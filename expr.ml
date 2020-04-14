@@ -1,10 +1,10 @@
 type name =
 | Hole
-| Name of string
+| Name of string * int
 
 let showName : name -> string = function
-  | Hole   -> "_"
-  | Name s -> s
+  | Hole        -> "_"
+  | Name (s, _) -> s
 
 type exp =
 | ELam of name * exp
@@ -63,10 +63,10 @@ let rec showValue : value -> string = function
   | VSet -> "U"
   | VPi (value, clos) ->
     let (x, f) = showClos clos in
-    Printf.sprintf "Π (%s : %s), %s" (showValue value) x f
+    Printf.sprintf "Π (%s : %s), %s" x (showValue value) f
   | VSig (value, clos) ->
     let (x, f) = showClos clos in
-    Printf.sprintf "Σ (%s : %s), %s" (showValue value) x f
+    Printf.sprintf "Σ (%s : %s), %s" x (showValue value) f
   | VNt n -> showNeut n
 and showNeut : neut -> string = function
   | NVar s -> showName s

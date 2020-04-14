@@ -53,8 +53,8 @@ let rec lookup (s : name) (lst : gamma) =
   | []      -> raise (Core ("lookup " ^ showName s))
 
 let pat (k : int) : name -> name = function
-  | Hole   -> Hole
-  | Name p -> Name (p ^ string_of_int k)
+  | Hole        -> Hole
+  | Name (p, _) -> Name (p, k)
 let genV k n : value = VNt (NVar (pat k n))
 
 let rec rbV (k : int) : value -> exp = function
@@ -153,7 +153,7 @@ and checkD k rho gma (d : decl) : gamma =
     check (k + 1) (UpVar (rho, p, gen)) gma1 e t;
     gma1
 
-let checkMain e = check 0 Nil [] e VSet
+let checkMain e = check 1 Nil [] e VSet
 
 let _ =
   for i = 1 to Array.length Sys.argv - 1 do

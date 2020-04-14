@@ -12,7 +12,7 @@
 
 ident:
   | HOLE  { Hole }
-  | IDENT { Name $1 }
+  | IDENT { Name ($1, 0) }
 
 exp0:
   | exp1 COMMA exp0 { EPair ($1, $3) }

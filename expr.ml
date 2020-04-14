@@ -70,10 +70,10 @@ let rec showValue : value -> string = function
   | VSet -> "U"
   | VPi (value, clos) ->
     let (x, f) = showClos clos in
-    Printf.sprintf "Π (%s : %s), %s" x (showValue value) f
+    Printf.sprintf "(%s : %s) -> %s" x (showValue value) f
   | VSig (value, clos) ->
     let (x, f) = showClos clos in
-    Printf.sprintf "Σ (%s : %s), %s" x (showValue value) f
+    Printf.sprintf "(%s : %s) * %s" x (showValue value) f
   | VNt n -> showNeut n
 and showNeut : neut -> string = function
   | NVar s -> showName s

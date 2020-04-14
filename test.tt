@@ -1,0 +1,9 @@
+def id : Π (A : U), A -> A :=
+λ A, λ a, a
+
+def test : Π (A : U), Π (B : A -> U),
+           Π (x : A), B x -> Σ (x : A), B x :=
+λ A, λ B, λ x, λ u, (x, u)
+
+def const : Π (A : U), Π (B : U), A -> B -> A :=
+λ A, λ B, λ a, λ b, a

@@ -1,22 +1,33 @@
 open Expr
 
-exception NfEqError
+exception TypeMismatch of exp * value * value
+exception InferError of exp
+exception VariableNotFound of name
+exception InvalidApplication of value * value
+exception ExpectedPi of value
+exception ExpectedSig of value
+
 exception Core of string
 
 let vfst : value -> value = function
   | VPair (u, _) -> u
   | VNt k        -> VNt (NFst k)
-  | _            -> raise (Core "vfst")
+  | v            -> raise (ExpectedSig v)
 
 let vsnd : value -> value = function
   | VPair (_, u) -> u
   | VNt k        -> VNt (NSnd k)
-  | _            -> raise (Core "vsnd")
+  | v            -> raise (ExpectedSig v)
 
 let rec lRho : rho -> int = function
   | Nil               -> 0
   | UpVar (rho, _, _) -> lRho rho + 1
   | UpDec (rho, _)    -> lRho rho
+
+let rec lookup (x1 : name) (lst : gamma) =
+  match lst with
+  | (x2, v) :: xs -> if x1 = x2 then v else lookup x1 xs
+  | []            -> raise (VariableNotFound x1)
 
 let rec eval (e : exp) (rho : rho) =
   match e with
@@ -32,25 +43,20 @@ let rec eval (e : exp) (rho : rho) =
   | EPair (e1, e2) -> VPair (eval e1 rho, eval e2 rho)
 and app : value * value -> value = function
   | (VLam f, v) -> closByVal f v
-  | (VNt k, m) -> VNt (NApp (k, m))
-  | _ -> raise (Core "app")
+  | (VNt k, m)  -> VNt (NApp (k, m))
+  | (x, y)      -> raise (InvalidApplication (x, y))
 and closByVal (x : clos) (v : value) =
   match x with
   | (p, e, rho) -> eval e (UpVar (rho, p, v))
 and getRho rho0 x =
   match rho0 with
+  | Nil -> raise (VariableNotFound x)
   | UpVar (rho, p, v) ->
     if x = p then v
     else getRho rho x
   | UpDec (rho, (p, _, e)) ->
     if x = p then eval e rho0
     else getRho rho x
-  | _ -> raise (Core "getRho")
-
-let rec lookup (s : name) (lst : gamma) =
-  match lst with
-  | x :: xs -> if s = fst x then snd x else lookup s xs
-  | []      -> raise (Core ("lookup " ^ showName s))
 
 let pat (k : int) : name -> name = function
   | Hole        -> Hole
@@ -76,19 +82,19 @@ and rbN i : neut -> exp = function
   | NFst k              -> EFst (rbN i k)
   | NSnd k              -> ESnd (rbN i k)
 
-let eqNf i m1 m2 : unit =
+let eqNf i e m1 m2 : unit =
   let e1 = rbV i m1 in
   let e2 = rbV i m2 in
   if e1 = e2 then ()
-  else raise NfEqError
+  else raise (TypeMismatch (e, m1, m2))
 
 let extPiG : value -> value * clos = function
   | VPi (t, g) -> (t, g)
-  | u          -> raise (Core ("extPiG " ^ Expr.showValue u))
+  | u          -> raise (ExpectedPi u)
 
 let extSigG : value -> value * clos = function
   | VSig (t, g) -> (t, g)
-  | u           -> raise (Core ("extSigG " ^ Expr.showValue u))
+  | u           -> raise (ExpectedSig u)
 
 let rec each (f : 'a -> unit) : 'a list -> unit = function
   | [] -> ()
@@ -101,67 +107,87 @@ let rec checkT k rho gma : exp -> unit = function
     checkT (k + 1) (UpVar (rho, p, genV k p)) gma1 b
   | ESig (p, a, b) -> checkT k rho gma (EPi (p, a, b))
   | ESet -> ()
-  | a -> check k rho gma a VSet
-and check k (rho : rho) (gma : gamma) (e0 : exp) (t0 : value) : unit =
+  | a -> let _ = check k rho gma a VSet in ()
+and check k (rho : rho) (gma : gamma) (e0 : exp) (t0 : value) : gamma =
   match e0, t0 with
   | ELam (p, e), VPi (t, g) ->
     let gen = genV k p in
     let gma1 = (p, t) :: gma in
     check (k + 1) (UpVar (rho, p, gen)) gma1 e (closByVal g gen)
   | EPair (e1, e2), VSig (t, g) ->
-    check k rho gma e1 t;
+    let _ = check k rho gma e1 t in
     check k rho gma e2 (closByVal g (eval e1 rho))
-  | ESet, VSet -> ()
+  | ESet, VSet -> gma
   | EPi (p, a, b), VSet ->
-    check k rho gma a VSet;
+    let _ = check k rho gma a VSet in
     let gen = genV k p in
     let gma1 = (p, eval a rho) :: gma in
     check (k + 1) (UpVar (rho, p, gen)) gma1 b VSet
   | ESig (p, a, b), VSet ->
     check k rho gma (EPi (p, a, b)) VSet
   | EDec (d, e), t ->
-    let gma1 = checkD k rho gma d in
-    check k (UpDec (rho, d)) gma1 e t
-  | e, t ->
-    let t0 = checkI k rho gma e in
-    try eqNf k t t0
-    with NfEqError ->
-      Printf.printf "%s was expected to be\n  %s\nbut it is\n  %s\n"
-        (Expr.showExp e) (Expr.showValue t) (Expr.showValue t0)
+    let (name, _, _) = d in
+    Printf.printf "Checking: %s\n" (Expr.showName name);
+    check k (UpDec (rho, d)) (checkD k rho gma d) e t
+  | e, t -> eqNf k e t (checkI k rho gma e); gma
 and checkI k rho gma : exp -> value = function
   | EVar x -> lookup x gma
   | EApp (f, x) ->
     let t1 = checkI k rho gma f in
     let (t, g) = extPiG t1 in
-    check k rho gma x t;
+    let _ = check k rho gma x t in
     closByVal g (eval x rho)
   | EFst e ->
-    let t = checkI k rho gma e in
-    fst (extSigG t)
+    let t = checkI k rho gma e in fst (extSigG t)
   | ESnd e ->
     let t = checkI k rho gma e in
     let (_, g) = extSigG t in
     closByVal g (vfst (eval e rho))
-  | e -> raise (Core ("checkI: " ^ Expr.showExp e))
+  | e -> raise (InferError e)
 and checkD k rho gma (d : decl) : gamma =
   match d with
   | (p, a, e) ->
     checkT k rho gma a;
-    let t = eval a rho in
-    let gen = genV k p in
+    let t = eval a rho in let gen = genV k p in
     let gma1 = (p, t) :: gma in
-    check (k + 1) (UpVar (rho, p, gen)) gma1 e t;
-    gma1
+    check (k + 1) (UpVar (rho, p, gen)) gma1 e t
 
-let checkMain e = check 1 Nil [] e VSet
+let checkMain filename gma e =
+  Printf.printf "Parsed “%s” successfully.\n" filename;
+  let rho = check 1 Nil gma e VSet in
+  Printf.printf "File loaded.\n"; rho
 
+let prettyPrintError : exn -> unit = function
+  | TypeMismatch (e, t, t0) ->
+    Printf.printf "%s was expected to be\n  %s\nbut it is\n  %s\n"
+      (Expr.showExp e) (Expr.showValue t) (Expr.showValue t0)
+  | InferError e ->
+    Printf.printf "Cannot infer type of\n  %s\n" (Expr.showExp e)
+  | VariableNotFound p ->
+    Printf.printf "Variable %s was not found\n" (Expr.showName p)
+  | InvalidApplication (x, y) ->
+    Printf.printf "Invalid application \n  %s\nto\n  %s\n"
+                  (Expr.showValue x) (Expr.showValue y)
+  | ExpectedPi x ->
+    Printf.printf "  %s\nexpected to be Pi-type\n" (Expr.showValue x)
+  | ExpectedSig x ->
+    Printf.printf "  %s\nexpected to be Sigma-type\n" (Expr.showValue x)
+  | ex -> Printf.printf "uncaught exception: %s" (Printexc.to_string ex)
+
+let handleErrors (f : 'a -> 'b) (x : 'a) (default : 'b) : 'b =
+  try f x with ex -> prettyPrintError ex; default
+
+let env : gamma ref = ref []
 let _ =
   for i = 1 to Array.length Sys.argv - 1 do
-    let filename = Sys.argv.(i) in
-    let chan = open_in filename in
-    let text = really_input_string chan (in_channel_length chan) in
-    close_in chan;
-    let exp = Parser.exp Lexer.main (Lexing.from_string text) in
-    Format.printf "Checking %s\n" filename;
-    checkMain exp
+    let filename = Sys.argv.(i) in let chan = open_in filename in
+    let exp = Parser.exp Lexer.main (Lexing.from_channel chan) in
+    close_in chan; env := handleErrors (checkMain filename !env) exp !env
+  done;
+  while true do
+    print_string "> ";
+    let line = read_line () in
+    let exp = Parser.repl Lexer.main (Lexing.from_string line) in
+    handleErrors (fun v -> Printf.printf "EVAL: %s\n" (Expr.showValue v))
+                 (eval exp Nil) ()
   done

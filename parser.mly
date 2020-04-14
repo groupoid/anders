@@ -7,6 +7,7 @@
 %token FST SND COLON DEFEQ ARROW LAM EOF
 
 %start <Expr.exp> exp
+%start <Expr.exp> repl
 
 %%
 
@@ -48,3 +49,6 @@ decl:
 exp:
   | decl exp { EDec ($1, $2) }
   | EOF { ESet }
+
+repl:
+  | exp0 EOF { $1 }

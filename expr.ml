@@ -50,7 +50,7 @@ type value =
 | VSig of value * clos
 | VNt of neut
 and neut =
-| NGen of int
+| NGen of int * name
 | NApp of neut * value
 | NFst of neut
 | NSnd of neut
@@ -73,26 +73,9 @@ let rec showValue : value -> string = function
     Printf.sprintf "Σ (%s : %s), %s" (showValue value) x f
   | VNt n -> showNeut n
 and showNeut : neut -> string = function
-  | NGen k -> "x" ^ string_of_int k
+  | NGen (k, s) -> s ^ "#" ^ string_of_int k
   | NApp (f, x) -> Printf.sprintf "(%s %s)" (showNeut f) (showValue x)
   | NFst v -> showNeut v ^ ".1"
   | NSnd v -> showNeut v ^ ".2"
 and showClos : clos -> string * string = function
   (patt, exp, _) -> (showPatt patt, showExp exp)
-
-type nexp =
-| NELam of int * nexp
-| NEPair of nexp * nexp
-| NESet
-| NEPi of nexp * int * nexp
-| NESig of nexp * int * nexp
-| NENt of nneut
-and nneut =
-| NtGen of int
-| NtApp of nneut * nexp
-| NtFst of nneut
-| NtSnd of nneut
-and nrho =
-| Nil
-| UpVar of nrho * patt * nexp
-| UpDec of nrho * decl

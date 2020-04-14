@@ -54,11 +54,11 @@ and closByVal (x : clos) (v : value) =
 and getRho rho0 x =
   match rho0 with
   | UpVar (rho, p, v) ->
-      if inPat x p then patProj p x v
-      else getRho rho x
+    if inPat x p then patProj p x v
+    else getRho rho x
   | UpDec (rho, (p, _, e)) ->
-      if inPat x p then patProj p x (eval e rho0)
-      else getRho rho x
+    if inPat x p then patProj p x (eval e rho0)
+    else getRho rho x
   | _ -> raise (Core "getRho")
 
 type gamma = (name * value) list
@@ -77,24 +77,23 @@ let rec update gma (p : patt) v1 v2 : gamma =
     update gma1 p2 (closByVal g (vfst v)) (vsnd v)
   | (p, _, _) -> raise (Core ("update: p = " ^ Expr.showPatt p))
 
-let genV k : value = VNt (NGen k)
+let genV k : value = VNt (NGen (k, "G"))
 
-let rec rbV (k : int) : value -> nexp = function
-  | VLam f         -> NELam (k, rbV (k + 1) (closByVal f (genV k)))
-  | VPair (u, v)   -> NEPair (rbV k u, rbV k v)
-  | VSet           -> NESet
-  | VPi (t, g)     -> NEPi (rbV k t, k, rbV (k + 1) (closByVal g (genV k)))
-  | VSig (t, g)    -> NESig (rbV k t, k, rbV (k + 1) (closByVal g (genV k)))
-  | VNt l          -> NENt (rbN k l)
-and rbN i : neut -> nneut = function
-  | NGen j              -> NtGen j
-  | NApp (k, m)         -> NtApp (rbN i k, rbV i m)
-  | NFst k              -> NtFst (rbN i k)
-  | NSnd k              -> NtSnd (rbN i k)
-and rbRho i : rho -> nrho = function
-  | Nil               -> Nil
-  | UpVar (rho, p, v) -> UpVar (rbRho i rho, p, rbV i v)
-  | UpDec (rho, d)    -> UpDec (rbRho i rho, d)
+let pat (k : int) : patt =
+  Var ("G#" ^ string_of_int k)
+
+let rec rbV (k : int) : value -> exp = function
+  | VLam f         -> ELam (pat k, rbV (k + 1) (closByVal f (genV k)))
+  | VPair (u, v)   -> EPair (rbV k u, rbV k v)
+  | VSet           -> ESet
+  | VPi (t, g)     -> EPi (pat k, rbV k t, rbV (k + 1) (closByVal g (genV k)))
+  | VSig (t, g)    -> ESig (pat k, rbV k t, rbV (k + 1) (closByVal g (genV k)))
+  | VNt l          -> rbN k l
+and rbN i : neut -> exp = function
+  | NGen (j, s)         -> EVar (s ^ string_of_int j)
+  | NApp (k, m)         -> EApp (rbN i k, rbV i m)
+  | NFst k              -> EFst (rbN i k)
+  | NSnd k              -> ESnd (rbN i k)
 
 let eqNf i m1 m2 : unit =
   let e1 = rbV i m1 in
@@ -151,9 +150,9 @@ and check k (rho : rho) (gma : gamma) (e0 : exp) (t0 : value) : unit =
   | e, t ->
     let t0 = checkI k rho gma e in
     try eqNf k t t0
-    with NfEqError -> raise (Core (Printf.sprintf
-      "%s was expected to be\n  %s\nbut it is\n  %s"
-      (Expr.showExp e) (Expr.showValue t) (Expr.showValue t0)))
+    with NfEqError ->
+      Printf.printf "%s was expected to be\n  %s\nbut it is\n  %s\n"
+        (Expr.showExp e) (Expr.showValue t) (Expr.showValue t0)
 and checkI k rho gma : exp -> value = function
   | EVar x -> lookup x gma
   | EApp (f, x) ->

@@ -27,7 +27,7 @@ let rec lam (e : exp) : name list -> exp = function
   | x :: xs -> ELam (x, lam e xs)
 
 let rec showExp : exp -> string = function
-  | ELam (p, exp) -> Printf.sprintf "λ %s, %s" (showName p) (showExp exp)
+  | ELam (p, exp) -> Printf.sprintf "\\ %s -> %s" (showName p) (showExp exp)
   | ESet -> "U"
   | EPi (p, exp1, exp2) ->
     Printf.sprintf "(%s : %s) -> %s" (showName p) (showExp exp1) (showExp exp2)
@@ -65,7 +65,7 @@ and rho =
 
 let rec showValue : value -> string = function
   | VLam clos -> let (x, f) = showClos clos in
-                 Printf.sprintf "λ %s, %s" x f
+                 Printf.sprintf "\\ %s -> %s" x f
   | VPair (fst, snd) -> Printf.sprintf "(%s, %s)" (showValue fst) (showValue snd)
   | VSet -> "U"
   | VPi (value, clos) ->

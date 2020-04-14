@@ -23,7 +23,7 @@ idents:
   | ident idents { $1 :: $2 }
 
 exp1:
-  | LAM idents COMMA exp1 { lam $4 $2 }
+  | LAM idents ARROW exp1 { lam $4 $2 }
   | LPARENS ident COLON exp1 RPARENS ARROW exp1
     { EPi  ($2, $4, $7) }
   | LPARENS ident COLON exp1 RPARENS STAR exp1

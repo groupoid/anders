@@ -108,7 +108,7 @@ let rec checkT k rho gma : exp -> unit = function
   | ESig (p, a, b) -> checkT k rho gma (EPi (p, a, b))
   | ESet -> ()
   | a -> let _ = check k rho gma a VSet in ()
-and check k (rho : rho) (gma : gamma) (e0 : exp) (t0 : value) : gamma =
+and check k (rho : rho) (gma : gamma) (e0 : exp) (t0 : value) : rho * gamma =
   match e0, t0 with
   | ELam (p, e), VPi (t, g) ->
     let gen = genV k p in
@@ -117,7 +117,7 @@ and check k (rho : rho) (gma : gamma) (e0 : exp) (t0 : value) : gamma =
   | EPair (e1, e2), VSig (t, g) ->
     let _ = check k rho gma e1 t in
     check k rho gma e2 (closByVal g (eval e1 rho))
-  | ESet, VSet -> gma
+  | ESet, VSet -> (rho, gma)
   | EPi (p, a, b), VSet ->
     let _ = check k rho gma a VSet in
     let gen = genV k p in
@@ -128,8 +128,8 @@ and check k (rho : rho) (gma : gamma) (e0 : exp) (t0 : value) : gamma =
   | EDec (d, e), t ->
     let (name, _, _) = d in
     Printf.printf "Checking: %s\n" (Expr.showName name);
-    check k (UpDec (rho, d)) (checkD k rho gma d) e t
-  | e, t -> eqNf k e t (checkI k rho gma e); gma
+    check k (UpDec (rho, d)) (snd (checkD k rho gma d)) e t
+  | e, t -> eqNf k e t (checkI k rho gma e); (rho, gma)
 and checkI k rho gma : exp -> value = function
   | EVar x -> lookup x gma
   | EApp (f, x) ->
@@ -144,7 +144,7 @@ and checkI k rho gma : exp -> value = function
     let (_, g) = extSigG t in
     closByVal g (vfst (eval e rho))
   | e -> raise (InferError e)
-and checkD k rho gma (d : decl) : gamma =
+and checkD k rho gma (d : decl) : rho * gamma =
   match d with
   | (p, a, e) ->
     checkT k rho gma a;
@@ -152,9 +152,9 @@ and checkD k rho gma (d : decl) : gamma =
     let gma1 = (p, t) :: gma in
     check (k + 1) (UpVar (rho, p, gen)) gma1 e t
 
-let checkMain filename gma e =
+let checkMain filename rho gma e =
   Printf.printf "Parsed “%s” successfully.\n" filename;
-  let rho = check 1 Nil gma e VSet in
+  let rho = check 1 rho gma e VSet in
   Printf.printf "File loaded.\n"; rho
 
 let prettyPrintError : exn -> unit = function
@@ -177,17 +177,22 @@ let prettyPrintError : exn -> unit = function
 let handleErrors (f : 'a -> 'b) (x : 'a) (default : 'b) : 'b =
   try f x with ex -> prettyPrintError ex; default
 
-let env : gamma ref = ref []
+let rho : rho ref   = ref Nil
+let gma : gamma ref = ref []
 let _ =
   for i = 1 to Array.length Sys.argv - 1 do
     let filename = Sys.argv.(i) in let chan = open_in filename in
     let exp = Parser.exp Lexer.main (Lexing.from_channel chan) in
-    close_in chan; env := handleErrors (checkMain filename !env) exp !env
+    close_in chan;
+    let (rho1, gma1) =
+      handleErrors (checkMain filename !rho !gma) exp
+                   (!rho, !gma) in
+    rho := rho1; gma := gma1
   done;
   while true do
     print_string "> ";
     let line = read_line () in
     let exp = Parser.repl Lexer.main (Lexing.from_string line) in
     handleErrors (fun v -> Printf.printf "EVAL: %s\n" (Expr.showValue v))
-                 (eval exp Nil) ()
+                 (eval exp !rho) ()
   done

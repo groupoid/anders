@@ -1,5 +1,6 @@
 open Expr
 
+exception NfEqError
 exception Core of string
 
 let vfst : value -> value = function
@@ -67,9 +68,6 @@ let rec lookup (s : 'a) (lst : ('a * 'b) list) =
   | x :: xs -> if s = fst x then snd x else lookup s xs
   | []      -> raise (Core ("lookup " ^ s))
 
-let showExp  (e : exp)  = "exp"
-let showPatt (p : patt) = "patt"
-
 let rec update gma (p : patt) v1 v2 : gamma =
   match (p, v1, v2) with
   | (Unit, _, _) -> gma
@@ -77,9 +75,8 @@ let rec update gma (p : patt) v1 v2 : gamma =
   | (Pair (p1, p2), VSig (t, g), v) ->
     let gma1 = update gma p1 t (vfst v) in
     update gma1 p2 (closByVal g (vfst v)) (vsnd v)
-  | (p, _, _) -> raise (Core ("update: p = " ^ showPatt p))
+  | (p, _, _) -> raise (Core ("update: p = " ^ Expr.showPatt p))
 
-let showNExp (e : nexp) = "exp"
 let genV k : value = VNt (NGen k)
 
 let rec rbV (k : int) : value -> nexp = function
@@ -103,17 +100,15 @@ let eqNf i m1 m2 : unit =
   let e1 = rbV i m1 in
   let e2 = rbV i m2 in
   if e1 = e2 then ()
-  else raise (Core "eqNf")
-
-let showVal u = showNExp (rbV 0 u)
+  else raise NfEqError
 
 let extPiG : value -> value * clos = function
   | VPi (t, g) -> (t, g)
-  | u          -> raise (Core ("extPiG " ^ showVal u))
+  | u          -> raise (Core ("extPiG " ^ Expr.showValue u))
 
 let extSigG : value -> value * clos = function
   | VSig (t, g) -> (t, g)
-  | u           -> raise (Core ("extSigG " ^ showVal u))
+  | u           -> raise (Core ("extSigG " ^ Expr.showValue u))
 
 let rec each (f : 'a -> unit) : 'a list -> unit = function
   | [] -> ()
@@ -153,7 +148,12 @@ and check k (rho : rho) (gma : gamma) (e0 : exp) (t0 : value) : unit =
   | EDec (d, e), t ->
     let gma1 = checkD k rho gma d in
     check k (UpDec (rho, d)) gma1 e t
-  | e, t -> eqNf k t (checkI k rho gma e)
+  | e, t ->
+    let t0 = checkI k rho gma e in
+    try eqNf k t t0
+    with NfEqError -> raise (Core (Printf.sprintf
+      "%s was expected to be\n  %s\nbut it is\n  %s"
+      (Expr.showExp e) (Expr.showValue t) (Expr.showValue t0)))
 and checkI k rho gma : exp -> value = function
   | EVar x -> lookup x gma
   | EApp (f, x) ->
@@ -167,8 +167,8 @@ and checkI k rho gma : exp -> value = function
   | ESnd e ->
     let t = checkI k rho gma e in
     let (_, g) = extSigG t in
-    closByVal g (eval e rho)
-  | e -> raise (Core ("checkI: " ^ showExp e))
+    closByVal g (vfst (eval e rho))
+  | e -> raise (Core ("checkI: " ^ Expr.showExp e))
 and checkD k rho gma (d : decl) : gamma =
   match d with
   | (p, a, e) ->

@@ -11,8 +11,8 @@ let bytes4 = ['\240'-'\247']['\128'-'\191']['\128'-'\191']['\128'-'\191']
 let ch     = bytes1|bytes2|bytes3|bytes4
 let ws     = (['\t' ' ' '\r' '\n']|"--"_*)
 let colon  = ':'
-let arrow  = "->"
-let defeq  = ":="
+let arrow  = "->"|"\xE2\x86\x92"
+let defeq  = ":="|"\xE2\x89\x94"|"\xE2\x89\x9C"|"\xE2\x89\x9D"
 let lam    = "\\"|"\xCE\xBB"
 let star   = '*'
 let pi     = "forall"|"\xCE\xA0"

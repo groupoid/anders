@@ -1,3 +1,5 @@
+exception ParsingError
+
 type name =
 | Hole
 | Name of string * int
@@ -18,6 +20,11 @@ type exp =
 | EVar of name
 | EDec of decl * exp
 and decl = name * exp * exp
+
+let rec lam (e : exp) : name list -> exp = function
+  | []      -> raise ParsingError
+  | [x]     -> ELam (x, e)
+  | x :: xs -> ELam (x, lam e xs)
 
 let rec showExp : exp -> string = function
   | ELam (p, exp) -> Printf.sprintf "λ %s, %s" (showName p) (showExp exp)

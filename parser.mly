@@ -3,7 +3,7 @@
 %}
 
 %token <string> IDENT
-%token LPARENS RPARENS COMMA HOLE SET DEF PI SIGMA
+%token LPARENS RPARENS COMMA HOLE SET DEF STAR
 %token FST SND COLON DEFEQ ARROW LAM EOF
 
 %start <Expr.exp> exp
@@ -18,12 +18,16 @@ exp0:
   | exp1 COMMA exp0 { EPair ($1, $3) }
   | exp1 { $1 }
 
+idents:
+  | ident { [$1] }
+  | ident idents { $1 :: $2 }
+
 exp1:
-  | LAM ident COMMA exp1 { ELam ($2, $4) }
-  | PI LPARENS ident COLON exp1 RPARENS COMMA exp1
-    { EPi  ($3, $5, $8) }
-  | SIGMA LPARENS ident COLON exp1 RPARENS COMMA exp1
-    { ESig ($3, $5, $8) }
+  | LAM idents COMMA exp1 { lam $4 $2 }
+  | LPARENS ident COLON exp1 RPARENS ARROW exp1
+    { EPi  ($2, $4, $7) }
+  | LPARENS ident COLON exp1 RPARENS STAR exp1
+    { ESig ($2, $4, $7) }
   | exp2 ARROW exp1 { EPi (Hole, $1, $3) }
   | exp2 { $1 }
 

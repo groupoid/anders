@@ -15,8 +15,6 @@ let arrow  = "->"|"\xE2\x86\x92"
 let defeq  = ":="|"\xE2\x89\x94"|"\xE2\x89\x9C"|"\xE2\x89\x9D"
 let lam    = "\\"|"\xCE\xBB"
 let star   = '*'
-let pi     = "forall"|"\xCE\xA0"
-let sigma  = "sigma"|"\xCE\xA3"
 
 rule main = parse
 | ws+      { main lexbuf }
@@ -27,12 +25,11 @@ rule main = parse
 | ')'      { RPARENS }
 | ".1"     { FST }
 | ".2"     { SND }
+| "*"      { STAR }
 | defeq    { DEFEQ }
 | lam      { LAM }
 | arrow    { ARROW }
 | colon    { COLON }
 | "def"    { DEF }
-| pi       { PI }
-| sigma    { SIGMA }
 | ch+ as s { IDENT s }
 | eof      { EOF }

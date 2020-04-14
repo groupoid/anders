@@ -1,16 +1,16 @@
-def id : Π (A : U), A -> A :=
+def id : (A : U) -> A -> A :=
 λ A, λ a, a
 
-def sigmaIntro : Π (A : U), Π (B : A -> U),
-                 Π (x : A), B x -> Σ (x : A), B x :=
+def sigmaIntro : (A : U) -> (B : A -> U) ->
+                 (x : A) -> B x -> (x : A) * B x :=
 λ A, λ B, λ x, λ u, (x, u)
 
-def sigmaProj₂ : Π (A : U), Π (B : A -> U),
-                 Π (z : Σ (x : A), B x), B z.1 :=
+def sigmaProj₂ : (A : U) -> (B : A -> U) ->
+                 (z : (x : A) * B x) -> B z.1 :=
 λ A, λ B, λ z, z.2
 
-def const : Π (A : U), Π (B : U), A -> B -> A :=
+def const : (A : U) -> (B : U) -> A -> B -> A :=
 λ A, λ B, λ a, λ b, a
 
-def test : Π (A : U), Π (B : U), (A -> B) -> A -> B :=
-λ A, λ B, λ f, λ x, f x
+def test : (A : U) -> (B : U) -> (A -> B) -> A -> B :=
+λ A B f x, f x

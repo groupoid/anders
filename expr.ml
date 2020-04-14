@@ -30,9 +30,9 @@ let rec showExp : exp -> string = function
   | ELam (p, exp) -> Printf.sprintf "λ %s, %s" (showName p) (showExp exp)
   | ESet -> "U"
   | EPi (p, exp1, exp2) ->
-    Printf.sprintf "Π (%s : %s), %s" (showName p) (showExp exp1) (showExp exp2)
+    Printf.sprintf "(%s : %s) -> %s" (showName p) (showExp exp1) (showExp exp2)
   | ESig (p, exp1, exp2) ->
-    Printf.sprintf "Σ (%s : %s), %s" (showName p) (showExp exp1) (showExp exp2)
+    Printf.sprintf "(%s : %s) * %s" (showName p) (showExp exp1) (showExp exp2)
   | EPair (fst, snd) -> Printf.sprintf "(%s, %s)" (showExp fst) (showExp snd)
   | EFst exp -> showExp exp ^ ".1"
   | ESnd exp -> showExp exp ^ ".2"

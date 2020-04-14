@@ -1,46 +1,42 @@
-type name = string
+type name =
+| Hole
+| Name of string
 
-type patt =
-| Unit
-| Var of name
-| Pair of patt * patt
-
-let rec showPatt : patt -> string = function
-  | Unit        -> "_"
-  | Var s       -> s
-  | Pair (x, y) -> Printf.sprintf "(%s, %s)" (showPatt x) (showPatt y)
+let showName : name -> string = function
+  | Hole   -> "_"
+  | Name s -> s
 
 type exp =
-| ELam of patt * exp
+| ELam of name * exp
 | ESet
-| EPi of patt * exp * exp
-| ESig of patt * exp * exp
+| EPi of name * exp * exp
+| ESig of name * exp * exp
 | EPair of exp * exp
 | EFst of exp
 | ESnd of exp
 | EApp of exp * exp
 | EVar of name
 | EDec of decl * exp
-and decl = patt * exp * exp
+and decl = name * exp * exp
 
 let rec showExp : exp -> string = function
-  | ELam (patt, exp) -> Printf.sprintf "λ %s, %s" (showPatt patt) (showExp exp)
+  | ELam (p, exp) -> Printf.sprintf "λ %s, %s" (showName p) (showExp exp)
   | ESet -> "U"
-  | EPi (patt, exp1, exp2) ->
-    Printf.sprintf "Π (%s : %s), %s" (showPatt patt) (showExp exp1) (showExp exp2)
-  | ESig (patt, exp1, exp2) ->
-    Printf.sprintf "Σ (%s : %s), %s" (showPatt patt) (showExp exp1) (showExp exp2)
+  | EPi (p, exp1, exp2) ->
+    Printf.sprintf "Π (%s : %s), %s" (showName p) (showExp exp1) (showExp exp2)
+  | ESig (p, exp1, exp2) ->
+    Printf.sprintf "Σ (%s : %s), %s" (showName p) (showExp exp1) (showExp exp2)
   | EPair (fst, snd) -> Printf.sprintf "(%s, %s)" (showExp fst) (showExp snd)
   | EFst exp -> showExp exp ^ ".1"
   | ESnd exp -> showExp exp ^ ".2"
   | EApp (f, x) -> Printf.sprintf "(%s %s)" (showExp f) (showExp x)
-  | EVar name -> name
+  | EVar p -> showName p
   | EDec (decl, exp) -> showDecl decl ^ "\n" ^ showExp exp
 and showDecl : decl -> string = function
-  (patt, exp1, exp2) -> Printf.sprintf "def %s : %s := %s"
-                                       (showPatt patt)
-                                       (showExp exp1)
-                                       (showExp exp2)
+  (p, exp1, exp2) -> Printf.sprintf "def %s : %s := %s"
+                                    (showName p)
+                                    (showExp exp1)
+                                    (showExp exp2)
 
 type value =
 | VLam of clos
@@ -50,14 +46,14 @@ type value =
 | VSig of value * clos
 | VNt of neut
 and neut =
-| NGen of int * name
+| NVar of name
 | NApp of neut * value
 | NFst of neut
 | NSnd of neut
-and clos = patt * exp * rho
+and clos = name * exp * rho
 and rho =
 | Nil
-| UpVar of rho * patt * value
+| UpVar of rho * name * value
 | UpDec of rho * decl
 
 let rec showValue : value -> string = function
@@ -73,9 +69,11 @@ let rec showValue : value -> string = function
     Printf.sprintf "Σ (%s : %s), %s" (showValue value) x f
   | VNt n -> showNeut n
 and showNeut : neut -> string = function
-  | NGen (k, s) -> s ^ "#" ^ string_of_int k
+  | NVar s -> showName s
   | NApp (f, x) -> Printf.sprintf "(%s %s)" (showNeut f) (showValue x)
   | NFst v -> showNeut v ^ ".1"
   | NSnd v -> showNeut v ^ ".2"
 and showClos : clos -> string * string = function
-  (patt, exp, _) -> (showPatt patt, showExp exp)
+  (p, exp, _) -> (showName p, showExp exp)
+
+type gamma = (name * value) list

@@ -13,20 +13,6 @@ let vsnd : value -> value = function
   | VNt k        -> VNt (NSnd k)
   | _            -> raise (Core "vsnd")
 
-let rec inPat x : patt -> bool = function
-  | Unit          -> false
-  | Var y         -> x = y
-  | Pair (p1, p2) -> inPat x p1 || inPat x p2
-
-let rec patProj (p : patt) (x : string) (v : value) =
-  match p with
-  | Var y when x = y -> v
-  | Pair (p1, p2) ->
-    if inPat x p1 then patProj p1 x (vfst v)
-    else if inPat x p2 then patProj p2 x (vsnd v)
-    else raise (Core "patProj")
-  | _ -> raise (Core "patProj")
-
 let rec lRho : rho -> int = function
   | Nil               -> 0
   | UpVar (rho, _, _) -> lRho rho + 1
@@ -54,43 +40,38 @@ and closByVal (x : clos) (v : value) =
 and getRho rho0 x =
   match rho0 with
   | UpVar (rho, p, v) ->
-    if inPat x p then patProj p x v
+    if x = p then v
     else getRho rho x
   | UpDec (rho, (p, _, e)) ->
-    if inPat x p then patProj p x (eval e rho0)
+    if x = p then eval e rho0
     else getRho rho x
   | _ -> raise (Core "getRho")
 
-type gamma = (name * value) list
-
-let rec lookup (s : 'a) (lst : ('a * 'b) list) =
+let rec lookup (s : name) (lst : gamma) =
   match lst with
   | x :: xs -> if s = fst x then snd x else lookup s xs
-  | []      -> raise (Core ("lookup " ^ s))
+  | []      -> raise (Core ("lookup " ^ showName s))
 
-let rec update gma (p : patt) v1 v2 : gamma =
-  match (p, v1, v2) with
-  | (Unit, _, _) -> gma
-  | (Var x, t, _) -> (x, t) :: gma
-  | (Pair (p1, p2), VSig (t, g), v) ->
-    let gma1 = update gma p1 t (vfst v) in
-    update gma1 p2 (closByVal g (vfst v)) (vsnd v)
-  | (p, _, _) -> raise (Core ("update: p = " ^ Expr.showPatt p))
-
-let genV k : value = VNt (NGen (k, "G"))
-
-let pat (k : int) : patt =
-  Var ("G#" ^ string_of_int k)
+let pat (k : int) : name -> name = function
+  | Hole   -> Hole
+  | Name p -> Name (p ^ string_of_int k)
+let genV k n : value = VNt (NVar (pat k n))
 
 let rec rbV (k : int) : value -> exp = function
-  | VLam f         -> ELam (pat k, rbV (k + 1) (closByVal f (genV k)))
+  | VLam f         ->
+    let (p, _, _) = f in
+    ELam (pat k p, rbV (k + 1) (closByVal f (genV k p)))
   | VPair (u, v)   -> EPair (rbV k u, rbV k v)
   | VSet           -> ESet
-  | VPi (t, g)     -> EPi (pat k, rbV k t, rbV (k + 1) (closByVal g (genV k)))
-  | VSig (t, g)    -> ESig (pat k, rbV k t, rbV (k + 1) (closByVal g (genV k)))
+  | VPi (t, g)     ->
+    let (p, _, _) = g in
+    EPi (pat k p, rbV k t, rbV (k + 1) (closByVal g (genV k p)))
+  | VSig (t, g)    ->
+    let (p, _, _) = g in
+    ESig (pat k p, rbV k t, rbV (k + 1) (closByVal g (genV k p)))
   | VNt l          -> rbN k l
 and rbN i : neut -> exp = function
-  | NGen (j, s)         -> EVar (s ^ string_of_int j)
+  | NVar s              -> EVar s
   | NApp (k, m)         -> EApp (rbN i k, rbV i m)
   | NFst k              -> EFst (rbN i k)
   | NSnd k              -> ESnd (rbN i k)
@@ -113,25 +94,19 @@ let rec each (f : 'a -> unit) : 'a list -> unit = function
   | [] -> ()
   | x :: xs -> f x; each f xs
 
-let rec each2 (f : 'a -> 'b -> unit) (lst1 : 'a list) (lst2 : 'b list) =
-  match lst1, lst2 with
-  | [], _ -> ()
-  | _, [] -> ()
-  | x :: xs, y :: ys -> f x y; each2 f xs ys
-
 let rec checkT k rho gma : exp -> unit = function
   | EPi (p, a, b) ->
     checkT k rho gma a;
-    let gma1 = update gma p (eval a rho) (genV k) in
-    checkT (k + 1) (UpVar (rho, p, genV k)) gma1 b
+    let gma1 = (p, eval a rho) :: gma in
+    checkT (k + 1) (UpVar (rho, p, genV k p)) gma1 b
   | ESig (p, a, b) -> checkT k rho gma (EPi (p, a, b))
   | ESet -> ()
   | a -> check k rho gma a VSet
 and check k (rho : rho) (gma : gamma) (e0 : exp) (t0 : value) : unit =
   match e0, t0 with
   | ELam (p, e), VPi (t, g) ->
-    let gen = genV k in
-    let gma1 = update gma p t gen in
+    let gen = genV k p in
+    let gma1 = (p, t) :: gma in
     check (k + 1) (UpVar (rho, p, gen)) gma1 e (closByVal g gen)
   | EPair (e1, e2), VSig (t, g) ->
     check k rho gma e1 t;
@@ -139,8 +114,8 @@ and check k (rho : rho) (gma : gamma) (e0 : exp) (t0 : value) : unit =
   | ESet, VSet -> ()
   | EPi (p, a, b), VSet ->
     check k rho gma a VSet;
-    let gen = genV k in
-    let gma1 = update gma p (eval a rho) gen in
+    let gen = genV k p in
+    let gma1 = (p, eval a rho) :: gma in
     check (k + 1) (UpVar (rho, p, gen)) gma1 b VSet
   | ESig (p, a, b), VSet ->
     check k rho gma (EPi (p, a, b)) VSet
@@ -173,11 +148,10 @@ and checkD k rho gma (d : decl) : gamma =
   | (p, a, e) ->
     checkT k rho gma a;
     let t = eval a rho in
-    let gen = genV k in
-    let gma1 = update gma p t gen in
+    let gen = genV k p in
+    let gma1 = (p, t) :: gma in
     check (k + 1) (UpVar (rho, p, gen)) gma1 e t;
-    let v = eval e (UpDec (rho, d)) in
-    update gma p t v
+    gma1
 
 let checkMain e = check 0 Nil [] e VSet
 

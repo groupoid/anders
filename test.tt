@@ -11,3 +11,6 @@ def sigmaProj₂ : Π (A : U), Π (B : A -> U),
 
 def const : Π (A : U), Π (B : U), A -> B -> A :=
 λ A, λ B, λ a, λ b, a
+
+def test : Π (A : U), Π (B : U), (A -> B) -> A -> B :=
+λ A, λ B, λ f, λ x, f x

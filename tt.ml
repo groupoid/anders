@@ -177,6 +177,11 @@ let prettyPrintError : exn -> unit = function
 let handleErrors (f : 'a -> 'b) (x : 'a) (default : 'b) : 'b =
   try f x with ex -> prettyPrintError ex; default
 
+let checkAndEval rho gma (exp : exp) =
+  let t = checkI 1 rho gma exp in
+  let v = eval exp rho in
+  Printf.printf "TYPE: %s\nEVAL: %s\n" (Expr.showValue t) (Expr.showValue v)
+
 let rho : rho ref   = ref Nil
 let gma : gamma ref = ref []
 let _ =
@@ -193,6 +198,5 @@ let _ =
     print_string "> ";
     let line = read_line () in
     let exp = Parser.repl Lexer.main (Lexing.from_string line) in
-    handleErrors (fun v -> Printf.printf "EVAL: %s\n" (Expr.showValue v))
-                 (eval exp !rho) ()
+    handleErrors (checkAndEval !rho !gma) exp ()
   done

@@ -1,16 +1,16 @@
 def id : (A : U) -> A -> A :=
-λ A a -> a
+λ (A : U) (a : A) -> a
 
 def sigmaIntro : (A : U) -> (B : A -> U) ->
                  (x : A) -> B x -> (x : A) * B x :=
-λ A B x u -> (x, u)
+λ (A : U) (B : A -> U) (x : A) (u : B x) -> (x, u)
 
 def sigmaProj₂ : (A : U) -> (B : A -> U) ->
                  (z : (x : A) * B x) -> B z.1 :=
-λ A B z -> z.2
+λ (A : U) (B : A -> U) (z : (x : A) * B x) -> z.2
 
 def const : (A : U) -> (B : U) -> A -> B -> A :=
-λ A B a b -> a
+λ (A : U) (B : U) (a : A) (b : B) -> a
 
 def test : (A : U) -> (B : U) -> (A -> B) -> A -> B :=
-λ A B f x -> f x
+λ (A : U) (B : U) (f : A -> B) (x : A) -> f x

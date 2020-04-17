@@ -1,6 +1,6 @@
 open Expr
 
-exception TypeMismatch of exp * value * value
+exception TypeMismatch of value * value
 exception InferError of exp
 exception VariableNotFound of name
 exception InvalidApplication of value * value
@@ -33,30 +33,27 @@ let rec eval (e : exp) (rho : rho) =
   match e with
   | ESet -> VSet
   | EDec (d, e) -> eval e (UpDec (rho, d))
-  | ELam (p, e) -> VLam (p, e, rho)
-  | EPi (p, a, b) -> VPi (eval a rho, (p, b, rho))
-  | ESig (p, a, b) -> VSig (eval a rho, (p, b, rho))
+  | ELam ((p, a), b) -> VLam (eval a rho, (p, b, rho))
+  | EPi  ((p, a), b) -> VPi  (eval a rho, (p, b, rho))
+  | ESig ((p, a), b) -> VSig (eval a rho, (p, b, rho))
   | EFst e -> vfst (eval e rho)
   | ESnd e -> vsnd (eval e rho)
   | EApp (f, x) -> app (eval f rho, eval x rho)
   | EVar x -> getRho rho x
   | EPair (e1, e2) -> VPair (eval e1 rho, eval e2 rho)
 and app : value * value -> value = function
-  | (VLam f, v) -> closByVal f v
-  | (VNt k, m)  -> VNt (NApp (k, m))
-  | (x, y)      -> raise (InvalidApplication (x, y))
+  | VLam (_, f), v -> closByVal f v
+  | VNt k, m       -> VNt (NApp (k, m))
+  | x, y           -> raise (InvalidApplication (x, y))
 and closByVal (x : clos) (v : value) =
-  match x with
-  | (p, e, rho) -> eval e (UpVar (rho, p, v))
+  let (p, e, rho) = x in eval e (UpVar (rho, p, v))
 and getRho rho0 x =
   match rho0 with
   | Nil -> raise (VariableNotFound x)
   | UpVar (rho, p, v) ->
-    if x = p then v
-    else getRho rho x
+    if x = p then v else getRho rho x
   | UpDec (rho, (p, _, e)) ->
-    if x = p then eval e rho0
-    else getRho rho x
+    if x = p then eval e rho0 else getRho rho x
 
 let pat (k : int) : name -> name = function
   | Hole        -> Hole
@@ -64,17 +61,17 @@ let pat (k : int) : name -> name = function
 let genV k n : value = VNt (NVar (pat k n))
 
 let rec rbV (k : int) : value -> exp = function
-  | VLam f         ->
-    let (p, _, _) = f in
-    ELam (pat k p, rbV (k + 1) (closByVal f (genV k p)))
+  | VLam (t, g)    ->
+    let (p, _, _) = g in
+    ELam ((pat k p, rbV k t), rbV (k + 1) (closByVal g (genV k p)))
   | VPair (u, v)   -> EPair (rbV k u, rbV k v)
   | VSet           -> ESet
   | VPi (t, g)     ->
     let (p, _, _) = g in
-    EPi (pat k p, rbV k t, rbV (k + 1) (closByVal g (genV k p)))
+    EPi ((pat k p, rbV k t), rbV (k + 1) (closByVal g (genV k p)))
   | VSig (t, g)    ->
     let (p, _, _) = g in
-    ESig (pat k p, rbV k t, rbV (k + 1) (closByVal g (genV k p)))
+    ESig ((pat k p, rbV k t), rbV (k + 1) (closByVal g (genV k p)))
   | VNt l          -> rbN k l
 and rbN i : neut -> exp = function
   | NVar s              -> EVar s
@@ -82,11 +79,11 @@ and rbN i : neut -> exp = function
   | NFst k              -> EFst (rbN i k)
   | NSnd k              -> ESnd (rbN i k)
 
-let eqNf i e m1 m2 : unit =
+let eqNf i m1 m2 : unit =
   let e1 = rbV i m1 in
   let e2 = rbV i m2 in
   if e1 = e2 then ()
-  else raise (TypeMismatch (e, m1, m2))
+  else raise (TypeMismatch (m1, m2))
 
 let extPiG : value -> value * clos = function
   | VPi (t, g) -> (t, g)
@@ -101,16 +98,17 @@ let rec each (f : 'a -> unit) : 'a list -> unit = function
   | x :: xs -> f x; each f xs
 
 let rec checkT k rho gma : exp -> unit = function
-  | EPi (p, a, b) ->
+  | EPi ((p, a), b) ->
     checkT k rho gma a;
     let gma1 = (p, eval a rho) :: gma in
     checkT (k + 1) (UpVar (rho, p, genV k p)) gma1 b
-  | ESig (p, a, b) -> checkT k rho gma (EPi (p, a, b))
+  | ESig ((p, a), b) -> checkT k rho gma (EPi ((p, a), b))
   | ESet -> ()
   | a -> let _ = check k rho gma a VSet in ()
 and check k (rho : rho) (gma : gamma) (e0 : exp) (t0 : value) : rho * gamma =
   match e0, t0 with
-  | ELam (p, e), VPi (t, g) ->
+  | ELam ((p, a), e), VPi (t, g) ->
+    eqNf k (eval a rho) t;
     let gen = genV k p in
     let gma1 = (p, t) :: gma in
     check (k + 1) (UpVar (rho, p, gen)) gma1 e (closByVal g gen)
@@ -118,18 +116,18 @@ and check k (rho : rho) (gma : gamma) (e0 : exp) (t0 : value) : rho * gamma =
     let _ = check k rho gma e1 t in
     check k rho gma e2 (closByVal g (eval e1 rho))
   | ESet, VSet -> (rho, gma)
-  | EPi (p, a, b), VSet ->
+  | EPi ((p, a), b), VSet ->
     let _ = check k rho gma a VSet in
     let gen = genV k p in
     let gma1 = (p, eval a rho) :: gma in
     check (k + 1) (UpVar (rho, p, gen)) gma1 b VSet
-  | ESig (p, a, b), VSet ->
-    check k rho gma (EPi (p, a, b)) VSet
+  | ESig ((p, a), b), VSet ->
+    check k rho gma (EPi ((p, a), b)) VSet
   | EDec (d, e), t ->
     let (name, _, _) = d in
     Printf.printf "Checking: %s\n" (Expr.showName name);
     check k (UpDec (rho, d)) (snd (checkD k rho gma d)) e t
-  | e, t -> eqNf k e t (checkI k rho gma e); (rho, gma)
+  | e, t -> eqNf k t (checkI k rho gma e); (rho, gma)
 and checkI k rho gma : exp -> value = function
   | EVar x -> lookup x gma
   | EApp (f, x) ->
@@ -137,15 +135,12 @@ and checkI k rho gma : exp -> value = function
     let (t, g) = extPiG t1 in
     let _ = check k rho gma x t in
     closByVal g (eval x rho)
-  | EFst e ->
-    let t = checkI k rho gma e in fst (extSigG t)
+  | EFst e -> fst (extSigG (checkI k rho gma e))
   | ESnd e ->
-    let t = checkI k rho gma e in
-    let (_, g) = extSigG t in
+    let (_, g) = extSigG (checkI k rho gma e) in
     closByVal g (vfst (eval e rho))
   | e -> raise (InferError e)
-and checkD k rho gma (d : decl) : rho * gamma =
-  match d with
+and checkD k rho gma : decl -> rho * gamma = function
   | (p, a, e) ->
     checkT k rho gma a;
     let t = eval a rho in let gen = genV k p in
@@ -158,9 +153,9 @@ let checkMain filename rho gma e =
   Printf.printf "File loaded.\n"; rho
 
 let prettyPrintError : exn -> unit = function
-  | TypeMismatch (e, t, t0) ->
-    Printf.printf "%s was expected to be\n  %s\nbut it is\n  %s\n"
-      (Expr.showExp e) (Expr.showValue t) (Expr.showValue t0)
+  | TypeMismatch (u, v) ->
+    Printf.printf "Type mismatch:\n%s\n  =/=\n%s\n"
+                  (Expr.showValue u) (Expr.showValue v)
   | InferError e ->
     Printf.printf "Cannot infer type of\n  %s\n" (Expr.showExp e)
   | VariableNotFound p ->

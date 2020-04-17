@@ -19,17 +19,18 @@ exp0:
   | exp1 COMMA exp0 { EPair ($1, $3) }
   | exp1 { $1 }
 
-idents:
-  | ident { [$1] }
-  | ident idents { $1 :: $2 }
+tele:
+  | LPARENS ident COLON exp1 RPARENS { ($2, $4) }
+
+cotele:
+  | tele cotele { $1 :: $2 }
+  | tele { [$1] }
 
 exp1:
-  | LAM idents ARROW exp1 { lam $4 $2 }
-  | LPARENS ident COLON exp1 RPARENS ARROW exp1
-    { EPi  ($2, $4, $7) }
-  | LPARENS ident COLON exp1 RPARENS STAR exp1
-    { ESig ($2, $4, $7) }
-  | exp2 ARROW exp1 { EPi (Hole, $1, $3) }
+  | LAM cotele ARROW exp1 { lam $4 $2 }
+  | tele ARROW exp1 { EPi  ($1, $3) }
+  | tele STAR exp1  { ESig ($1, $3) }
+  | exp2 ARROW exp1 { EPi ((Hole, $1), $3) }
   | exp2 { $1 }
 
 exp2:

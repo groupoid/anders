@@ -23,7 +23,7 @@ and decl = name * exp * exp
 and tele = name * exp
 
 let rec lam (e : exp) : tele list -> exp = function
-  | []      -> raise ParsingError
+  | []      -> e
   | [x]     -> ELam (x, e)
   | x :: xs -> ELam (x, lam e xs)
 
@@ -65,24 +65,34 @@ and rho =
 | UpDec of rho * decl
 
 let rec showValue : value -> string = function
-  | VLam (value, clos) ->
-    let (x, f) = showClos clos in
-    Printf.sprintf "\\(%s : %s) -> %s" x (showValue value) f
+  | VLam (x, (p, e, rho)) ->
+    Printf.sprintf "\\%s -> %s" (showTele p x rho) (showExp e)
   | VPair (fst, snd) -> Printf.sprintf "(%s, %s)" (showValue fst) (showValue snd)
   | VSet -> "U"
-  | VPi (value, clos) ->
-    let (x, f) = showClos clos in
-    Printf.sprintf "(%s : %s) -> %s" x (showValue value) f
-  | VSig (value, clos) ->
-    let (x, f) = showClos clos in
-    Printf.sprintf "(%s : %s) * %s" x (showValue value) f
+  | VPi (x, (p, e, rho)) ->
+    Printf.sprintf "%s -> %s" (showTele p x rho) (showExp e)
+  | VSig (x, (p, e, rho)) ->
+    Printf.sprintf "%s * %s" (showTele p x rho) (showExp e)
   | VNt n -> showNeut n
 and showNeut : neut -> string = function
   | NVar s -> showName s
   | NApp (f, x) -> Printf.sprintf "(%s %s)" (showNeut f) (showValue x)
   | NFst v -> showNeut v ^ ".1"
   | NSnd v -> showNeut v ^ ".2"
-and showClos : clos -> string * string = function
-  (p, exp, _) -> (showName p, showExp exp)
+and showTele p x : rho -> string = function
+  | UpDec (rho, _) -> showTele p x rho
+  | Nil -> Printf.sprintf "(%s : %s)" (showName p) (showValue x)
+  | rho -> Printf.sprintf "(%s : %s, %s)" (showName p) (showValue x) (showRho rho)
+and isRhoInvisible : rho -> bool = function
+  | Nil     -> true
+  | UpDec _ -> true
+  | _       -> false
+and showRho : rho -> string = function
+  | UpVar (u, p, v) when isRhoInvisible u ->
+    Printf.sprintf "%s := %s" (showName p) (showValue v)
+  | UpVar (rho, p, v) ->
+    Printf.sprintf "%s := %s, %s" (showName p) (showValue v) (showRho rho)
+  | UpDec (rho, _) -> showRho rho
+  | Nil -> ""
 
 type gamma = (name * value) list

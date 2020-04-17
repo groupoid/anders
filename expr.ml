@@ -22,10 +22,15 @@ type exp =
 and decl = name * exp * exp
 and tele = name * exp
 
-let rec lam (e : exp) : tele list -> exp = function
+(* In OCaml constructors are not functions. *)
+let eLam x y = ELam (x, y)
+let ePi x y  = EPi  (x, y)
+let eSig x y = ESig (x, y)
+
+let rec cotele (f : tele -> exp -> exp) (e : exp) : tele list -> exp = function
   | []      -> e
-  | [x]     -> ELam (x, e)
-  | x :: xs -> ELam (x, lam e xs)
+  | [x]     -> f x e
+  | x :: xs -> f x (cotele f e xs)
 
 let rec showExp : exp -> string = function
   | ESet -> "U"

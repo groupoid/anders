@@ -27,10 +27,10 @@ cotele:
   | tele { [$1] }
 
 exp1:
-  | LAM cotele ARROW exp1 { lam $4 $2 }
-  | tele ARROW exp1 { EPi  ($1, $3) }
-  | tele STAR exp1  { ESig ($1, $3) }
-  | exp2 ARROW exp1 { EPi ((Hole, $1), $3) }
+  | LAM cotele ARROW exp1 { cotele eLam $4 $2 }
+  | cotele ARROW exp1 { cotele ePi  $3 $1 }
+  | cotele STAR exp1  { cotele eSig $3 $1 }
+  | exp2 ARROW exp1   { EPi ((Hole, $1), $3) }
   | exp2 { $1 }
 
 exp2:

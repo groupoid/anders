@@ -24,7 +24,7 @@ and tele = name * exp
 
 (* In OCaml constructors are not functions. *)
 let eLam x y = ELam (x, y)
-let ePi x y  = EPi  (x, y)
+let ePi  x y = EPi  (x, y)
 let eSig x y = ESig (x, y)
 
 let rec cotele (f : tele -> exp -> exp) (e : exp) : tele list -> exp = function

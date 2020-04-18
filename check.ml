@@ -14,14 +14,14 @@ let rec each (f : 'a -> unit) : 'a list -> unit = function
   | [] -> ()
   | x :: xs -> f x; each f xs
 
-let rec checkT k rho gma : exp -> unit = function
+let rec checkT k rho gma : exp -> rho * gamma = function
   | EPi ((p, a), b) ->
-    checkT k rho gma a;
+    let _ = checkT k rho gma a in
     let gma1 = (p, eval a rho) :: gma in
     checkT (k + 1) (UpVar (rho, p, genV k p)) gma1 b
   | ESig ((p, a), b) -> checkT k rho gma (EPi ((p, a), b))
-  | ESet -> ()
-  | a -> let _ = check k rho gma a VSet in ()
+  | ESet -> (rho, gma)
+  | u    -> eqNf k VSet (checkI k rho gma u); (rho, gma)
 and check k (rho : rho) (gma : gamma) (e0 : exp) (t0 : value) : rho * gamma =
   match e0, t0 with
   | ELam ((p, a), e), VPi (t, g) ->
@@ -32,18 +32,11 @@ and check k (rho : rho) (gma : gamma) (e0 : exp) (t0 : value) : rho * gamma =
   | EPair (e1, e2), VSig (t, g) ->
     let _ = check k rho gma e1 t in
     check k rho gma e2 (closByVal g (eval e1 rho))
-  | ESet, VSet -> (rho, gma)
-  | EPi ((p, a), b), VSet ->
-    let _ = check k rho gma a VSet in
-    let gen = genV k p in
-    let gma1 = (p, eval a rho) :: gma in
-    check (k + 1) (UpVar (rho, p, gen)) gma1 b VSet
-  | ESig ((p, a), b), VSet ->
-    check k rho gma (EPi ((p, a), b)) VSet
   | EDec (d, e), t ->
     let (name, _, _) = d in
     Printf.printf "Checking: %s\n" (Expr.showName name);
     check k (UpDec (rho, d)) (snd (checkD k rho gma d)) e t
+  | e, VSet -> checkT k rho gma e
   | e, t -> eqNf k t (checkI k rho gma e); (rho, gma)
 and checkI k rho gma : exp -> value = function
   | EVar x -> lookup x gma
@@ -59,7 +52,7 @@ and checkI k rho gma : exp -> value = function
   | e -> raise (InferError e)
 and checkD k rho gma : decl -> rho * gamma = function
   | (p, a, e) ->
-    checkT k rho gma a;
+    let _ = checkT k rho gma a in
     let t = eval a rho in let gen = genV k p in
     let gma1 = (p, t) :: gma in
     check (k + 1) (UpVar (rho, p, gen)) gma1 e t

@@ -6,3 +6,4 @@ exception VariableNotFound of name
 exception InvalidApplication of value * value
 exception ExpectedPi of value
 exception ExpectedSig of value
+exception UnknownCommand of string

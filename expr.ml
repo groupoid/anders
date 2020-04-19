@@ -123,3 +123,7 @@ and showTele p x rho : string =
   else Printf.sprintf "(%s : %s)" (showName p) (showValue x)
 
 type gamma = value Env.t
+
+type command =
+  | Eval of exp
+  | Command of string * exp

@@ -3,11 +3,11 @@
 %}
 
 %token <string> IDENT
-%token LPARENS RPARENS COMMA HOLE SET DEF STAR
-%token FST SND COLON DEFEQ ARROW LAM EOF
+%token LPARENS RPARENS COMMA COLON HOLE EOF
+%token SET DEF STAR DEFEQ ARROW FST SND LAM
 
 %start <Expr.exp> exp
-%start <Expr.exp> repl
+%start <Expr.command> repl
 
 %%
 
@@ -52,4 +52,5 @@ exp:
   | EOF { ESet }
 
 repl:
-  | exp0 EOF { $1 }
+  | COLON IDENT exp0 EOF { Command ($2, $3) }
+  | exp0 EOF { Eval $1 }

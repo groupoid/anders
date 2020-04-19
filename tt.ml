@@ -25,7 +25,7 @@ let prettyPrintError : exn -> unit = function
     Printf.printf "  %s\nexpected to be Sigma-type\n" (Expr.showValue x)
   | UnknownCommand s ->
     Printf.printf "Unknown command “%s”\n" s
-  | ex -> Printf.printf "uncaught exception: %s" (Printexc.to_string ex)
+  | ex -> Printf.printf "uncaught exception: %s\n" (Printexc.to_string ex)
 
 let handleErrors (f : 'a -> 'b) (x : 'a) (default : 'b) : 'b =
   try f x with ex -> prettyPrintError ex; default
@@ -42,6 +42,7 @@ let main rho gma : command -> unit = function
     let t = rbV 1 t0 in let v = rbV 1 v0 in
     Printf.printf "TYPE: %s\nNORMEVAL: %s\n" (Expr.showExp t) (Expr.showExp v)
   | Command (s, _) -> raise (UnknownCommand s)
+  | Nope -> ()
 
 let rho : rho ref   = ref Env.empty
 let gma : gamma ref = ref Env.empty
@@ -55,9 +56,10 @@ let _ =
                    (!rho, !gma) in
     rho := rho1; gma := gma1
   done;
-  while true do
+  try while true do
     print_string "> ";
     let line = read_line () in
-    let exp = Parser.repl Lexer.main (Lexing.from_string line) in
-    handleErrors (main !rho !gma) exp ()
-  done
+    handleErrors (fun x ->
+      let exp = Parser.repl Lexer.main (Lexing.from_string x) in
+        main !rho !gma exp) line ()
+  done with End_of_file -> ()

@@ -125,5 +125,6 @@ and showTele p x rho : string =
 type gamma = value Env.t
 
 type command =
+  | Nope
   | Eval of exp
   | Command of string * exp

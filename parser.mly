@@ -54,3 +54,4 @@ exp:
 repl:
   | COLON IDENT exp0 EOF { Command ($2, $3) }
   | exp0 EOF { Eval $1 }
+  | EOF { Nope }

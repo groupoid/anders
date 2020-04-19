@@ -33,8 +33,8 @@ let checkAndEval rho gma (exp : exp) =
   let v = eval exp rho in
   Printf.printf "TYPE: %s\nEVAL: %s\n" (Expr.showValue t) (Expr.showValue v)
 
-let rho : rho ref   = ref Nil
-let gma : gamma ref = ref []
+let rho : rho ref   = ref Env.empty
+let gma : gamma ref = ref Env.empty
 let _ =
   for i = 1 to Array.length Sys.argv - 1 do
     let filename = Sys.argv.(i) in let chan = open_in filename in

@@ -1,5 +1,3 @@
-exception ParsingError
-
 type name =
 | Hole
 | Name of string * int
@@ -7,6 +5,19 @@ type name =
 let showName : name -> string = function
   | Hole        -> "_"
   | Name (s, _) -> s
+
+module Name = struct
+  type t = name
+  let compare x y =
+    match (x, y) with
+    | Hole, Hole -> 0
+    | Hole, Name _ -> -1
+    | Name _, Hole -> 1
+    | Name (p, a), Name (q, b) ->
+      if p = q then compare a b
+      else compare p q
+end
+module Env = Map.Make(Name)
 
 type exp =
 | ELam of tele * exp
@@ -64,10 +75,25 @@ and neut =
 | NFst of neut
 | NSnd of neut
 and clos = name * exp * rho
-and rho =
-| Nil
-| UpVar of rho * name * value
-| UpDec of rho * decl
+and term =
+| Exp of exp
+| Value of value
+and rho = term Env.t
+
+(* Compatibility with OCaml 4.05
+   From: https://github.com/ocaml/ocaml/blob/trunk/stdlib/list.ml *)
+let filterMap f =
+  let rec aux accu = function
+    | [] -> List.rev accu
+    | x :: l ->
+      match f x with
+      | None -> aux accu l
+      | Some v -> aux (v :: accu) l
+  in aux []
+
+let isTermVisible : term -> bool = function
+  | Exp _   -> false
+  | Value _ -> true
 
 let rec showValue : value -> string = function
   | VLam (x, (p, e, rho)) ->
@@ -84,20 +110,16 @@ and showNeut : neut -> string = function
   | NApp (f, x) -> Printf.sprintf "(%s %s)" (showNeut f) (showValue x)
   | NFst v -> showNeut v ^ ".1"
   | NSnd v -> showNeut v ^ ".2"
-and showTele p x : rho -> string = function
-  | UpDec (rho, _) -> showTele p x rho
-  | Nil -> Printf.sprintf "(%s : %s)" (showName p) (showValue x)
-  | rho -> Printf.sprintf "(%s : %s, %s)" (showName p) (showValue x) (showRho rho)
-and isRhoInvisible : rho -> bool = function
-  | Nil     -> true
-  | UpDec _ -> true
-  | _       -> false
-and showRho : rho -> string = function
-  | UpVar (u, p, v) when isRhoInvisible u ->
-    Printf.sprintf "%s := %s" (showName p) (showValue v)
-  | UpVar (rho, p, v) ->
-    Printf.sprintf "%s := %s, %s" (showName p) (showValue v) (showRho rho)
-  | UpDec (rho, _) -> showRho rho
-  | Nil -> ""
+and showTermBind : name * term -> string option = function
+  | p, Value v -> Some (Printf.sprintf "%s := %s" (showName p) (showValue v))
+  | _, _       -> None
+and showRho (rho : rho) : string =
+  Env.bindings rho
+  |> filterMap showTermBind
+  |> String.concat ", "
+and showTele p x rho : string =
+  if Env.exists (fun _ -> isTermVisible) rho then
+    Printf.sprintf "(%s : %s, %s)" (showName p) (showValue x) (showRho rho)
+  else Printf.sprintf "(%s : %s)" (showName p) (showValue x)
 
-type gamma = (name * value) list
+type gamma = value Env.t

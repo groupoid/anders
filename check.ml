@@ -10,15 +10,11 @@ let extSigG : value -> value * clos = function
   | VSig (t, g) -> (t, g)
   | u           -> raise (ExpectedSig u)
 
-let rec each (f : 'a -> unit) : 'a list -> unit = function
-  | [] -> ()
-  | x :: xs -> f x; each f xs
-
 let rec checkT k rho gma : exp -> rho * gamma = function
   | EPi ((p, a), b) ->
     let _ = checkT k rho gma a in
-    let gma1 = (p, eval a rho) :: gma in
-    checkT (k + 1) (UpVar (rho, p, genV k p)) gma1 b
+    let gma1 = Env.add p (eval a rho) gma in
+    checkT (k + 1) (upVar rho p (genV k p)) gma1 b
   | ESig ((p, a), b) -> checkT k rho gma (EPi ((p, a), b))
   | ESet -> (rho, gma)
   | u    -> eqNf k VSet (checkI k rho gma u); (rho, gma)
@@ -27,15 +23,15 @@ and check k (rho : rho) (gma : gamma) (e0 : exp) (t0 : value) : rho * gamma =
   | ELam ((p, a), e), VPi (t, g) ->
     eqNf k (eval a rho) t;
     let gen = genV k p in
-    let gma1 = (p, t) :: gma in
-    check (k + 1) (UpVar (rho, p, gen)) gma1 e (closByVal g gen)
+    let gma1 = Env.add p t gma in
+    check (k + 1) (upVar rho p gen) gma1 e (closByVal g gen)
   | EPair (e1, e2), VSig (t, g) ->
     let _ = check k rho gma e1 t in
     check k rho gma e2 (closByVal g (eval e1 rho))
   | EDec (d, e), t ->
     let (name, _, _) = d in
     Printf.printf "Checking: %s\n" (Expr.showName name);
-    check k (UpDec (rho, d)) (snd (checkD k rho gma d)) e t
+    check k (upDec rho d) (snd (checkD k rho gma d)) e t
   | e, VSet -> checkT k rho gma e
   | e, t -> eqNf k t (checkI k rho gma e); (rho, gma)
 and checkI k rho gma : exp -> value = function
@@ -43,7 +39,7 @@ and checkI k rho gma : exp -> value = function
   | EApp (f, x) ->
     let t1 = checkI k rho gma f in
     let (t, g) = extPiG t1 in
-    let _ = check k rho gma x t in
+    ignore (check k rho gma x t);
     closByVal g (eval x rho)
   | EFst e -> fst (extSigG (checkI k rho gma e))
   | ESnd e ->
@@ -54,5 +50,5 @@ and checkD k rho gma : decl -> rho * gamma = function
   | (p, a, e) ->
     let _ = checkT k rho gma a in
     let t = eval a rho in let gen = genV k p in
-    let gma1 = (p, t) :: gma in
-    check (k + 1) (UpVar (rho, p, gen)) gma1 e t
+    let gma1 = Env.add p t gma in
+    check (k + 1) (upVar rho p gen) gma1 e t

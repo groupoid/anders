@@ -11,20 +11,21 @@ let vsnd : value -> value = function
   | VNt k        -> VNt (NSnd k)
   | v            -> raise (ExpectedSig v)
 
-let rec lRho : rho -> int = function
-  | Nil               -> 0
-  | UpVar (rho, _, _) -> lRho rho + 1
-  | UpDec (rho, _)    -> lRho rho
+let lookup (x : name) (lst : gamma) =
+  match Env.find_opt x lst with
+  | Some v -> v
+  | None -> raise (VariableNotFound x)
 
-let rec lookup (x1 : name) (lst : gamma) =
-  match lst with
-  | (x2, v) :: xs -> if x1 = x2 then v else lookup x1 xs
-  | []            -> raise (VariableNotFound x1)
+let upDec (rho : rho) : decl -> rho = function
+  (p, _, e) -> Env.add p (Exp e) rho
+
+let upVar (rho : rho) (p : name) (v : value) : rho =
+  Env.add p (Value v) rho
 
 let rec eval (e : exp) (rho : rho) =
   match e with
   | ESet -> VSet
-  | EDec (d, e) -> eval e (UpDec (rho, d))
+  | EDec (d, e) -> eval e (upDec rho d)
   | ELam ((p, a), b) -> VLam (eval a rho, (p, b, rho))
   | EPi  ((p, a), b) -> VPi  (eval a rho, (p, b, rho))
   | ESig ((p, a), b) -> VSig (eval a rho, (p, b, rho))
@@ -38,14 +39,12 @@ and app : value * value -> value = function
   | VNt k, m       -> VNt (NApp (k, m))
   | x, y           -> raise (InvalidApplication (x, y))
 and closByVal (x : clos) (v : value) =
-  let (p, e, rho) = x in eval e (UpVar (rho, p, v))
+  let (p, e, rho) = x in eval e (upVar rho p v)
 and getRho rho0 x =
-  match rho0 with
-  | Nil -> raise (VariableNotFound x)
-  | UpVar (rho, p, v) ->
-    if x = p then v else getRho rho x
-  | UpDec (rho, (p, _, e)) ->
-    if x = p then eval e rho0 else getRho rho x
+  match Env.find_opt x rho0 with
+  | Some (Value v) -> v
+  | Some (Exp e) -> eval e rho0
+  | None -> raise (VariableNotFound x)
 
 let pat (k : int) : name -> name = function
   | Hole        -> Hole

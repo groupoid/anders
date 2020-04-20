@@ -12,5 +12,5 @@ $ apt install ocaml ocamlbuild menhir
 
 ```shell
 $ ocamlbuild -use-menhir tt.native
-$ ./tt.native test.tt
+$ ./tt.native check experiments/test.tt
 ```

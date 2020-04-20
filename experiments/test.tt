@@ -1,16 +1,12 @@
-id : (A : U) -> A -> A :=
-λ (A : U) (a : A) -> a
+id (A : U) (a : A) : A := a
 
-sigmaIntro : (A : U) -> (B : A -> U) ->
-             (x : A) -> B (id A x) -> (x : A) * B x :=
-λ (A : U) (B : A -> U) (x : A) (u : B x) -> (x, u)
+sigmaIntro (A : U) (B : A -> U) (x : A) (u : B (id A x)) : (x : A) * B x := (x, u)
 
 sigmaProj₂ : (A : U) -> (B : A -> U) ->
              (z : (x : A) * B x) -> B z.1 :=
 λ (A : U) (B : A -> U) (z : (x : A) * B x) -> z.2
 
-const : (A : U) -> (B : U) -> A -> B -> A :=
-λ (A : U) (B : U) (a : A) (b : B) -> a
+const (A : U) (B : U) (a : A) (b : B) : A = a
 
 test : (A : U) -> (B : U) -> (A -> B) -> A -> B :=
 λ (A : U) (B : U) (f : A -> B) (x : A) -> f x

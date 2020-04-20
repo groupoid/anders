@@ -22,14 +22,18 @@ exp0:
 tele:
   | LPARENS ident COLON exp1 RPARENS { ($2, $4) }
 
-cotele:
-  | tele cotele { $1 :: $2 }
+cotele1:
+  | tele cotele1 { $1 :: $2 }
   | tele { [$1] }
 
+cotele0:
+  | cotele1 { $1 }
+  | { [] }
+
 exp1:
-  | LAM cotele ARROW exp1 { cotele eLam $4 $2 }
-  | cotele ARROW exp1 { cotele ePi  $3 $1 }
-  | cotele STAR exp1  { cotele eSig $3 $1 }
+  | LAM cotele1 ARROW exp1 { cotele eLam $4 $2 }
+  | cotele1 ARROW exp1 { cotele ePi  $3 $1 }
+  | cotele1 STAR exp1  { cotele eSig $3 $1 }
   | exp2 ARROW exp1   { EPi ((Hole, $1), $3) }
   | exp2 { $1 }
 
@@ -45,7 +49,8 @@ exp3:
   | LPARENS exp0 RPARENS { $2 }
 
 decl:
-  | ident COLON exp1 DEFEQ SKIP? exp1 { ($1, $3, $6) }
+  | ident cotele0 COLON exp1 DEFEQ SKIP? exp1
+    { ($1, cotele ePi $4 $2, cotele eLam $7 $2) }
 
 codecl:
   | decl SKIP codecl { EDec ($1, $3) }

@@ -55,7 +55,7 @@ let rec showExp : exp -> string = function
   | EVar p -> showName p
   | EDec (decl, exp) -> showDecl decl ^ "\n" ^ showExp exp
 and showDecl : decl -> string = function
-  (p, exp1, exp2) -> Printf.sprintf "def %s : %s := %s"
+  (p, exp1, exp2) -> Printf.sprintf "%s : %s := %s"
                                     (showName p)
                                     (showExp exp1)
                                     (showExp exp2)

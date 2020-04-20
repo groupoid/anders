@@ -1,13 +1,13 @@
-def N1 : N := succ N0
-def N2 : N := succ N1
-def N3 : N := succ N2
-def N4 : N := succ N3
-def N5 : N := succ N4
-def N6 : N := succ N5
-def N7 : N := succ N6
-def N8 : N := succ N7
-def N9 : N := succ N8
-def N10 : N := succ N9
+N1 : N := succ N0
+N2 : N := succ N1
+N3 : N := succ N2
+N4 : N := succ N3
+N5 : N := succ N4
+N6 : N := succ N5
+N7 : N := succ N6
+N8 : N := succ N7
+N9 : N := succ N8
+N10 : N := succ N9
 
-def N3000 : N :=
+N3000 : N :=
 mult N10 (mult N10 (mult N10 N3))

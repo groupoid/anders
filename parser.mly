@@ -4,9 +4,9 @@
 
 %token <string> IDENT
 %token LPARENS RPARENS COMMA COLON HOLE EOF
-%token SET DEF STAR DEFEQ ARROW FST SND LAM
+%token SET STAR DEFEQ ARROW FST SND LAM SKIP
 
-%start <Expr.exp> exp
+%start <Expr.exp> codecl
 %start <Expr.command> repl
 
 %%
@@ -45,11 +45,11 @@ exp3:
   | LPARENS exp0 RPARENS { $2 }
 
 decl:
-  | DEF ident COLON exp1 DEFEQ exp1 { ($2, $4, $6) }
+  | ident COLON exp1 DEFEQ SKIP? exp1 { ($1, $3, $6) }
 
-exp:
-  | decl exp { EDec ($1, $2) }
-  | EOF { ESet }
+codecl:
+  | decl SKIP codecl { EDec ($1, $3) }
+  | decl EOF { EDec ($1, ESet) }
 
 repl:
   | COLON IDENT exp0 EOF { Command ($2, $3) }

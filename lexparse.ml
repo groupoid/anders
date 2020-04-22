@@ -1,3 +1,10 @@
+open Lexing
+
+let parseErr f lexbuf =
+  try f Lexer.main lexbuf
+  with Parser.Error ->
+    raise (Error.Parser (lexeme_start lexbuf, lexeme_end lexbuf))
+
 let lex filename =
   let chan = open_in filename in
   let lexbuf = Lexing.from_channel chan in
@@ -12,5 +19,9 @@ let lex filename =
 let parse filename =
   let chan = open_in filename in
   Printf.printf "Parsing “%s”.\n" filename;
-  let exp = Parser.codecl Lexer.main (Lexing.from_channel chan) in
-  print_endline (Expr.showExp exp)
+  Error.handleErrors
+    (fun chan ->
+      let lexbuf = Lexing.from_channel chan in
+      let exp = parseErr Parser.codecl lexbuf in
+      print_endline (Expr.showExp exp))
+    chan ()

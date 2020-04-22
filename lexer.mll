@@ -8,17 +8,19 @@ let bytes2 = ['\192'-'\223']['\128'-'\191']
 let bytes3 = ['\224'-'\239']['\128'-'\191']['\128'-'\191']
 let bytes4 = ['\240'-'\247']['\128'-'\191']['\128'-'\191']['\128'-'\191']
 
-let ch     = bytes1|bytes2|bytes3|bytes4
-let ws     = (['\t' ' ' '\r' '\n']|"--"_*)
-let nl     = ['\r' '\n']
-let colon  = ':'
-let arrow  = "->"|"\xE2\x86\x92"
-let defeq  = "="|":="|"\xE2\x89\x94"|"\xE2\x89\x9C"|"\xE2\x89\x9D"
-let lam    = "\\"|"\xCE\xBB"
-let star   = '*'
+let ch      = bytes1|bytes2|bytes3|bytes4
+let ws      = ['\t' ' ' '\r' '\n']
+let nl      = ['\r' '\n']
+let comment = "--"  [^ '\n' '\r']* (nl|eof)
+let colon   = ':'
+let arrow   = "->"|"\xE2\x86\x92"
+let defeq   = "="|":="|"\xE2\x89\x94"|"\xE2\x89\x9C"|"\xE2\x89\x9D"
+let lam     = "\\"|"\xCE\xBB"
+let star    = '*'
 
 rule main = parse
 | nl+      { SKIP }
+| comment  { main lexbuf }
 | ws+      { main lexbuf }
 | "U"      { SET }
 | ','      { COMMA }

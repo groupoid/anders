@@ -70,8 +70,26 @@ and rbN i : neut -> exp = function
   | NFst k              -> EFst (rbN i k)
   | NSnd k              -> ESnd (rbN i k)
 
-let eqNf i m1 m2 : unit =
-  let e1 = rbV i m1 in
-  let e2 = rbV i m2 in
-  if e1 = e2 then ()
-  else raise (TypeMismatch (m1, m2))
+let rec conv k v1 v2 : bool =
+  match v1, v2 with
+  | VSet, VSet -> true
+  | VNt x, VNt y -> convNeut k x y
+  | VPair (a, b), VPair (c, d) -> conv k a b && conv k b d
+  | VLam (a, g), VLam (b, h) ->
+    let (p, _, _) = g in
+    let p' = genV k p in
+    conv k a b && conv (k + 1) (closByVal g p') (closByVal h p')
+  | VPi (a, g), VPi (b, h) -> conv k (VLam (a, g)) (VLam (b, h))
+  | VSig (a, g), VSig (b, h) -> conv k (VLam (a, g)) (VLam (b, h))
+  | _, _ -> false
+and convNeut k n1 n2 : bool =
+  match n1, n2 with
+  | NVar a, NVar b -> a = b
+  | NApp (f, a), NApp (g, b) -> convNeut k f g && conv k a b
+  | NFst x, NFst y -> convNeut k x y
+  | NSnd x, NSnd y -> convNeut k x y
+  | _, _ -> false
+
+let eqNf k v1 v2 : unit =
+  if conv k v1 v2 then ()
+  else raise (TypeMismatch (v1, v2))

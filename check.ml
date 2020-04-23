@@ -50,5 +50,5 @@ and checkD k rho gma : decl -> rho * gamma = function
   | (p, a, e) ->
     let _ = checkT k rho gma a in
     let t = eval a rho in let gen = genV k p in
-    let gma1 = Env.add p t gma in
-    check (k + 1) (upVar rho p gen) gma1 e t
+    let gma' = Env.add p t gma in
+    check (k + 1) (upVar rho p gen) gma' e t

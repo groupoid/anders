@@ -27,7 +27,7 @@ let prettyPrintError : exn -> unit = function
   | UnknownCommand s ->
     Printf.printf "Unknown command “%s”\n" s
   | Parser (x, y) ->
-    Printf.printf "Parser error at characters %d:%d\n" x y
+    Printf.printf "Parsing error at characters %d:%d\n" x y
   | ex -> Printf.printf "uncaught exception: %s\n" (Printexc.to_string ex)
 
 let handleErrors (f : 'a -> 'b) (x : 'a) (default : 'b) : 'b =

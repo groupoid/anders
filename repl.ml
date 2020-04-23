@@ -19,7 +19,8 @@ let main rho gma : command -> unit = function
     let (t0, v0) = checkAndEval rho gma e in
     let t = Eval.rbV 1 t0 in let v = Eval.rbV 1 v0 in
     Printf.printf "TYPE: %s\nNORMEVAL: %s\n" (Expr.showExp t) (Expr.showExp v)
-  | Command (s, _) -> raise (UnknownCommand s)
+  | Action "q" -> exit 0
+  | Command (s, _) | Action s -> raise (UnknownCommand s)
   | Nope -> ()
 
 let rho : rho ref   = ref Env.empty

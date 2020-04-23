@@ -127,4 +127,5 @@ type gamma = value Env.t
 type command =
   | Nope
   | Eval of exp
+  | Action of string
   | Command of string * exp

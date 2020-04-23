@@ -1,8 +1,10 @@
 %{
   open Expr
+  exception UnexpectedToken of string
 %}
 
 %token <string> IDENT
+%token <string> OTHER
 %token LPARENS RPARENS COMMA COLON HOLE EOF
 %token SET STAR DEFEQ ARROW FST SND LAM SKIP
 
@@ -22,6 +24,7 @@ idents:
 exp0:
   | exp1 COMMA exp0 { EPair ($1, $3) }
   | exp1 { $1 }
+  | OTHER { raise (UnexpectedToken $1) }
 
 tele:
   | LPARENS idents COLON exp1 RPARENS { List.map (fun x -> (x, $4)) $2 }

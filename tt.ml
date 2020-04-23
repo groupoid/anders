@@ -44,6 +44,6 @@ let defaults : cmdline list -> cmdline list = function
   | xs when List.exists needRepl xs -> xs @ [Repl]
   | xs -> xs
 
-let _ =
+let () =
   Array.to_list Sys.argv |> List.tl
   |> parseArgs |> defaults |> List.iter cmd

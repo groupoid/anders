@@ -10,15 +10,16 @@ let extSigG : value -> value * clos = function
   | VSig (t, g) -> (t, g)
   | u           -> raise (ExpectedSig u)
 
-let rec checkT k rho gma : exp -> rho * gamma = function
-  | EPi ((p, a), b) ->
-    let _ = checkT k rho gma a in
-    let gma1 = Env.add p (eval a rho) gma in
-    checkT (k + 1) (upVar rho p (genV k p)) gma1 b
-  | ESig ((p, a), b) -> checkT k rho gma (EPi ((p, a), b))
-  | ESet -> (rho, gma)
-  | u    -> eqNf k VSet (checkI k rho gma u); (rho, gma)
-and check k (rho : rho) (gma : gamma) (e0 : exp) (t0 : value) : rho * gamma =
+let isVSet : value -> bool = function
+  | VSet _ -> true
+  | u      -> false
+
+let imax a b =
+  match a, b with
+  | VSet u, VSet v -> VSet (max u v)
+  | u, v -> ExpectedVSet (if isVSet u then u else v) |> raise
+
+let rec check k (rho : rho) (gma : gamma) (e0 : exp) (t0 : value) : rho * gamma =
   match e0, t0 with
   | ELam ((p, a), e), VPi (t, g) ->
     eqNf k (eval a rho) t;
@@ -31,24 +32,33 @@ and check k (rho : rho) (gma : gamma) (e0 : exp) (t0 : value) : rho * gamma =
   | EDec (d, e), t ->
     let (name, _, _) = d in
     Printf.printf "Checking: %s\n" (Expr.showName name);
-    check k (upDec rho d) (snd (checkD k rho gma d)) e t
-  | e, VSet -> checkT k rho gma e
-  | e, t -> eqNf k t (checkI k rho gma e); (rho, gma)
-and checkI k rho gma : exp -> value = function
+    check k (upDec rho d) (snd (checkDecl k rho gma d)) e t
+  | EHole, v ->
+    Printf.printf "Hole: %s\n" (Expr.showValue v);
+    (rho, gma)
+  | e, t -> eqNf k t (infer k rho gma e); (rho, gma)
+and infer k rho gma : exp -> value = function
   | EVar x -> lookup x gma
+  | ESet u -> VSet (u + 1)
+  | EPi ((p, a), b) ->
+    let u = infer k rho gma a in
+    let v = infer (k + 1) (upVar rho p (genV k p))
+                  (Env.add p (eval a rho) gma) b in
+    imax u v
+  | ESig (x, y) -> infer k rho gma (EPi (x, y))
   | EApp (f, x) ->
-    let t1 = checkI k rho gma f in
-    let (t, g) = extPiG t1 in
+    let (t, g) = extPiG (infer k rho gma f) in
     ignore (check k rho gma x t);
     closByVal g (eval x rho)
-  | EFst e -> fst (extSigG (checkI k rho gma e))
+  | EFst e -> fst (extSigG (infer k rho gma e))
   | ESnd e ->
-    let (_, g) = extSigG (checkI k rho gma e) in
+    let (_, g) = extSigG (infer k rho gma e) in
     closByVal g (vfst (eval e rho))
   | e -> raise (InferError e)
-and checkD k rho gma : decl -> rho * gamma = function
+and checkDecl k rho gma : decl -> rho * gamma = function
   | (p, a, e) ->
-    let _ = checkT k rho gma a in
+    let b = infer k rho gma a in
+    if not (isVSet b) then raise (ExpectedVSet b) else ();
     let t = eval a rho in let gen = genV k p in
     let gma' = Env.add p t gma in
     check (k + 1) (upVar rho p gen) gma' e t

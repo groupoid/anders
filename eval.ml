@@ -24,7 +24,7 @@ let upVar (rho : rho) (p : name) (v : value) : rho =
 
 let rec eval (e : exp) (rho : rho) =
   match e with
-  | ESet -> VSet
+  | ESet u -> VSet u
   | EDec (d, e) -> eval e (upDec rho d)
   | ELam ((p, a), b) -> VLam (eval a rho, (p, b, rho))
   | EPi  ((p, a), b) -> VPi  (eval a rho, (p, b, rho))
@@ -34,6 +34,7 @@ let rec eval (e : exp) (rho : rho) =
   | EApp (f, x) -> app (eval f rho, eval x rho)
   | EVar x -> getRho rho x
   | EPair (e1, e2) -> VPair (eval e1 rho, eval e2 rho)
+  | EHole -> VNt NHole
 and app : value * value -> value = function
   | VLam (_, f), v -> closByVal f v
   | VNt k, m       -> VNt (NApp (k, m))
@@ -47,7 +48,7 @@ and getRho rho0 x =
   | None -> raise (VariableNotFound x)
 
 let pat (k : int) : name -> name = function
-  | Hole        -> Hole
+  | No          -> No
   | Name (p, _) -> Name (p, k)
 let genV k n : value = VNt (NVar (pat k n))
 
@@ -56,7 +57,7 @@ let rec rbV (k : int) : value -> exp = function
     let (p, _, _) = g in
     ELam ((pat k p, rbV k t), rbV (k + 1) (closByVal g (genV k p)))
   | VPair (u, v)   -> EPair (rbV k u, rbV k v)
-  | VSet           -> ESet
+  | VSet u         -> ESet u
   | VPi (t, g)     ->
     let (p, _, _) = g in
     EPi ((pat k p, rbV k t), rbV (k + 1) (closByVal g (genV k p)))
@@ -65,14 +66,15 @@ let rec rbV (k : int) : value -> exp = function
     ESig ((pat k p, rbV k t), rbV (k + 1) (closByVal g (genV k p)))
   | VNt l          -> rbN k l
 and rbN i : neut -> exp = function
-  | NVar s              -> EVar s
-  | NApp (k, m)         -> EApp (rbN i k, rbV i m)
-  | NFst k              -> EFst (rbN i k)
-  | NSnd k              -> ESnd (rbN i k)
+  | NVar s      -> EVar s
+  | NApp (k, m) -> EApp (rbN i k, rbV i m)
+  | NFst k      -> EFst (rbN i k)
+  | NSnd k      -> ESnd (rbN i k)
+  | NHole       -> EHole
 
 let rec conv k v1 v2 : bool =
   match v1, v2 with
-  | VSet, VSet -> true
+  | VSet u, VSet v -> u = v
   | VNt x, VNt y -> convNeut k x y
   | VPair (a, b), VPair (c, d) -> conv k a b && conv k b d
   | VLam (a, g), VLam (b, h) ->
@@ -92,4 +94,4 @@ and convNeut k n1 n2 : bool =
 
 let eqNf k v1 v2 : unit =
   if conv k v1 v2 then ()
-  else raise (TypeMismatch (v1, v2))
+  else raise (TypeIneq (v1, v2))

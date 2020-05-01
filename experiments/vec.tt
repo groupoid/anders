@@ -1,4 +1,4 @@
-vec : U → N → U :=
+vec : U → N → U 1 :=
 λ (α : U) (n : N) → (V : N → U) → V N0 → ((n : N) → α → V n → V (succ n)) → V n
 
 vnil : (α : U) → vec α N0 :=
@@ -9,7 +9,7 @@ vcons : (α : U) → (n : N) → α → vec α n → vec α (succ n) :=
   (V : N -> U) (s : V N0) (c : (n : N) → α → V n → V (succ n)) →
   c n x (xs V s c)
 
-bool : U := (α : U) → α → α → α
+bool : U 1 := (α : U) → α → α → α
 
 true  : bool := λ (α : U) (t : α) (f : α) → t
 false : bool := λ (α : U) (t : α) (f : α) → f

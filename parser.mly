@@ -5,7 +5,8 @@
 
 %token <string> IDENT
 %token <string> OTHER
-%token LPARENS RPARENS COMMA COLON HOLE EOF
+%token <int> NAT
+%token LPARENS RPARENS COMMA COLON NO EOF HOLE
 %token SET STAR DEFEQ ARROW FST SND LAM SKIP
 
 %start <Expr.exp> codecl
@@ -14,7 +15,7 @@
 %%
 
 ident:
-  | HOLE  { Hole }
+  | NO    { No }
   | IDENT { Name ($1, 0) }
 
 idents:
@@ -41,7 +42,7 @@ exp1:
   | LAM cotele ARROW exp1 { cotele eLam $4 $2 }
   | cotele ARROW exp1 { cotele ePi $3 $1 }
   | cotele STAR exp1 { cotele eSig $3 $1 }
-  | exp2 ARROW exp1 { EPi ((Hole, $1), $3) }
+  | exp2 ARROW exp1 { EPi ((No, $1), $3) }
   | exp2 { $1 }
 
 exp2:
@@ -49,7 +50,9 @@ exp2:
   | exp3 { $1 }
 
 exp3:
-  | SET { ESet }
+  | HOLE { EHole }
+  | SET NAT { ESet $2 }
+  | SET { ESet 0 }
   | exp3 FST { EFst $1 }
   | exp3 SND { ESnd $1 }
   | ident { EVar $1 }
@@ -61,7 +64,7 @@ decl:
 
 codecl:
   | decl SKIP+ codecl { EDec ($1, $3) }
-  | decl SKIP* EOF { EDec ($1, ESet) }
+  | decl SKIP* EOF { EDec ($1, ESet 0) }
 
 repl:
   | COLON IDENT exp1 EOF { Command ($2, $3) }

@@ -21,21 +21,23 @@ let lam     = "\\"|"\xCE\xBB"
 let star    = '*'
 
 rule main = parse
-| nl+        { SKIP }
-| comment    { main lexbuf }
-| ws+        { main lexbuf }
-| "U"        { SET }
-| ','        { COMMA }
-| '_'        { HOLE }
-| '('        { LPARENS }
-| ')'        { RPARENS }
-| ".1"       { FST }
-| ".2"       { SND }
-| "*"        { STAR }
-| defeq      { DEFEQ }
-| lam        { LAM }
-| arrow      { ARROW }
-| colon      { COLON }
-| ch+ as s   { IDENT s }
-| utf8+ as s { OTHER s }
-| eof        { EOF }
+| nl+             { SKIP }
+| comment         { main lexbuf }
+| ws+             { main lexbuf }
+| "U"             { SET }
+| ','             { COMMA }
+| '_'             { HOLE }
+| '('             { LPARENS }
+| ')'             { RPARENS }
+| ".1"            { FST }
+| ".2"            { SND }
+| "*"             { STAR }
+| "?"             { HOLE }
+| defeq           { DEFEQ }
+| lam             { LAM }
+| arrow           { ARROW }
+| colon           { COLON }
+| ['0'-'9']+ as s { NAT (int_of_string s) }
+| ch+ as s        { IDENT s }
+| utf8+ as s      { OTHER s }
+| eof             { EOF }

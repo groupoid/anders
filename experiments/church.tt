@@ -1,4 +1,4 @@
-N : U := (A : U) -> (A -> A) -> A -> A
+N : U 1 := (A : U) -> (A -> A) -> A -> A
 N0 : N := \(A : U) (S : A -> A) (Z : A) -> Z
 succ : N -> N :=
 \(n : N) (A : U) (S : A -> A) (Z : A) -> S (n A S Z)

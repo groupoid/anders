@@ -1,18 +1,18 @@
 type name =
-| Hole
+| No
 | Name of string * int
 
 let showName : name -> string = function
-  | Hole        -> "_"
+  | No          -> "_"
   | Name (s, _) -> s
 
 module Name = struct
   type t = name
   let compare x y =
     match (x, y) with
-    | Hole, Hole -> 0
-    | Hole, Name _ -> -1
-    | Name _, Hole -> 1
+    | No, No -> 0
+    | No, Name _ -> -1
+    | Name _, No -> 1
     | Name (p, a), Name (q, b) ->
       if p = q then compare a b
       else compare p q
@@ -21,7 +21,7 @@ module Env = Map.Make(Name)
 
 type exp =
 | ELam of tele * exp
-| ESet
+| ESet of int
 | EPi of tele * exp
 | ESig of tele * exp
 | EPair of exp * exp
@@ -30,6 +30,7 @@ type exp =
 | EApp of exp * exp
 | EVar of name
 | EDec of decl * exp
+| EHole
 and decl = name * exp * exp
 and tele = name * exp
 
@@ -44,7 +45,7 @@ let rec cotele (f : tele -> exp -> exp) (e : exp) : tele list -> exp = function
   | x :: xs -> f x (cotele f e xs)
 
 let rec showExp : exp -> string = function
-  | ESet -> "U"
+  | ESet u -> Printf.sprintf "U %d" u
   | ELam (p, x) -> Printf.sprintf "\\%s -> %s" (showTele p) (showExp x)
   | EPi  (p, x) -> Printf.sprintf "%s -> %s"   (showTele p) (showExp x)
   | ESig (p, x) -> Printf.sprintf "%s * %s"    (showTele p) (showExp x)
@@ -54,6 +55,7 @@ let rec showExp : exp -> string = function
   | EApp (f, x) -> Printf.sprintf "(%s %s)" (showExp f) (showExp x)
   | EVar p -> showName p
   | EDec (decl, exp) -> showDecl decl ^ "\n" ^ showExp exp
+  | EHole -> "?"
 and showDecl : decl -> string = function
   (p, exp1, exp2) -> Printf.sprintf "%s : %s := %s"
                                     (showName p)
@@ -65,7 +67,7 @@ and showTele : tele -> string = function
 type value =
 | VLam of value * clos
 | VPair of value * value
-| VSet
+| VSet of int
 | VPi of value * clos
 | VSig of value * clos
 | VNt of neut
@@ -74,6 +76,7 @@ and neut =
 | NApp of neut * value
 | NFst of neut
 | NSnd of neut
+| NHole
 and clos = name * exp * rho
 and term =
 | Exp of exp
@@ -99,7 +102,7 @@ let rec showValue : value -> string = function
   | VLam (x, (p, e, rho)) ->
     Printf.sprintf "\\%s -> %s" (showTele p x rho) (showExp e)
   | VPair (fst, snd) -> Printf.sprintf "(%s, %s)" (showValue fst) (showValue snd)
-  | VSet -> "U"
+  | VSet u -> Printf.sprintf "U %d" u
   | VPi (x, (p, e, rho)) ->
     Printf.sprintf "%s -> %s" (showTele p x rho) (showExp e)
   | VSig (x, (p, e, rho)) ->
@@ -110,6 +113,7 @@ and showNeut : neut -> string = function
   | NApp (f, x) -> Printf.sprintf "(%s %s)" (showNeut f) (showValue x)
   | NFst v -> showNeut v ^ ".1"
   | NSnd v -> showNeut v ^ ".2"
+  | NHole -> "?"
 and showTermBind : name * term -> string option = function
   | p, Value v -> Some (Printf.sprintf "%s := %s" (showName p) (showValue v))
   | _, _       -> None

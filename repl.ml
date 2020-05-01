@@ -5,11 +5,11 @@ let checkMain rho gma filename =
   let chan = open_in filename in
   let exp = Lexparse.parseErr Parser.codecl (Lexing.from_channel chan) in
   close_in chan; Printf.printf "Parsed “%s” successfully.\n" filename;
-  let rho = Check.check 1 rho gma exp VSet in
+  let rho = Check.check 1 rho gma exp (VSet 1) in
   Printf.printf "File loaded.\n"; rho
 
 let checkAndEval rho gma e : value * value =
-  (Check.checkI 1 rho gma e, Eval.eval e rho)
+  (Check.infer 1 rho gma e, Eval.eval e rho)
 
 let main rho gma : command -> unit = function
   | Eval e ->

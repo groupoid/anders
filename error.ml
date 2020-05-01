@@ -1,16 +1,18 @@
 open Expr
 
-exception TypeMismatch of value * value
+exception TypeIneq of value * value
 exception InferError of exp
 exception VariableNotFound of name
 exception InvalidApplication of value * value
 exception ExpectedPi of value
 exception ExpectedSig of value
+exception ExpectedESet of exp
+exception ExpectedVSet of value
 exception UnknownCommand of string
 exception Parser of int * int
 
 let prettyPrintError : exn -> unit = function
-  | TypeMismatch (u, v) ->
+  | TypeIneq (u, v) ->
     Printf.printf "Type mismatch:\n%s\n  =/=\n%s\n"
                   (showValue u) (showValue v)
   | InferError e ->
@@ -20,6 +22,10 @@ let prettyPrintError : exn -> unit = function
   | InvalidApplication (x, y) ->
     Printf.printf "Invalid application \n  %s\nto\n  %s\n"
                   (showValue x) (showValue y)
+  | ExpectedESet x ->
+    Printf.printf "  %s\nexpected to be universe\n" (showExp x)
+  | ExpectedVSet x ->
+    Printf.printf "  %s\nexpected to be universe\n" (showValue x)
   | ExpectedPi x ->
     Printf.printf "  %s\nexpected to be Pi-type\n" (showValue x)
   | ExpectedSig x ->

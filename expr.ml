@@ -128,6 +128,13 @@ and showTele p x rho : string =
 
 type gamma = value Env.t
 
+let showGamma (gma : gamma) : string =
+  Env.bindings gma
+  |> List.map
+      (fun x -> let (p, v) = x in
+        Printf.sprintf "%s : %s" (showName p) (showValue v))
+  |> String.concat "\n"
+
 type command =
   | Nope
   | Eval of exp

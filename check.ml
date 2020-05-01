@@ -34,7 +34,8 @@ let rec check k (rho : rho) (gma : gamma) (e0 : exp) (t0 : value) : rho * gamma 
     Printf.printf "Checking: %s\n" (Expr.showName name);
     check k (upDec rho d) (snd (checkDecl k rho gma d)) e t
   | EHole, v ->
-    Printf.printf "Hole: %s\n" (Expr.showValue v);
+    print_string ("\nHole:\n\n" ^ Expr.showGamma gma ^ "\n" ^
+                  String.make 80 '-' ^ "\n" ^ Expr.showValue v ^ "\n\n");
     (rho, gma)
   | e, t -> eqNf k t (infer k rho gma e); (rho, gma)
 and infer k rho gma : exp -> value = function

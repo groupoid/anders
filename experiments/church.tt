@@ -1,3 +1,5 @@
+module church where
+
 N := (A : U) -> (A -> A) -> A -> A
 N0 : N := \(A : U) (S : A -> A) (Z : A) -> Z
 succ : N -> N :=

@@ -1,3 +1,6 @@
+module vec where
+import experiments/church
+
 vec (α : U) (n : N) : U 1 :=
 (V : N → U) → V N0 → ((n : N) → α → V n → V (succ n)) → V n
 

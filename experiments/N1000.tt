@@ -1,3 +1,6 @@
+module N1000 where
+import experiments/church
+
 N1 : N := succ N0
 N2 : N := succ N1
 N3 : N := succ N2

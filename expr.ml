@@ -19,6 +19,8 @@ module Name = struct
 end
 module Env = Map.Make(Name)
 
+module Files = Set.Make(String)
+
 type exp =
 | ELam of tele * exp
 | ESet of int
@@ -29,11 +31,7 @@ type exp =
 | ESnd of exp
 | EApp of exp * exp
 | EVar of name
-| EDec of decl * exp
 | EHole
-and decl =
-| NotAnnotated of name * exp
-| Annotated of name * exp * exp
 and tele = name * exp
 
 (* In OCaml constructors are not functions. *)
@@ -56,15 +54,35 @@ let rec showExp : exp -> string = function
   | ESnd exp -> showExp exp ^ ".2"
   | EApp (f, x) -> Printf.sprintf "(%s %s)" (showExp f) (showExp x)
   | EVar p -> showName p
-  | EDec (decl, exp) -> showDecl decl ^ "\n" ^ showExp exp
   | EHole -> "?"
-and showDecl : decl -> string = function
+and showTele : tele -> string = function
+  (p, x) -> Printf.sprintf "(%s : %s)" (showName p) (showExp x)
+
+type decl =
+  | NotAnnotated of name * exp
+  | Annotated of name * exp * exp
+
+let showDecl : decl -> string = function
   | Annotated (p, exp1, exp2) ->
     Printf.sprintf "%s : %s := %s" (showName p) (showExp exp1) (showExp exp2)
   | NotAnnotated (p, exp) ->
     Printf.sprintf "%s := %s" (showName p) (showExp exp)
-and showTele : tele -> string = function
-  (p, x) -> Printf.sprintf "(%s : %s)" (showName p) (showExp x)
+
+type content =
+| Import of string * content
+| Decl of decl * content
+| End
+type file = string * content
+
+let rec showContent : content -> string = function
+  | Import (p, rest) ->
+    Printf.sprintf "import %s" p ^ "\n" ^ showContent rest
+  | Decl (d, rest) ->
+    showDecl d ^ "\n" ^ showContent rest
+  | End -> ""
+
+let showFile : file -> string = function
+  | (p, x) -> Printf.sprintf "module %s where\n%s" p (showContent x)
 
 type value =
 | VLam of value * clos

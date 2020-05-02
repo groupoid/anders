@@ -8,8 +8,9 @@
 %token <int> NAT
 %token LPARENS RPARENS COMMA COLON NO EOF HOLE
 %token SET STAR DEFEQ ARROW FST SND LAM SKIP
+%token DIRSEP MODULE WHERE IMPORT
 
-%start <Expr.exp> codecl
+%start <Expr.file> file
 %start <Expr.command> repl
 
 %%
@@ -64,9 +65,17 @@ decl:
   | ident empcotele DEFEQ SKIP* exp1
     { NotAnnotated ($1, cotele eLam $5 $2) }
 
-codecl:
-  | decl SKIP+ codecl { EDec ($1, $3) }
-  | decl SKIP* EOF { EDec ($1, ESet 0) }
+path:
+  | IDENT { $1 }
+  | IDENT DIRSEP path { $1 ^ Filename.dir_sep ^ $3 }
+
+content:
+  | IMPORT path SKIP+ content { Import ($2, $4) }
+  | decl SKIP+ content { Decl ($1, $3) }
+  | decl SKIP* EOF { Decl ($1, End) }
+
+file:
+  | MODULE IDENT WHERE SKIP* content { ($2, $5) }
 
 repl:
   | COLON IDENT exp1 EOF { Command ($2, $3) }

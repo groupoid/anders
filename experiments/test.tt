@@ -1,3 +1,5 @@
+module test where
+
 id (A : U) (a : A) : A := a
 
 sigmaIntro (A : U) (B : A -> U) (x : A) (u : B (id A x)) : (x : A) * B x := (x, u)

@@ -1,3 +1,5 @@
+module bool where
+
 bool := (α : U) → α → α → α
 
 true  : bool := λ (α : U) (t f : α) → t

@@ -10,6 +10,7 @@ exception ExpectedESet of exp
 exception ExpectedVSet of value
 exception UnknownCommand of string
 exception Parser of int * int
+exception InvalidModuleName of string * string
 
 let prettyPrintError : exn -> unit = function
   | TypeIneq (u, v) ->
@@ -22,6 +23,9 @@ let prettyPrintError : exn -> unit = function
   | InvalidApplication (x, y) ->
     Printf.printf "Invalid application \n  %s\nto\n  %s\n"
                   (showValue x) (showValue y)
+  | InvalidModuleName (name, filename) ->
+    Printf.printf "Module “%s” does not match name of its file: %s\n"
+                  name filename
   | ExpectedESet x ->
     Printf.printf "  %s\nexpected to be universe\n" (showExp x)
   | ExpectedVSet x ->
@@ -34,6 +38,7 @@ let prettyPrintError : exn -> unit = function
     Printf.printf "Unknown command “%s”\n" s
   | Parser (x, y) ->
     Printf.printf "Parsing error at characters %d:%d\n" x y
+  | Sys_error s -> print_endline s
   | ex -> Printf.printf "uncaught exception: %s\n" (Printexc.to_string ex)
 
 let handleErrors (f : 'a -> 'b) (x : 'a) (default : 'b) : 'b =

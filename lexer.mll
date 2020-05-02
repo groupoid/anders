@@ -4,7 +4,7 @@
 }
 
 let lat1   = ['a'-'z' 'A'-'Z' '0'-'9' '-' '_']
-let ext1   = [^ '\t' ' ' '\r' '\n' '(' ')' ':' '.' ',']
+let ext1   = [^ '\t' ' ' '\r' '\n' '(' ')' ':' '.' ',' '/']
 let bytes2 = ['\192'-'\223']['\128'-'\191']
 let bytes3 = ['\224'-'\239']['\128'-'\191']['\128'-'\191']
 let bytes4 = ['\240'-'\247']['\128'-'\191']['\128'-'\191']['\128'-'\191']
@@ -24,11 +24,15 @@ rule main = parse
 | nl+             { SKIP }
 | comment         { main lexbuf }
 | ws+             { main lexbuf }
-| "U"             { SET }
+| "module"        { MODULE }
+| "where"         { WHERE }
+| "import"        { IMPORT }
+| 'U'             { SET }
 | ','             { COMMA }
 | '_'             { HOLE }
 | '('             { LPARENS }
 | ')'             { RPARENS }
+| '/'             { DIRSEP }
 | ".1"            { FST }
 | ".2"            { SND }
 | "*"             { STAR }

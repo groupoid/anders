@@ -19,10 +19,6 @@ let imax a b =
   | VSet u, VSet v -> VSet (max u v)
   | u, v -> ExpectedVSet (if isVSet u then u else v) |> raise
 
-let getDeclName : decl -> name = function
-  | Annotated (p, _, _)
-  | NotAnnotated (p, _) -> p
-
 let rec check k (rho : rho) (gma : gamma) (e0 : exp) (t0 : value) : rho * gamma =
   match e0, t0 with
   | ELam ((p, a), e), VPi (t, g) ->
@@ -33,10 +29,6 @@ let rec check k (rho : rho) (gma : gamma) (e0 : exp) (t0 : value) : rho * gamma 
   | EPair (e1, e2), VSig (t, g) ->
     let _ = check k rho gma e1 t in
     check k rho gma e2 (closByVal g (eval e1 rho))
-  | EDec (d, e), t ->
-    let name = getDeclName d in
-    Printf.printf "Checking: %s\n" (Expr.showName name);
-    check k (upDec rho d) (snd (checkDecl k rho gma d)) e t
   | EHole, v ->
     print_string ("\nHole:\n\n" ^ Expr.showGamma gma ^ "\n" ^
                   String.make 80 '-' ^ "\n" ^ Expr.showValue v ^ "\n\n");
@@ -60,15 +52,3 @@ and infer k rho gma : exp -> value = function
     let (_, g) = extSigG (infer k rho gma e) in
     closByVal g (vfst (eval e rho))
   | e -> raise (InferError e)
-and checkDecl k rho gma : decl -> rho * gamma = function
-  | Annotated (p, a, e) ->
-    let b = infer k rho gma a in
-    if not (isVSet b) then raise (ExpectedVSet b) else ();
-    let t = eval a rho in let gen = genV k p in
-    let gma' = Env.add p t gma in
-    check (k + 1) (upVar rho p gen) gma' e t
-  | NotAnnotated (p, e) ->
-    let t = infer k rho gma e in
-    let gen = genV k p in
-    let gma' = Env.add p t gma in
-    check (k + 1) (upVar rho p gen) gma' e t

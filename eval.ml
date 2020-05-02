@@ -26,7 +26,6 @@ let upVar (rho : rho) (p : name) (v : value) : rho =
 let rec eval (e : exp) (rho : rho) =
   match e with
   | ESet u -> VSet u
-  | EDec (d, e) -> eval e (upDec rho d)
   | ELam ((p, a), b) -> VLam (eval a rho, (p, b, rho))
   | EPi  ((p, a), b) -> VPi  (eval a rho, (p, b, rho))
   | ESig ((p, a), b) -> VSig (eval a rho, (p, b, rho))

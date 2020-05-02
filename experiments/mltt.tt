@@ -1,3 +1,5 @@
+module mltt where
+
 Pi (A: U) (B: A -> U): U = (x: A) -> B x
 lambda (A: U) (B: A -> U) (b: Pi A B): Pi A B = \(x: A) -> b x
 app    (A: U) (B: A -> U) (f: Pi A B) (a: A): B a = f a

@@ -19,3 +19,7 @@ let tokenToString : token -> string = function
   | COMMA   -> "COMMA"
   | COLON   -> "COLON"
   | ARROW   -> "ARROW"
+  | WHERE   -> "WHERE"
+  | MODULE  -> "MODULE"
+  | IMPORT  -> "IMPORT"
+  | DIRSEP  -> "DIRSEP"

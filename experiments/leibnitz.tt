@@ -1,3 +1,6 @@
+module leibnitz where
+import experiments/10×10×10×3
+
 eq   (A : U 1) (x y : A) : U 2 := (P : A -> U 1) -> P x -> P y
 refl (A : U 1) (x : A) : eq A x x := \(P : A -> U 1) (u : P x) -> u
 

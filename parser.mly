@@ -60,7 +60,9 @@ exp3:
 
 decl:
   | ident empcotele COLON exp1 DEFEQ SKIP* exp1
-    { ($1, cotele ePi $4 $2, cotele eLam $7 $2) }
+    { Annotated ($1, cotele ePi $4 $2, cotele eLam $7 $2) }
+  | ident empcotele DEFEQ SKIP* exp1
+    { NotAnnotated ($1, cotele eLam $5 $2) }
 
 codecl:
   | decl SKIP+ codecl { EDec ($1, $3) }

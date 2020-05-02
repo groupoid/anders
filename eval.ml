@@ -17,7 +17,8 @@ let lookup (x : name) (lst : gamma) =
   | None -> raise (VariableNotFound x)
 
 let upDec (rho : rho) : decl -> rho = function
-  (p, _, e) -> Env.add p (Exp e) rho
+  | NotAnnotated (p, e)
+  | Annotated (p, _, e) -> Env.add p (Exp e) rho
 
 let upVar (rho : rho) (p : name) (v : value) : rho =
   Env.add p (Value v) rho

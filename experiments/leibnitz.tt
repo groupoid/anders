@@ -1,0 +1,4 @@
+eq   (A : U 1) (x y : A) : U 2 := (P : A -> U 1) -> P x -> P y
+refl (A : U 1) (x : A) : eq A x x := \(P : A -> U 1) (u : P x) -> u
+
+two-plus-two : eq N (plus N5 N4) N9 := refl N N9

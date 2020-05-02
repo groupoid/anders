@@ -31,7 +31,9 @@ type exp =
 | EVar of name
 | EDec of decl * exp
 | EHole
-and decl = name * exp * exp
+and decl =
+| NotAnnotated of name * exp
+| Annotated of name * exp * exp
 and tele = name * exp
 
 (* In OCaml constructors are not functions. *)
@@ -57,10 +59,10 @@ let rec showExp : exp -> string = function
   | EDec (decl, exp) -> showDecl decl ^ "\n" ^ showExp exp
   | EHole -> "?"
 and showDecl : decl -> string = function
-  (p, exp1, exp2) -> Printf.sprintf "%s : %s := %s"
-                                    (showName p)
-                                    (showExp exp1)
-                                    (showExp exp2)
+  | Annotated (p, exp1, exp2) ->
+    Printf.sprintf "%s : %s := %s" (showName p) (showExp exp1) (showExp exp2)
+  | NotAnnotated (p, exp) ->
+    Printf.sprintf "%s := %s" (showName p) (showExp exp)
 and showTele : tele -> string = function
   (p, x) -> Printf.sprintf "(%s : %s)" (showName p) (showExp x)
 

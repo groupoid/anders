@@ -13,7 +13,10 @@ let vsnd : value -> value = function
 
 let lookup (x : name) (lst : gamma) =
   match Env.find_opt x lst with
-  | Some v -> v
+  | Some v ->
+    (match v with
+    | Local u
+    | Global u -> u)
   | None -> raise (VariableNotFound x)
 
 let upDec (rho : rho) : decl -> rho = function
@@ -22,6 +25,12 @@ let upDec (rho : rho) : decl -> rho = function
 
 let upVar (rho : rho) (p : name) (v : value) : rho =
   Env.add p (Value v) rho
+
+let upLocal (gma : gamma) (p : name) (v : value) : gamma =
+  Env.add p (Local v) gma
+
+let upGlobal (gma : gamma) (p : name) (v : value) : gamma =
+  Env.add p (Global v) gma
 
 let rec eval (e : exp) (rho : rho) =
   match e with

@@ -146,13 +146,18 @@ and showTele p x rho : string =
     Printf.sprintf "(%s : %s, %s)" (showName p) (showValue x) (showRho rho)
   else Printf.sprintf "(%s : %s)" (showName p) (showValue x)
 
-type gamma = value Env.t
+type scope =
+  | Local  of value
+  | Global of value
+type gamma = scope Env.t
 
 let showGamma (gma : gamma) : string =
   Env.bindings gma
-  |> List.map
-      (fun x -> let (p, v) = x in
-        Printf.sprintf "%s : %s" (showName p) (showValue v))
+  |> filterMap
+      (fun x -> let (p, y) = x in
+        match y with
+        | Local v -> Some (Printf.sprintf "%s : %s" (showName p) (showValue v))
+        | _       -> None )
   |> String.concat "\n"
 
 type command =

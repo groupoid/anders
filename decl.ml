@@ -21,12 +21,12 @@ let checkDecl rho gma d : rho * gamma =
     let b = infer 1 rho gma a in
     if not (isVSet b) then raise (ExpectedVSet b) else ();
     let a' = eval a rho in
-    let gma' = Env.add p a' gma in
+    let gma' = upGlobal gma p a' in
     ignore (check 1 rho gma' e a');
     (upDec rho d, gma')
   | NotAnnotated (p, e) ->
     let a = infer 1 rho gma e in
-    let gma' = Env.add p a gma in
+    let gma' = upGlobal gma p a in
     ignore (check 1 rho gma' e a);
     (upDec rho d, gma')
 

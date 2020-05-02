@@ -24,7 +24,7 @@ let rec check k (rho : rho) (gma : gamma) (e0 : exp) (t0 : value) : rho * gamma 
   | ELam ((p, a), e), VPi (t, g) ->
     eqNf k (eval a rho) t;
     let gen = genV k p in
-    let gma1 = Env.add p t gma in
+    let gma1 = upLocal gma p t in
     check (k + 1) (upVar rho p gen) gma1 e (closByVal g gen)
   | EPair (e1, e2), VSig (t, g) ->
     let _ = check k rho gma e1 t in
@@ -40,7 +40,7 @@ and infer k rho gma : exp -> value = function
   | EPi ((p, a), b) ->
     let u = infer k rho gma a in
     let v = infer (k + 1) (upVar rho p (genV k p))
-                  (Env.add p (eval a rho) gma) b in
+                  (upLocal gma p (eval a rho)) b in
     imax u v
   | ESig (x, y) -> infer k rho gma (EPi (x, y))
   | EApp (f, x) ->

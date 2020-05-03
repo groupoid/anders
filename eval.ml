@@ -44,6 +44,7 @@ let rec eval (e : exp) (rho : rho) =
   | EVar x -> getRho rho x
   | EPair (e1, e2) -> VPair (eval e1 rho, eval e2 rho)
   | EHole -> VNt NHole
+  | EUndef -> VNt NUndef
 and app : value * value -> value = function
   | VLam (_, f), v -> closByVal f v
   | VNt k, m       -> VNt (NApp (k, m))
@@ -80,6 +81,7 @@ and rbN i : neut -> exp = function
   | NFst k      -> EFst (rbN i k)
   | NSnd k      -> ESnd (rbN i k)
   | NHole       -> EHole
+  | NUndef      -> EUndef
 
 let rec conv k v1 v2 : bool =
   match v1, v2 with

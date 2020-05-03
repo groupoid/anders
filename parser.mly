@@ -8,7 +8,7 @@
 %token <int> NAT
 %token LPARENS RPARENS COMMA COLON NO EOF HOLE
 %token SET STAR DEFEQ ARROW FST SND LAM SKIP
-%token DIRSEP MODULE WHERE IMPORT
+%token DIRSEP MODULE WHERE IMPORT UNDEF
 
 %start <Expr.file> file
 %start <Expr.command> repl
@@ -52,6 +52,7 @@ exp2:
 
 exp3:
   | HOLE { EHole }
+  | UNDEF { EUndef }
   | SET NAT { ESet $2 }
   | SET { ESet 0 }
   | exp3 FST { EFst $1 }

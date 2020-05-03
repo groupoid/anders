@@ -31,7 +31,7 @@ type exp =
 | ESnd of exp
 | EApp of exp * exp
 | EVar of name
-| EHole
+| EHole | EUndef
 and tele = name * exp
 
 (* In OCaml constructors are not functions. *)
@@ -55,6 +55,7 @@ let rec showExp : exp -> string = function
   | EApp (f, x) -> Printf.sprintf "(%s %s)" (showExp f) (showExp x)
   | EVar p -> showName p
   | EHole -> "?"
+  | EUndef -> "undefined"
 and showTele : tele -> string = function
   (p, x) -> Printf.sprintf "(%s : %s)" (showName p) (showExp x)
 
@@ -96,7 +97,7 @@ and neut =
 | NApp of neut * value
 | NFst of neut
 | NSnd of neut
-| NHole
+| NHole | NUndef
 and clos = name * exp * rho
 and term =
 | Exp of exp
@@ -134,6 +135,7 @@ and showNeut : neut -> string = function
   | NFst v -> showNeut v ^ ".1"
   | NSnd v -> showNeut v ^ ".2"
   | NHole -> "?"
+  | NUndef -> "undefined"
 and showTermBind : name * term -> string option = function
   | p, Value v -> Some (Printf.sprintf "%s := %s" (showName p) (showValue v))
   | _, _       -> None

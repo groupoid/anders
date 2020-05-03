@@ -37,6 +37,7 @@ rule main = parse
 | ".2"            { SND }
 | "*"             { STAR }
 | "?"             { HOLE }
+| "undefined"     { UNDEF }
 | defeq           { DEFEQ }
 | lam             { LAM }
 | arrow           { ARROW }

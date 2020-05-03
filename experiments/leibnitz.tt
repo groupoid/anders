@@ -3,7 +3,7 @@ import experiments/10×10×10×3
 
 option type-in-type true
 
-eq   (A : U) (x y : A) : U 2 := (P : A -> U) -> P x -> P y
+eq   (A : U) (x y : A) : U := (P : A -> U) -> P x -> P y
 refl (A : U) (x : A) : eq A x x := \(P : A -> U) (u : P x) -> u
 
 two-plus-two : eq N (plus N5 N4) N9 := refl N N9

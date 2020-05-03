@@ -1,4 +1,4 @@
-module leibnitz where
+module leibniz where
 import experiments/10×10×10×3
 
 option type-in-type true
@@ -11,3 +11,7 @@ two-plus-two : eq N (plus N5 N4) N9 := refl N N9
 subst (A : U) (P : A -> U) (a b : A) (p : eq A a b) : P a -> P b := p P
 ap (A B : U) (f : A -> B) (a b : A) (p : eq A a b) : eq B (f a) (f b) :=
 subst A (\(b : A) -> eq B (f a) (f b)) a b p (refl B (f a))
+
+D (A : U) : U := (x y : A) -> eq A x y -> U
+singl (A : U) (a : A) : U := (x : A) * eq A a x
+eta (A : U) (a : A) : singl A a = (a, refl A a)

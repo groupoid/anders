@@ -10,10 +10,9 @@ type cmdline =
   | Repl
   | Help
 
+let banner = "TT theorem prover\n"
 let help =
-"TT theorem prover
-
-   invoke = tt | tt list
+"    invoke = tt | tt list
      list = [] | command list
   command = check filename | lex filename
           | parse filename | help"
@@ -45,6 +44,7 @@ let defaults : cmdline list -> cmdline list = function
   | xs -> xs
 
 let rec main () =
+  print_endline banner;
   try Array.to_list Sys.argv |> List.tl
       |> parseArgs |> defaults |> List.iter cmd
   with Restart -> main ()

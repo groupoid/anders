@@ -1,6 +1,14 @@
 open Error
 open Expr
 
+let help =
+"Available commands:
+  <statement> Infer type and evaluate statement
+  :n          <statement> normalize statement
+  :q          Quit
+  :r          Restart
+  :h          Display this message"
+
 let init : Decl.state = (Env.empty, Env.empty, Files.empty)
 let st : Decl.state ref = ref init
 
@@ -17,6 +25,7 @@ let main rho gma : command -> unit = function
     Printf.printf "TYPE: %s\nNORMEVAL: %s\n" (Expr.showExp t) (Expr.showExp v)
   | Action "q" -> exit 0
   | Action "r" -> st := init; raise Restart
+  | Action "h" -> print_endline help
   | Command (s, _) | Action s -> raise (UnknownCommand s)
   | Nope -> ()
 

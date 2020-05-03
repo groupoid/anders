@@ -24,3 +24,4 @@ let tokenToString : token -> string = function
   | MODULE  -> "MODULE"
   | IMPORT  -> "IMPORT"
   | DIRSEP  -> "DIRSEP"
+  | OPTION  -> "OPTION"

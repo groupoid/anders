@@ -9,6 +9,7 @@
 %token LPARENS RPARENS COMMA COLON NO EOF HOLE
 %token SET STAR DEFEQ ARROW FST SND LAM SKIP
 %token DIRSEP MODULE WHERE IMPORT UNDEF
+%token OPTION
 
 %start <Expr.file> file
 %start <Expr.command> repl
@@ -70,10 +71,15 @@ path:
   | IDENT { $1 }
   | IDENT DIRSEP path { $1 ^ Filename.dir_sep ^ $3 }
 
+line:
+  | IMPORT path { Import $2 }
+  | OPTION IDENT IDENT { Option ($2, $3) }
+  | decl { Decl $1 }
+
 content:
-  | IMPORT path SKIP+ content { Import ($2, $4) }
-  | decl SKIP+ content { Decl ($1, $3) }
-  | decl SKIP* EOF { Decl ($1, End) }
+  | line SKIP+ content { $1 :: $3 }
+  | line EOF { [$1] }
+  | EOF { [] }
 
 file:
   | MODULE IDENT WHERE SKIP* content { ($2, $5) }

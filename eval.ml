@@ -1,6 +1,9 @@
 open Expr
 open Error
 
+let typeInType : bool ref = ref false
+let ieq u v : bool = !typeInType || u = v
+
 let vfst : value -> value = function
   | VPair (u, _) -> u
   | VNt k        -> VNt (NFst k)
@@ -85,7 +88,7 @@ and rbN i : neut -> exp = function
 
 let rec conv k v1 v2 : bool =
   match v1, v2 with
-  | VSet u, VSet v -> u = v
+  | VSet u, VSet v -> ieq u v
   | VNt x, VNt y -> convNeut k x y
   | VPair (a, b), VPair (c, d) -> conv k a b && conv k b d
   | VLam (a, g), VLam (b, h) ->

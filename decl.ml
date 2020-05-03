@@ -30,20 +30,27 @@ let checkDecl rho gma d : rho * gamma =
     ignore (check 1 rho gma' e a);
     (upDec rho d, gma')
 
-let rec checkContent p : content -> state =
-  let (rho, gma, checked) = p in function
-  | Decl (d, rest) ->
+let rec checkLine st : line -> state =
+  let (rho, gma, checked) = st in function
+  | Decl d ->
     let name = getDeclName d in
     Printf.printf "Checking: %s\n" (Expr.showName name);
     let (rho', gma') = checkDecl rho gma d in
-    checkContent (rho', gma', checked) rest
-  | Import (x, rest) ->
+    (rho', gma', checked)
+  | Option (opt, value) ->
+    (match opt with
+    | "type-in-type" ->
+      (match value with
+      | "tt" | "true"  -> typeInType := true
+      | "ff" | "false" -> typeInType := false
+      | _ -> raise (UnknownOptionValue (opt, value)))
+    | _ -> raise (UnknownOption opt));
+    st
+  | Import x ->
     let path = ext x in
-    let p' =
-      if Files.mem path checked then p
-      else checkFile p path in
-    checkContent p' rest
-  | End -> (rho, gma, checked)
+    if Files.mem path checked then st
+    else checkFile st path
+and checkContent st xs = List.fold_left checkLine st xs
 and checkFile p path =
   let (rho, gma, checked) = p in
   let filename = Filename.basename path in

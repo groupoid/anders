@@ -45,6 +45,7 @@ let rec cotele (f : tele -> exp -> exp) (e : exp) : tele list -> exp = function
   | x :: xs -> f x (cotele f e xs)
 
 let rec showExp : exp -> string = function
+  | ESet 0 -> "U"
   | ESet u -> Printf.sprintf "U %d" u
   | ELam (p, x) -> Printf.sprintf "\\%s -> %s" (showTele p) (showExp x)
   | EPi  (p, x) -> Printf.sprintf "%s -> %s"   (showTele p) (showExp x)
@@ -69,18 +70,18 @@ let showDecl : decl -> string = function
   | NotAnnotated (p, exp) ->
     Printf.sprintf "%s := %s" (showName p) (showExp exp)
 
-type content =
-| Import of string * content
-| Decl of decl * content
-| End
+type line =
+| Import of string
+| Option of string * string
+| Decl of decl
+type content = line list
 type file = string * content
 
-let rec showContent : content -> string = function
-  | Import (p, rest) ->
-    Printf.sprintf "import %s" p ^ "\n" ^ showContent rest
-  | Decl (d, rest) ->
-    showDecl d ^ "\n" ^ showContent rest
-  | End -> ""
+let showLine : line -> string = function
+  | Import p -> Printf.sprintf "import %s" p
+  | Option (opt, value) -> Printf.sprintf "option %s %s" opt value
+  | Decl d -> showDecl d
+let showContent x = String.concat "\n" (List.map showLine x)
 
 let showFile : file -> string = function
   | (p, x) -> Printf.sprintf "module %s where\n%s" p (showContent x)
@@ -123,6 +124,7 @@ let rec showValue : value -> string = function
   | VLam (x, (p, e, rho)) ->
     Printf.sprintf "\\%s -> %s" (showTele p x rho) (showExp e)
   | VPair (fst, snd) -> Printf.sprintf "(%s, %s)" (showValue fst) (showValue snd)
+  | VSet 0 -> "U"
   | VSet u -> Printf.sprintf "U %d" u
   | VPi (x, (p, e, rho)) ->
     Printf.sprintf "%s -> %s" (showTele p x rho) (showExp e)

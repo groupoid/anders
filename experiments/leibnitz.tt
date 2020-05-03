@@ -1,9 +1,13 @@
 module leibnitz where
 import experiments/10×10×10×3
 
-eq   (A : U 1) (x y : A) : U 2 := (P : A -> U 1) -> P x -> P y
-refl (A : U 1) (x : A) : eq A x x := \(P : A -> U 1) (u : P x) -> u
+option type-in-type true
+
+eq   (A : U) (x y : A) : U 2 := (P : A -> U) -> P x -> P y
+refl (A : U) (x : A) : eq A x x := \(P : A -> U) (u : P x) -> u
 
 two-plus-two : eq N (plus N5 N4) N9 := refl N N9
 
-subst (A : U 1) (P : A -> U 1) (a b : A) (p : eq A a b) : P a -> P b := p P
+subst (A : U) (P : A -> U) (a b : A) (p : eq A a b) : P a -> P b := p P
+ap (A B : U) (f : A -> B) (a b : A) (p : eq A a b) : eq B (f a) (f b) :=
+subst A (\(b : A) -> eq B (f a) (f b)) a b p (refl B (f a))

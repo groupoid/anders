@@ -27,6 +27,7 @@ rule main = parse
 | "module"        { MODULE }
 | "where"         { WHERE }
 | "import"        { IMPORT }
+| "option"        { OPTION }
 | 'U'             { SET }
 | ','             { COMMA }
 | '_'             { HOLE }

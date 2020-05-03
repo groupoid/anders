@@ -44,9 +44,8 @@ let defaults : cmdline list -> cmdline list = function
   | xs -> xs
 
 let rec main () =
-  print_endline banner;
   try Array.to_list Sys.argv |> List.tl
       |> parseArgs |> defaults |> List.iter cmd
   with Restart -> main ()
 
-let () = main ()
+let () = print_endline banner; main ()

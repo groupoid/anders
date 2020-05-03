@@ -45,5 +45,8 @@ let defaults : cmdline list -> cmdline list = function
   | xs -> xs
 
 let () =
-  Array.to_list Sys.argv |> List.tl
-  |> parseArgs |> defaults |> List.iter cmd
+  while true do
+    try Array.to_list Sys.argv |> List.tl
+        |> parseArgs |> defaults |> List.iter cmd
+    with Restart -> ()
+  done

@@ -1,6 +1,9 @@
 open Error
 open Expr
 
+let init : Decl.state = (Env.empty, Env.empty, Files.empty)
+let st : Decl.state ref = ref init
+
 let checkAndEval rho gma e : value * value =
   (Check.infer 1 rho gma e, Eval.eval e rho)
 
@@ -13,10 +16,9 @@ let main rho gma : command -> unit = function
     let t = Eval.rbV 1 t0 in let v = Eval.rbV 1 v0 in
     Printf.printf "TYPE: %s\nNORMEVAL: %s\n" (Expr.showExp t) (Expr.showExp v)
   | Action "q" -> exit 0
+  | Action "r" -> st := init; raise Restart
   | Command (s, _) | Action s -> raise (UnknownCommand s)
   | Nope -> ()
-
-let st : Decl.state ref = ref (Env.empty, Env.empty, Files.empty)
 
 let check filename =
   st := handleErrors (Decl.checkFile !st) filename !st
@@ -30,4 +32,4 @@ let repl () =
       let exp = Lexparse.parseErr Parser.repl
                   (Lexing.from_string x) in
       main rho gma exp) line ()
-  done with End_of_file -> ()  
+  done with End_of_file -> ()

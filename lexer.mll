@@ -13,7 +13,7 @@ let ch      = lat1|bytes2|bytes3|bytes4
 let utf8    = ext1|bytes2|bytes3|bytes4
 let ws      = ['\t' ' ' '\r' '\n']
 let nl      = ['\r' '\n']
-let comment = "--"  [^ '\n' '\r']* (nl|eof)
+let comment = "--" [^ '\n' '\r']* (nl|eof)
 let colon   = ':'
 let arrow   = "->"|"\xE2\x86\x92"
 let defeq   = "="|":="|"\xE2\x89\x94"|"\xE2\x89\x9C"|"\xE2\x89\x9D"

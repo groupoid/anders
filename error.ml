@@ -1,5 +1,6 @@
 open Expr
 
+exception Restart
 exception TypeIneq of value * value
 exception InferError of exp
 exception VariableNotFound of name
@@ -39,7 +40,8 @@ let prettyPrintError : exn -> unit = function
   | Parser (x, y) ->
     Printf.printf "Parsing error at characters %d:%d\n" x y
   | Sys_error s -> print_endline s
-  | ex -> Printf.printf "uncaught exception: %s\n" (Printexc.to_string ex)
+  | Restart -> raise Restart
+  | ex -> Printf.printf "Uncaught exception: %s\n" (Printexc.to_string ex)
 
 let handleErrors (f : 'a -> 'b) (x : 'a) (default : 'b) : 'b =
   try f x with ex -> prettyPrintError ex; default

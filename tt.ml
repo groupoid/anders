@@ -44,9 +44,9 @@ let defaults : cmdline list -> cmdline list = function
   | xs when List.exists needRepl xs -> xs @ [Repl]
   | xs -> xs
 
-let () =
-  while true do
-    try Array.to_list Sys.argv |> List.tl
-        |> parseArgs |> defaults |> List.iter cmd
-    with Restart -> ()
-  done
+let rec main () =
+  try Array.to_list Sys.argv |> List.tl
+      |> parseArgs |> defaults |> List.iter cmd
+  with Restart -> main ()
+
+let () = main ()

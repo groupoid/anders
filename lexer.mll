@@ -15,10 +15,14 @@ let ws      = ['\t' ' ' '\r' '\n']
 let nl      = ['\r' '\n']
 let comment = "--" [^ '\n' '\r']* (nl|eof)
 let colon   = ':'
+(* arrow := -> | →
+   defeq := =  | := | ≔ | ≜ | ≝
+   lam   := \  | λ
+   prod  := *  | × *)
 let arrow   = "->"|"\xE2\x86\x92"
 let defeq   = "="|":="|"\xE2\x89\x94"|"\xE2\x89\x9C"|"\xE2\x89\x9D"
 let lam     = "\\"|"\xCE\xBB"
-let star    = '*'
+let prod    = '*'|"\xC3\x97"
 
 rule main = parse
 | nl+             { SKIP }
@@ -36,7 +40,7 @@ rule main = parse
 | '/'             { DIRSEP }
 | ".1"            { FST }
 | ".2"            { SND }
-| "*"             { STAR }
+| prod            { STAR }
 | "?"             { HOLE }
 | "undefined"     { UNDEF }
 | defeq           { DEFEQ }

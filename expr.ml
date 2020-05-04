@@ -58,7 +58,8 @@ let rec showExp : exp -> string = function
   | EHole -> "?"
   | EUndef -> "undefined"
 and showTele : tele -> string = function
-  (p, x) -> Printf.sprintf "(%s : %s)" (showName p) (showExp x)
+  | (No, x) -> showExp x
+  | (p,  x) -> Printf.sprintf "(%s : %s)" (showName p) (showExp x)
 
 type decl =
   | NotAnnotated of name * exp
@@ -148,7 +149,9 @@ and showRho (rho : rho) : string =
 and showTele p x rho : string =
   if Env.exists (fun _ -> isTermVisible) rho then
     Printf.sprintf "(%s : %s, %s)" (showName p) (showValue x) (showRho rho)
-  else Printf.sprintf "(%s : %s)" (showName p) (showValue x)
+  else match p with
+  | No -> showValue x
+  | _  -> Printf.sprintf "(%s : %s)" (showName p) (showValue x)
 
 type scope =
   | Local  of value

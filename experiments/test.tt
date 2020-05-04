@@ -12,3 +12,6 @@ const (A : U) (B : U) (a : A) (b : B) : A = a
 
 test : (A : U) -> (B : U) -> (A -> B) -> A -> B :=
 λ (A : U) (B : U) (f : A -> B) (x : A) -> f x
+
+trio : U 2 := (fst : U 1) × (snd : U 1) × (U 1)
+instance : trio := (U, U -> U, U -> U -> U)

@@ -24,8 +24,8 @@ let rec check k (rho : rho) (gma : gamma) (e0 : exp) (t0 : value) : rho * gamma 
   | ELam ((p, a), e), VPi (t, g) ->
     eqNf k (eval a rho) t;
     let gen = genV k p in
-    let gma1 = upLocal gma p t in
-    check (k + 1) (upVar rho p gen) gma1 e (closByVal g gen)
+    let gma' = upLocal gma p t in
+    check (k + 1) (upVar rho p gen) gma' e (closByVal g gen)
   | EPair (e1, e2), VSig (t, g) ->
     let _ = check k rho gma e1 t in
     check k rho gma e2 (closByVal g (eval e1 rho))

@@ -54,10 +54,10 @@ and app : value * value -> value = function
   | x, y           -> raise (InvalidApplication (x, y))
 and closByVal (x : clos) (v : value) =
   let (p, e, rho) = x in eval e (upVar rho p v)
-and getRho rho0 x =
-  match Env.find_opt x rho0 with
+and getRho rho x =
+  match Env.find_opt x rho with
   | Some (Value v) -> v
-  | Some (Exp e) -> eval e rho0
+  | Some (Exp e) -> eval e rho
   | None -> raise (VariableNotFound x)
 
 let pat (k : int) : name -> name = function
@@ -92,9 +92,14 @@ let rec conv k v1 v2 : bool =
   | VNt x, VNt y -> convNeut k x y
   | VPair (a, b), VPair (c, d) -> conv k a b && conv k b d
   | VLam (a, g), VLam (b, h) ->
-    let (p, _, _) = g in
-    let p' = genV k p in
+    let (p, _, _) = g in let p' = genV k p in
     conv k a b && conv (k + 1) (closByVal g p') (closByVal h p')
+  | VLam (a, g), b ->
+    let (p, _, _) = g in let p' = genV k p in
+    conv (k + 1) (closByVal g p') (app (b, p'))
+  | b, VLam (a, g) ->
+    let (p, _, _) = g in let p' = genV k p in
+    conv (k + 1) (app (b, p')) (closByVal g p')
   | VPi (a, g), VPi (b, h) -> conv k (VLam (a, g)) (VLam (b, h))
   | VSig (a, g), VSig (b, h) -> conv k (VLam (a, g)) (VLam (b, h))
   | _, _ -> false

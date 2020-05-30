@@ -34,7 +34,7 @@ let rec checkLine st : line -> state =
   let (rho, gma, checked) = st in function
   | Decl d ->
     let name = getDeclName d in
-    Printf.printf "Checking: %s\n" (Expr.showName name);
+    Printf.printf "Checking: %s\n" (Expr.showName name); flush_all ();
     let (rho', gma') = checkDecl rho gma d in
     (rho', gma', checked)
   | Option (opt, value) ->
@@ -56,7 +56,7 @@ and checkFile p path =
   let filename = Filename.basename path in
   let chan = open_in path in
   let (name, con) = Lexparse.parseErr Parser.file (Lexing.from_channel chan) in
-  close_in chan; Printf.printf "Parsed “%s” successfully.\n" filename;
+  close_in chan; Printf.printf "Parsed “%s” successfully.\n" filename; flush_all ();
   if ext name = filename then ()
   else raise (InvalidModuleName (name, filename));
   let res = checkContent (rho, gma, Files.add path checked) con in

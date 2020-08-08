@@ -9,13 +9,15 @@ type cmdline =
   | Parse of string
   | Repl
   | Help
+  | Trace
 
 let banner = "TT theorem prover\n"
 let help =
 "    invoke = tt | tt list
      list = [] | command list
   command = check filename | lex filename
-          | parse filename | help"
+          | parse filename | help
+          | trace"
 
 let cmd : cmdline -> unit = function
   | Check filename -> Repl.check filename
@@ -23,6 +25,7 @@ let cmd : cmdline -> unit = function
   | Parse filename -> Lexparse.parse filename
   | Help -> print_endline help
   | Repl -> Repl.repl ()
+  | Trace -> (Prefs.trace := true)
 
 let needRepl : cmdline -> bool = function
   | Check _ -> true
@@ -34,6 +37,7 @@ let rec parseArgs : string list -> cmdline list = function
   | "lex"   :: filename :: rest -> Lex   filename :: parseArgs rest
   | "parse" :: filename :: rest -> Parse filename :: parseArgs rest
   | "help"  :: rest -> Help :: parseArgs rest
+  | "trace" :: rest -> Trace :: parseArgs rest
   | x :: xs ->
     Printf.printf "Unknown command “%s”\n" x;
     parseArgs xs

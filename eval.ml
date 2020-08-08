@@ -36,6 +36,9 @@ let upGlobal (gma : gamma) (p : name) (v : value) : gamma =
   Env.add p (Global v) gma
 
 let rec eval (e : exp) (rho : rho) =
+  if !Prefs.trace then
+    (Printf.printf "EVAL: %s\n" (showExp e); flush_all ())
+  else ();
   match e with
   | ESet u -> VSet u
   | ELam ((p, a), b) -> VLam (eval a rho, (p, b, rho))

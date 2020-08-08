@@ -20,6 +20,10 @@ let imax a b =
   | u, v -> ExpectedVSet (if isVSet u then u else v) |> raise
 
 let rec check k (rho : rho) (gma : gamma) (e0 : exp) (t0 : value) : rho * gamma =
+  if !Prefs.trace then
+    (Printf.printf "CHECK: %s has type %s?\n" (showExp e0) (showValue t0);
+     flush_all ())
+  else ();
   match e0, t0 with
   | ELam ((p, a), e), VPi (t, g) ->
     eqNf k (eval a rho) t;

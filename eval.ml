@@ -63,57 +63,60 @@ and getRho rho x =
   | Some (Exp e) -> eval e rho
   | None -> raise (VariableNotFound x)
 
-let pat (k : int) : name -> name = function
+let gen : int ref = ref 0
+let pat : name -> name = (gen := !gen + 1); function
   | No          -> No
-  | Name (p, _) -> Name (p, k)
-let genV k n : value = VNt (NVar (pat k n))
+  | Name (p, _) -> Name (p, !gen)
 
-let rec rbV (k : int) : value -> exp = function
+let var x  = VNt (NVar x)
+let genV n = var (pat n)
+
+let rec rbV : value -> exp = function
   | VLam (t, g)    ->
-    let (p, _, _) = g in
-    ELam ((pat k p, rbV k t), rbV (k + 1) (closByVal g (genV k p)))
-  | VPair (u, v)   -> EPair (rbV k u, rbV k v)
+    let (p, _, _) = g in let q = pat p in
+    ELam ((q, rbV t), rbV (closByVal g (var q)))
+  | VPair (u, v)   -> EPair (rbV u, rbV v)
   | VSet u         -> ESet u
   | VPi (t, g)     ->
-    let (p, _, _) = g in
-    EPi ((pat k p, rbV k t), rbV (k + 1) (closByVal g (genV k p)))
+    let (p, _, _) = g in let q = pat p in
+    EPi ((q, rbV t), rbV (closByVal g (var q)))
   | VSig (t, g)    ->
-    let (p, _, _) = g in
-    ESig ((pat k p, rbV k t), rbV (k + 1) (closByVal g (genV k p)))
-  | VNt l          -> rbN k l
-and rbN i : neut -> exp = function
+    let (p, _, _) = g in let q = pat p in
+    ESig ((q, rbV t), rbV (closByVal g (var q)))
+  | VNt l          -> rbN l
+and rbN : neut -> exp = function
   | NVar s      -> EVar s
-  | NApp (k, m) -> EApp (rbN i k, rbV i m)
-  | NFst k      -> EFst (rbN i k)
-  | NSnd k      -> ESnd (rbN i k)
+  | NApp (k, m) -> EApp (rbN k, rbV m)
+  | NFst k      -> EFst (rbN k)
+  | NSnd k      -> ESnd (rbN k)
   | NHole       -> EHole
   | NUndef      -> EUndef
 
-let rec conv k v1 v2 : bool =
+let rec conv v1 v2 : bool =
   match v1, v2 with
   | VSet u, VSet v -> ieq u v
-  | VNt x, VNt y -> convNeut k x y
-  | VPair (a, b), VPair (c, d) -> conv k a b && conv k b d
+  | VNt x, VNt y -> convNeut x y
+  | VPair (a, b), VPair (c, d) -> conv a b && conv b d
   | VLam (a, g), VLam (b, h) ->
-    let (p, _, _) = g in let p' = genV k p in
-    conv k a b && conv (k + 1) (closByVal g p') (closByVal h p')
+    let (p, _, _) = g in let p' = genV p in
+    conv a b && conv (closByVal g p') (closByVal h p')
   | VLam (a, g), b ->
-    let (p, _, _) = g in let p' = genV k p in
-    conv (k + 1) (closByVal g p') (app (b, p'))
+    let (p, _, _) = g in let p' = genV p in
+    conv (closByVal g p') (app (b, p'))
   | b, VLam (a, g) ->
-    let (p, _, _) = g in let p' = genV k p in
-    conv (k + 1) (app (b, p')) (closByVal g p')
-  | VPi (a, g), VPi (b, h) -> conv k (VLam (a, g)) (VLam (b, h))
-  | VSig (a, g), VSig (b, h) -> conv k (VLam (a, g)) (VLam (b, h))
+    let (p, _, _) = g in let p' = genV p in
+    conv (app (b, p')) (closByVal g p')
+  | VPi (a, g), VPi (b, h) -> conv (VLam (a, g)) (VLam (b, h))
+  | VSig (a, g), VSig (b, h) -> conv (VLam (a, g)) (VLam (b, h))
   | _, _ -> false
-and convNeut k n1 n2 : bool =
+and convNeut n1 n2 : bool =
   match n1, n2 with
   | NVar a, NVar b -> a = b
-  | NApp (f, a), NApp (g, b) -> convNeut k f g && conv k a b
-  | NFst x, NFst y -> convNeut k x y
-  | NSnd x, NSnd y -> convNeut k x y
+  | NApp (f, a), NApp (g, b) -> convNeut f g && conv a b
+  | NFst x, NFst y -> convNeut x y
+  | NSnd x, NSnd y -> convNeut x y
   | _, _ -> false
 
-let eqNf k v1 v2 : unit =
-  if conv k v1 v2 then ()
+let eqNf v1 v2 : unit =
+  if conv v1 v2 then ()
   else raise (TypeIneq (v1, v2))

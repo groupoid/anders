@@ -56,7 +56,10 @@ and app : value * value -> value = function
   | VNt k, m       -> VNt (NApp (k, m))
   | x, y           -> raise (InvalidApplication (x, y))
 and closByVal (x : clos) (v : value) =
-  let (p, e, rho) = x in eval e (upVar rho p v)
+  let (p, e, rho) = x in if !Prefs.trace then
+    (Printf.printf "CLOSBYVAL: (%s)(%s)\n" (showExp e) (showValue v);
+     flush_all ())
+  else (); eval e (upVar rho p v)
 and getRho rho x =
   match Env.find_opt x rho with
   | Some (Value v) -> v

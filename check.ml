@@ -21,7 +21,7 @@ let imax a b =
 
 let rec check (rho : rho) (gma : gamma) (e0 : exp) (t0 : value) : rho * gamma =
   if !Prefs.trace then
-    (Printf.printf "CHECK: %s has type %s?\n" (showExp e0) (showValue t0);
+    (Printf.printf "CHECK: %s : %s\n" (showExp e0) (showValue t0);
      flush_all ())
   else ();
   match e0, t0 with

@@ -164,7 +164,7 @@ let showGamma (gma : gamma) : string =
       (fun x -> let (p, y) = x in
         match y with
         | Local v -> Some (Printf.sprintf "%s : %s" (showName p) (showValue v))
-        | _       -> None )
+        | _       -> None)
   |> String.concat "\n"
 
 type command =

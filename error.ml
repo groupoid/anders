@@ -1,18 +1,18 @@
 open Expr
 
 exception Restart
-exception TypeIneq of value * value
 exception InferError of exp
-exception VariableNotFound of name
-exception InvalidApplication of value * value
 exception ExpectedPi of value
-exception ExpectedSig of value
-exception ExpectedESet of exp
-exception ExpectedVSet of value
-exception UnknownCommand of string
 exception Parser of int * int
-exception InvalidModuleName of string * string
+exception ExpectedESet of exp
+exception ExpectedSig of value
+exception ExpectedVSet of value
 exception UnknownOption of string
+exception UnknownCommand of string
+exception VariableNotFound of name
+exception TypeIneq of value * value
+exception InvalidApplication of value * value
+exception InvalidModuleName of string * string
 exception UnknownOptionValue of string * string
 
 let prettyPrintError : exn -> unit = function

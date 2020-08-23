@@ -39,7 +39,12 @@ let rec check (rho : rho) (gma : gamma) (e0 : exp) (t0 : value) : rho * gamma =
     (rho, gma)
   | EUndef, v -> (rho, gma)
   | e, t -> eqNf t (infer rho gma e); (rho, gma)
-and infer rho gma : exp -> value = function
+and infer rho gma e0 : value =
+  if !Prefs.trace then
+    (Printf.printf "INFER: %s\n" (showExp e0);
+     flush_all ())
+  else ();
+  match e0 with
   | EVar x -> lookup x gma
   | ESet u -> VSet (u + 1)
   | EPi ((p, a), b) ->

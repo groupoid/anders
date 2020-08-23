@@ -57,7 +57,7 @@ and app : value * value -> value = function
   | x, y           -> raise (InvalidApplication (x, y))
 and closByVal (x : clos) (v : value) =
   let (p, e, rho) = x in if !Prefs.trace then
-    (Printf.printf "CLOSBYVAL: (%s)(%s)\n" (showExp e) (showValue v);
+    (Printf.printf "CLOSBYVAL: (%s)(%s := %s)\n" (showExp e) (showName p) (showValue v);
      flush_all ())
   else (); eval e (upVar rho p v)
 and getRho rho x =

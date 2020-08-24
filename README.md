@@ -1,6 +1,6 @@
 # Requirements
 
-OCaml, ocamlbuild, ocamllex and Menhir.
+OCaml, ocamlbuild, ocamllex, Menhir and Make.
 
 On Ubuntu 18.04 all this can be installed via:
 
@@ -11,6 +11,6 @@ $ apt install ocaml ocamlbuild menhir
 # Build
 
 ```shell
-$ ocamlbuild -use-menhir tt.native
+$ make
 $ ./tt.native check experiments/test.tt
 ```

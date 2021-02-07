@@ -26,14 +26,22 @@ let upDec (rho : rho) : decl -> rho = function
   | NotAnnotated (p, e)
   | Annotated (p, _, e) -> Env.add p (Exp e) rho
 
+let iteHole (p : name) a b =
+  match p with
+  | No -> a
+  | _  -> b
+
 let upVar (rho : rho) (p : name) (v : value) : rho =
   Env.add p (Value v) rho
+  |> iteHole p rho
 
 let upLocal (gma : gamma) (p : name) (v : value) : gamma =
   Env.add p (Local v) gma
+  |> iteHole p gma
 
 let upGlobal (gma : gamma) (p : name) (v : value) : gamma =
   Env.add p (Global v) gma
+  |> iteHole p gma
 
 let rec eval (e : exp) (rho : rho) =
   if !Prefs.trace then

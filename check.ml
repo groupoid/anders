@@ -17,7 +17,7 @@ let isVSet : value -> bool = function
 let imax a b =
   match a, b with
   | VSet u, VSet v -> VSet (max u v)
-  | u, v -> ExpectedVSet (if isVSet u then u else v) |> raise
+  | u, v -> ExpectedVSet (if isVSet u then v else u) |> raise
 
 let rec check (rho : rho) (gma : gamma) (e0 : exp) (t0 : value) : rho * gamma =
   if !Prefs.trace then

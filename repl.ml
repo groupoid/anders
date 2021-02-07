@@ -3,11 +3,11 @@ open Expr
 
 let help =
 "Available commands:
-  <statement> Infer type and evaluate statement
-  :n          <statement> normalize statement
-  :q          Quit
-  :r          Restart
-  :h          Display this message"
+  <statement>    infer type and evaluate statement
+  :n <statement> normalize statement
+  :q             quit
+  :r             restart
+  :h             display this message"
 
 let init : Decl.state = (Env.empty, Env.empty, Files.empty)
 let st : Decl.state ref = ref init

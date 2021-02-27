@@ -13,7 +13,7 @@ type cmdline =
 
 let banner = "TT theorem prover\n"
 let help =
-"    invoke = tt | tt list
+"   invoke = tt | tt list
      list = [] | command list
   command = check filename | lex filename
           | parse filename | help

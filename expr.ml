@@ -1,6 +1,6 @@
 type name =
-| No
-| Name of string * int
+  | No
+  | Name of string * int
 
 let showName : name -> string = function
   | No          -> "_"
@@ -22,16 +22,16 @@ module Env = Map.Make(Name)
 module Files = Set.Make(String)
 
 type exp =
-| ELam of tele * exp
-| ESet of int
-| EPi of tele * exp
-| ESig of tele * exp
-| EPair of exp * exp
-| EFst of exp
-| ESnd of exp
-| EApp of exp * exp
-| EVar of name
-| EHole | EUndef
+  | ELam of tele * exp
+  | ESet of int
+  | EPi of tele * exp
+  | ESig of tele * exp
+  | EPair of exp * exp
+  | EFst of exp
+  | ESnd of exp
+  | EApp of exp * exp
+  | EVar of name
+  | EHole | EUndef
 and tele = name * exp
 
 (* In OCaml constructors are not functions. *)
@@ -72,9 +72,9 @@ let showDecl : decl -> string = function
     Printf.sprintf "%s := %s" (showName p) (showExp exp)
 
 type line =
-| Import of string
-| Option of string * string
-| Decl of decl
+  | Import of string
+  | Option of string * string
+  | Decl of decl
 type content = line list
 type file = string * content
 
@@ -88,22 +88,22 @@ let showFile : file -> string = function
   | (p, x) -> Printf.sprintf "module %s where\n%s" p (showContent x)
 
 type value =
-| VLam of value * clos
-| VPair of value * value
-| VSet of int
-| VPi of value * clos
-| VSig of value * clos
-| VNt of neut
+  | VLam of value * clos
+  | VPair of value * value
+  | VSet of int
+  | VPi of value * clos
+  | VSig of value * clos
+  | VNt of neut
 and neut =
-| NVar of name
-| NApp of neut * value
-| NFst of neut
-| NSnd of neut
-| NHole | NUndef
+  | NVar of name
+  | NApp of neut * value
+  | NFst of neut
+  | NSnd of neut
+  | NHole | NUndef
 and clos = name * exp * rho
 and term =
-| Exp of exp
-| Value of value
+  | Exp of exp
+  | Value of value
 and rho = term Env.t
 
 (* Compatibility with OCaml 4.05

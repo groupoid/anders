@@ -13,7 +13,7 @@ let init : Decl.state = (Env.empty, Env.empty, Files.empty)
 let st : Decl.state ref = ref init
 
 let checkAndEval rho gma e : value * value =
-  (Check.infer rho gma e, Eval.eval e rho)
+  (Check.infer 0 rho gma e, Eval.eval e rho)
 
 let main rho gma : command -> unit = function
   | Eval e ->

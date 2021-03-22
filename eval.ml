@@ -44,9 +44,9 @@ let upGlobal (gma : gamma) (p : name) (v : value) : gamma =
   |> iteHole p gma
 
 let rec eval (e : exp) (rho : rho) =
-  if !Prefs.trace then
-    (Printf.printf "EVAL: %s\n" (showExp e); flush_all ())
-  else ();
+  if !Prefs.trace then begin
+    Printf.printf "EVAL: %s\n" (showExp e); flush_all ()
+  end else ();
   match e with
   | ESet u -> VSet u
   | ELam ((p, a), b) -> VLam (eval a rho, (p, b, rho))
@@ -64,10 +64,11 @@ and app : value * value -> value = function
   | VNt k, m       -> VNt (NApp (k, m))
   | x, y           -> raise (InvalidApplication (x, y))
 and closByVal (x : clos) (v : value) =
-  let (p, e, rho) = x in if !Prefs.trace then
-    (Printf.printf "CLOSBYVAL: (%s)(%s := %s)\n" (showExp e) (showName p) (showValue v);
-     flush_all ())
-  else (); eval e (upVar rho p v)
+  let (p, e, rho) = x in if !Prefs.trace then begin
+    Printf.printf "CLOSBYVAL: (%s)(%s := %s)\n"
+      (showExp e) (showName p) (showValue v);
+    flush_all ()
+  end else (); eval e (upVar rho p v)
 and getRho rho x =
   match Env.find_opt x rho with
   | Some (Value v) -> v

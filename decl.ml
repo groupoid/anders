@@ -4,7 +4,7 @@ open Check
 open Error
 
 type state = rho * gamma * Files.t
-let ext x = x ^ ".tt"
+let ext x = x ^ ".anders"
 
 let rec listLast : 'a list -> 'a = function
   | []      -> raise (Failure "listLast")

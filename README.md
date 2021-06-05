@@ -19,5 +19,5 @@ $ ./anders.native girard check experiments/mltt.anders
 Credits
 -------
 
-Siegmentation Fault
-5HT
+* Siegmentation Fault
+* 5HT

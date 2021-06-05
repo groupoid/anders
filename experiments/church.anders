@@ -10,3 +10,6 @@ plus (m n : N) : N :=
 
 mult (m n : N) : N :=
 \(A : U) (S : A -> A) (Z : A) -> m A (n A S) Z
+
+pow (m n : N) : N :=
+\(A : U) (S : A -> A) (Z : A) -> n (A -> A) (m A) S Z

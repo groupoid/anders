@@ -116,6 +116,8 @@ let rec conv v1 v2 : bool =
   | VPair (a, b), VPair (c, d) -> conv a c && conv b d
   | VPair (a, b), v -> conv a (vfst v) && conv b (vsnd v)
   | v, VPair (a, b) -> conv (vfst v) a && conv (vsnd v) b
+  | VPi (a, g), VPi (b, h)
+  | VSig (a, g), VSig (b, h)
   | VLam (a, g), VLam (b, h) ->
     let (p, _, _) = g in let p' = genV p in
 
@@ -127,8 +129,6 @@ let rec conv v1 v2 : bool =
   | b, VLam (a, g) ->
     let (p, _, _) = g in let p' = genV p in
     conv (app (b, p')) (closByVal g p')
-  | VPi (a, g), VPi (b, h) -> conv (VLam (a, g)) (VLam (b, h))
-  | VSig (a, g), VSig (b, h) -> conv (VLam (a, g)) (VLam (b, h))
   | _, _ -> false
 and convNeut n1 n2 : bool =
   match n1, n2 with

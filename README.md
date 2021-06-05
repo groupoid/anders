@@ -12,5 +12,5 @@ $ apt install ocaml ocamlbuild menhir make
 
 ```shell
 $ make
-$ ./tt.native check experiments/test.tt
+$ ./anders.native check experiments/test.anders
 ```

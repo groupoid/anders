@@ -1,8 +1,8 @@
 open Expr
 open Error
 
-let typeInType : bool ref = ref false
-let ieq u v : bool = !typeInType || u = v
+let girard : bool ref = ref false
+let ieq u v : bool = !girard || u = v
 
 let vfst : value -> value = function
   | VPair (u, _) -> u

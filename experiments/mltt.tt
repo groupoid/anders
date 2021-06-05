@@ -1,6 +1,6 @@
 module mltt where
-
-option type-in-type true
+-- $ tt girard check experiments/mltt.tt
+-- or insert “option girard true”
 
 Pi (A: U) (B: A -> U): U = (x: A) -> B x
 lambda (A: U) (B: A -> U) (b: Pi A B): Pi A B = \(x: A) -> b x

@@ -39,10 +39,10 @@ let rec checkLine st : line -> state =
     (rho', gma', checked)
   | Option (opt, value) ->
     (match opt with
-    | "type-in-type" ->
+    | "girard" ->
       (match value with
-      | "tt" | "true"  -> typeInType := true
-      | "ff" | "false" -> typeInType := false
+      | "tt" | "true"  -> girard := true
+      | "ff" | "false" -> girard := false
       | _ -> raise (UnknownOptionValue (opt, value)))
     | _ -> raise (UnknownOption opt));
     st

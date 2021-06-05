@@ -36,12 +36,12 @@ eta       (A: U) (a: A): singl A a = (a,reflect A a)
 --
 --trans_comp (A:U)(a: A): Path A a (trans A A (<i> A) a) = fill (<i> A) a []
 --subst_comp (A:U)(P:A -> U)(a:A)(e:P(a)): Path (P a) e (subst A P a a (reflect A a) e) = trans_comp (P a) e
---
---comp1 (A:U)(B:A -> U)(a:A)(f: Pi A B): Equ (B a) (app A B (lambda A B f) a) (f a) = reflect (B a) (f a)
---comp2 (A:U)(B:A -> U)(a:A)(f: Pi A B): Equ (Pi A B) f (\(x:A) -> f x)               = reflect (Pi A B)  f
---comp3 (A:U)(B:A -> U)(a:A)(b: B a): Equ A a (pr1 A B (a,b))                         = reflect A           a
---comp4 (A:U)(B:A -> U)(a:A)(b: B a): Equ (B a) b (pr2 A B (a,b))                     = reflect (B a)       b
---comp5 (A:U)(B:A -> U)(p: Sigma A B): Equ (Sigma A B) p (pr1 A B p,pr2 A B p)        = reflect (Sigma A B) p
+
+comp1 (A:U)(B:A -> U)(a:A)(f: Pi A B): Equ (B a) (app A B (lambda A B f) a) (f a) = reflect (B a) (f a)
+comp2 (A:U)(B:A -> U)(a:A)(f: Pi A B): Equ (Pi A B) f (\(x:A) -> f x)               = reflect (Pi A B)  f
+comp3 (A:U)(B:A -> U)(a:A)(b: B a): Equ A a (pr1 A B (a,b))                         = reflect A           a
+comp4 (A:U)(B:A -> U)(a:A)(b: B a): Equ (B a) b (pr2 A B (a,b))                     = reflect (B a)       b
+comp5 (A:U)(B:A -> U)(p: Sigma A B): Equ (Sigma A B) p (pr1 A B p,pr2 A B p)        = reflect (Sigma A B) p
 --comp6 (A:U)(a:A)(C: D A) (d: C a a (reflect A a))
 --    : Path (C a a (reflect A a)) d (J A a C d a (reflect A a))
 --    = subst_comp (singl A a) T (eta A a) d where T (z: singl A a) : U = C a (z.1) (z.2)

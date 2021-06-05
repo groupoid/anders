@@ -1,7 +1,7 @@
 Anders
 ======
 
-CCHM homotopy system type checker.
+CCHM homotopy system type checker based on Mini-TT for OCaml.
 
 # Prerequisites
 

@@ -3,13 +3,15 @@ Anders
 
 CCHM homotopy system type checker based on Mini-TT for OCaml.
 
-# Prerequisites
+Prerequisites
+-------------
 
 ```shell
 $ apt install ocaml ocamlbuild menhir make
 ```
 
-# Try
+Try
+---
 
 ```shell
 $ make

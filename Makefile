@@ -4,7 +4,7 @@ clean:
 	ocamlbuild -clean
 
 native:
-	ocamlbuild -use-menhir tt.native
+	ocamlbuild -use-menhir anders.native
 
 byte:
-	ocamlbuild -use-menhir tt.byte -tag 'debug'
+	ocamlbuild -use-menhir anders.byte -tag 'debug'

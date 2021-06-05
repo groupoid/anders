@@ -10,9 +10,9 @@ type cmdline =
   | Repl  | Help
   | Trace | Girard
 
-let banner = "TT theorem prover\n"
+let banner = "Anders theorem prover\n"
 let help =
-"   invoke = tt | tt list
+"   invoke = anders | anders list
      list = [] | command list
   command = check filename | lex filename
           | parse filename | help

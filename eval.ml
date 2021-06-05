@@ -105,6 +105,11 @@ and rbN : neut -> exp = function
   | NUndef      -> EUndef
 
 let rec conv v1 v2 : bool =
+  if !Prefs.trace then begin
+    Printf.printf "CONV: %s = %s\n"
+      (showValue v1) (showValue v2);
+    flush_all ()
+  end else ();
   match v1, v2 with
   | VSet u, VSet v -> ieq u v
   | VNt x, VNt y -> convNeut x y

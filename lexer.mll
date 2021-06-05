@@ -34,7 +34,7 @@ rule main = parse
 | "option"        { OPTION }
 | 'U'             { SET }
 | ','             { COMMA }
-| '_'             { HOLE }
+| '_'             { NO }
 | '('             { LPARENS }
 | ')'             { RPARENS }
 | '/'             { DIRSEP }

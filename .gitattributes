@@ -1,1 +1,3 @@
 Makefile linguist-detectable=false
+*.mll  linguist-detectable=false
+*.mly  linguist-detectable=false

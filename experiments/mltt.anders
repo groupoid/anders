@@ -12,8 +12,10 @@ pr1 (A: U) (B: A -> U) (x: Sigma A B): A = x.1
 pr2 (A: U) (B: A -> U) (x: Sigma A B): B (pr1 A B x) = x.2
 
 W (A:U) (B: A -> U): U  = (x:A) * ( B(x) -> W A B )
-Wrec (A:U) (B:A -> U) (P:U) (alg: (a:A) -> (B(a) -> W A B) -> ((b:B(a)) -> P) -> P) : (w: W A B) -> P = \(w:W A B) -> alg w.1 w.2 (\(b:B(w.1)) -> Wrec A B P alg (w.2 b))
-Wind (A:U) (B:A -> U) (P:W A B -> U) (alg: (a:A) (f:B(a) -> W A B) -> ((b:B(a)) -> P (f b)) -> P (a,f)) : (w: W A B) -> P w = \(w:W A B) -> alg w.1 w.2 (\(b:B(w.1)) -> Wind A B P alg (w.2 b))
+Wrec (A:U) (B:A -> U) (P:U) (alg: (a:A) -> (B(a) -> W A B) -> ((b:B(a)) -> P) -> P)
+  : (w: W A B) -> P = \(w:W A B) -> alg w.1 w.2 (\(b:B(w.1)) -> Wrec A B P alg (w.2 b))
+Wind (A:U) (B:A -> U) (P:W A B -> U) (alg: (a:A) (f:B(a) -> W A B) -> ((b:B(a)) -> P (f b)) -> P (a,f))
+  : (w: W A B) -> P w = \(w:W A B) -> alg w.1 w.2 (\(b:B(w.1)) -> Wind A B P alg (w.2 b))
 Equ       (A: U) (x y: A): U = (P : A -> U) -> P x -> P y
 refl      (A : U) (x : A) : Equ A x x = \(P : A -> U) (u : P x) -> u
 
@@ -21,6 +23,7 @@ reflect   (A: U) (a: A): Equ A a a = refl A a
 D         (A: U) : U = (x y: A) -> Equ A x y -> U
 singl     (A: U) (a: A): U = (x: A) * Equ A a x
 eta       (A: U) (a: A): singl A a = (a,reflect A a)
+
 --contr     (A: U) (a b: A) (p: Equ A a b): Equ (singl A a) (eta A a) (b,p) = <i> (p @ i, <j> p @ i /\ j)
 --subst     (A: U) (P: A -> U) (a b: A) (p: Equ A a b) (e: P a): P b = transport (ap A U P a b p) e
 --trans   (A B: U) (p: Path U A B) (a : A): B = comp p a []

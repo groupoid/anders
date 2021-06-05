@@ -1,16 +1,23 @@
-# Requirements
+Anders
+======
 
-OCaml, ocamlbuild, ocamllex, Menhir and Make.
+CCHM homotopy system type checker based on Mini-TT for OCaml.
 
-On Ubuntu 18.04 all this can be installed via:
+# Prerequisites
 
 ```shell
 $ apt install ocaml ocamlbuild menhir make
 ```
 
-# Build
+# Try
 
 ```shell
 $ make
-$ ./anders.native check experiments/test.anders
+$ ./anders.native girard check experiments/mltt.anders
 ```
+
+Credits
+-------
+
+* Siegmentation Fault
+* 5HT

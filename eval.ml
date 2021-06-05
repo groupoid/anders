@@ -108,7 +108,7 @@ let rec conv v1 v2 : bool =
   match v1, v2 with
   | VSet u, VSet v -> ieq u v
   | VNt x, VNt y -> convNeut x y
-  | VPair (a, b), VPair (c, d) -> conv a b && conv b d
+  | VPair (a, b), VPair (c, d) -> conv a c && conv b d
   | VLam (a, g), VLam (b, h) ->
     let (p, _, _) = g in let p' = genV p in
     conv a b && conv (closByVal g p') (closByVal h p')
@@ -130,5 +130,10 @@ and convNeut n1 n2 : bool =
   | _, _ -> false
 
 let eqNf v1 v2 : unit =
+  if !Prefs.trace then begin
+    Printf.printf "EQNF: %s = %s\n"
+      (showValue v1) (showValue v2);
+    flush_all ()
+  end else ();
   if conv v1 v2 then ()
   else raise (TypeIneq (v1, v2))

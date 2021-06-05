@@ -114,9 +114,13 @@ let rec conv v1 v2 : bool =
   | VSet u, VSet v -> ieq u v
   | VNt x, VNt y -> convNeut x y
   | VPair (a, b), VPair (c, d) -> conv a c && conv b d
+  | VPair (a, b), v -> conv a (vfst v) && conv b (vsnd v)
+  | v, VPair (a, b) -> conv (vfst v) a && conv (vsnd v) b
   | VLam (a, g), VLam (b, h) ->
     let (p, _, _) = g in let p' = genV p in
-    conv a b && conv (closByVal g p') (closByVal h p')
+
+    let (_, e1, _) = g in let (_, e2, _) = h in
+    conv a b && (e1 = e2 || conv (closByVal g p') (closByVal h p'))
   | VLam (a, g), b ->
     let (p, _, _) = g in let p' = genV p in
     conv (closByVal g p') (app (b, p'))

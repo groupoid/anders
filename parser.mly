@@ -62,10 +62,8 @@ exp3:
   | ident { EVar $1 }
 
 decl:
-  | DEF ident empcotele COLON exp1 DEFEQ exp1
-    { Annotated ($2, cotele ePi $5 $3, cotele eLam $7 $3) }
-  | DEF ident empcotele DEFEQ exp1
-    { NotAnnotated ($2, cotele eLam $5 $3) }
+  | DEF ident empcotele COLON exp1 DEFEQ exp1 { Annotated ($2, cotele ePi $5 $3, cotele eLam $7 $3) }
+  | DEF ident empcotele DEFEQ exp1 { NotAnnotated ($2, cotele eLam $5 $3) }
 
 path:
   | IDENT { $1 }

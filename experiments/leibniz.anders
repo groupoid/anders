@@ -6,8 +6,7 @@ option girard true
 definition eq (A : U) (x y : A) : U := Π (P : A -> U), P x -> P y
 definition refl (A : U) (x : A) : eq A x x := λ (P : A -> U) (u : P x), u
 
--- todo: unification bug
-definition two-plus-two : eq N (plus N5 N4) N9 := refl N N9
+definition five-plus-four : eq N (plus N5 N4) N9 := refl N N9
 
 definition subst (A : U) (P : A -> U) (a b : A) (p : eq A a b) : P a -> P b := p P
 definition ap (A B : U) (f : A -> B) (a b : A) (p : eq A a b) : eq B (f a) (f b) :=

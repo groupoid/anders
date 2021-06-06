@@ -97,12 +97,32 @@ and rbN : neut -> exp = function
   | NHole         -> EHole
   | NAxiom (p, v) -> EAxiom (p, rbV v)
 
+let prune rho x =
+  match Env.find_opt x rho with
+  | Some (Value v) -> rbV v
+  | Some (Exp e)   -> e
+  | None           -> EVar x
+
+let rec weak (e : exp) (rho : rho) =
+  match e with
+  | ESet u           -> ESet u
+  | ELam ((p, a), b) -> ELam ((p, weak a rho), weak b rho)
+  | EPi  ((p, a), b) -> EPi  ((p, weak a rho), weak b rho)
+  | ESig ((p, a), b) -> ESig ((p, weak a rho), weak b rho)
+  | EFst e           -> EFst (weak e rho)
+  | ESnd e           -> ESnd (weak e rho)
+  | EApp (f, x)      -> EApp (weak f rho, weak x rho)
+  | EVar x           -> prune rho x
+  | EPair (e1, e2)   -> EPair (weak e1 rho, weak e2 rho)
+  | EHole            -> EHole
+  | EAxiom (p, e)    -> EAxiom (p, weak e rho)
+
 let rec conv v1 v2 : bool =
   if !Prefs.trace then begin
     Printf.printf "CONV: %s = %s\n" (showValue v1) (showValue v2);
     flush_all ()
   end else ();
-  match v1, v2 with
+  v1 = v2 || match v1, v2 with
   | VSet u, VSet v             -> ieq u v
   | VNt x, VNt y               -> convNeut x y
   | VPair (a, b), VPair (c, d) -> conv a c && conv b d
@@ -111,8 +131,8 @@ let rec conv v1 v2 : bool =
   | VPi (a, g), VPi (b, h)
   | VSig (a, g), VSig (b, h)
   | VLam (a, g), VLam (b, h)   ->
-    let (p, e1, _) = g in let (_, e2, _) = h in
-    conv a b && (e1 = e2 || conv (closByVal g (genV p)) (closByVal h (genV p)))
+    let (p, e1, rho1) = g in let (_, e2, rho2) = h in
+    conv a b && (weak e1 rho1 = weak e2 rho2 || conv (closByVal g (genV p)) (closByVal h (genV p)))
   | VLam (a, g), b -> let (p, _, _) = g in let p' = genV p in conv (closByVal g p') (app (b, p'))
   | b, VLam (a, g) -> let (p, _, _) = g in let p' = genV p in conv (app (b, p')) (closByVal g p')
   | _, _ -> false

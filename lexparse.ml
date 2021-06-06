@@ -3,7 +3,7 @@ open Lexing
 let parseErr f lexbuf =
   try f Lexer.main lexbuf
   with Parser.Error ->
-    raise (Error.Parser (lexeme_start lexbuf, lexeme_end lexbuf, lexeme lexbuf))
+    raise (Error.Parser (lexbuf.lex_curr_p.pos_lnum, lexeme lexbuf))
 
 let lex filename =
   let chan = open_in filename in

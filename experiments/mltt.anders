@@ -58,7 +58,7 @@ def MLTT (A: U) : U ≔ Σ
     (=-comp₁ : Π (a : A) (C: D A) (d: C a a (=-ctor₁ a)), Equ (C a a (=-ctor₁ a)) d (=-elim₁ a C d a (=-ctor₁ a))),
     U
 
-def instance (A : U) : MLTT A ≔
+theorem instance (A : U) : MLTT A ≔
     (Pi A, lambda A, app A, comp₁ A, comp₂ A,
      Sigma A, pair A, pr₁ A, pr₂ A, comp₃ A, comp₄ A, comp₅ A,
      Equ A, refl A, J A, comp₆ A, A)

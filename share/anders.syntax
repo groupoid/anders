@@ -54,6 +54,7 @@ context default
     keyword whole form cyan
     keyword whole definition cyan
     keyword whole axiom cyan
+    keyword whole theorem cyan
     keyword whole data cyan
     keyword whole split cyan
     keyword whole opaque cyan

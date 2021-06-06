@@ -33,7 +33,7 @@ def comp₂ (A : U) (B : A → U) (a : A) (f : Pi A B) : Equ (Pi A B) f (λ (x :
 def comp₃ (A : U) (B : A → U) (a : A) (b : B a) : Equ A a (pr₁ A B (a ,b)) := refl A a
 def comp₄ (A : U) (B : A → U) (a : A) (b : B a) : Equ (B a) b (pr₂ A B (a, b)) := refl (B a) b
 def comp₅ (A : U) (B : A → U) (p : Sigma A B) : Equ (Sigma A B) p (pr₁ A B p, pr₂ A B p) := refl (Sigma A B) p
-axiom comp₆ (A : U) (a : A) (C : D A) (d: C a a (refl A a)) : Path (C a a (refl A a)) d (J A a C d a (refl A a))
+axiom comp₆ (A : U) (a : A) (C : D A) (d: C a a (refl A a)) : Equ (C a a (refl A a)) d (J A a C d a (refl A a))
 
 -- def comp6 (A:U)(a:A)(C: D A) (d: C a a (refl A a))
 --     : Equ (C a a (refl A a)) d (J A a C d a (refl A a)) :=
@@ -62,7 +62,7 @@ def MLTT (A: U) : U :=
 def instance (A : U) : MLTT A
   := (Pi A, lambda A, app A, comp₁ A, comp₂ A,
       Sigma A, pair A, pr₁ A, pr₂ A, comp₃ A, comp₄ A, comp₅ A,
-      Equ A, refl A, A, J A, comp₆ A)
+      Equ A, refl A, J A, comp₆ A)
 
 -- Inductive Types
 

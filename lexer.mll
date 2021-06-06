@@ -9,14 +9,12 @@
                  pos_lnum = pos.pos_lnum + 1 }
 }
 
-let lat1   = ['a'-'z' 'A'-'Z' '0'-'9' '-' '_']
-let ext1   = [^ '\t' ' ' '\r' '\n' '(' ')' ':' '.' ',' '/']
+let lat1   = [^ '\t' ' ' '\r' '\n' '(' ')' ':' '.' ',' '/']
 let bytes2 = ['\192'-'\223']['\128'-'\191']
 let bytes3 = ['\224'-'\239']['\128'-'\191']['\128'-'\191']
 let bytes4 = ['\240'-'\247']['\128'-'\191']['\128'-'\191']['\128'-'\191']
 
-let ch      = lat1|bytes2|bytes3|bytes4
-let utf8    = ext1|bytes2|bytes3|bytes4
+let utf8    = lat1|bytes2|bytes3|bytes4
 let ws      = ['\t' ' ']
 let nl      = "\r\n"|"\r"|"\n"
 let comment = "--" [^ '\n' '\r']* (nl|eof)

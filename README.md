@@ -27,7 +27,7 @@ def MLTT (A: U) : U := Σ
     (Σ-comp₁ : Π (B : A → U) (a : A) (b: B a), Equ A a (Σ-elim₁ B (Σ-ctor₁ B a b)))
     (Σ-comp₂ : Π (B : A → U) (a : A) (b: B a), Equ (B a) b (Σ-elim₂ B (a, b)))
     (Σ-comp₃ : Π (B : A → U) (p : Sigma A B), Equ (Sigma A B) p (pr₁ A B p, pr₂ A B p))
-    (=-form  : Π (I : A), A → U) -- Identity Type
+    (=-form  : Π (a : A), A → U) -- Identity Type
     (=-ctor₁ : Π (a : A), Equ A a a)
     (=-elim₁ : Π (a : A) (C: D A) (d: C a a (=-ctor₁ a)) (y: A) (p: Equ A a y), C a y p)
     (=-comp₁ : Π (a : A) (C: D A) (d: C a a (=-ctor₁ a)),

@@ -51,20 +51,20 @@ def comp5 (A : U) (B : A → U) (p : Sigma A B) : Equ (Sigma A B) p (pr1 A B p, 
 def Path (A : U) (x y : A) : U := Π (P : A → U), P x → P y
 
 def MLTT (A: U) : U := Σ
-    (Pi_Former : (A → U) → U)
-    (Pi_Intro : Π (B : A → U), Pi A B → Pi A B)
-    (Pi_Elim : Π (B : A → U), Pi A B → Pi A B)
-    (Pi_Comp1 : Π (B : A → U) (a : A) (f : Pi A B), Equ (B a) (Pi_Elim B (Pi_Intro B f) a) (f a))
-    (Pi_Comp2 : Π (B : A → U) (a : A) (f : Pi A B), Equ (Pi A B) f (λ (x : A), f x))
-    (Sigma_Former : (A → U) → U)
-    (Sigma_Intro : Π (B : A → U) (a : A) (b : B a), Sigma A B)
-    (Sigma_Elim1 : Π (B : A → U) (_ : Sigma A B), A)
-    (Sigma_Elim2 : Π (B : A → U) (x : Sigma A B), B (pr1 A B x))
-    (Sigma_Comp1 : Π (B : A → U) (a : A) (b: B a), Equ A a (Sigma_Elim1 B (Sigma_Intro B a b)))
-    (Sigma_Comp2 : Π (B : A → U) (a : A) (b: B a), Equ (B a) b (Sigma_Elim2 B (a, b)))
-    (Sigma_Comp3 : Π (B : A → U) (p : Sigma A B), Equ (Sigma A B) p (pr1 A B p, pr2 A B p))
-    (Id_Former : A → A → U)
-    (Id_Intro : Π (a : A), Equ A a a),
+    (Π_Former : (A → U) → U)
+    (Π_Intro  : Π (B : A → U), Pi A B → Pi A B)
+    (Π_Elim   : Π (B : A → U), Pi A B → Pi A B)
+    (Π_Comp1  : Π (B : A → U) (a : A) (f : Pi A B), Equ (B a) (Π_Elim B (Π_Intro B f) a) (f a))
+    (Π_Comp2  : Π (B : A → U) (a : A) (f : Pi A B), Equ (Pi A B) f (λ (x : A), f x))
+    (Σ_Former : (A → U) → U)
+    (Σ_Intro  : Π (B : A → U) (a : A) (b : B a), Sigma A B)
+    (Σ_Elim1  : Π (B : A → U) (_ : Sigma A B), A)
+    (Σ_Elim2  : Π (B : A → U) (x : Sigma A B), B (pr1 A B x))
+    (Σ_Comp1  : Π (B : A → U) (a : A) (b: B a), Equ A a (Σ_Elim1 B (Σ_Intro B a b)))
+    (Σ_Comp2  : Π (B : A → U) (a : A) (b: B a), Equ (B a) b (Σ_Elim2 B (a, b)))
+    (Σ_Comp3  : Π (B : A → U) (p : Sigma A B), Equ (Sigma A B) p (pr1 A B p, pr2 A B p))
+    (=_Former : A → (A → U))
+    (=_Intro  : Π (a : A), Equ A a a),
     U
 
 -- x  (Id_Elim: (x: A) (C: D A) (d: C x x (Id_Intro x)) (y: A) (p: Equ A x y) → C x y p)

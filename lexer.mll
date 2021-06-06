@@ -58,6 +58,6 @@ rule main = parse
 | arrow           { ARROW }
 | colon           { COLON }
 | ['0'-'9']+ as s { NAT (int_of_string s) }
-| ch+ as s        { IDENT s }
-| utf8+ as s      { OTHER s }
+(* | ch+ as s        { IDENT s } *)
+| utf8+ as s      { IDENT s }
 | eof             { EOF }

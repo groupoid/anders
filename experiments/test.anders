@@ -5,12 +5,12 @@ def id (A : U) (a : A) : A := a
 def sigmaIntro (A : U) (B : A -> U) (x : A) (u : B (id A x)) : Σ (x : A), B x := (x, u)
 
 def sigmaProj₂ : Π (A : U) (B : A -> U) (z : Σ (x : A), B x), B z.1 :=
-λ (A : U) (B : A -> U) (z : Σ (x : A), B x), z.2
+    λ (A : U) (B : A -> U) (z : Σ (x : A), B x), z.2
 
 def const (A : U) (B : U) (a : A) (b : B) : A := a
 
 def test : Π (A : U) (B : U), (A -> B) -> A -> B :=
-λ (A : U) (B : U) (f : A -> B) (x : A), f x
+    λ (A : U) (B : U) (f : A -> B) (x : A), f x
 
 def trio : U 2 := Σ (fst : U 1) (snd : U 1), (U 1)
 def instance : trio := (U, U -> U, U -> U -> U)

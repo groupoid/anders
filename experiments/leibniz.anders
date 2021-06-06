@@ -1,16 +1,15 @@
 module leibniz where
 import experiments/10×10×10×3
-
 option girard true
 
 definition eq (A : U) (x y : A) : U := Π (P : A -> U), P x -> P y
 definition refl (A : U) (x : A) : eq A x x := λ (P : A -> U) (u : P x), u
 
-definition five-plus-four : eq N (plus N5 N4) N9 := refl N N9
+definition five-plus-four : eq N (plus N5 N4) N0 := refl N N9
 
 definition subst (A : U) (P : A -> U) (a b : A) (p : eq A a b) : P a -> P b := p P
-definition ap (A B : U) (f : A -> B) (a b : A) (p : eq A a b) : eq B (f a) (f b) :=
-subst A (λ (b : A), eq B (f a) (f b)) a b p (refl B (f a))
+definition ap (A B : U) (f : A -> B) (a b : A) (p : eq A a b) : eq B (f a) (f b)
+        := subst A (λ (b : A), eq B (f a) (f b)) a b p (refl B (f a))
 
 definition D (A : U) : U := Π (x y : A), eq A x y -> U
 definition singl (A : U) (a : A) : U := Σ (x : A), eq A a x

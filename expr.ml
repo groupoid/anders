@@ -125,14 +125,14 @@ let isTermVisible : term -> bool = function
 
 let rec showValue : value -> string = function
   | VLam (x, (p, e, rho)) ->
-    Printf.sprintf "\\%s -> %s" (showTele p x rho) (showExp e)
+    Printf.sprintf "λ %s, %s" (showTele p x rho) (showExp e)
   | VPair (fst, snd) -> Printf.sprintf "(%s, %s)" (showValue fst) (showValue snd)
   | VSet 0 -> "U"
   | VSet u -> Printf.sprintf "U %d" u
   | VPi (x, (p, e, rho)) ->
-    Printf.sprintf "%s -> %s" (showTele p x rho) (showExp e)
+    Printf.sprintf "Π %s, %s" (showTele p x rho) (showExp e)
   | VSig (x, (p, e, rho)) ->
-    Printf.sprintf "%s * %s" (showTele p x rho) (showExp e)
+    Printf.sprintf "Σ %s, %s" (showTele p x rho) (showExp e)
   | VNt n -> showNeut n
 and showNeut : neut -> string = function
   | NVar p -> showName p

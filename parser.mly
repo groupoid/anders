@@ -1,5 +1,7 @@
 %{ open Expr
-   exception UnexpectedToken of string %}
+   exception UnexpectedToken of string
+%}
+
 %token <string> IDENT
 %token <int> NAT
 %token LPARENS RPARENS COMMA COLON NO EOF HOLE
@@ -22,6 +24,7 @@ path : IDENT { $1 } | IDENT DIRSEP path { $1 ^ Filename.dir_sep ^ $3 }
 content : line content { $1 :: $2 } | EOF { [] }
 file : MODULE IDENT WHERE content { ($2, $4) }
 line : IMPORT path { Import $2 } | OPTION IDENT IDENT { Option ($2, $3) } | declarations { Decl $1 }
+repl : COLON IDENT exp1 EOF { Command ($2, $3) } | COLON IDENT EOF { Action $2 } | exp0 EOF { Eval $1 } | EOF { Nope }
 
 exp1:
   | LAM telescope COMMA exp1 { telescope eLam $4 $2 }
@@ -43,9 +46,3 @@ declarations:
   | DEF IDENT params DEFEQ exp1 { NotAnnotated ($2, telescope eLam $5 $3) }
   | DEF IDENT params COLON exp1 DEFEQ exp1 { Annotated ($2, telescope ePi $5 $3, telescope eLam $7 $3) }
   | AXIOM IDENT params COLON exp1 { Annotated ($2, telescope ePi $5 $3, EAxiom ($2, telescope ePi $5 $3)) }
-
-repl:
-  | COLON IDENT exp1 EOF { Command ($2, $3) }
-  | COLON IDENT EOF { Action $2 }
-  | exp0 EOF { Eval $1 }
-  | EOF { Nope }

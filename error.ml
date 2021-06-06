@@ -44,7 +44,7 @@ let prettyPrintError : exn -> unit = function
   | UnknownOptionValue (opt, value) ->
     Printf.printf "Unknown value “%s” of option “%s”\n" value opt
   | Parser (x, y, buf) ->
-    Printf.printf "Parsing error at characters %d:%d: “%s”\n" x y buf
+    Printf.printf "Parsing error at %d:%d: “%s”\n" x y buf
   | Sys_error s -> print_endline s
   | Restart -> raise Restart
   | ex -> Printf.printf "Uncaught exception: %s\n" (Printexc.to_string ex)

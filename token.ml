@@ -4,9 +4,10 @@ let tokenToString : token -> string = function
   | IDENT s -> Printf.sprintf "IDENT %s" s
   | OTHER s -> Printf.sprintf "OTHER %s" s
   | NAT u   -> Printf.sprintf "NAT %d" u
-  | STAR    -> "STAR"
+  | DEF     -> "DEF"
+  | SIGMA   -> "SIGMA"
+  | PI      -> "PI"
   | SND     -> "SND"
-  | SKIP    -> "SKIP"
   | SET     -> "SET"
   | RPARENS -> "RPARENS"
   | LPARENS -> "LPARENS"

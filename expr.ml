@@ -47,9 +47,13 @@ let rec cotele (f : tele -> exp -> exp) (e : exp) : tele list -> exp = function
 let rec showExp : exp -> string = function
   | ESet 0 -> "U"
   | ESet u -> Printf.sprintf "U %d" u
-  | ELam (p, x) -> Printf.sprintf "\\%s -> %s" (showTele p) (showExp x)
-  | EPi  (p, x) -> Printf.sprintf "%s -> %s"   (showTele p) (showExp x)
-  | ESig (p, x) -> Printf.sprintf "%s * %s"    (showTele p) (showExp x)
+  | ELam (p, x) -> Printf.sprintf "λ %s, %s" (showTele p) (showExp x)
+  | EPi  (p, x) ->
+    let (var, dom) = p in begin match var with
+    | No -> Printf.sprintf "(%s → %s)" (showExp dom) (showExp x)
+    | _  -> Printf.sprintf "Π %s, %s" (showTele p) (showExp x)
+    end
+  | ESig (p, x) -> Printf.sprintf "Σ %s, %s" (showTele p) (showExp x)
   | EPair (fst, snd) -> Printf.sprintf "(%s, %s)" (showExp fst) (showExp snd)
   | EFst exp -> showExp exp ^ ".1"
   | ESnd exp -> showExp exp ^ ".2"
@@ -67,9 +71,9 @@ type decl =
 
 let showDecl : decl -> string = function
   | Annotated (p, exp1, exp2) ->
-    Printf.sprintf "%s : %s := %s" (showName p) (showExp exp1) (showExp exp2)
+    Printf.sprintf "definition %s : %s := %s" (showName p) (showExp exp1) (showExp exp2)
   | NotAnnotated (p, exp) ->
-    Printf.sprintf "%s := %s" (showName p) (showExp exp)
+    Printf.sprintf "definition %s := %s" (showName p) (showExp exp)
 
 type line =
   | Import of string

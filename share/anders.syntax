@@ -47,6 +47,7 @@ context default
     keyword whole Π brightmagenta
     keyword whole module cyan
     keyword whole def cyan
+    keyword whole definition cyan
     keyword whole axiom cyan
     keyword whole data cyan
     keyword whole split cyan

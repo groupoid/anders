@@ -15,39 +15,23 @@
 
 %%
 
-ident:
-  | NO    { No }
-  | IDENT { Name ($1, 0) }
-
-idents:
-  | ident idents { $1 :: $2 }
-  | ident { [$1] }
-
-tele:
-  | LPARENS idents COLON exp1 RPARENS { List.map (fun x -> (x, $4)) $2 }
-
-cotele:
-  | tele cotele { List.append $1 $2 }
-  | tele { $1 }
-
-empcotele:
-  | cotele { $1 }
-  | { [] }
-
-exp0:
-  | exp1 COMMA exp0 { EPair ($1, $3) }
-  | exp1 { $1 }
+ident : NO { No } | IDENT { Name ($1, 0) }
+vars : ident vars { $1 :: $2 } | ident { [$1] }
+lense : LPARENS vars COLON exp1 RPARENS { List.map (fun x -> (x, $4)) $2 }
+telescope : lense telescope { List.append $1 $2 } | lense { $1 }
+params : telescope { $1 } | { [] }
+exp0 : exp1 COMMA exp0 { EPair ($1, $3) } | exp1 { $1 }
+exp2 : exp2 exp3 { EApp ($1, $2) } | exp3 { $1 }
+path : IDENT { $1 } | IDENT DIRSEP path { $1 ^ Filename.dir_sep ^ $3 }
+content : line content { $1 :: $2 } | EOF { [] }
+file : MODULE IDENT WHERE content { ($2, $4) }
 
 exp1:
-  | LAM cotele COMMA exp1 { cotele eLam $4 $2 }
-  | PI cotele COMMA exp1 { cotele ePi $4 $2 }
-  | SIGMA cotele COMMA exp1 { cotele eSig $4 $2 }
+  | LAM telescope COMMA exp1 { cotele eLam $4 $2 }
+  | PI telescope COMMA exp1 { cotele ePi $4 $2 }
+  | SIGMA telescope COMMA exp1 { cotele eSig $4 $2 }
   | exp2 ARROW exp1 { EPi ((No, $1), $3) }
   | exp2 { $1 }
-
-exp2:
-  | exp2 exp3 { EApp ($1, $2) }
-  | exp3 { $1 }
 
 exp3:
   | HOLE { EHole }
@@ -58,26 +42,15 @@ exp3:
   | LPARENS exp0 RPARENS { $2 }
   | ident { EVar $1 }
 
-decl:
-  | DEF IDENT empcotele COLON exp1 DEFEQ exp1 { Annotated ($2, cotele ePi $5 $3, cotele eLam $7 $3) }
-  | DEF IDENT empcotele DEFEQ exp1 { NotAnnotated ($2, cotele eLam $5 $3) }
-  | AXIOM IDENT empcotele COLON exp1 { Annotated ($2, cotele ePi $5 $3, EAxiom ($2, cotele ePi $5 $3)) }
-
-path:
-  | IDENT { $1 }
-  | IDENT DIRSEP path { $1 ^ Filename.dir_sep ^ $3 }
+declarations:
+  | DEF IDENT   params DEFEQ exp1 { NotAnnotated ($2, cotele eLam $5 $3) }
+  | DEF IDENT   params COLON exp1 DEFEQ exp1 { Annotated ($2, cotele ePi $5 $3, cotele eLam $7 $3) }
+  | AXIOM IDENT params COLON exp1 { Annotated ($2, cotele ePi $5 $3, EAxiom ($2, cotele ePi $5 $3)) }
 
 line:
   | IMPORT path { Import $2 }
   | OPTION IDENT IDENT { Option ($2, $3) }
-  | decl { Decl $1 }
-
-content:
-  | line content { $1 :: $2 }
-  | EOF { [] }
-
-file:
-  | MODULE IDENT WHERE content { ($2, $4) }
+  | declarations { Decl $1 }
 
 repl:
   | COLON IDENT exp1 EOF { Command ($2, $3) }

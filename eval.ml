@@ -24,7 +24,7 @@ let lookup (x : name) (lst : gamma) =
 
 let upDec (rho : rho) : decl -> rho = function
   | NotAnnotated (p, e)
-  | Annotated (p, _, e) -> Env.add p (Exp e) rho
+  | Annotated (p, _, e) -> Env.add (Name (p, 0)) (Exp e) rho
 
 let iteHole (p : name) a b =
   match p with
@@ -58,7 +58,7 @@ let rec eval (e : exp) (rho : rho) =
   | EVar x           -> getRho rho x
   | EPair (e1, e2)   -> VPair (eval e1 rho, eval e2 rho)
   | EHole            -> VNt NHole
-  | EAxiom           -> VNt NAxiom
+  | EAxiom (p, e)    -> VNt (NAxiom (p, eval e rho))
 and app : value * value -> value = function
   | VLam (_, f), v -> closByVal f v
   | VNt k, m       -> VNt (NApp (k, m))
@@ -89,13 +89,13 @@ let rec rbV : value -> exp = function
   | VPi (t, g)      -> let (p, _, _) = g in let q = pat p in EPi ((q, rbV t), rbV (closByVal g (var q)))
   | VSig (t, g)     -> let (p, _, _) = g in let q = pat p in ESig ((q, rbV t), rbV (closByVal g (var q)))
   | VNt l           -> rbN l
-and rbN : neut  -> exp = function
-  | NVar s      -> EVar s
-  | NApp (k, m) -> EApp (rbN k, rbV m)
-  | NFst k      -> EFst (rbN k)
-  | NSnd k      -> ESnd (rbN k)
-  | NHole       -> EHole
-  | NAxiom      -> EAxiom
+and rbN : neut -> exp = function
+  | NVar s        -> EVar s
+  | NApp (k, m)   -> EApp (rbN k, rbV m)
+  | NFst k        -> EFst (rbN k)
+  | NSnd k        -> ESnd (rbN k)
+  | NHole         -> EHole
+  | NAxiom (p, v) -> EAxiom (p, rbV v)
 
 let rec conv v1 v2 : bool =
   if !Prefs.trace then begin
@@ -111,8 +111,8 @@ let rec conv v1 v2 : bool =
   | VPi (a, g), VPi (b, h)
   | VSig (a, g), VSig (b, h)
   | VLam (a, g), VLam (b, h)   ->
-      let (p, e1, _) = g in let (_, e2, _) = h in
-      conv a b && (e1 = e2 || conv (closByVal g (genV p)) (closByVal h (genV p)))
+    let (p, e1, _) = g in let (_, e2, _) = h in
+    conv a b && (e1 = e2 || conv (closByVal g (genV p)) (closByVal h (genV p)))
   | VLam (a, g), b -> let (p, _, _) = g in let p' = genV p in conv (closByVal g p') (app (b, p'))
   | b, VLam (a, g) -> let (p, _, _) = g in let p' = genV p in conv (app (b, p')) (closByVal g p')
   | _, _ -> false
@@ -122,6 +122,8 @@ and convNeut n1 n2 : bool =
   | NApp (f, a), NApp (g, b) -> convNeut f g && conv a b
   | NFst x, NFst y -> convNeut x y
   | NSnd x, NSnd y -> convNeut x y
+  | NAxiom (p, x), NAxiom (q, y) ->
+    p = q && conv x y
   | _, _ -> false
 
 let eqNf v1 v2 : unit =

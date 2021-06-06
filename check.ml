@@ -37,7 +37,8 @@ let rec check k (rho : rho) (gma : gamma) (e0 : exp) (t0 : value) : rho * gamma 
     print_string ("\nHole:\n\n" ^ Expr.showGamma gma ^ "\n" ^
                   String.make 80 '-' ^ "\n" ^ Expr.showValue v ^ "\n\n");
     (rho, gma)
-  | EAxiom, v -> (rho, gma)
+  | EAxiom (_, u), v ->
+    eqNf (eval u rho) v; (rho, gma)
   | e, t -> eqNf t (infer (k + 1) rho gma e); (rho, gma)
 and infer k rho gma e0 : value =
   if !Prefs.trace then
@@ -61,4 +62,5 @@ and infer k rho gma e0 : value =
   | ESnd e ->
     let (_, g) = extSigG (infer (k + 1) rho gma e) in
     closByVal g (vfst (eval e rho))
+  | EAxiom (_, e) -> eval e rho
   | e -> raise (InferError e)

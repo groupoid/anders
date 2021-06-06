@@ -30,6 +30,7 @@ let lam     = "\\"|"\xCE\xBB"
 let pi      = "pi"|"\xCE\xA0"
 let sigma   = "sigma"|"\xCE\xA3"
 let def     = "def"|"definition"|"theorem"|"lemma"|"corollary"|"proposition"
+let axiom   = "axiom"|"postulate"
 
 rule main = parse
 | nl              { next_line lexbuf; main lexbuf }
@@ -51,7 +52,7 @@ rule main = parse
 | pi              { PI }
 | sigma           { SIGMA }
 | "?"             { HOLE }
-| "axiom"         { AXIOM }
+| axiom           { AXIOM }
 | defeq           { DEFEQ }
 | lam             { LAM }
 | arrow           { ARROW }

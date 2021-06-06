@@ -53,7 +53,6 @@ exp2:
 
 exp3:
   | HOLE { EHole }
-  | AXIOM { EAxiom }
   | SET NAT { ESet $2 }
   | SET { ESet 0 }
   | exp3 FST { EFst $1 }
@@ -62,8 +61,9 @@ exp3:
   | ident { EVar $1 }
 
 decl:
-  | DEF ident empcotele COLON exp1 DEFEQ exp1 { Annotated ($2, cotele ePi $5 $3, cotele eLam $7 $3) }
-  | DEF ident empcotele DEFEQ exp1 { NotAnnotated ($2, cotele eLam $5 $3) }
+  | DEF IDENT empcotele COLON exp1 DEFEQ exp1 { Annotated ($2, cotele ePi $5 $3, cotele eLam $7 $3) }
+  | DEF IDENT empcotele DEFEQ exp1 { NotAnnotated ($2, cotele eLam $5 $3) }
+  | AXIOM IDENT empcotele COLON exp1 { Annotated ($2, cotele ePi $5 $3, EAxiom ($2, $5)) }
 
 path:
   | IDENT { $1 }

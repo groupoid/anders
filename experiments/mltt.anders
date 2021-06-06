@@ -1,8 +1,6 @@
 module mltt where
 option girard true
 
-def a : U := axiom
-
 def Pi (A:U) (B: A → U): U := Π (x:A), B x
 def lambda (A:U) (B:A → U) (b: Pi A B): Pi A B := λ (x: A), b x
 def app (A:U) (B:A → U) (f: Pi A B) (a: A): B a := f a

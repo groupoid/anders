@@ -11,7 +11,7 @@ let rec listLast : 'a list -> 'a = function
   | [x]     -> x
   | x :: xs -> listLast xs
 
-let getDeclName : decl -> name = function
+let getDeclName : decl -> string = function
   | Annotated (p, _, _)
   | NotAnnotated (p, _) -> p
 
@@ -21,12 +21,12 @@ let checkDecl rho gma d : rho * gamma =
     let b = infer 0 rho gma a in
     if not (isVSet b) then raise (ExpectedVSet b) else ();
     let a' = eval a rho in
-    let gma' = upGlobal gma p a' in
+    let gma' = upGlobal gma (Name (p, 0)) a' in
     ignore (check 0 rho gma' e a');
     (upDec rho d, gma')
   | NotAnnotated (p, e) ->
     let a = infer 0 rho gma e in
-    let gma' = upGlobal gma p a in
+    let gma' = upGlobal gma (Name (p, 0)) a in
     ignore (check 0 rho gma' e a);
     (upDec rho d, gma')
 
@@ -34,7 +34,7 @@ let rec checkLine st : line -> state =
   let (rho, gma, checked) = st in function
   | Decl d ->
     let name = getDeclName d in
-    Printf.printf "Checking: %s\n" (Expr.showName name); flush_all ();
+    Printf.printf "Checking: %s\n" name; flush_all ();
     let (rho', gma') = checkDecl rho gma d in
     (rho', gma', checked)
   | Option (opt, value) ->

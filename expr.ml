@@ -31,7 +31,7 @@ type exp =
   | ESnd of exp
   | EApp of exp * exp
   | EVar of name
-  | EHole | EAxiom
+  | EHole | EAxiom of string * exp
 and tele = name * exp
 
 (* In OCaml constructors are not functions. *)
@@ -60,18 +60,18 @@ let rec showExp : exp -> string = function
   | EApp (f, x) -> Printf.sprintf "(%s %s)" (showExp f) (showExp x)
   | EVar p -> showName p
   | EHole -> "?"
-  | EAxiom -> "axiom"
+  | EAxiom (p, _) -> p
 and showTele : tele -> string = function
   | (No, x) -> showExp x
   | (p,  x) -> Printf.sprintf "(%s : %s)" (showName p) (showExp x)
 
 type decl =
-  | NotAnnotated of name * exp
-  | Annotated of name * exp * exp
+  | NotAnnotated of string * exp
+  | Annotated of string * exp * exp
 
 let showDecl : decl -> string = function
-  | Annotated (p, exp1, exp2) -> Printf.sprintf "def %s : %s := %s" (showName p) (showExp exp1) (showExp exp2)
-  | NotAnnotated (p, exp) -> Printf.sprintf "def %s := %s" (showName p) (showExp exp)
+  | Annotated (p, exp1, exp2) -> Printf.sprintf "def %s : %s := %s" p (showExp exp1) (showExp exp2)
+  | NotAnnotated (p, exp) -> Printf.sprintf "def %s := %s" p (showExp exp)
 
 type line =
   | Import of string
@@ -101,7 +101,7 @@ and neut =
   | NApp of neut * value
   | NFst of neut
   | NSnd of neut
-  | NHole | NAxiom
+  | NHole | NAxiom of string * value
 and clos = name * exp * rho
 and term =
   | Exp of exp
@@ -135,12 +135,12 @@ let rec showValue : value -> string = function
     Printf.sprintf "%s * %s" (showTele p x rho) (showExp e)
   | VNt n -> showNeut n
 and showNeut : neut -> string = function
-  | NVar s -> showName s
+  | NVar p -> showName p
   | NApp (f, x) -> Printf.sprintf "(%s %s)" (showNeut f) (showValue x)
   | NFst v -> showNeut v ^ ".1"
   | NSnd v -> showNeut v ^ ".2"
   | NHole -> "?"
-  | NAxiom -> "axiom"
+  | NAxiom (p, _) -> p
 and showTermBind : name * term -> string option = function
   | p, Value v -> Some (Printf.sprintf "%s := %s" (showName p) (showValue v))
   | _, _       -> None

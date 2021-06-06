@@ -30,7 +30,8 @@ def MLTT (A: U) : U := Σ
     (=-form  : Π (I : A), A → U) -- Identity Type
     (=-ctor₁ : Π (a : A), Equ A a a)
     (=-elim₁ : Π (a : A) (C: D A) (d: C a a (=-ctor₁ a)) (y: A) (p: Equ A a y), C a y p)
-    (=-comp₁ : Π (a : A) (C: D A) (d: C a a (=-ctor₁ a)), Equ (C a a (=-ctor₁ a)) d (=-elim₁ a C d a (=-ctor₁ a))),
+    (=-comp₁ : Π (a : A) (C: D A) (d: C a a (=-ctor₁ a)),
+       Equ (C a a (=-ctor₁ a)) d (=-elim₁ a C d a (=-ctor₁ a))),
     U
 ```
 

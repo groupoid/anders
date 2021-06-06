@@ -7,14 +7,8 @@ def app (A:U) (B:A → U) (f: Pi A B) (a: A): B a := f a
 
 def Sigma (A : U) (B : A → U) : U := Σ (x : A), B x
 def pair (A : U) (B : A → U) (a : A) (b : B a) : Sigma A B := (a, b)
-def pr1 (A : U) (B : A → U) (x : Sigma A B) : A := x.1
-def pr2 (A : U) (B : A → U) (x : Sigma A B) : B (pr1 A B x) := x.2
-
-def W (A : U) (B : A → U) : U := Σ (x : A), B x → W A B
-def Wrec (A : U) (B : A → U) (P : U) (alg : Π (a : A), (B(a) → W A B) → (Π (b : B(a)), P) → P)
-  : Π (w : W A B), P := λ (w : W A B), alg w.1 w.2 (λ (b : B w.1), Wrec A B P alg (w.2 b))
-def Wind (A : U) (B : A → U) (P : W A B → U) (alg : Π (a : A) (f : B(a) → W A B), (Π (b : B(a)), P (f b)) → P (a,f))
-  : Π (w : W A B), P w := λ (w : W A B), alg w.1 w.2 (λ (b : B w.1), Wind A B P alg (w.2 b))
+def pr₁ (A : U) (B : A → U) (x : Sigma A B) : A := x.1
+def pr₂ (A : U) (B : A → U) (x : Sigma A B) : B (pr₁ A B x) := x.2
 
 def Equ  (A: U) (x y : A) : U := Π (P : A → U), P x → P y
 def refl (A : U) (x : A) : Equ A x x := λ (P : A → U) (u : P x), u
@@ -35,11 +29,11 @@ def eta       (A : U) (a : A) : singl A a := (a, reflect A a)
 -- def trans_comp (A:U)(a: A): Path A a (trans A A (<i> A) a) = fill (<i> A) a []
 -- def subst_comp (A:U)(P:A → U)(a:A)(e:P(a)): Path (P a) e (subst A P a a (reflect A a) e) = trans_comp (P a) e
 
-def comp1 (A : U) (B : A → U) (a : A) (f : Pi A B) : Equ (B a) (app A B (lambda A B f) a) (f a) := reflect (B a) (f a)
-def comp2 (A : U) (B : A → U) (a : A) (f : Pi A B) : Equ (Pi A B) f (λ (x : A), f x) := reflect (Pi A B) f
-def comp3 (A : U) (B : A → U) (a : A) (b : B a) : Equ A a (pr1 A B (a ,b)) := reflect A a
-def comp4 (A : U) (B : A → U) (a : A) (b : B a) : Equ (B a) b (pr2 A B (a, b)) := reflect (B a) b
-def comp5 (A : U) (B : A → U) (p : Sigma A B) : Equ (Sigma A B) p (pr1 A B p, pr2 A B p) := reflect (Sigma A B) p
+def comp₁ (A : U) (B : A → U) (a : A) (f : Pi A B) : Equ (B a) (app A B (lambda A B f) a) (f a) := reflect (B a) (f a)
+def comp₂ (A : U) (B : A → U) (a : A) (f : Pi A B) : Equ (Pi A B) f (λ (x : A), f x) := reflect (Pi A B) f
+def comp₃ (A : U) (B : A → U) (a : A) (b : B a) : Equ A a (pr₁ A B (a ,b)) := reflect A a
+def comp₄ (A : U) (B : A → U) (a : A) (b : B a) : Equ (B a) b (pr₂ A B (a, b)) := reflect (B a) b
+def comp₅ (A : U) (B : A → U) (p : Sigma A B) : Equ (Sigma A B) p (pr₁ A B p, pr₂ A B p) := reflect (Sigma A B) p
 
 -- def comp6 (A:U)(a:A)(C: D A) (d: C a a (reflect A a))
 --     : Path (C a a (reflect A a)) d (J A a C d a (reflect A a)) :=
@@ -56,10 +50,10 @@ def MLTT (A: U) : U :=
     (Σ-form  : Π (B : A → U), U)
     (Σ-ctor₁ : Π (B : A → U) (a : A) (b : B a), Sigma A B)
     (Σ-elim₁ : Π (B : A → U) (_ : Sigma A B), A)
-    (Σ-elim₂ : Π (B : A → U) (x : Sigma A B), B (pr1 A B x))
+    (Σ-elim₂ : Π (B : A → U) (x : Sigma A B), B (pr₁ A B x))
     (Σ-comp₁ : Π (B : A → U) (a : A) (b: B a), Equ A a (Σ-elim₁ B (Σ-ctor₁ B a b)))
     (Σ-comp₂ : Π (B : A → U) (a : A) (b: B a), Equ (B a) b (Σ-elim₂ B (a, b)))
-    (Σ-comp₃ : Π (B : A → U) (p : Sigma A B), Equ (Sigma A B) p (pr1 A B p, pr2 A B p))
+    (Σ-comp₃ : Π (B : A → U) (p : Sigma A B), Equ (Sigma A B) p (pr₁ A B p, pr₂ A B p))
     (=-form  : Π (I : A), A → U)
     (=-ctor₁ : Π (a : A), Equ A a a),
     U
@@ -68,6 +62,15 @@ def MLTT (A: U) : U :=
 --  (=_Comp: (a:A)(C: D A) (d: C a a (Id_Intro a)) → Path (C a a (Id_Intro a)) d (Id_Elim a C d a (Id_Intro a)))
 
 def instance (A : U) : MLTT A
-  := (Pi A, lambda A, app A, comp1 A, comp2 A,
-      Sigma A, pair A, pr1 A, pr2 A, comp3 A, comp4 A, comp5 A,
-      Equ A, reflect A, A)
+  := (Pi A, lambda A, app A, comp₁ A, comp₂ A,
+      Sigma A, pair A, pr₁ A, pr₂ A, comp₃ A, comp₄ A, comp₅ A,
+      Equ A, refl A, A)
+
+-- Inductive Types
+
+def W (A : U) (B : A → U) : U := Σ (x : A), B x → W A B
+def Wrec (A : U) (B : A → U) (P : U) (alg : Π (a : A), (B(a) → W A B) → (Π (b : B(a)), P) → P)
+  : Π (w : W A B), P := λ (w : W A B), alg w.1 w.2 (λ (b : B w.1), Wrec A B P alg (w.2 b))
+def Wind (A : U) (B : A → U) (P : W A B → U) (alg : Π (a : A) (f : B(a) → W A B), (Π (b : B(a)), P (f b)) → P (a,f))
+  : Π (w : W A B), P w := λ (w : W A B), alg w.1 w.2 (λ (b : B w.1), Wind A B P alg (w.2 b))
+

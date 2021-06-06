@@ -9,6 +9,8 @@ context default
     keyword whole = brightmagenta
     keyword whole lam brightmagenta
     keyword whole app brightmagenta
+    keyword whole pair brightmagenta
+    keyword whole lambda brightmagenta
     keyword whole ap brightmagenta
     keyword whole fiber brightmagenta
     keyword whole subst brightmagenta
@@ -18,10 +20,8 @@ context default
     keyword whole transport brightmagenta
     keyword whole cong brightmagenta
     keyword whole Sigma brightmagenta
-    keyword whole pi1 brightmagenta
-    keyword whole pi2 brightmagenta
-    keyword whole pr1 brightmagenta
-    keyword whole pr2 brightmagenta
+    keyword whole pi brightmagenta
+    keyword whole pr brightmagenta
     keyword whole fst brightmagenta
     keyword whole snd brightmagenta
     keyword whole funext brightmagenta
@@ -49,6 +49,9 @@ context default
     keyword whole Π brightmagenta
     keyword whole module cyan
     keyword whole def cyan
+    keyword whole ctor cyan
+    keyword whole elim cyan
+    keyword whole form cyan
     keyword whole definition cyan
     keyword whole axiom cyan
     keyword whole data cyan

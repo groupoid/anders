@@ -2,7 +2,6 @@ open Parser
 
 let tokenToString : token -> string = function
   | IDENT s -> Printf.sprintf "IDENT %s" s
-  | OTHER s -> Printf.sprintf "OTHER %s" s
   | NAT u   -> Printf.sprintf "NAT %d" u
   | DEF     -> "DEF"
   | SIGMA   -> "SIGMA"

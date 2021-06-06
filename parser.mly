@@ -4,7 +4,6 @@
 %}
 
 %token <string> IDENT
-%token <string> OTHER
 %token <int> NAT
 %token LPARENS RPARENS COMMA COLON NO EOF HOLE
 %token SET DEFEQ ARROW FST SND LAM DEF
@@ -38,7 +37,6 @@ empcotele:
 exp0:
   | exp1 COMMA exp0 { EPair ($1, $3) }
   | exp1 { $1 }
-  | OTHER { raise (UnexpectedToken $1) }
 
 exp1:
   | LAM cotele COMMA exp1 { cotele eLam $4 $2 }

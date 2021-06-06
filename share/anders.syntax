@@ -5,6 +5,8 @@
 
 context default
     keyword whole Pi brightmagenta
+    keyword whole Equ brightmagenta
+    keyword whole = brightmagenta
     keyword whole lam brightmagenta
     keyword whole app brightmagenta
     keyword whole ap brightmagenta

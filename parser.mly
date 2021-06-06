@@ -84,5 +84,5 @@ file:
 repl:
   | COLON IDENT exp1 EOF { Command ($2, $3) }
   | COLON IDENT EOF { Action $2 }
-  | exp1 EOF { Eval $1 }
+  | exp0 EOF { Eval $1 }
   | EOF { Nope }

@@ -13,6 +13,8 @@ $ apt install ocaml ocamlbuild menhir make
 Try
 ---
 
+Reality checking.
+
 ```Lean
 def MLTT (A: U) : U := Σ
     (Π-form  : Π (B : A → U), U) -- Pi Type

@@ -24,9 +24,9 @@ file : MODULE IDENT WHERE content { ($2, $4) }
 line : IMPORT path { Import $2 } | OPTION IDENT IDENT { Option ($2, $3) } | declarations { Decl $1 }
 
 exp1:
-  | LAM telescope COMMA exp1 { cotele eLam $4 $2 }
-  | PI telescope COMMA exp1 { cotele ePi $4 $2 }
-  | SIGMA telescope COMMA exp1 { cotele eSig $4 $2 }
+  | LAM telescope COMMA exp1 { telescope eLam $4 $2 }
+  | PI telescope COMMA exp1 { telescope ePi $4 $2 }
+  | SIGMA telescope COMMA exp1 { telescope eSig $4 $2 }
   | exp2 ARROW exp1 { EPi ((No, $1), $3) }
   | exp2 { $1 }
 
@@ -40,9 +40,9 @@ exp3:
   | ident { EVar $1 }
 
 declarations:
-  | DEF IDENT params DEFEQ exp1 { NotAnnotated ($2, cotele eLam $5 $3) }
-  | DEF IDENT params COLON exp1 DEFEQ exp1 { Annotated ($2, cotele ePi $5 $3, cotele eLam $7 $3) }
-  | AXIOM IDENT params COLON exp1 { Annotated ($2, cotele ePi $5 $3, EAxiom ($2, cotele ePi $5 $3)) }
+  | DEF IDENT params DEFEQ exp1 { NotAnnotated ($2, telescope eLam $5 $3) }
+  | DEF IDENT params COLON exp1 DEFEQ exp1 { Annotated ($2, telescope ePi $5 $3, telescope eLam $7 $3) }
+  | AXIOM IDENT params COLON exp1 { Annotated ($2, telescope ePi $5 $3, EAxiom ($2, telescope ePi $5 $3)) }
 
 repl:
   | COLON IDENT exp1 EOF { Command ($2, $3) }

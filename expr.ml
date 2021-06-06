@@ -39,10 +39,10 @@ let eLam x y = ELam (x, y)
 let ePi  x y = EPi  (x, y)
 let eSig x y = ESig (x, y)
 
-let rec cotele (f : tele -> exp -> exp) (e : exp) : tele list -> exp = function
+let rec telescope (f : tele -> exp -> exp) (e : exp) : tele list -> exp = function
   | []      -> e
   | [x]     -> f x e
-  | x :: xs -> f x (cotele f e xs)
+  | x :: xs -> f x (telescope f e xs)
 
 let rec showExp : exp -> string = function
   | ESet 0 -> "U"

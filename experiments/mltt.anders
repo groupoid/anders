@@ -50,8 +50,8 @@ def comp5 (A : U) (B : A -> U) (p : Sigma A B) : Equ (Sigma A B) p (pr1 A B p, p
 -- temporary solution
 def Path (A : U) (x y : A) : U := Π (P : A -> U), P x -> P y
 
-def MLTT (A: U) : U :=
-  Σ (Pi_Former : (A -> U) -> U)
+def MLTT (A: U) : U := Σ
+    (Pi_Former : (A -> U) -> U)
     (Pi_Intro : Π (B : A -> U), Pi A B -> Pi A B)
     (Pi_Elim : Π (B : A -> U), Pi A B -> Pi A B)
     (Pi_Comp1 : Π (B : A -> U) (a : A) (f : Pi A B), Equ (B a) (Pi_Elim B (Pi_Intro B f) a) (f a))

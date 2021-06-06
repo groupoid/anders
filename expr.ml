@@ -70,10 +70,8 @@ type decl =
   | Annotated of name * exp * exp
 
 let showDecl : decl -> string = function
-  | Annotated (p, exp1, exp2) ->
-    Printf.sprintf "definition %s : %s := %s" (showName p) (showExp exp1) (showExp exp2)
-  | NotAnnotated (p, exp) ->
-    Printf.sprintf "definition %s := %s" (showName p) (showExp exp)
+  | Annotated (p, exp1, exp2) -> Printf.sprintf "def %s : %s := %s" (showName p) (showExp exp1) (showExp exp2)
+  | NotAnnotated (p, exp) -> Printf.sprintf "def %s := %s" (showName p) (showExp exp)
 
 type line =
   | Import of string

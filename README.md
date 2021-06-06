@@ -32,7 +32,9 @@ def MLTT (A: U) : U := Σ
     (=-elim₁ : Π (a : A) (C: D A) (d: C a a (=-ctor₁ a)) (y: A) (p: Equ A a y), C a y p)
     (=-comp₁ : Π (a : A) (C: D A) (d: C a a (=-ctor₁ a)), Equ (C a a (=-ctor₁ a)) d (=-elim₁ a C d a (=-ctor₁ a))),
     U
+```
 
+```Lean
 def instance (A : U) : MLTT A :=
     (Pi A, lambda A, app A, comp₁ A, comp₂ A,
      Sigma A, pair A, pr₁ A, pr₂ A, comp₃ A, comp₄ A, comp₅ A,

@@ -1,0 +1,8 @@
+module axioms where
+import experiments/leibniz
+
+axiom T : U
+axiom t₁ : T
+axiom t₂ : T
+
+lemma refl-t₁ : eq T t₁ t₁ := refl T t₁

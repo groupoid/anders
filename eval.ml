@@ -58,7 +58,7 @@ let rec eval (e : exp) (rho : rho) =
   | EVar x           -> getRho rho x
   | EPair (e1, e2)   -> VPair (eval e1 rho, eval e2 rho)
   | EHole            -> VNt NHole
-  | EUndef           -> VNt NUndef
+  | EAxiom           -> VNt NAxiom
 and app : value * value -> value = function
   | VLam (_, f), v -> closByVal f v
   | VNt k, m       -> VNt (NApp (k, m))
@@ -95,7 +95,7 @@ and rbN : neut  -> exp = function
   | NFst k      -> EFst (rbN k)
   | NSnd k      -> ESnd (rbN k)
   | NHole       -> EHole
-  | NUndef      -> EUndef
+  | NAxiom      -> EAxiom
 
 let rec conv v1 v2 : bool =
   if !Prefs.trace then begin

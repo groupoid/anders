@@ -37,7 +37,7 @@ let rec check k (rho : rho) (gma : gamma) (e0 : exp) (t0 : value) : rho * gamma 
     print_string ("\nHole:\n\n" ^ Expr.showGamma gma ^ "\n" ^
                   String.make 80 '-' ^ "\n" ^ Expr.showValue v ^ "\n\n");
     (rho, gma)
-  | EUndef, v -> (rho, gma)
+  | EAxiom, v -> (rho, gma)
   | e, t -> eqNf t (infer (k + 1) rho gma e); (rho, gma)
 and infer k rho gma e0 : value =
   if !Prefs.trace then

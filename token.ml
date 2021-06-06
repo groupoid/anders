@@ -13,7 +13,7 @@ let tokenToString : token -> string = function
   | LPARENS -> "LPARENS"
   | LAM     -> "LAM"
   | HOLE    -> "HOLE"
-  | UNDEF   -> "UNDEF"
+  | AXIOM   -> "AXIOM"
   | NO      -> "NO"
   | FST     -> "FST"
   | EOF     -> "EOF"

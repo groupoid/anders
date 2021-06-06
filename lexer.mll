@@ -51,7 +51,7 @@ rule main = parse
 | pi              { PI }
 | sigma           { SIGMA }
 | "?"             { HOLE }
-| "undefined"     { UNDEF }
+| "axiom"         { AXIOM }
 | defeq           { DEFEQ }
 | lam             { LAM }
 | arrow           { ARROW }

@@ -1,9 +1,11 @@
 module mltt where
 option girard true
 
-def Pi (A : U) (B : A → U) : U := Π (x : A), B x
-def lambda (A : U) (B : A → U) (b : Pi A B) : Pi A B := λ (x : A), b x
-def app (A : U) (B : A → U) (f : Pi A B) (a : A) : B a := f a
+def a : U := axiom
+
+def Pi (A:U) (B: A → U): U := Π (x:A), B x
+def lambda (A:U) (B:A → U) (b: Pi A B): Pi A B := λ (x: A), b x
+def app (A:U) (B:A → U) (f: Pi A B) (a: A): B a := f a
 
 def Sigma (A : U) (B : A → U) : U := Σ (x : A), B x
 def pair (A : U) (B : A → U) (a : A) (b : B a) : Sigma A B := (a, b)

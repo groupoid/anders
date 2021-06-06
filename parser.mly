@@ -8,7 +8,7 @@
 %token <int> NAT
 %token LPARENS RPARENS COMMA COLON NO EOF HOLE
 %token SET DEFEQ ARROW FST SND LAM DEF
-%token DIRSEP MODULE WHERE IMPORT UNDEF
+%token DIRSEP MODULE WHERE IMPORT AXIOM
 %token SIGMA PI OPTION
 
 %start <Expr.file> file
@@ -53,7 +53,7 @@ exp2:
 
 exp3:
   | HOLE { EHole }
-  | UNDEF { EUndef }
+  | AXIOM { EAxiom }
   | SET NAT { ESet $2 }
   | SET { ESet 0 }
   | exp3 FST { EFst $1 }

@@ -28,11 +28,11 @@ axiom J (A: U) (x: A) (C: D A) (d: C x x (refl A x)) (y: A) (p: Equ A x y) : C x
 -- def trans_comp (A:U)(a: A): Equ A a (trans A A (<i> A) a) = fill (<i> A) a []
 -- def subst_comp (A:U)(P:A → U)(a:A)(e:P(a)): Equ (P a) e (subst A P a a (refl A a) e) = trans_comp (P a) e
 
-def comp₁ (A : U) (B : A → U) (a : A) (f : Pi A B) : Equ (B a) (app A B (lambda A B f) a) (f a) ≔ refl (B a) (f a)
-def comp₂ (A : U) (B : A → U) (a : A) (f : Pi A B) : Equ (Pi A B) f (λ (x : A), f x) ≔ refl (Pi A B) f
-def comp₃ (A : U) (B : A → U) (a : A) (b : B a) : Equ A a (pr₁ A B (a ,b)) ≔ refl A a
-def comp₄ (A : U) (B : A → U) (a : A) (b : B a) : Equ (B a) b (pr₂ A B (a, b)) ≔ refl (B a) b
-def comp₅ (A : U) (B : A → U) (p : Sigma A B) : Equ (Sigma A B) p (pr₁ A B p, pr₂ A B p) ≔ refl (Sigma A B) p
+definition comp₁ (A : U) (B : A → U) (a : A) (f : Pi A B) : Equ (B a) (app A B (lambda A B f) a) (f a) ≔ refl (B a) (f a)
+definition comp₂ (A : U) (B : A → U) (a : A) (f : Pi A B) : Equ (Pi A B) f (λ (x : A), f x) ≔ refl (Pi A B) f
+definition comp₃ (A : U) (B : A → U) (a : A) (b : B a) : Equ A a (pr₁ A B (a ,b)) ≔ refl A a
+definition comp₄ (A : U) (B : A → U) (a : A) (b : B a) : Equ (B a) b (pr₂ A B (a, b)) ≔ refl (B a) b
+definition comp₅ (A : U) (B : A → U) (p : Sigma A B) : Equ (Sigma A B) p (pr₁ A B p, pr₂ A B p) ≔ refl (Sigma A B) p
 axiom comp₆ (A : U) (a : A) (C : D A) (d: C a a (refl A a)) : Equ (C a a (refl A a)) d (J A a C d a (refl A a))
 
 -- def comp6 (A:U)(a:A)(C: D A) (d: C a a (refl A a))
@@ -40,22 +40,22 @@ axiom comp₆ (A : U) (a : A) (C : D A) (d: C a a (refl A a)) : Equ (C a a (refl
 --       subst_comp (singl A a) T (eta A a) d where T (z: singl A a) : U ≔ C a (z.1) (z.2)
 
 def MLTT (A: U) : U ≔ Σ
-    (Π-form  : Π (B : A → U)                      , U)
-    (Π-ctor₁ : Π (B : A → U)                      , Pi A B → Pi A B)
-    (Π-elim₁ : Π (B : A → U)                      , Pi A B → Pi A B)
+    (Π-form  : Π (B : A → U) , U)
+    (Π-ctor₁ : Π (B : A → U) , Pi A B → Pi A B)
+    (Π-elim₁ : Π (B : A → U) , Pi A B → Pi A B)
     (Π-comp₁ : Π (B : A → U) (a : A) (f : Pi A B) , Equ (B a) (Π-elim₁ B (Π-ctor₁ B f) a) (f a))
     (Π-comp₂ : Π (B : A → U) (a : A) (f : Pi A B) , Equ (Pi A B) f (λ (x : A), f x))
-    (Σ-form  : Π (B : A → U)                      , U)
-    (Σ-ctor₁ : Π (B : A → U) (a : A) (b : B a)    , Sigma A B)
-    (Σ-elim₁ : Π (B : A → U) (p : Sigma A B)      , A)
-    (Σ-elim₂ : Π (B : A → U) (p : Sigma A B)      , B (pr₁ A B p))
-    (Σ-comp₁ : Π (B : A → U) (a : A) (b: B a)     , Equ A a (Σ-elim₁ B (Σ-ctor₁ B a b)))
-    (Σ-comp₂ : Π (B : A → U) (a : A) (b: B a)     , Equ (B a) b (Σ-elim₂ B (a, b)))
-    (Σ-comp₃ : Π (B : A → U) (p : Sigma A B)      , Equ (Sigma A B) p (pr₁ A B p, pr₂ A B p))
-    (=-form  : Π (a : A)                          , A → U)
-    (=-ctor₁ : Π (a : A)                          , Equ A a a)
+    (Σ-form  : Π (B : A → U) , U)
+    (Σ-ctor₁ : Π (B : A → U) (a : A) (b : B a) , Sigma A B)
+    (Σ-elim₁ : Π (B : A → U) (p : Sigma A B) , A)
+    (Σ-elim₂ : Π (B : A → U) (p : Sigma A B) , B (pr₁ A B p))
+    (Σ-comp₁ : Π (B : A → U) (a : A) (b: B a) , Equ A a (Σ-elim₁ B (Σ-ctor₁ B a b)))
+    (Σ-comp₂ : Π (B : A → U) (a : A) (b: B a) , Equ (B a) b (Σ-elim₂ B (a, b)))
+    (Σ-comp₃ : Π (B : A → U) (p : Sigma A B) , Equ (Sigma A B) p (pr₁ A B p, pr₂ A B p))
+    (=-form  : Π (a : A) , A → U)
+    (=-ctor₁ : Π (a : A) , Equ A a a)
     (=-elim₁ : Π (a : A) (C: D A) (d: C a a (=-ctor₁ a)) (y: A) (p: Equ A a y), C a y p)
-    (=-comp₁ : Π (a : A) (C: D A) (d: C a a (=-ctor₁ a)), Equ (C a a (=-ctor₁ a)) d (=-elim₁ a C d a (=-ctor₁ a))),
+    (=-comp₁ : Π (a : A) (C: D A) (d: C a a (=-ctor₁ a)) , Equ (C a a (=-ctor₁ a)) d (=-elim₁ a C d a (=-ctor₁ a))),
     U
 
 theorem instance (A : U) : MLTT A ≔

@@ -3,6 +3,16 @@ Anders
 
 CCHM homotopy system type checker based on Mini-TT for OCaml.
 
+Features
+--------
+
+* MLTT with Leibniz equality (axiomatic J and comp₆) in 500 LOC
+* Parser in 50 LOC
+* Lexer in 50 LOC
+* Full Agda-style UTF-8 support
+* Lean comma-syntax for ΠΣ
+* Non-2D syntax with top-level specificators
+
 Prerequisites
 -------------
 

@@ -64,36 +64,35 @@ let rec eval (e : exp) (rho : rho) = traceEval e; match e with
   | EHole            -> VNt NHole
   | EAxiom (p, e)    -> VNt (NAxiom (p, eval e rho))
 and app : value * value -> value = function
-  | VLam (_, f), v -> closByVal f v
-  | VNt k, m       -> VNt (NApp (k, m))
-  | x, y           -> raise (InvalidApplication (x, y))
+  | VLam (_, f), v   -> closByVal f v
+  | VNt k, m         -> VNt (NApp (k, m))
+  | x, y             -> raise (InvalidApplication (x, y))
 and getRho rho x = match Env.find_opt x rho with
-  | Some (Value v) -> v
-  | Some (Exp e)   -> eval e rho
-  | None           -> raise (VariableNotFound x)
-and closByVal (x: clos) (v : value) =
-  let (p,e,rho) = x in
+  | Some (Value v)   -> v
+  | Some (Exp e)     -> eval e rho
+  | None             -> raise (VariableNotFound x)
+and closByVal (x: clos) (v : value) = let (p,e,rho) = x in
   begin traceClos e p v; eval e (upVar rho p v) end
 
-let rec rbV : value -> exp = function
-  | VLam (t, g)     -> let (p, _, _) = g in let q = pat p in ELam ((q, rbV t), rbV (closByVal g (var q)))
-  | VPair (u, v)    -> EPair (rbV u, rbV v)
-  | VSet u          -> ESet u
-  | VPi (t, g)      -> let (p, _, _) = g in let q = pat p in EPi ((q, rbV t), rbV (closByVal g (var q)))
-  | VSig (t, g)     -> let (p, _, _) = g in let q = pat p in ESig ((q, rbV t), rbV (closByVal g (var q)))
-  | VNt l           -> rbN l
+let rec rbV : value  -> exp = function
+  | VLam (t, g)      -> let (p, _, _) = g in let q = pat p in ELam ((q, rbV t), rbV (closByVal g (var q)))
+  | VPair (u, v)     -> EPair (rbV u, rbV v)
+  | VSet u           -> ESet u
+  | VPi (t, g)       -> let (p, _, _) = g in let q = pat p in EPi ((q, rbV t), rbV (closByVal g (var q)))
+  | VSig (t, g)      -> let (p, _, _) = g in let q = pat p in ESig ((q, rbV t), rbV (closByVal g (var q)))
+  | VNt l            -> rbN l
 and rbN : neut -> exp = function
-  | NVar s        -> EVar s
-  | NApp (k, m)   -> EApp (rbN k, rbV m)
-  | NFst k        -> EFst (rbN k)
-  | NSnd k        -> ESnd (rbN k)
-  | NHole         -> EHole
-  | NAxiom (p, v) -> EAxiom (p, rbV v)
+  | NVar s           -> EVar s
+  | NApp (k, m)      -> EApp (rbN k, rbV m)
+  | NFst k           -> EFst (rbN k)
+  | NSnd k           -> ESnd (rbN k)
+  | NHole            -> EHole
+  | NAxiom (p, v)    -> EAxiom (p, rbV v)
 
 let prune rho x = match Env.find_opt x rho with
-  | Some (Value v) -> rbV v
-  | Some (Exp e)   -> e
-  | None           -> EVar x
+  | Some (Value v)   -> rbV v
+  | Some (Exp e)     -> e
+  | None             -> EVar x
 
 let rec weak (e : exp) (rho : rho) = match e with
   | ESet u           -> ESet u
@@ -109,17 +108,17 @@ let rec weak (e : exp) (rho : rho) = match e with
   | EAxiom (p, e)    -> EAxiom (p, weak e rho)
 
 let rec conv v1 v2 : bool = traceConv v1 v2; v1 = v2 || match v1, v2 with
-  | VSet u, VSet v             -> ieq u v
-  | VNt x, VNt y               -> convNeut x y
+  | VSet u, VSet v -> ieq u v
+  | VNt x, VNt y -> convNeut x y
   | VPair (a, b), VPair (c, d) -> conv a c && conv b d
-  | VPair (a, b), v            -> conv a (vfst v) && conv b (vsnd v)
-  | v, VPair (a, b)            -> conv (vfst v) a && conv (vsnd v) b
+  | VPair (a, b), v -> conv a (vfst v) && conv b (vsnd v)
+  | v, VPair (a, b) -> conv (vfst v) a && conv (vsnd v) b
   | VPi (a, g), VPi (b, h)
   | VSig (a, g), VSig (b, h)
   | VLam (a, g), VLam (b, h) -> let (p, e1, rho1) = g in let (_, e2, rho2) = h in
     conv a b && (weak e1 rho1 = weak e2 rho2 || conv (closByVal g (genV p)) (closByVal h (genV p)))
-  | VLam (a, g), b -> let (p, _, _) = g in let p' = genV p in conv (closByVal g p') (app (b, p'))
-  | b, VLam (a, g) -> let (p, _, _) = g in let p' = genV p in conv (app (b, p')) (closByVal g p')
+  | VLam (a, (p,o,v)), b -> conv (closByVal (p,o,v) (genV p)) (app (b, (genV p)))
+  | b, VLam (a, (p,o,v)) -> conv (app (b, (genV p))) (closByVal (p,o,v) (genV p))
   | _, _ -> false
 and convNeut n1 n2 : bool = match n1, n2 with
   | NVar a, NVar b -> a = b

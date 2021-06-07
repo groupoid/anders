@@ -12,7 +12,7 @@ let vsnd : value -> value = function
   | v -> raise (ExpectedSig v)
 
 let lookup (x : name) (lst : gamma) = match Env.find_opt x lst with
-  | Some v -> (match v with | Local u| Global u -> u)
+  | Some v -> (match v with | Local u | Global u -> u)
   | None -> raise (VariableNotFound x)
 
 let upDec (rho : rho) : decl -> rho = function
@@ -34,15 +34,15 @@ let upGlobal (gma : gamma) (p : name) (v : value) : gamma =
 
 let gen : int ref = ref 0
 let var x  = VNt (NVar x)
-let pat : name  -> name = (gen := !gen + 1); function | No -> No | Name (p, _) -> Name (p, !gen)
+let pat : name -> name = (gen := !gen + 1); function | No -> No | Name (p, _) -> Name (p, !gen)
 let genV n = var (pat n)
 let girard : bool ref = ref false
 let ieq u v : bool = !girard || u = v
 
-let traceEval (e: exp) : unit = if !Prefs.trace then
+let traceEval (e : exp) : unit = if !Prefs.trace then
   begin Printf.printf "EVAL: %s\n" (showExp e); flush_all () end else ()
 
-let traceClos (e: exp) (p: name) (v: value): unit = if !Prefs.trace then
+let traceClos (e : exp) (p : name) (v : value) : unit = if !Prefs.trace then
   begin Printf.printf "CLOSBYVAL: (%s)(%s := %s)\n" (showExp e) (showName p) (showValue v); flush_all () end else ()
 
 let traceConv (v1 : value) (v2 : value) : unit = if !Prefs.trace then
@@ -117,8 +117,8 @@ let rec conv v1 v2 : bool = traceConv v1 v2; v1 = v2 || match v1, v2 with
   | VSig (a, g), VSig (b, h)
   | VLam (a, g), VLam (b, h) -> let (p, e1, rho1) = g in let (_, e2, rho2) = h in
     conv a b && (weak e1 rho1 = weak e2 rho2 || conv (closByVal g (genV p)) (closByVal h (genV p)))
-  | VLam (a, (p,o,v)), b -> conv (closByVal (p,o,v) (genV p)) (app (b, (genV p)))
-  | b, VLam (a, (p,o,v)) -> conv (app (b, (genV p))) (closByVal (p,o,v) (genV p))
+  | VLam (a, (p, o, v)), b -> conv (closByVal (p, o, v) (genV p)) (app (b, (genV p)))
+  | b, VLam (a, (p, o, v)) -> conv (app (b, (genV p))) (closByVal (p, o, v) (genV p))
   | _, _ -> false
 and convNeut n1 n2 : bool = match n1, n2 with
   | NVar a, NVar b -> a = b

@@ -3,6 +3,8 @@ open Error
 open Eval
 open Check
 
+open Formula
+
 type cmdline =
   | Check of string
   | Lex   of string

@@ -15,8 +15,7 @@ let getDeclName : decl -> string = function
   | Annotated (p, _, _)
   | NotAnnotated (p, _) -> p
 
-let checkDecl rho gma d : rho * gamma =
-  match d with
+let checkDecl rho gma d : rho * gamma = match d with
   | Annotated (p, a, e) ->
     let b = infer 0 rho gma a in
     if not (isVSet b) then raise (ExpectedVSet b) else ();
@@ -46,11 +45,7 @@ let rec checkLine st : line -> state =
       | _ -> raise (UnknownOptionValue (opt, value)))
     | _ -> raise (UnknownOption opt));
     st
-  | Import x ->
-    let path = ext x in
-    if Files.mem path checked then st
-    else checkFile st path
-and checkContent st xs = List.fold_left checkLine st xs
+  | Import x -> let path = ext x in if Files.mem path checked then st else checkFile st path
 and checkFile p path =
   let (rho, gma, checked) = p in
   let filename = Filename.basename path in
@@ -61,3 +56,4 @@ and checkFile p path =
   else raise (InvalidModuleName (name, filename));
   let res = checkContent (rho, gma, Files.add path checked) con in
   Printf.printf "File loaded.\n"; res
+and checkContent st xs = List.fold_left checkLine st xs

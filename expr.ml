@@ -17,8 +17,8 @@ module Name = struct
       if p = q then compare a b
       else compare p q
 end
-module Env = Map.Make(Name)
 
+module Env = Map.Make(Name)
 module Files = Set.Make(String)
 
 type exp =
@@ -34,7 +34,6 @@ type exp =
   | EHole | EAxiom of string * exp
 and tele = name * exp
 
-(* In OCaml constructors are not functions. *)
 let eLam x y = ELam (x, y)
 let ePi  x y = EPi  (x, y)
 let eSig x y = ESig (x, y)
@@ -48,11 +47,8 @@ let rec showExp : exp -> string = function
   | ESet 0 -> "U"
   | ESet u -> Printf.sprintf "U %d" u
   | ELam (p, x) -> Printf.sprintf "λ %s, %s" (showTele p) (showExp x)
-  | EPi  (p, x) ->
-    let (var, dom) = p in begin match var with
-    | No -> Printf.sprintf "(%s → %s)" (showExp dom) (showExp x)
-    | _  -> Printf.sprintf "Π %s, %s" (showTele p) (showExp x)
-    end
+  | EPi  (p, x) -> let (var, dom) = p in begin match var with | No -> Printf.sprintf "(%s → %s)" (showExp dom) (showExp x)
+                                                              | _  -> Printf.sprintf "Π %s, %s" (showTele p) (showExp x) end
   | ESig (p, x) -> Printf.sprintf "Σ %s, %s" (showTele p) (showExp x)
   | EPair (fst, snd) -> Printf.sprintf "(%s, %s)" (showExp fst) (showExp snd)
   | EFst exp -> showExp exp ^ ".1"
@@ -77,13 +73,16 @@ type line =
   | Import of string
   | Option of string * string
   | Decl of decl
+
 type content = line list
+
 type file = string * content
 
 let showLine : line -> string = function
   | Import p -> Printf.sprintf "import %s" p
   | Option (opt, value) -> Printf.sprintf "option %s %s" opt value
   | Decl d -> showDecl d
+
 let showContent x = String.concat "\n" (List.map showLine x)
 
 let showFile : file -> string = function
@@ -124,15 +123,12 @@ let isTermVisible : term -> bool = function
   | Value _ -> true
 
 let rec showValue : value -> string = function
-  | VLam (x, (p, e, rho)) ->
-    Printf.sprintf "λ %s, %s" (showTele p x rho) (showExp e)
+  | VLam (x, (p, e, rho)) -> Printf.sprintf "λ %s, %s" (showTele p x rho) (showExp e)
   | VPair (fst, snd) -> Printf.sprintf "(%s, %s)" (showValue fst) (showValue snd)
   | VSet 0 -> "U"
   | VSet u -> Printf.sprintf "U %d" u
-  | VPi (x, (p, e, rho)) ->
-    Printf.sprintf "Π %s, %s" (showTele p x rho) (showExp e)
-  | VSig (x, (p, e, rho)) ->
-    Printf.sprintf "Σ %s, %s" (showTele p x rho) (showExp e)
+  | VPi (x, (p, e, rho)) -> Printf.sprintf "Π %s, %s" (showTele p x rho) (showExp e)
+  | VSig (x, (p, e, rho)) -> Printf.sprintf "Σ %s, %s" (showTele p x rho) (showExp e)
   | VNt n -> showNeut n
 and showNeut : neut -> string = function
   | NVar p -> showName p
@@ -145,9 +141,7 @@ and showTermBind : name * term -> string option = function
   | p, Value v -> Some (Printf.sprintf "%s := %s" (showName p) (showValue v))
   | _, _       -> None
 and showRho (rho : rho) : string =
-  Env.bindings rho
-  |> filterMap showTermBind
-  |> String.concat ", "
+  Env.bindings rho |> filterMap showTermBind |> String.concat ", "
 and showTele p x rho : string =
   if Env.exists (fun _ -> isTermVisible) rho then
     Printf.sprintf "(%s : %s, %s)" (showName p) (showValue x) (showRho rho)

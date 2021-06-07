@@ -10,7 +10,7 @@ type cmdline =
   | Repl  | Help
   | Trace | Girard
 
-let banner = "Anders theorem prover\n"
+let banner = "Anders MLTT theorem prover.\n"
 let help =
 "   invoke = anders | anders list
      list = [] | command list

@@ -56,7 +56,7 @@ def instance (A : U) : MLTT A :=
 ```
 
 ```shell
-$ make
+$ ocamlbuild -use-menhir -yaccflag "--explain" anders.native
 $ ./anders.native girard check experiments/mltt.anders
 ```
 

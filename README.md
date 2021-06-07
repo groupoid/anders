@@ -18,7 +18,7 @@ Prerequisites
 -------------
 
 ```shell
-$ apt install ocaml ocamlbuild menhir make
+$ apt install ocaml ocamlbuild menhir
 ```
 
 Try

@@ -12,6 +12,7 @@ Features
 * Full Agda-style UTF-8 support
 * Lean comma-syntax for ΠΣ
 * Non-2D syntax with top-level specificators
+* Best suited for academic papers
 
 Prerequisites
 -------------

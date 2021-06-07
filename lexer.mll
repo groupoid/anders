@@ -19,15 +19,12 @@ let ws      = ['\t' ' ']
 let nl      = "\r\n"|"\r"|"\n"
 let comment = "--" [^ '\n' '\r']* (nl|eof)
 let colon   = ':'
-(* arrow := -> | →
-   defeq := := | ≔ | ≜ | ≝
-   lam   := \  | λ *)
-let arrow   = "->"|"\xE2\x86\x92"
-let defeq   = ":="|"\xE2\x89\x94"|"\xE2\x89\x9C"|"\xE2\x89\x9D"
-let lam     = "\\"|"\xCE\xBB"
-let pi      = "pi"|"\xCE\xA0"
-let sigma   = "sigma"|"\xCE\xA3"
-let def     = "def"|"definition"|"theorem"|"lemma"|"corollary"|"proposition"
+let defeq   = ":=" | "\xE2\x89\x94" | "\xE2\x89\x9C" | "\xE2\x89\x9D" (* ≔ | ≜ | ≝ *)
+let arrow   = "->" | "\xE2\x86\x92" (* → *)
+let lam     = "\\" | "\xCE\xBB"     (* λ *)
+let pi      = "pi" | "\xCE\xA0"     (* Π *)
+let sigma   = "sigma" | "\xCE\xA3"  (* Σ *)
+let def     = "definition" | "def" | "theorem" | "lemma" | "corollary" | "proposition"
 let axiom   = "axiom"|"postulate"
 
 rule main = parse

@@ -10,7 +10,7 @@ type cmdline =
   | Repl  | Help
   | Trace | Girard
 
-let banner = "Anders MLTT theorem prover.\n"
+let banner = "Anders theorem prover [MLTT].\n"
 let help =
 "   invoke = anders | anders list
      list = [] | command list
@@ -49,8 +49,7 @@ let defaults : cmdline list -> cmdline list = function
   | xs -> xs
 
 let rec main () =
-  try Array.to_list Sys.argv   |> List.tl
-      |> parseArgs |> defaults |> List.iter cmd
+  try Array.to_list Sys.argv |> List.tl |> parseArgs |> defaults |> List.iter cmd
   with Restart -> main ()
 
 let () = print_endline banner; main ()

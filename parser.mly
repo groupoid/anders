@@ -9,7 +9,11 @@
 %token SET DEFEQ ARROW FST SND LAM DEF
 %token DIRSEP MODULE WHERE IMPORT AXIOM
 %token SIGMA PI OPTION LT GT PATHP APPFORMULA
-%token NEGATE AND OR ZERO ONE
+%token AND OR ZERO ONE NEGATE
+
+%left AND OR
+%nonassoc NEGATE
+
 %start <Expr.file> file
 %start <Expr.command> repl
 
@@ -35,8 +39,8 @@ formula:
   | ONE { Dir One }
   | ident { Atom $1 }
   | NEGATE formula { negFormula $2 }
-  | AND formula formula { And ($2, $3) }
-  | OR formula formula { Or ($2, $3) }
+  | formula AND formula { And ($1, $3) }
+  | formula OR formula { Or ($1, $3) }
   | LPARENS formula RPARENS { $2 }
 
 exp1:

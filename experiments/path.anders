@@ -1,12 +1,14 @@
 module path where
 
-def Path (A : U) (a b : A) : U := PathP (<_> A) a b
-def rfl (A : U) (a : A) : Path A a a := <_> a
-def contr (A: U) (a b: A) (p: Path A a b): Path (singl A a) (eta A a) (b,p) := <i> (p @ i,<j> p @ i/\j)
-def sym (A: U) (a b: A) (p: Path A a b): Path A b a := <i> p @ -i
-def cong (A B: U) (f: A->B) (a b: A) (p: Path A a b): Path B (f a) (f b) := <i> f (p @ i)
-def ap (A: U) (a x:A) (B:A->U) (f: A->B a) (b: B a) (p: Path A a x): Path (B a) (f a) (f x) := <i> f (p @ i)
-axiom trans (A B: U) (p: Path U A B) (a : A): B -- := transport p a -- comp p a []
-axiom subst (A: U) (P: A->U) (a b: A) (p: Path A a b) (e: P a): P b = -- comp (<i> P (p @ i)) e []
-def inv (A: U) (a b: A) (p: Path A a b): Path A b a := <i> p @ -i
+axiom Path (A : U) (a b : A) : U -- := PathP (<_> A) a b
+axiom rfl (A : U) (a : A) : Path A a a -- := <_> a
+def singl (A: U) (a: A): U := Σ (x: A), Path A a x
+def eta (A: U) (a: A): singl A a := (a, rfl A a)
+axiom contr (A: U) (a b: A) (p: Path A a b): Path (singl A a) (eta A a) (b,p) -- := <i> (p @ i,<j> p @ i/\j)
+axiom sym (A: U) (a b: A) (p: Path A a b): Path A b a -- := <i> p @ -i
+axiom cong (A B: U) (f: A -> B) (a b: A) (p: Path A a b): Path B (f a) (f b) -- := <i> f (p @ i)
+axiom ap (A: U) (a x: A) (B: A -> U) (f: A -> B a) (b: B a) (p: Path A a x): Path (B a) (f a) (f x) -- := <i> f (p @ i)
+axiom trans (A B: U) (p: Path U A B) (a: A): B -- := transport p a -- comp p a []
+axiom subst (A: U) (P: A -> U) (a b: A) (p: Path A a b) (e: P a): P b = -- comp (<i> P (p @ i)) e []
+axiom inv (A: U) (a b: A) (p: Path A a b): Path A b a -- := <i> p @ -i
 def coerce (A B: U) (p: Path U A B): A -> B := \ (x: A), trans A B p x

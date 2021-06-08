@@ -11,7 +11,8 @@
 %token SIGMA PI OPTION LT GT PATHP APPFORMULA
 %token AND OR ZERO ONE NEGATE
 
-%left AND OR
+%left OR
+%left AND
 %nonassoc NEGATE
 
 %start <Expr.file> file

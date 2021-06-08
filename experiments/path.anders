@@ -10,6 +10,6 @@ axiom sym (A: U) (a b: A) (p: Path A a b): Path A b a -- := <i> p @ -i
 axiom cong (A B: U) (f: A -> B) (a b: A) (p: Path A a b): Path B (f a) (f b) -- := <i> f (p @ i)
 axiom ap (A: U) (a x: A) (B: A -> U) (f: A -> B a) (b: B a) (p: Path A a x): Path (B a) (f a) (f x) -- := <i> f (p @ i)
 axiom trans (A B: U) (p: Path U A B) (a: A): B -- := transport p a -- comp p a []
-axiom subst (A: U) (P: A -> U) (a b: A) (p: Path A a b) (e: P a): P b = -- comp (<i> P (p @ i)) e []
+axiom subst (A: U) (P: A -> U) (a b: A) (p: Path A a b) (e: P a): P b -- := comp (<i> P (p @ i)) e []
 axiom inv (A: U) (a b: A) (p: Path A a b): Path A b a -- := <i> p @ -i
 def coerce (A B: U) (p: Path U A B): A -> B := \ (x: A), trans A B p x

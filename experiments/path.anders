@@ -1,4 +1,5 @@
 module path where
+option girard true
 
 def Path (A: U) (x y: A) : U := Π (P : A → U), P x → P y
 def rfl (A : U) (x : A) : Path A x x := λ (P : A → U) (u : P x), u

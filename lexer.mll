@@ -37,36 +37,20 @@ rule main = parse
 | nl              { next_line lexbuf; main lexbuf }
 | comment         { next_line lexbuf; main lexbuf }
 | ws+             { main lexbuf }
-| "module"        { MODULE }
-| "where"         { WHERE }
-| "import"        { IMPORT }
-| "option"        { OPTION }
-| def             { DEF }
-| 'U'             { SET }
-| ','             { COMMA }
-| '_'             { NO }
-| '('             { LPARENS }
-| ')'             { RPARENS }
-| '/'             { DIRSEP }
-| ".1"            { FST }
-| ".2"            { SND }
-| pi              { PI }
-| sigma           { SIGMA }
-| "?"             { HOLE }
-| "<"             { LT }
-| ">"             { GT }
-| "PathP"         { PATHP }
-| "@"             { APPFORMULA }
-| "0"             { ZERO }
-| "1"             { ONE }
-| negFormula      { NEGATE }
-| andFormula      { AND }
-| orFormula       { OR }
-| axiom           { AXIOM }
-| defeq           { DEFEQ }
-| lam             { LAM }
-| arrow           { ARROW }
-| colon           { COLON }
+| "module"        { MODULE }    | "where"         { WHERE }
+| "import"        { IMPORT }    | "option"        { OPTION }
+| def             { DEF }       | 'U'             { SET }
+| ','             { COMMA }     | '_'             { NO }
+| '('             { LPARENS }   | ')'             { RPARENS }
+| '/'             { DIRSEP }    | ".1"            { FST }
+| ".2"            { SND }       | pi              { PI }
+| sigma           { SIGMA }     | "?"             { HOLE }
+| "<"             { LT }        | ">"             { GT }
+| "PathP"         { PATHP }     | "@"             { APPFORMULA }
+| "0"             { ZERO }      | "1"             { ONE }
+| negFormula      { NEGATE }    | andFormula      { AND }
+| orFormula       { OR }        | axiom           { AXIOM }
+| defeq           { DEFEQ }     | lam             { LAM }
+| arrow           { ARROW }     | colon           { COLON }
+| ident as s      { IDENT s }   | eof             { EOF }
 | ['0'-'9']+ as s { NAT (int_of_string s) }
-| ident as s      { IDENT s }
-| eof             { EOF }

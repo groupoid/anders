@@ -21,7 +21,7 @@ type formula =
 let rec showFormula : formula -> string = function
   | Dir dir    -> showDir dir
   | Atom i     -> showName i
-  | Neg i      -> "−" ^ showName i
+  | Neg i      -> "-" ^ showName i
   | And (f, g) -> showFormula f ^ " ∧ " ^ showFormula g
   | Or (f, g)  -> showFormula f ^ " ∨ " ^ showFormula g
 

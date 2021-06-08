@@ -1,9 +1,7 @@
-open Expr
-open Error
-open Eval
 open Check
-
-open Formula
+open Error
+open Expr
+open Eval
 
 type cmdline =
   | Check of string

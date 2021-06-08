@@ -1,25 +1,5 @@
-type name =
-  | No
-  | Name of string * int
-
-let showName : name -> string = function
-  | No          -> "_"
-  | Name (s, _) -> s
-
-module Name = struct
-  type t = name
-  let compare x y =
-    match (x, y) with
-    | No, No -> 0
-    | No, Name _ -> -1
-    | Name _, No -> 1
-    | Name (p, a), Name (q, b) ->
-      if p = q then compare a b
-      else compare p q
-end
-
-module Env = Map.Make(Name)
-module Files = Set.Make(String)
+open Formula
+open Ident
 
 type exp =
   | ELam of tele * exp
@@ -32,6 +12,9 @@ type exp =
   | EApp of exp * exp
   | EVar of name
   | EHole | EAxiom of string * exp
+  | EPathP of exp * exp * exp
+  | EPLam of name * exp
+  | EAppFormula of exp * formula
 and tele = name * exp
 
 let eLam x y = ELam (x, y)
@@ -42,6 +25,10 @@ let rec telescope (f : tele -> exp -> exp) (e : exp) : tele list -> exp = functi
   | []      -> e
   | [x]     -> f x e
   | x :: xs -> f x (telescope f e xs)
+
+let rec pLam (e : exp) : name list -> exp = function
+  | []      -> e
+  | x :: xs -> EPLam (x, pLam e xs)
 
 let rec showExp : exp -> string = function
   | ESet 0 -> "U"
@@ -57,6 +44,9 @@ let rec showExp : exp -> string = function
   | EVar p -> showName p
   | EHole -> "?"
   | EAxiom (p, _) -> p
+  | EPathP (t, a, b) -> Printf.sprintf "PathP %s %s %s" (showExp t) (showExp a) (showExp b)
+  | EPLam (i, e) -> Printf.sprintf "(<%s> %s)" (showName i) (showExp e)
+  | EAppFormula (e, f) -> Printf.sprintf "%s @ %s" (showExp e) (showFormula f)
 and showTele : tele -> string = function
   | (No, x) -> showExp x
   | (p,  x) -> Printf.sprintf "(%s : %s)" (showName p) (showExp x)
@@ -95,6 +85,9 @@ type value =
   | VPi of value * clos
   | VSig of value * clos
   | VNt of neut
+  | VPathP of value * value * value
+  | VPLam of name * value
+  | VAppFormula of value * formula
 and neut =
   | NVar of name
   | NApp of neut * value
@@ -105,6 +98,7 @@ and clos = name * exp * rho
 and term =
   | Exp of exp
   | Value of value
+  | Formula of formula
 and rho = term Env.t
 
 (* Compatibility with OCaml 4.05
@@ -129,6 +123,9 @@ let rec showValue : value -> string = function
   | VSet u -> Printf.sprintf "U %d" u
   | VPi (x, (p, e, rho)) -> Printf.sprintf "Π %s, %s" (showTele p x rho) (showExp e)
   | VSig (x, (p, e, rho)) -> Printf.sprintf "Σ %s, %s" (showTele p x rho) (showExp e)
+  | VPathP (t, a, b) -> Printf.sprintf "PathP %s %s %s" (showValue t) (showValue a) (showValue b)
+  | VPLam (i, e) -> Printf.sprintf "(<%s> %s)" (showName i) (showValue e)
+  | VAppFormula (e, f) -> Printf.sprintf "%s @ %s" (showValue e) (showFormula f)
   | VNt n -> showNeut n
 and showNeut : neut -> string = function
   | NVar p -> showName p

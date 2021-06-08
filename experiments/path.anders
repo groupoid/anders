@@ -1,0 +1,6 @@
+module path where
+
+def Path (A : U) (a b : A) : U := PathP (<_> A) a b
+def refl (A : U) (a : A) : Path A a a := <_> a
+
+def symm (A : U) (a b : A) (p : Path A a b) : Path A b a := <i> p @ -i

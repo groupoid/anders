@@ -1,7 +1,8 @@
-open Expr
-open Eval
 open Check
 open Error
+open Ident
+open Expr
+open Eval
 
 type state = rho * gamma * Files.t
 let ext x = x ^ ".anders"

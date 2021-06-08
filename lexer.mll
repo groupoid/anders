@@ -27,6 +27,10 @@ let sigma   = "sigma" | "\xCE\xA3"  (* Σ *)
 let def     = "definition" | "def" | "theorem" | "lemma" | "corollary" | "proposition"
 let axiom   = "axiom"|"postulate"
 
+let negFormula = "-"|"\xE2\x88\x92" (* − *)
+let andFormula = "/\\"|"\xE2\x88\xA7" (* ∧ *)
+let orFormula  = "\\/"|"\xE2\x88\xA8" (* ∨ *)
+
 rule main = parse
 | nl              { next_line lexbuf; main lexbuf }
 | comment         { next_line lexbuf; main lexbuf }
@@ -47,6 +51,15 @@ rule main = parse
 | pi              { PI }
 | sigma           { SIGMA }
 | "?"             { HOLE }
+| "<"             { LT }
+| ">"             { GT }
+| "PathP"         { PATHP }
+| "@"             { APPFORMULA }
+| "0"             { ZERO }
+| "1"             { ONE }
+| negFormula      { NEGATE }
+| andFormula      { AND }
+| orFormula       { OR }
 | axiom           { AXIOM }
 | defeq           { DEFEQ }
 | lam             { LAM }

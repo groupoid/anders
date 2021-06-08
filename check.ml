@@ -1,5 +1,5 @@
-open Expr
 open Error
+open Expr
 open Eval
 
 let traceCheck (k: int) (e0 : exp) (t0:value):unit =
@@ -39,5 +39,16 @@ and infer k rho gma e0 : value = traceInfer k e0; match e0 with
   | EFst e -> fst (extSigG (infer (k + 1) rho gma e))
   | ESnd e -> let (_, g) = extSigG (infer (k + 1) rho gma e) in closByVal g (vfst (eval e rho))
   | EAxiom (_, e) -> eval e rho
+(*  | EPathP (t, e0, e1) ->
+    let (a0, a1) = checkPLam () in
+*)
   | e -> raise (InferError e)
-
+(*and checkPLam k rho gma e0 t0 : value * value =
+  match e0 with
+  | PLam (i, e) ->
+    (eval (upVar rho i ()))
+  | _ ->
+    match infer k rho gma e0 with
+    |
+    | _ -> 
+*)

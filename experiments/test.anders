@@ -13,4 +13,5 @@ def test : Π (A : U) (B : U), (A -> B) -> A -> B :=
     λ (A : U) (B : U) (f : A -> B) (x : A), f x
 
 def trio : U₂ := Σ (fst : U₁) (snd : U₁), U₁
+def lower : U₁₁₂₁₂ := U₁₁₂₁₁
 def instance : trio := (U, U -> U, U -> U -> U)

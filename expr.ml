@@ -23,7 +23,6 @@ let eSig x y = ESig (x, y)
 
 let rec telescope (f : tele -> exp -> exp) (e : exp) : tele list -> exp = function
   | []      -> e
-  | [x]     -> f x e
   | x :: xs -> f x (telescope f e xs)
 
 let rec pLam (e : exp) : name list -> exp = function

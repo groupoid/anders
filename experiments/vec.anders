@@ -1,7 +1,7 @@
 module vec where
 import experiments/church
 
-def vec (α : U) (n : N) : U 1
+def vec (α : U) (n : N) : U₁
  := Π (V : N → U), V N0 → (Π (n : N), α → V n → V (succ n)) → V n
 
 def vnil (α : U) : vec α N0

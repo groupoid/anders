@@ -12,5 +12,5 @@ def const (A : U) (B : U) (a : A) (b : B) : A := a
 def test : Π (A : U) (B : U), (A -> B) -> A -> B :=
     λ (A : U) (B : U) (f : A -> B) (x : A), f x
 
-def trio : U 2 := Σ (fst : U 1) (snd : U 1), (U 1)
+def trio : U₂ := Σ (fst : U₁) (snd : U₁), U₁
 def instance : trio := (U, U -> U, U -> U -> U)

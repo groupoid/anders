@@ -4,9 +4,9 @@
 %}
 
 %token <string> IDENT
-%token <int> NAT
+%token <int> SET
 %token LPARENS RPARENS COMMA COLON NO EOF HOLE
-%token SET DEFEQ ARROW FST SND LAM DEF
+%token DEFEQ ARROW FST SND LAM DEF
 %token DIRSEP MODULE WHERE IMPORT AXIOM
 %token SIGMA PI OPTION LT GT PATHP APPFORMULA
 %token AND OR ZERO ONE NEGATE
@@ -52,8 +52,7 @@ exp1:
 
 exp3:
   | HOLE { EHole }
-  | SET NAT { ESet $2 }
-  | SET { ESet 0 }
+  | SET { ESet $1 }
   | exp3 FST { EFst $1 }
   | exp3 SND { ESnd $1 }
   | LPARENS exp0 RPARENS { $2 }

@@ -2,11 +2,24 @@
   open Parser
   open Lexing
 
-  let next_line lexbuf =
+  let nextLine lexbuf =
     let pos = lexbuf.lex_curr_p in
     lexbuf.lex_curr_p <-
       { pos with pos_bol = pos.pos_cnum;
                  pos_lnum = pos.pos_lnum + 1 }
+
+  let getLevel s =
+    let res = ref 0 in let queue = Queue.of_seq (String.to_seq s) in
+    if (Queue.take queue <> 'U') then failwith "invalid universe";
+
+    while not (Queue.is_empty queue) do
+      if (Queue.take queue <> '\xE2' ||
+          Queue.take queue <> '\x82')
+      then failwith "invalid universe";
+
+      let value = Char.code (Queue.take queue) - 0x80 in
+      res := !res * 10 + value
+    done; !res
 }
 
 let lat1   = [^ '\t' ' ' '\r' '\n' '(' ')' ':' '.' ',' '/' '<' '>']
@@ -33,24 +46,26 @@ let negFormula = "-"
 let andFormula = "/\\"|"\xE2\x88\xA7" (* ∧ *)
 let orFormula  = "\\/"|"\xE2\x88\xA8" (* ∨ *)
 
+let subscript = '\xE2' '\x82' ['\x80'-'\x89']
+let set       = 'U' subscript*
+
 rule main = parse
-| nl              { next_line lexbuf; main lexbuf }
-| comment         { next_line lexbuf; main lexbuf }
+| nl              { nextLine lexbuf; main lexbuf }
+| comment         { nextLine lexbuf; main lexbuf }
 | ws+             { main lexbuf }
-| "module"        { MODULE }    | "where"         { WHERE }
-| "import"        { IMPORT }    | "option"        { OPTION }
-| def             { DEF }       | 'U'             { SET }
-| ','             { COMMA }     | '_'             { NO }
-| '('             { LPARENS }   | ')'             { RPARENS }
-| '/'             { DIRSEP }    | ".1"            { FST }
-| ".2"            { SND }       | pi              { PI }
-| sigma           { SIGMA }     | "?"             { HOLE }
-| "<"             { LT }        | ">"             { GT }
-| "PathP"         { PATHP }     | "@"             { APPFORMULA }
-| "0"             { ZERO }      | "1"             { ONE }
-| negFormula      { NEGATE }    | andFormula      { AND }
-| orFormula       { OR }        | axiom           { AXIOM }
-| defeq           { DEFEQ }     | lam             { LAM }
-| arrow           { ARROW }     | colon           { COLON }
-| ident as s      { IDENT s }   | eof             { EOF }
-| ['0'-'9']+ as s { NAT (int_of_string s) }
+| "module"        { MODULE }           | "where"         { WHERE }
+| "import"        { IMPORT }           | "option"        { OPTION }
+| def             { DEF }              | colon           { COLON }
+| ','             { COMMA }            | '_'             { NO }
+| '('             { LPARENS }          | ')'             { RPARENS }
+| '/'             { DIRSEP }           | ".1"            { FST }
+| ".2"            { SND }              | pi              { PI }
+| sigma           { SIGMA }            | "?"             { HOLE }
+| "<"             { LT }               | ">"             { GT }
+| "PathP"         { PATHP }            | "@"             { APPFORMULA }
+| "0"             { ZERO }             | "1"             { ONE }
+| negFormula      { NEGATE }           | andFormula      { AND }
+| orFormula       { OR }               | axiom           { AXIOM }
+| defeq           { DEFEQ }            | lam             { LAM }
+| set as s        { SET (getLevel s) } | arrow           { ARROW }
+| ident as s      { IDENT s }          | eof             { EOF }

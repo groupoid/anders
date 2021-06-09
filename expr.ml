@@ -31,13 +31,13 @@ let rec pLam (e : exp) : name list -> exp = function
   | x :: xs -> EPLam (x, pLam e xs)
 
 let getDigit x = Char.chr (x + 0x80) |> Printf.sprintf "\xE2\x82%c"
-let rec showUniverse x =
-  if x < 0 then failwith "showUniverse: expected positive integer"
-  else if x = 0 then "" else showUniverse (x / 10) ^ getDigit (x mod 10)
+let rec showLevel x =
+  if x < 0 then failwith "showLevel: expected positive integer"
+  else if x = 0 then "" else showLevel (x / 10) ^ getDigit (x mod 10)
 
 let rec showExp : exp -> string = function
   | ESet 0 -> "U"
-  | ESet u -> "U" ^ showUniverse u
+  | ESet u -> "U" ^ showLevel u
   | ELam (p, x) -> Printf.sprintf "λ %s, %s" (showTele p) (showExp x)
   | EPi  (p, x) -> let (var, dom) = p in begin match var with | No -> Printf.sprintf "(%s → %s)" (showExp dom) (showExp x)
                                                               | _  -> Printf.sprintf "Π %s, %s" (showTele p) (showExp x) end
@@ -125,7 +125,7 @@ let rec showValue : value -> string = function
   | VLam (x, (p, e, rho)) -> Printf.sprintf "λ %s, %s" (showTele p x rho) (showExp e)
   | VPair (fst, snd) -> Printf.sprintf "(%s, %s)" (showValue fst) (showValue snd)
   | VSet 0 -> "U"
-  | VSet u -> "U" ^ showUniverse u
+  | VSet u -> "U" ^ showLevel u
   | VPi (x, (p, e, rho)) -> Printf.sprintf "Π %s, %s" (showTele p x rho) (showExp e)
   | VSig (x, (p, e, rho)) -> Printf.sprintf "Σ %s, %s" (showTele p x rho) (showExp e)
   | VPathP (t, a, b) -> Printf.sprintf "PathP %s %s %s" (showValue t) (showValue a) (showValue b)

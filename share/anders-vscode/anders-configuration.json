@@ -1,0 +1,23 @@
+{
+    "brackets": [
+        ["(", ")"],
+        ["[", "]"]
+    ],
+    "comments": {
+        "lineComment": "--",
+        "blockComment": ["{-", "-}"]
+    },
+    "surroundingPairs": [
+        ["(", ")"],
+        ["[", "]"],
+        ["<", ">"]
+    ],
+    "folding": {
+        "offSide": true,
+        "markers": {
+            "start": "^[[:word:]']+",
+            "end": "^[[:word:]']+"
+        }
+    },
+    "wordPattern": "[^\\s\\(\\)\\:\\.\\,<>-][^\\s\\(\\)\\:\\.\\,<>]*"
+}

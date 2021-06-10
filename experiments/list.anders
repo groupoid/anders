@@ -20,16 +20,16 @@ def [] (α : U) : list α ≔
 def ∷ (α : U) (x : α) (xs : list α) : list α ≔
 λ (μ : U) (n : μ) (c : α → μ → μ), c x (xs μ n c)
 
-def map (α β : U) (f : α → β) (xs : list α) : list β ≔
+def list-map (α β : U) (f : α → β) (xs : list α) : list β ≔
 λ (μ : U) (n : μ) (c : β → μ → μ), xs μ n (∘ α β (μ → μ) c f)
 
-def pure (α : U) : α → list α ≔
+def list-pure (α : U) : α → list α ≔
 λ (a : α), ∷ α a ([] α)
 
 def lst₁ : list N ≔ ∷ N N0 (∷ N N1 (∷ N N2 (∷ N N3 ([] N))))
 def lst₂ : list N ≔ ∷ N N1 (∷ N N2 (∷ N N3 (∷ N N4 ([] N))))
 
-theorem map-succ-lst₁-eq-lst₂ : eq (list N) (map N N succ lst₁) lst₂ ≔
+theorem map-succ-lst₁-eq-lst₂ : eq (list N) (list-map N N succ lst₁) lst₂ ≔
 refl (list N) lst₂
 
 def append (α : U) (xs : list α) (ys : list α) : list α ≔
@@ -49,25 +49,38 @@ def lst₅ : list (list N) ≔ ∷ (list N) lst₃ (∷ (list N) lst₄ ([] (lis
 theorem join-lst₅-eq-lst₁ : eq (list N) (join N lst₅) lst₁ ≔
 refl (list N) lst₁
 
-def bind (α β : U) (x : list α) (f : α → list β) : list β ≔
-join β (map α (list β) f x)
+def list-bind (α β : U) (x : list α) (f : α → list β) : list β ≔
+join β (list-map α (list β) f x)
 
-def filterM (α : U) (f : α → list bool) (lst : list α) : list (list α) ≔
-lst (list (list α)) (∷ (list α) ([] α) ([] (list α)))
-    (λ (x : α) (xs : list (list α)), bind bool (list α) (f x)
-      (λ (b : bool), ite (list (list α))
-        (map (list α) (list α) (∷ α x) xs) xs b))
+def monad ≔
+  Σ (μ : U → U) (pure : Π (α : U), α → μ α),
+  (Π (α β : U), μ α → (α → μ β) → μ β)
+
+def pure (μ : monad) : Π (α : U), α → μ.1 α ≔ μ.2.1
+def bind (μ : monad) : Π (α β : U), μ.1 α → (α → μ.1 β) → μ.1 β ≔ μ.2.2
+
+def map (μ : monad) (α β : U) (f : α → β) (x : μ.1 α) : μ.1 β ≔
+bind μ α β x (∘ α β (μ.1 β) (pure μ β) f)
+
+def filterM (μ : monad) (α : U) (f : α → μ.1 bool) (lst : list α) : μ.1 (list α) ≔
+lst (μ.1 (list α)) (pure μ (list α) ([] α))
+    (λ (x : α) (xs : μ.1 (list α)), bind μ bool (list α) (f x)
+      (λ (b : bool), ite (μ.1 (list α))
+        (map μ (list α) (list α) (∷ α x) xs) xs b))
+
+def List : monad ≔
+(list, list-pure, list-bind)
 
 def true-false : list bool ≔
 ∷ bool true (∷ bool false ([] bool))
 
 def powerset (α : U) : list α → list (list α) ≔
-filterM α (const (list bool) α true-false)
+filterM List α (const (list bool) α true-false)
 
 def lst₃-powerset : list (list N) ≔
 ∷ (list N) lst₃
-  (∷ (list N) (pure N N0)
-    (∷ (list N) (pure N N1)
+  (∷ (list N) (list-pure N N0)
+    (∷ (list N) (list-pure N N1)
       (∷ (list N) ([] N)
         ([] (list N)))))
 

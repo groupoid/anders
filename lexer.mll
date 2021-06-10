@@ -28,11 +28,14 @@ let bytes2 = ['\192'-'\223']['\128'-'\191']
 let bytes3 = ['\224'-'\239']['\128'-'\191']['\128'-'\191']
 let bytes4 = ['\240'-'\247']['\128'-'\191']['\128'-'\191']['\128'-'\191']
 
+let nl               = "\r\n"|"\r"|"\n"
+let inlineComment    = "--" [^ '\n' '\r']* (nl|eof)
+let multilineComment = "{-" [^ '-']* '-' ([^ '-' '}'][^ '-']* '-' | '-')* '}'
+let comment          = inlineComment | multilineComment
+
 let utf8    = lat1|bytes2|bytes3|bytes4
 let ident   = beg utf8*
 let ws      = ['\t' ' ']
-let nl      = "\r\n"|"\r"|"\n"
-let comment = "--" [^ '\n' '\r']* (nl|eof)
 let colon   = ':'
 let defeq   = ":=" | "\xE2\x89\x94" | "\xE2\x89\x9C" | "\xE2\x89\x9D" (* ≔ | ≜ | ≝ *)
 let arrow   = "->" | "\xE2\x86\x92" (* → *)

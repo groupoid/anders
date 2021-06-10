@@ -1,5 +1,9 @@
 module church where
 
+{-
+    Church numerals
+-}
+
 definition N := Π (A : U), (A -> A) -> A -> A
 definition N0 : N := λ (A : U) (S : A -> A) (Z : A), Z
 

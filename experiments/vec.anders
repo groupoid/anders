@@ -2,10 +2,10 @@ module vec where
 import experiments/church
 
 def vec (α : U) (n : N) : U₁
- := Π (V : N → U), V N0 → (Π (n : N), α → V n → V (succ n)) → V n
+ := Π (μ : N → U), μ N0 → (Π (n : N), α → μ n → μ (succ n)) → μ n
 
 def vnil (α : U) : vec α N0
- := λ (V : N -> U) (n : V N0) (c : Π (n : N), α → V n → V (succ n)), n
+ := λ (μ : N -> U) (n : μ N0) (c : Π (n : N), α → μ n → μ (succ n)), n
 
 def vcons (α : U) (n : N) (x : α) (xs : vec α n) : vec α (succ n)
- := λ (V : N -> U) (s : V N0) (c : Π (n : N), α → V n → V (succ n)), c n x (xs V s c)
+ := λ (μ : N -> U) (s : μ N0) (c : Π (n : N), α → μ n → μ (succ n)), c n x (xs μ s c)

@@ -1,0 +1,75 @@
+module list where
+
+import experiments/leibniz
+import experiments/bool
+
+option girard true
+
+def ∘ (α β γ : U) (f : β → γ) (g : α → β) : α → γ ≔
+λ (x : α), f (g x)
+
+def const (α β : U) : α → β → α ≔
+λ (a : α) (b : β), a
+
+def list (α : U) : U ≔
+Π (μ : U), μ → (α → μ → μ) → μ
+
+def [] (α : U) : list α ≔
+λ (μ : U) (n : μ) (c : α → μ → μ), n
+
+def ∷ (α : U) (x : α) (xs : list α) : list α ≔
+λ (μ : U) (n : μ) (c : α → μ → μ), c x (xs μ n c)
+
+def map (α β : U) (f : α → β) (xs : list α) : list β ≔
+λ (μ : U) (n : μ) (c : β → μ → μ), xs μ n (∘ α β (μ → μ) c f)
+
+def pure (α : U) : α → list α ≔
+λ (a : α), ∷ α a ([] α)
+
+def lst₁ : list N ≔ ∷ N N0 (∷ N N1 (∷ N N2 (∷ N N3 ([] N))))
+def lst₂ : list N ≔ ∷ N N1 (∷ N N2 (∷ N N3 (∷ N N4 ([] N))))
+
+theorem map-succ-lst₁-eq-lst₂ : eq (list N) (map N N succ lst₁) lst₂ ≔
+refl (list N) lst₂
+
+def append (α : U) (xs : list α) (ys : list α) : list α ≔
+λ (μ : U) (n : μ) (c : α → μ → μ), xs μ (ys μ n c) c
+
+def lst₃ : list N ≔ ∷ N N0 (∷ N N1 ([] N))
+def lst₄ : list N ≔ ∷ N N2 (∷ N N3 ([] N))
+
+theorem lst₃-append-lst₄-eq-lst₁ : eq (list N) (append N lst₃ lst₄) lst₁ ≔
+refl (list N) lst₁
+
+def join (α : U) (xs : list (list α)) : list α ≔
+xs (list α) ([] α) (append α)
+
+def lst₅ : list (list N) ≔ ∷ (list N) lst₃ (∷ (list N) lst₄ ([] (list N)))
+
+theorem join-lst₅-eq-lst₁ : eq (list N) (join N lst₅) lst₁ ≔
+refl (list N) lst₁
+
+def bind (α β : U) (x : list α) (f : α → list β) : list β ≔
+join β (map α (list β) f x)
+
+def filterM (α : U) (f : α → list bool) (lst : list α) : list (list α) ≔
+lst (list (list α)) (∷ (list α) ([] α) ([] (list α)))
+    (λ (x : α) (xs : list (list α)), bind bool (list α) (f x)
+      (λ (b : bool), ite (list (list α))
+        (map (list α) (list α) (∷ α x) xs) xs b))
+
+def true-false : list bool ≔
+∷ bool true (∷ bool false ([] bool))
+
+def powerset (α : U) : list α → list (list α) ≔
+filterM α (const (list bool) α true-false)
+
+def lst₃-powerset : list (list N) ≔
+∷ (list N) lst₃
+  (∷ (list N) (pure N N0)
+    (∷ (list N) (pure N N1)
+      (∷ (list N) ([] N)
+        ([] (list N)))))
+
+theorem powerset-correct-at-list₃ : eq (list (list N)) (powerset N lst₃) lst₃-powerset ≔
+refl (list (list N)) lst₃-powerset

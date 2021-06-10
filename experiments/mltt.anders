@@ -39,7 +39,7 @@ axiom comp₆ (A : U) (a : A) (C : D A) (d: C a a (refl A a)) : Equ (C a a (refl
 --     : Equ (C a a (refl A a)) d (J A a C d a (refl A a)) ≔
 --       subst_comp (singl A a) T (eta A a) d where T (z: singl A a) : U ≔ C a (z.1) (z.2)
 
-def MLTT (A: U) : U ≔ Σ
+def MLTT (A : U) : U ≔ Σ
     (Π-form  : Π (B : A → U) , U)
     (Π-ctor₁ : Π (B : A → U) , Pi A B → Pi A B)
     (Π-elim₁ : Π (B : A → U) , Pi A B → Pi A B)

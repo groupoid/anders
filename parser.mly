@@ -25,7 +25,7 @@ vars : ident vars { $1 :: $2 } | ident { [$1] }
 lense : LPARENS vars COLON exp1 RPARENS { List.map (fun x -> (x, $4)) $2 }
 telescope : lense telescope { List.append $1 $2 } | lense { $1 }
 params : telescope { $1 } | { [] }
-exp0 : exp1 COMMA exp0 { EPair ($1, $3) } | exp1 { $1 }  | PATHP exp3 exp3 exp3 { EPathP ($2, $3, $4) }
+exp0 : exp1 COMMA exp0 { EPair ($1, $3) } | exp1 { $1 }
 exp2 : exp2 exp3 { EApp ($1, $2) } | exp3 { $1 } | exp3 APPFORMULA formula { EAppFormula ($1, $3) }
 path : IDENT { $1 } | IDENT DIRSEP path { $1 ^ Filename.dir_sep ^ $3 }
 content : line content { $1 :: $2 } | EOF { [] }
@@ -46,6 +46,7 @@ exp1:
   | LAM telescope COMMA exp1 { telescope eLam $4 $2 }
   | PI telescope COMMA exp1 { telescope ePi $4 $2 }
   | SIGMA telescope COMMA exp1 { telescope eSig $4 $2 }
+  | PATHP exp3 exp3 exp3 { EPathP ($2, $3, $4) }
   | LT vars GT exp1 { pLam $4 $2 }
   | exp2 ARROW exp1 { EPi ((No, $1), $3) }
   | exp2 PROD exp1 { ESig ((No, $1), $3) }

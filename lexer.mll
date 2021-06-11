@@ -39,6 +39,7 @@ let ws      = ['\t' ' ']
 let colon   = ':'
 let defeq   = ":=" | "\xE2\x89\x94" | "\xE2\x89\x9C" | "\xE2\x89\x9D" (* ≔ | ≜ | ≝ *)
 let arrow   = "->" | "\xE2\x86\x92" (* → *)
+let prod    = "*"  | "\xC3\x97"     (* × *)
 let lam     = "\\" | "\xCE\xBB"     (* λ *)
 let pi      = "pi" | "\xCE\xA0"     (* Π *)
 let sigma   = "sigma" | "\xCE\xA3"  (* Σ *)
@@ -70,5 +71,6 @@ rule main = parse
 | negFormula      { NEGATE }           | andFormula      { AND }
 | orFormula       { OR }               | axiom           { AXIOM }
 | defeq           { DEFEQ }            | lam             { LAM }
-| set as s        { SET (getLevel s) } | arrow           { ARROW }
-| ident as s      { IDENT s }          | eof             { EOF }
+| arrow           { ARROW }            | prod            { PROD }
+| set as s        { SET (getLevel s) } | ident as s      { IDENT s }
+| eof             { EOF }

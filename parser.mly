@@ -6,7 +6,7 @@
 %token <string> IDENT
 %token <int> SET
 %token LPARENS RPARENS COMMA COLON NO EOF HOLE
-%token DEFEQ ARROW FST SND LAM DEF
+%token DEFEQ PROD ARROW FST SND LAM DEF
 %token DIRSEP MODULE WHERE IMPORT AXIOM
 %token SIGMA PI OPTION LT GT PATHP APPFORMULA
 %token AND OR ZERO ONE NEGATE
@@ -48,6 +48,7 @@ exp1:
   | SIGMA telescope COMMA exp1 { telescope eSig $4 $2 }
   | LT vars GT exp1 { pLam $4 $2 }
   | exp2 ARROW exp1 { EPi ((No, $1), $3) }
+  | exp2 PROD exp1 { ESig ((No, $1), $3) }
   | exp2 { $1 }
 
 exp3:

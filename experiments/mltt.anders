@@ -40,22 +40,22 @@ axiom comp₆ (A : U) (a : A) (C : D A) (d: C a a (refl A a)) : Equ (C a a (refl
 --       subst_comp (singl A a) T (eta A a) d where T (z: singl A a) : U ≔ C a (z.1) (z.2)
 
 def MLTT (A : U) : U ≔ Σ
-    (Π-form  : Π (B : A → U) , U)
-    (Π-ctor₁ : Π (B : A → U) , Pi A B → Pi A B)
-    (Π-elim₁ : Π (B : A → U) , Pi A B → Pi A B)
-    (Π-comp₁ : Π (B : A → U) (a : A) (f : Pi A B) , Equ (B a) (Π-elim₁ B (Π-ctor₁ B f) a) (f a))
-    (Π-comp₂ : Π (B : A → U) (a : A) (f : Pi A B) , Equ (Pi A B) f (λ (x : A), f x))
-    (Σ-form  : Π (B : A → U) , U)
+    (Π-form  : Π (B : A → U), U)
+    (Π-ctor₁ : Π (B : A → U), Pi A B → Pi A B)
+    (Π-elim₁ : Π (B : A → U), Pi A B → Pi A B)
+    (Π-comp₁ : Π (B : A → U) (a : A) (f : Pi A B), Equ (B a) (Π-elim₁ B (Π-ctor₁ B f) a) (f a))
+    (Π-comp₂ : Π (B : A → U) (a : A) (f : Pi A B), Equ (Pi A B) f (λ (x : A), f x))
+    (Σ-form  : Π (B : A → U), U)
     (Σ-ctor₁ : Π (B : A → U) (a : A) (b : B a) , Sigma A B)
-    (Σ-elim₁ : Π (B : A → U) (p : Sigma A B) , A)
-    (Σ-elim₂ : Π (B : A → U) (p : Sigma A B) , B (pr₁ A B p))
-    (Σ-comp₁ : Π (B : A → U) (a : A) (b: B a) , Equ A a (Σ-elim₁ B (Σ-ctor₁ B a b)))
-    (Σ-comp₂ : Π (B : A → U) (a : A) (b: B a) , Equ (B a) b (Σ-elim₂ B (a, b)))
-    (Σ-comp₃ : Π (B : A → U) (p : Sigma A B) , Equ (Sigma A B) p (pr₁ A B p, pr₂ A B p))
-    (=-form  : Π (a : A) , A → U)
-    (=-ctor₁ : Π (a : A) , Equ A a a)
+    (Σ-elim₁ : Π (B : A → U) (p : Sigma A B), A)
+    (Σ-elim₂ : Π (B : A → U) (p : Sigma A B), B (pr₁ A B p))
+    (Σ-comp₁ : Π (B : A → U) (a : A) (b: B a), Equ A a (Σ-elim₁ B (Σ-ctor₁ B a b)))
+    (Σ-comp₂ : Π (B : A → U) (a : A) (b: B a), Equ (B a) b (Σ-elim₂ B (a, b)))
+    (Σ-comp₃ : Π (B : A → U) (p : Sigma A B), Equ (Sigma A B) p (pr₁ A B p, pr₂ A B p))
+    (=-form  : Π (a : A), A → U)
+    (=-ctor₁ : Π (a : A), Equ A a a)
     (=-elim₁ : Π (a : A) (C: D A) (d: C a a (=-ctor₁ a)) (y: A) (p: Equ A a y), C a y p)
-    (=-comp₁ : Π (a : A) (C: D A) (d: C a a (=-ctor₁ a)) , Equ (C a a (=-ctor₁ a)) d (=-elim₁ a C d a (=-ctor₁ a))),
+    (=-comp₁ : Π (a : A) (C: D A) (d: C a a (=-ctor₁ a)), Equ (C a a (=-ctor₁ a)) d (=-elim₁ a C d a (=-ctor₁ a))),
     U
 
 theorem instance (A : U) : MLTT A ≔

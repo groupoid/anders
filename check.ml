@@ -17,11 +17,11 @@ let extSigG : value -> value * clos = function
   | u           -> raise (ExpectedSig u)
 
 let isVSet : value -> bool = function
-  | VSet _ -> true
+  | VKan _ -> true
   | u      -> false
 
 let imax a b = match a, b with
-  | VSet u, VSet v -> VSet (max u v)
+  | VKan u, VKan v -> VKan (max u v)
   | u, v -> ExpectedVSet (if isVSet u then v else u) |> raise
 
 let rec check k (rho : rho) (gma : gamma) (e0 : exp) (t0 : value) : rho * gamma = traceCheck k e0 t0; match e0, t0 with
@@ -32,23 +32,11 @@ let rec check k (rho : rho) (gma : gamma) (e0 : exp) (t0 : value) : rho * gamma 
   | e, t -> eqNf t (infer (k + 1) rho gma e); (rho, gma)
 and infer k rho gma e0 : value = traceInfer k e0; match e0 with
   | EVar x -> lookup x gma
-  | ESet u -> VSet (u + 1)
+  | EKan u -> VKan (u + 1)
   | EPi ((p, a), b) -> let v = infer (k + 1) (upVar rho p (genV p)) (upLocal gma p (eval a rho)) b in imax (infer (k + 1) rho gma a) v
   | ESig (x, y) -> infer (k + 1) rho gma (EPi (x, y))
   | EApp (f, x) -> let (t, g) = extPiG (infer (k + 1) rho gma f) in ignore (check (k + 1) rho gma x t); closByVal g (eval x rho)
   | EFst e -> fst (extSigG (infer (k + 1) rho gma e))
   | ESnd e -> let (_, g) = extSigG (infer (k + 1) rho gma e) in closByVal g (vfst (eval e rho))
   | EAxiom (_, e) -> eval e rho
-(*  | EPathP (t, e0, e1) ->
-    let (a0, a1) = checkPLam () in
-*)
   | e -> raise (InferError e)
-(*and checkPLam k rho gma e0 t0 : value * value =
-  match e0 with
-  | PLam (i, e) ->
-    (eval (upVar rho i ()))
-  | _ ->
-    match infer k rho gma e0 with
-    |
-    | _ -> 
-*)

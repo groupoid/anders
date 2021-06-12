@@ -34,15 +34,6 @@ file : MODULE IDENT WHERE content { ($2, $4) }
 line : IMPORT path { Import $2 } | OPTION IDENT IDENT { Option ($2, $3) } | declarations { Decl $1 }
 repl : COLON IDENT exp1 EOF { Command ($2, $3) } | COLON IDENT EOF { Action $2 } | exp0 EOF { Eval $1 } | EOF { Nope }
 
-(*formula:
-  | ZERO { Dir Zero }
-  | ONE { Dir One }
-  | ident { Atom $1 }
-  | NEGATE formula { negFormula $2 }
-  | formula AND formula { And ($1, $3) }
-  | formula OR formula { Or ($1, $3) }
-  | LPARENS formula RPARENS { $2 }*)
-
 exp1:
   | LAM telescope COMMA exp1 { telescope eLam $4 $2 }
   | PI telescope COMMA exp1 { telescope ePi $4 $2 }
@@ -55,7 +46,7 @@ exp1:
 
 exp3:
   | HOLE { EHole }
-  | SET { ESet $1 }
+  | SET { EKan $1 }
   | exp3 FST { EFst $1 }
   | exp3 SND { ESnd $1 }
   | NEGATE exp3 { neg $2 }

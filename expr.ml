@@ -3,7 +3,7 @@ open Ident
 
 type exp =
   | ELam of tele * exp
-  | ESet of int
+  | EKan of int
   | EPi of tele * exp
   | ESig of tele * exp
   | EPair of exp * exp
@@ -41,7 +41,7 @@ let rec showLevel x =
   else if x = 0 then "" else showLevel (x / 10) ^ getDigit (x mod 10)
 
 let rec showExp : exp -> string = function
-  | ESet u -> "U" ^ showLevel u
+  | EKan u -> "U" ^ showLevel u
   | ELam (p, x) -> Printf.sprintf "λ %s, %s" (showTele p) (showExp x)
   | EPi  (p, x) -> let (var, dom) = p in begin match var with | No -> Printf.sprintf "(%s → %s)" (showExp dom) (showExp x)
                                                               | _  -> Printf.sprintf "Π %s, %s" (showTele p) (showExp x) end
@@ -87,7 +87,7 @@ let showFile : file -> string = function
 type value =
   | VLam of value * clos
   | VPair of value * value
-  | VSet of int
+  | VKan of int
   | VPi of value * clos
   | VSig of value * clos
   | VNt of neut
@@ -121,7 +121,7 @@ let isTermVisible : term -> bool = function
 let rec showValue : value -> string = function
   | VLam (x, (p, e, rho)) -> Printf.sprintf "λ %s, %s" (showTele p x rho) (showExp e)
   | VPair (fst, snd) -> Printf.sprintf "(%s, %s)" (showValue fst) (showValue snd)
-  | VSet u -> "U" ^ showLevel u
+  | VKan u -> "U" ^ showLevel u
   | VPi (x, (p, e, rho)) -> Printf.sprintf "Π %s, %s" (showTele p x rho) (showExp e)
   | VSig (x, (p, e, rho)) -> Printf.sprintf "Σ %s, %s" (showTele p x rho) (showExp e)
   | VNt n -> showNeut n

@@ -15,7 +15,6 @@ let tokenToString : token -> string = function
   | WHERE      -> "WHERE"       | MODULE     -> "MODULE"
   | IMPORT     -> "IMPORT"      | DIRSEP     -> "DIRSEP"
   | LT         -> "LT"          | GT         -> "GT"
-  | PATHP      -> "PATHP"       | APPFORMULA -> "APPFORMULA"
+  | APPFORMULA -> "APPFORMULA"  | NEGATE     -> "NEGATE"
   | ZERO       -> "ZERO"        | ONE        -> "ONE"
   | AND        -> "AND"         | OR         -> "OR"
-  | NEGATE     -> "NEGATE"

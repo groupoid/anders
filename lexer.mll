@@ -66,11 +66,10 @@ rule main = parse
 | ".2"            { SND }              | pi              { PI }
 | sigma           { SIGMA }            | "?"             { HOLE }
 | "<"             { LT }               | ">"             { GT }
-| "PathP"         { PATHP }            | "@"             { APPFORMULA }
 | "0"             { ZERO }             | "1"             { ONE }
 | negFormula      { NEGATE }           | andFormula      { AND }
-| orFormula       { OR }               | axiom           { AXIOM }
-| defeq           { DEFEQ }            | lam             { LAM }
-| arrow           { ARROW }            | prod            { PROD }
-| set as s        { SET (getLevel s) } | ident as s      { IDENT s }
-| eof             { EOF }
+| orFormula       { OR }               | "@"             { APPFORMULA }
+| axiom           { AXIOM }            | defeq           { DEFEQ }
+| lam             { LAM }              | arrow           { ARROW }
+| prod            { PROD }             | set as s        { SET (getLevel s) }
+| ident as s      { IDENT s }          | eof             { EOF }

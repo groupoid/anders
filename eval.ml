@@ -53,27 +53,6 @@ let traceConv (v1 : value) (v2 : value) : unit = if !Prefs.trace then
 let traceEqNF (v1 : value) (v2 : value) : unit = if !Prefs.trace then
   begin Printf.printf "EQNF: %s = %s\n" (showValue v1) (showValue v2); flush_all () end else ()
 
-let lookFormula (x : name) (rho : rho) =
-  match Env.find_opt x rho with
-  | Some (Formula f) -> f
-  | Some (Value _) | Some (Exp _) ->
-    failwith (Printf.sprintf "“%s” expected to be a formula, not term\n" (showName x))
-  | None -> raise (VariableNotFound x)
-
-let rec evalFormula (rho : rho) : formula -> formula = function
-  | Atom i     -> lookFormula i rho
-  | Neg i      -> negFormula (lookFormula i rho)
-  | And (f, g) -> And (evalFormula rho f, evalFormula rho g)
-  | Or (f, g)  -> Or (evalFormula rho f, evalFormula rho g)
-  | f          -> f
-
-(*let appFormula (v : value) (f : formula) : value =
-  match v with
-  | VPLam (i, e) -> VSet 0
-  | VHole -> VAppFormula (v, f)
-  | VNt n ->
-    match inferNt*)
-
 let rec eval (e : exp) (rho : rho) = traceEval e; match e with
   | ESet u             -> VSet u
   | ELam ((p, a), b)   -> VLam (eval a rho, (p, b, rho))
@@ -86,9 +65,6 @@ let rec eval (e : exp) (rho : rho) = traceEval e; match e with
   | EPair (e1, e2)     -> VPair (eval e1 rho, eval e2 rho)
   | EHole              -> VNt NHole
   | EAxiom (p, e)      -> VNt (NAxiom (p, eval e rho))
-  | EPathP (t, a, b)   -> VPathP (eval t rho, eval a rho, eval b rho)
-  | EPLam (i, e)       -> let j = pat i in VPLam (j, eval e (upVar rho i (var j)))
-(*  | EAppFormula (e, f) -> appFormula (eval e rho) (evalFormula rho f)*)
 and app : value * value -> value = function
   | VLam (_, f), v     -> closByVal f v
   | VNt k, m           -> VNt (NApp (k, m))
@@ -96,7 +72,6 @@ and app : value * value -> value = function
 and getRho rho x = match Env.find_opt x rho with
   | Some (Value v)     -> v
   | Some (Exp e)       -> eval e rho
-  | Some (Formula f)   -> failwith (Printf.sprintf "“%s” expected to be a term, not formula\n" (showName x))
   | None               -> raise (VariableNotFound x)
 and closByVal (x : clos) (v : value) = let (p, e, rho) = x in
   begin traceClos e p v; eval e (upVar rho p v) end
@@ -107,8 +82,6 @@ let rec rbV : value  -> exp = function
   | VSet u           -> ESet u
   | VPi (t, g)       -> let (p, _, _) = g in let q = pat p in EPi ((q, rbV t), rbV (closByVal g (var q)))
   | VSig (t, g)      -> let (p, _, _) = g in let q = pat p in ESig ((q, rbV t), rbV (closByVal g (var q)))
-  | VPathP (t, a, b) -> EPathP (rbV t, rbV a, rbV b)
-  | VPLam (i, v)     -> EPLam (i, rbV v)
   | VNt l            -> rbN l
 and rbN : neut -> exp = function
   | NVar s           -> EVar s
@@ -135,8 +108,6 @@ let rec weak (e : exp) (rho : rho) = match e with
   | EPair (e1, e2)   -> EPair (weak e1 rho, weak e2 rho)
   | EHole            -> EHole
   | EAxiom (p, e)    -> EAxiom (p, weak e rho)
-  | EPathP (t, a, b) -> EPathP (weak t rho, weak a rho, weak b rho)
-  | EPLam (i, e)     -> EPLam (i, weak e rho)
 and weakTele ctor rho p a b : exp =
   ctor (p, weak a rho) (weak b (upVar rho p (var p)))
 

@@ -2,10 +2,10 @@ open Error
 open Expr
 open Eval
 
-let traceCheck (k: int) (e0 : exp) (t0:value):unit =
+let traceCheck (k : int) (e0 : exp) (t0 : value) : unit =
   if !Prefs.trace then (Printf.printf "[%d] CHECK: %s : %s\n" k (showExp e0) (showValue t0); flush_all ()) else ()
 
-let traceInfer (k: int) (e0: exp):unit =
+let traceInfer (k : int) (e0 : exp) : unit =
   if !Prefs.trace then (Printf.printf "[%d] INFER: %s\n" k (showExp e0); flush_all ()) else ()
 
 let extPiG : value -> value * clos = function

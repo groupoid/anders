@@ -35,7 +35,7 @@ let upGlobal (gma : gamma) (p : name) (v : value) : gamma =
   Env.add p (Global v) gma |> iteHole p gma
 
 let gen : int ref = ref 0
-let var x  = VNt (NVar x)
+let var x = VNt (NVar x)
 let pat : name -> name = (gen := !gen + 1); function | No -> No | Name (p, _) -> Name (p, !gen)
 let genV n = var (pat n)
 let girard : bool ref = ref false
@@ -67,6 +67,13 @@ let rec evalFormula (rho : rho) : formula -> formula = function
   | Or (f, g)  -> Or (evalFormula rho f, evalFormula rho g)
   | f          -> f
 
+(*let appFormula (v : value) (f : formula) : value =
+  match v with
+  | VPLam (i, e) -> VSet 0
+  | VHole -> VAppFormula (v, f)
+  | VNt n ->
+    match inferNt*)
+
 let rec eval (e : exp) (rho : rho) = traceEval e; match e with
   | ESet u             -> VSet u
   | ELam ((p, a), b)   -> VLam (eval a rho, (p, b, rho))
@@ -81,6 +88,7 @@ let rec eval (e : exp) (rho : rho) = traceEval e; match e with
   | EAxiom (p, e)      -> VNt (NAxiom (p, eval e rho))
   | EPathP (t, a, b)   -> VPathP (eval t rho, eval a rho, eval b rho)
   | EPLam (i, e)       -> let j = pat i in VPLam (j, eval e (upVar rho i (var j)))
+(*  | EAppFormula (e, f) -> appFormula (eval e rho) (evalFormula rho f)*)
 and app : value * value -> value = function
   | VLam (_, f), v     -> closByVal f v
   | VNt k, m           -> VNt (NApp (k, m))
@@ -113,13 +121,13 @@ and rbN : neut -> exp = function
 let prune rho x = match Env.find_opt x rho with
   | Some (Value v)   -> rbV v
   | Some (Exp e)     -> e
-  | None             -> EVar x
+  | None             -> raise (VariableNotFound x)
 
 let rec weak (e : exp) (rho : rho) = match e with
   | ESet u           -> ESet u
-  | ELam ((p, a), b) -> ELam ((p, weak a rho), weak b rho)
-  | EPi  ((p, a), b) -> EPi  ((p, weak a rho), weak b rho)
-  | ESig ((p, a), b) -> ESig ((p, weak a rho), weak b rho)
+  | ELam ((p, a), b) -> weakTele eLam rho p a b
+  | EPi  ((p, a), b) -> weakTele ePi  rho p a b
+  | ESig ((p, a), b) -> weakTele eSig rho p a b
   | EFst e           -> EFst (weak e rho)
   | ESnd e           -> ESnd (weak e rho)
   | EApp (f, x)      -> EApp (weak f rho, weak x rho)
@@ -129,6 +137,8 @@ let rec weak (e : exp) (rho : rho) = match e with
   | EAxiom (p, e)    -> EAxiom (p, weak e rho)
   | EPathP (t, a, b) -> EPathP (weak t rho, weak a rho, weak b rho)
   | EPLam (i, e)     -> EPLam (i, weak e rho)
+and weakTele ctor rho p a b : exp =
+  ctor (p, weak a rho) (weak b (upVar rho p (var p)))
 
 let rec conv v1 v2 : bool = traceConv v1 v2; v1 = v2 || match v1, v2 with
   | VSet u, VSet v -> ieq u v
@@ -136,12 +146,13 @@ let rec conv v1 v2 : bool = traceConv v1 v2; v1 = v2 || match v1, v2 with
   | VPair (a, b), VPair (c, d) -> conv a c && conv b d
   | VPair (a, b), v -> conv a (vfst v) && conv b (vsnd v)
   | v, VPair (a, b) -> conv (vfst v) a && conv (vsnd v) b
-  | VPi (a, g), VPi (b, h)
-  | VSig (a, g), VSig (b, h)
-  | VLam (a, g), VLam (b, h) -> let (p, e1, rho1) = g in let (_, e2, rho2) = h in
-    conv a b && (weak e1 rho1 = weak e2 rho2 || conv (closByVal g (genV p)) (closByVal h (genV p)))
-  | VLam (a, (p, o, v)), b -> conv (closByVal (p, o, v) (genV p)) (app (b, (genV p)))
-  | b, VLam (a, (p, o, v)) -> conv (app (b, (genV p))) (closByVal (p, o, v) (genV p))
+  | VPi (a, g), VPi (b, h) | VSig (a, g), VSig (b, h)
+  | VLam (a, g), VLam (b, h) -> let (p, e1, rho1) = g in let (q, e2, rho2) = h in
+    let v = genV p in conv a b &&
+      (weak e1 (upVar rho1 p v) = weak e2 (upVar rho2 q v) ||
+       conv (closByVal g v) (closByVal h v))
+  | VLam (a, (p, o, v)), b -> let u = genV p in conv (closByVal (p, o, v) u) (app (b, u))
+  | b, VLam (a, (p, o, v)) -> let u = genV p in conv (app (b, u)) (closByVal (p, o, v) u)
   | _, _ -> false
 and convNeut n1 n2 : bool = match n1, n2 with
   | NVar a, NVar b -> a = b

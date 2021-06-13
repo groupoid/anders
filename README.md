@@ -7,6 +7,7 @@ Features
 --------
 
 * MLTT with Leibniz equality (axiomatic J and comp₆) in 500 LOC
+* CHM-style PathP and PartialP primitives
 * Parser in 50 LOC
 * Lexer in 50 LOC
 * Full Agda-style UTF-8 support including universe levels
@@ -65,6 +66,7 @@ Papers
 
 * <a href="http://www.cse.chalmers.se/~bengt/papers/GKminiTT.pdf">A simple type-theoretic language: Mini-TT</a> [Coquand, Kinoshita, Nordström, Takeyama]
 * <a href="https://arxiv.org/pdf/1611.02108.pdf">Cubical Type Theory: a constructive interpretation of the univalence axiom</a> [Cohen, Coquand, Huber, Mörtberg]
+* <a href="https://arxiv.org/pdf/1802.01170.pdf">On Higher Inductive Types in Cubical Type Theory</a> [Coquand, Huber, Mörtberg]
 
 Credits
 -------

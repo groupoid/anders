@@ -6,8 +6,8 @@ CCHM homotopy system type checker based on Mini-TT for OCaml.
 Features
 --------
 
-* Fibrant ΠΣ MLTT-style primitives with Leibniz equality in 500 LOC
-* Cofibrant I CHM-style primitives with pretypes hierarchy Vₙ in 200 LOC
+* Fibrant MLTT-style ΠΣ primitives with Leibniz equality in 500 LOC
+* Cofibrant CHM-style I primitives with pretypes hierarchy Vₙ in 200 LOC
 * Parser in 50 LOC
 * Lexer in 50 LOC
 * Full Agda-style UTF-8 support including universe levels

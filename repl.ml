@@ -15,13 +15,13 @@ let init : state = empty
 let st : state ref = ref init
 
 let checkAndEval env e : value * value =
-  (Check.infer env e, Eval.eval e env)
+  (Check.infer env e, Check.eval e env)
 
 let main env : command -> unit = function
   | Eval e -> let (t, v) = checkAndEval env e in
     Printf.printf "TYPE: %s\nEVAL: %s\n" (showValue t) (showValue v)
   | Command ("n", e) -> let (t0, v0) = checkAndEval env e in
-    let (_, gma) = env in let t = Eval.rbV gma t0 in let v = Eval.rbV gma v0 in
+    let (_, gma) = env in let t = Check.rbV gma t0 in let v = Check.rbV gma v0 in
     Printf.printf "TYPE: %s\nNORMEVAL: %s\n" (showExp t) (showExp v)
   | Action "q" -> exit 0
   | Action "r" -> st := init; raise Restart

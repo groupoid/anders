@@ -1,7 +1,6 @@
 open Check
 open Error
 open Expr
-open Eval
 
 type cmdline =
   | Check of string

@@ -54,6 +54,7 @@ let traceEqNF (v1 : value) (v2 : value) : unit = if !Prefs.trace then
   begin Printf.printf "EQNF: %s = %s\n" (showValue v1) (showValue v2); flush_all () end else ()
 
 let rec eval (e : exp) (rho : rho) = traceEval e; match e with
+  | EPre u             -> VPre u
   | EKan u             -> VKan u
   | ELam ((p, a), b)   -> VLam (eval a rho, (p, b, rho))
   | EPi  ((p, a), b)   -> VPi  (eval a rho, (p, b, rho))
@@ -79,6 +80,7 @@ and closByVal (x : clos) (v : value) = let (p, e, rho) = x in
 let rec rbV : value  -> exp = function
   | VLam (t, g)      -> let (p, _, _) = g in let q = pat p in ELam ((q, rbV t), rbV (closByVal g (var q)))
   | VPair (u, v)     -> EPair (rbV u, rbV v)
+  | VPre u           -> EPre u
   | VKan u           -> EKan u
   | VPi (t, g)       -> let (p, _, _) = g in let q = pat p in EPi ((q, rbV t), rbV (closByVal g (var q)))
   | VSig (t, g)      -> let (p, _, _) = g in let q = pat p in ESig ((q, rbV t), rbV (closByVal g (var q)))
@@ -97,6 +99,7 @@ let prune rho x = match Env.find_opt x rho with
   | None             -> raise (VariableNotFound x)
 
 let rec weak (e : exp) (rho : rho) = match e with
+  | EPre u           -> EPre u
   | EKan u           -> EKan u
   | ELam ((p, a), b) -> weakTele eLam rho p a b
   | EPi  ((p, a), b) -> weakTele ePi  rho p a b

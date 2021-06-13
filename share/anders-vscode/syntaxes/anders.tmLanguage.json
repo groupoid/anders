@@ -14,12 +14,16 @@
             "name": "comment.line.double-dash.anders"
         },
         {
-            "match": "(?<=^|[\\s()])(U|option|axiom|postulate|def|definition|theorem|lemma|corollary|proposition|hdata|data|import|mutual|let|in|split|with|module|where|opaque|transparent|transparent_all)(?=$|[\\s()])",
+            "match": "(?<=^|[\\s()])(option|axiom|postulate|def|definition|theorem|lemma|corollary|proposition|hdata|data|import|mutual|let|in|split|with|module|where|opaque|transparent|transparent_all)(?=$|[\\s()])",
             "name": "keyword.other.anders"
         },
         {
-            "match": "(?<=^|[\\s()])(λ|Σ|Π|sigma|pi|PathP|LineP|V|Vin|Vproj|comp|hcomp|hcom|com|coe|transport|fill|Glue|glue|unglue|Id|idC|idJ)(?=$|[\\s()])",
+            "match": "(?<=^|[\\s()])(λ|Σ|Π|sigma|pi|PathP|LineP|comp|hcomp|hcom|com|transport|fill|Glue|glue|unglue)(?=$|[\\s()])",
             "name": "keyword.control.anders"
+        },
+        {
+            "match": "(?<=^|[\\s()])([UV][₀₁₂₃₄₅₆₇₈₉]*)(?=$|[\\s()])",
+            "name": "keyword.other.anders"
         },
         {
             "match": "(?<=^|[\\s()])(->|→|:=|≔|≜|≝|:|\\*|\\\\/|/\\\\|∧|∨|@)(?=$|[\\s()])",

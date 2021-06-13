@@ -10,12 +10,13 @@
 
   let getLevel s =
     let res = ref 0 in let queue = Queue.of_seq (String.to_seq s) in
-    if (Queue.take queue <> 'U') then failwith "invalid universe";
+    let sym = Queue.take queue in if (sym <> 'U' && sym <> 'V') then
+      failwith "invalid universe";
 
     while not (Queue.is_empty queue) do
       if (Queue.take queue <> '\xE2' ||
           Queue.take queue <> '\x82')
-      then failwith "invalid universe";
+      then failwith "invalid universe level while lexing";
 
       let value = Char.code (Queue.take queue) - 0x80 in
       res := !res * 10 + value
@@ -51,7 +52,8 @@ let andFormula = "/\\"|"\xE2\x88\xA7" (* ∧ *)
 let orFormula  = "\\/"|"\xE2\x88\xA8" (* ∨ *)
 
 let subscript = '\xE2' '\x82' ['\x80'-'\x89']
-let set       = 'U' subscript*
+let kan       = 'U' subscript*
+let pre       = 'V' subscript*
 
 rule main = parse
 | nl              { nextLine lexbuf; main lexbuf }
@@ -71,5 +73,6 @@ rule main = parse
 | orFormula       { OR }               | "@"             { APPFORMULA }
 | axiom           { AXIOM }            | defeq           { DEFEQ }
 | lam             { LAM }              | arrow           { ARROW }
-| prod            { PROD }             | set as s        { SET (getLevel s) }
-| ident as s      { IDENT s }          | eof             { EOF }
+| prod            { PROD }             | kan as s        { KAN (getLevel s) } 
+| pre as s        { PRE (getLevel s) } | ident as s      { IDENT s }
+| eof             { EOF }

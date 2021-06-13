@@ -4,7 +4,8 @@
 %}
 
 %token <string> IDENT
-%token <int> SET
+%token <int> KAN
+%token <int> PRE
 %token LPARENS RPARENS COMMA COLON NO EOF HOLE
 %token DEFEQ PROD ARROW FST SND LAM DEF
 %token DIRSEP MODULE WHERE IMPORT AXIOM
@@ -46,7 +47,8 @@ exp1:
 
 exp3:
   | HOLE { EHole }
-  | SET { EKan $1 }
+  | PRE { EPre $1 }
+  | KAN { EKan $1 }
   | exp3 FST { EFst $1 }
   | exp3 SND { ESnd $1 }
   | NEGATE exp3 { neg $2 }

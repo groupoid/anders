@@ -10,10 +10,11 @@
 %token DEFEQ PROD ARROW FST SND LAM DEF
 %token DIRSEP MODULE WHERE IMPORT AXIOM
 %token SIGMA PI OPTION LT GT APPFORMULA
-%token AND OR NEGATE
+%token PATHP AND OR NEGATE
 
 %left OR
 %left AND
+%nonassoc PATHP
 %nonassoc NEGATE
 %nonassoc FST SND
 
@@ -28,7 +29,7 @@ lense : LPARENS vars COLON exp1 RPARENS { List.map (fun x -> (x, $4)) $2 }
 telescope : lense telescope { List.append $1 $2 } | lense { $1 }
 params : telescope { $1 } | { [] }
 exp0 : exp1 COMMA exp0 { EPair ($1, $3) } | exp1 { $1 }
-exp2 : exp2 exp3 { EApp ($1, $2) } | exp3 { $1 } | exp3 APPFORMULA exp3 { pApp $1 $3 }
+exp2 : exp2 exp3 { EApp ($1, $2) } | exp3 { $1 } | exp3 APPFORMULA exp3 { EAppFormula ($1, $3) }
 path : IDENT { $1 } | IDENT DIRSEP path { $1 ^ Filename.dir_sep ^ $3 }
 content : line content { $1 :: $2 } | EOF { [] }
 file : MODULE IDENT WHERE content { ($2, $4) }
@@ -50,11 +51,17 @@ exp3:
   | KAN { EKan $1 }
   | exp3 FST { EFst $1 }
   | exp3 SND { ESnd $1 }
-  | NEGATE exp3 { ineg $2 }
-  | exp3 AND exp3 { iand $1 $3 }
-  | exp3 OR exp3 { ior $1 $3 }
+  | NEGATE exp3 { ENeg $2 }
+  | exp3 AND exp3 { EAnd ($1, $3) }
+  | exp3 OR exp3 { EOr ($1, $3) }
+  | PATHP exp3 { EPathP $2 }
   | LPARENS exp0 RPARENS { $2 }
-  | ident { EVar $1 }
+  | IDENT { match $1 with
+            | "0" -> EZero
+            | "1" -> EOne
+            | "I" -> EI
+            | _   -> decl $1 }
+  | NO { EVar No }
 
 declarations:
   | DEF IDENT params DEFEQ exp1 { NotAnnotated ($2, telescope eLam $5 $3) }

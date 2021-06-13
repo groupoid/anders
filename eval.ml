@@ -59,7 +59,6 @@ let evalPrim k v =
   | _ -> default
 
 let rec eval (e : exp) (rho : rho) = traceEval e; match e with
-  | EPre u             -> VPre u
   | EKan u             -> VKan u
   | ELam ((p, a), b)   -> VLam (eval a rho, (p, b, rho))
   | EPi  ((p, a), b)   -> VPi  (eval a rho, (p, b, rho))
@@ -71,6 +70,13 @@ let rec eval (e : exp) (rho : rho) = traceEval e; match e with
   | EPair (e1, e2)     -> VPair (eval e1 rho, eval e2 rho)
   | EHole              -> VNt NHole
   | EAxiom (p, e)      -> VNt (NAxiom (p, eval e rho))
+  | EPre u             -> VPre u
+  | EPathP e           -> VPathP (eval e rho)
+  | EPLam e            -> VPLam (eval e rho)
+  | EAppFormula (f, x) -> VAppFormula (eval f rho, eval x rho)
+  | EI                 -> VNt NI
+  | EZero              -> VNt NZero
+  | EOne               -> VNt NOne
 and app : value * value -> value = function
   | VLam (_, f), v     -> closByVal f v
   | VNt k, m           -> evalPrim k m

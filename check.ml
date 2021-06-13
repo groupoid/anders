@@ -45,7 +45,6 @@ let rec check (rho : rho) (gma : gamma) (e0 : exp) (t0 : value) = traceCheck e0 
   | e, t -> eqNf t (infer rho gma e)
 and infer rho gma e0 : value = traceInfer e0; match e0 with
   | EVar x -> lookup x gma
-  | EPre u -> VPre (u + 1)
   | EKan u -> VKan (u + 1)
   | EPi ((p, a), b) -> let v = infer (upVar rho p (genV p)) (upLocal gma p (eval a rho)) b in imax (infer rho gma a) v
   | ESig (x, y) -> infer rho gma (EPi (x, y))
@@ -53,4 +52,8 @@ and infer rho gma e0 : value = traceInfer e0; match e0 with
   | EFst e -> fst (extSigG (infer rho gma e))
   | ESnd e -> let (_, g) = extSigG (infer rho gma e) in closByVal g (vfst (eval e rho))
   | EAxiom (_, e) -> eval e rho
+  | EPre u -> VPre (u + 1)
+  | EI -> VPre 0
+  | EZero -> VNt NI
+  | EOne -> VNt NI
   | e -> raise (InferError e)

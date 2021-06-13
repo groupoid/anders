@@ -40,7 +40,9 @@ let ival = "I"
 let i0   = "0"
 let i1   = "1"
 
-let pLam e v = EPLam (telescope eLam e (List.map (fun p -> (p, decl ival)) v))
+let rec pLam e : name list -> exp = function
+  | [] -> e
+  | x :: xs -> EPLam (ELam ((x, decl ival), pLam e xs))
 
 let getDigit x = Char.chr (x + 0x80) |> Printf.sprintf "\xE2\x82%c"
 let rec showLevel x =

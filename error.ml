@@ -9,6 +9,7 @@ exception ExpectedSig of value
 exception ExpectedVSet of value
 exception Parser of int * string
 exception UnknownOption of string
+exception ExpectedFibrant of value
 exception UnknownCommand of string
 exception VariableNotFound of name
 exception TypeIneq of value * value
@@ -32,6 +33,7 @@ let prettyPrintError : exn -> unit = function
   | InvalidModuleName (name, filename) -> Printf.printf "Module “%s” does not match name of its file: %s\n" name filename
   | ExpectedESet x -> Printf.printf "  %s\nexpected to be universe\n" (showExp x)
   | ExpectedVSet x -> Printf.printf "  %s\nexpected to be universe\n" (showValue x)
+  | ExpectedFibrant x -> Printf.printf "  %s\nexpected to be fibrant universe\n" (showValue x)
   | ExpectedPi x -> Printf.printf "  %s\nexpected to be Pi-type\n" (showValue x)
   | ExpectedSig x -> Printf.printf "  %s\nexpected to be Sigma-type\n" (showValue x)
   | UnknownCommand s -> Printf.printf "Unknown command “%s”\n" s

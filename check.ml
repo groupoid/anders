@@ -1,3 +1,4 @@
+open Ident
 open Error
 open Expr
 open Eval
@@ -53,6 +54,17 @@ and infer rho gma e0 : value = traceInfer e0; match e0 with
   | ESnd e -> let (_, g) = extSigG (infer rho gma e) in closByVal g (vfst (eval e rho))
   | EAxiom (_, e) -> eval e rho
   | EPre u -> VPre (u + 1)
+  | EPathP (EPLam f) ->
+    let v1 = app (eval f rho, VNt NZero) in
+    let v2 = app (eval f rho, VNt NOne) in
+    let t1 = infer rho gma (rbV v1) in
+    let t2 = infer rho gma (rbV v2) in begin
+    match t1, t2 with
+    | VKan u, VKan v ->
+      if ieq u v then VPi (v1, (No, impl (rbV v2) (EKan u), Env.empty))
+      else raise (TypeIneq (VKan u, VKan v))
+    | _, _ -> ExpectedFibrant (if isVSet t1 then t2 else t1) |> raise
+  end
   | EI -> VPre 0
   | EZero -> VNt NI
   | EOne -> VNt NI

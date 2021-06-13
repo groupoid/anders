@@ -63,7 +63,7 @@ let rec showExp : exp -> string = function
   | EAxiom (p, _) -> p
   | EPre n -> "V" ^ showLevel n
   | EPathP e -> "PathP " ^ showExp e
-  | EPLam e -> "pLam " ^ showExp e
+  | EPLam e -> Printf.sprintf "(pLam %s)" (showExp e)
   | EAppFormula (f, x) -> Printf.sprintf "(%s @ %s)" (showExp f) (showExp x)
   | EI -> "I" | EZero -> "0" | EOne -> "1"
   | EAnd (a, b) -> Printf.sprintf "(%s ∧ %s)" (showExp a) (showExp b)
@@ -109,7 +109,6 @@ type value =
   | VNt of neut
   (* cubical part *)
   | VPre of int
-  | VPathP of value
   | VPLam of value
   | VAppFormula of value * value
 and neut =
@@ -120,6 +119,7 @@ and neut =
   | NAxiom of string * value
   | NHole
   (* cubical part *)
+  | NPathP of value
   | NI | NZero | NOne
   | NAnd of neut * neut
   | NOr of neut * neut
@@ -153,8 +153,7 @@ let rec showValue : value -> string = function
   | VSig (x, (p, e, rho)) -> Printf.sprintf "Σ %s, %s" (showTele p x rho) (showExp e)
   | VNt n -> showNeut n
   | VPre n -> "V" ^ showLevel n
-  | VPathP v -> "PathP " ^ showValue v
-  | VPLam v -> "pLam " ^ showValue v
+  | VPLam v -> Printf.sprintf "(pLam %s)" (showValue v)
   | VAppFormula (f, x) -> Printf.sprintf "(%s @ %s)" (showValue f) (showValue x)
 and showNeut : neut -> string = function
   | NVar p -> showName p
@@ -163,6 +162,7 @@ and showNeut : neut -> string = function
   | NSnd v -> showNeut v ^ ".2"
   | NHole -> "?"
   | NAxiom (p, _) -> p
+  | NPathP v -> "PathP " ^ showValue v
   | NI -> "I" | NZero -> "0" | NOne -> "1"
   | NAnd (a, b) -> Printf.sprintf "(%s ∧ %s)" (showNeut a) (showNeut b)
   | NOr (a, b) -> Printf.sprintf "(%s ∨ %s)" (showNeut a) (showNeut b)

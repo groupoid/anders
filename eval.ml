@@ -71,7 +71,7 @@ let rec eval (e : exp) (rho : rho) = traceEval e; match e with
   | EHole              -> VNt NHole
   | EAxiom (p, e)      -> VNt (NAxiom (p, eval e rho))
   | EPre u             -> VPre u
-  | EPathP e           -> VPathP (eval e rho)
+  | EPathP e           -> VNt (NPathP (eval e rho))
   | EPLam e            -> VPLam (eval e rho)
   | EAppFormula (e, x) -> begin
     let v = eval e rho in match v with
@@ -83,7 +83,7 @@ let rec eval (e : exp) (rho : rho) = traceEval e; match e with
   | EZero              -> VNt NZero
   | EOne               -> VNt NOne
   | EAnd (e1, e2)      -> andFormula (eval e1 rho) (eval e2 rho)
-  | EOr (e1, e2 )      -> orFormula (eval e1 rho) (eval e2 rho)
+  | EOr (e1, e2)       -> orFormula (eval e1 rho) (eval e2 rho)
   | ENeg e             -> negFormula (eval e rho)
 and app : value * value -> value = function
   | VLam (_, f), v     -> closByVal f v
@@ -104,7 +104,6 @@ let rec rbV : value  -> exp = function
   | VSig (t, g)        -> let (p, _, _) = g in let q = pat p in ESig ((q, rbV t), rbV (closByVal g (var q)))
   | VNt l              -> rbN l
   | VPre u             -> EPre u
-  | VPathP v           -> EPathP (rbV v)
   | VPLam f            -> EPLam (rbV f)
   | VAppFormula (f, x) -> EAppFormula (rbV f, rbV x)
 and rbN : neut -> exp = function
@@ -114,6 +113,7 @@ and rbN : neut -> exp = function
   | NSnd k             -> ESnd (rbN k)
   | NHole              -> EHole
   | NAxiom (p, v)      -> EAxiom (p, rbV v)
+  | NPathP v           -> EPathP (rbV v)
   | NI                 -> EI
   | NZero              -> EZero
   | NOne               -> EOne

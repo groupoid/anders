@@ -72,6 +72,6 @@ rule main = parse
 | orFormula       { OR }               | "@"             { APPFORMULA }
 | axiom           { AXIOM }            | defeq           { DEFEQ }
 | lam             { LAM }              | arrow           { ARROW }
-| prod            { PROD }             | kan as s        { KAN (getLevel s) } 
-| pre as s        { PRE (getLevel s) } | ident as s      { IDENT s }
-| eof             { EOF }
+| prod            { PROD }             | kan as s        { KAN (getLevel s) }
+| pre as s        { PRE (getLevel s) } | "PathP"         { PATHP }
+| ident as s      { IDENT s }          | eof             { EOF }

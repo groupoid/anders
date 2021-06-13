@@ -1,6 +1,7 @@
 module path where
 option girard true
 
+def NonFibrant : V := I
 def Path (A : U) (x y : A) : U := PathP (<_> A) x y
 def rfl (A : U) (x : A) : Path A x x := <_> x
 def singl (A: U) (a: A): U := Σ (x: A), Path A a x

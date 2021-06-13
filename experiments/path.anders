@@ -25,5 +25,8 @@ def refl-right (A : U) (x y : A) (p : Path A x y) :
   Path (Path A y y) (<_> y) (<_> p @ 1) := <_ _> y
 
 def sym-sym-eq-idp (A : U) (x y : A) (p : Path A x y) :
-  Path (Path A x y) p (sym A y x (sym A x y p)) :=
-  <_> p
+  Path (Path A x y) p (sym A y x (sym A x y p)) := <_> p
+
+def hmtpy (A : U) (x y : A) (p : Path A x y) :
+  Path (Path A x x) (<_> x) (<i> p @ i /\ -i) :=
+  <j i> p @ j /\ i /\ -i

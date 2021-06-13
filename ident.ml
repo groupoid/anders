@@ -4,7 +4,7 @@ type name =
 
 let showName : name -> string = function
   | No          -> "_"
-  | Name (s, _) -> s
+  | Name (p, n) -> if !Prefs.trace then p ^ "#" ^ string_of_int n else p
 
 module Name = struct
   type t = name

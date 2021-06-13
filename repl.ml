@@ -11,16 +11,17 @@ let help =
   :r             restart
   :h             display this message"
 
-let init : state = List.fold_left constant empty Expr.cubical
+let init : state = empty
 let st : state ref = ref init
 
-let checkAndEval rho gma e : value * value =
-  (Check.infer rho gma e, Eval.eval e rho)
+let checkAndEval env e : value * value =
+  (Check.infer env e, Eval.eval e env)
 
-let main rho gma : command -> unit = function
-  | Eval e -> let (t, v) = checkAndEval rho gma e in
+let main env : command -> unit = function
+  | Eval e -> let (t, v) = checkAndEval env e in
     Printf.printf "TYPE: %s\nEVAL: %s\n" (showValue t) (showValue v)
-  | Command ("n", e) -> let (t0, v0) = checkAndEval rho gma e in let t = Eval.rbV t0 in let v = Eval.rbV v0 in
+  | Command ("n", e) -> let (t0, v0) = checkAndEval env e in
+    let (_, gma) = env in let t = Eval.rbV gma t0 in let v = Eval.rbV gma v0 in
     Printf.printf "TYPE: %s\nNORMEVAL: %s\n" (showExp t) (showExp v)
   | Action "q" -> exit 0
   | Action "r" -> st := init; raise Restart
@@ -32,12 +33,12 @@ let check filename =
   st := handleErrors (checkFile !st) filename !st
 
 let repl () =
-  let (rho, gma, _) = !st in
+  let (env, _) = !st in
   try while true do
     print_string "> ";
     let line = read_line () in
     handleErrors (fun x ->
       let exp = Lexparse.parseErr Parser.repl
                   (Lexing.from_string x) in
-      main rho gma exp) line ()
+      main env exp) line ()
   done with End_of_file -> ()

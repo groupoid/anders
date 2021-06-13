@@ -6,8 +6,8 @@ open Eval
 
 let ext x = x ^ ".anders"
 
-type state = rho * gamma * Files.t
-let empty : state = (Env.empty, Env.empty, Files.empty)
+type state = env * Files.t
+let empty : state = ((Env.empty, Env.empty), Files.empty)
 
 let rec listLast : 'a list -> 'a = function
   | []      -> raise (Failure "listLast")
@@ -18,34 +18,33 @@ let getDeclName : decl -> string = function
   | Annotated (p, _, _)
   | NotAnnotated (p, _) -> p
 
-let constant (rho, gma, checked) (p, t) : state =
-  let decl = Annotated (p, t, EAxiom (p, t)) in
-  (upDec rho decl, upGlobal gma (name p) (eval t rho), checked)
+let constant (env, checked) (p, t) : state =
+  let (rho, gma) = env in let decl = Annotated (p, t, EAxiom (p, t)) in
+  ((upDec rho decl, upGlobal gma (name p) (eval t env)), checked)
 
-let checkDecl rho gma d : rho * gamma =
+let checkDecl (rho, gma) d : env =
   let x = getDeclName d in if Env.mem (name x) gma then
     raise (AlreadyDeclared x);
   match d with
   | Annotated (p, a, e) ->
-    let b = infer rho gma a in
+    let b = infer (rho, gma) a in
     if not (isVSet b) then raise (ExpectedVSet b) else ();
-    let a' = eval a rho in
+    let a' = eval a (rho, gma) in
     let gma' = upGlobal gma (Name (p, 0)) a' in
-    check rho gma' e a';
+    check (rho, gma') e a';
     (upDec rho d, gma')
   | NotAnnotated (p, e) ->
-    let a = infer rho gma e in
+    let a = infer (rho, gma) e in
     let gma' = upGlobal gma (Name (p, 0)) a in
-    check rho gma' e a;
+    check (rho, gma') e a;
     (upDec rho d, gma')
 
 let rec checkLine st : line -> state =
-  let (rho, gma, checked) = st in function
+  let (env, checked) = st in function
   | Decl d ->
     let name = getDeclName d in
     Printf.printf "Checking: %s\n" name; flush_all ();
-    let (rho', gma') = checkDecl rho gma d in
-    (rho', gma', checked)
+    (checkDecl env d, checked)
   | Option (opt, value) ->
     (match opt with
     | "girard" ->
@@ -57,13 +56,13 @@ let rec checkLine st : line -> state =
     st
   | Import x -> let path = ext x in if Files.mem path checked then st else checkFile st path
 and checkFile p path =
-  let (rho, gma, checked) = p in
+  let ((rho, gma), checked) = p in
   let filename = Filename.basename path in
   let chan = open_in path in
   let (name, con) = Lexparse.parseErr Parser.file (Lexing.from_channel chan) in
   close_in chan; Printf.printf "Parsed “%s” successfully.\n" filename; flush_all ();
   if ext name = filename then ()
   else raise (InvalidModuleName (name, filename));
-  let res = checkContent (rho, gma, Files.add path checked) con in
+  let res = checkContent ((rho, gma), Files.add path checked) con in
   Printf.printf "File loaded.\n"; res
 and checkContent st xs = List.fold_left checkLine st xs

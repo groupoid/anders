@@ -3,6 +3,7 @@ open Expr
 
 exception Restart
 exception InferError of exp
+exception ExpectedPath of exp
 exception ExpectedPi of value
 exception ExpectedESet of exp
 exception ExpectedSig of value
@@ -22,6 +23,7 @@ exception InvalidModuleName of string * string
 exception UnknownOptionValue of string * string
 
 let prettyPrintError : exn -> unit = function
+  | ExpectedPath e -> Printf.printf "“%s” expected to be a path.\n" (showExp e)
   | AlreadyDeclared p -> Printf.printf "“%s” is already declared.\n" p
   | InvalidFormulaNeg v -> Printf.printf "Cannot evaluate invalid formula:\n  -%s\n" (showValue v)
   | InvalidFormulaOr (u, v) -> Printf.printf "Cannot evaluate invalid formula:\n  %s ∨ %s\n" (showValue u) (showValue v)

@@ -41,7 +41,6 @@ let i0   = "0"
 let i1   = "1"
 
 let pLam e v = EPLam (telescope eLam e (List.map (fun p -> (p, decl ival)) v))
-let cubical : (string * exp) list = [(ival, EPre 0); (i0, decl ival); (i1, decl ival)]
 
 let getDigit x = Char.chr (x + 0x80) |> Printf.sprintf "\xE2\x82%c"
 let rec showLevel x =
@@ -51,8 +50,9 @@ let rec showLevel x =
 let rec showExp : exp -> string = function
   | EKan n -> "U" ^ showLevel n
   | ELam (p, x) -> Printf.sprintf "λ %s, %s" (showTele p) (showExp x)
-  | EPi  (p, x) -> let (var, dom) = p in begin match var with | No -> Printf.sprintf "(%s → %s)" (showExp dom) (showExp x)
-                                                              | _  -> Printf.sprintf "Π %s, %s" (showTele p) (showExp x) end
+  | EPi (p, x) -> let (var, dom) = p in begin match var with
+    | No -> Printf.sprintf "(%s → %s)" (showExp dom) (showExp x)
+    | _  -> Printf.sprintf "Π %s, %s" (showTele p) (showExp x) end
   | ESig (p, x) -> Printf.sprintf "Σ %s, %s" (showTele p) (showExp x)
   | EPair (fst, snd) -> Printf.sprintf "(%s, %s)" (showExp fst) (showExp snd)
   | EFst exp -> showExp exp ^ ".1"
@@ -69,9 +69,8 @@ let rec showExp : exp -> string = function
   | EAnd (a, b) -> Printf.sprintf "(%s ∧ %s)" (showExp a) (showExp b)
   | EOr (a, b) -> Printf.sprintf "(%s ∨ %s)" (showExp a) (showExp b)
   | ENeg a -> Printf.sprintf "-%s" (showExp a)
-and showTele : tele -> string = function
-  | (No, x) -> showExp x
-  | (p,  x) -> Printf.sprintf "(%s : %s)" (showName p) (showExp x)
+and showTele : tele -> string =
+  fun (p, x) -> Printf.sprintf "(%s : %s)" (showName p) (showExp x)
 
 type decl =
   | NotAnnotated of string * exp
@@ -149,7 +148,9 @@ let rec showValue : value -> string = function
   | VLam (x, (p, e, rho)) -> Printf.sprintf "λ %s, %s" (showTele p x rho) (showExp e)
   | VPair (fst, snd) -> Printf.sprintf "(%s, %s)" (showValue fst) (showValue snd)
   | VKan n -> "U" ^ showLevel n
-  | VPi (x, (p, e, rho)) -> Printf.sprintf "Π %s, %s" (showTele p x rho) (showExp e)
+  | VPi (x, (p, e, rho)) -> begin match p with
+    | No -> Printf.sprintf "(%s → %s)" (showValue x) (showExp e)
+    | _  -> Printf.sprintf "Π %s, %s" (showTele p x rho) (showExp e) end
   | VSig (x, (p, e, rho)) -> Printf.sprintf "Σ %s, %s" (showTele p x rho) (showExp e)
   | VNt n -> showNeut n
   | VPre n -> "V" ^ showLevel n
@@ -175,9 +176,7 @@ and showRho (rho : rho) : string =
 and showTele p x rho : string =
   if Env.exists (fun _ -> isTermVisible) rho then
     Printf.sprintf "(%s : %s, %s)" (showName p) (showValue x) (showRho rho)
-  else match p with
-  | No -> showValue x
-  | _  -> Printf.sprintf "(%s : %s)" (showName p) (showValue x)
+  else Printf.sprintf "(%s : %s)" (showName p) (showValue x)
 
 type scope =
   | Local  of value
@@ -192,6 +191,8 @@ let showGamma (gma : gamma) : string =
         | Local v -> Some (Printf.sprintf "%s : %s" (showName p) (showValue v))
         | _       -> None)
   |> String.concat "\n"
+
+type env = rho * gamma
 
 type command =
   | Nope

@@ -1,5 +1,6 @@
 open Error
 open Ident
+open Decl
 open Expr
 
 let help =
@@ -10,17 +11,17 @@ let help =
   :r             restart
   :h             display this message"
 
-let init : Decl.state = (Env.empty, Env.empty, Files.empty)
-let st : Decl.state ref = ref init
+let init : state = List.fold_left constant empty Expr.cubical
+let st : state ref = ref init
 
 let checkAndEval rho gma e : value * value =
   (Check.infer rho gma e, Eval.eval e rho)
 
 let main rho gma : command -> unit = function
   | Eval e -> let (t, v) = checkAndEval rho gma e in
-    Printf.printf "TYPE: %s\nEVAL: %s\n" (Expr.showValue t) (Expr.showValue v)
+    Printf.printf "TYPE: %s\nEVAL: %s\n" (showValue t) (showValue v)
   | Command ("n", e) -> let (t0, v0) = checkAndEval rho gma e in let t = Eval.rbV t0 in let v = Eval.rbV v0 in
-    Printf.printf "TYPE: %s\nNORMEVAL: %s\n" (Expr.showExp t) (Expr.showExp v)
+    Printf.printf "TYPE: %s\nNORMEVAL: %s\n" (showExp t) (showExp v)
   | Action "q" -> exit 0
   | Action "r" -> st := init; raise Restart
   | Action "h" -> print_endline help
@@ -28,7 +29,7 @@ let main rho gma : command -> unit = function
   | Nope -> ()
 
 let check filename =
-  st := handleErrors (Decl.checkFile !st) filename !st
+  st := handleErrors (checkFile !st) filename !st
 
 let repl () =
   let (rho, gma, _) = !st in

@@ -4,8 +4,10 @@ open Ident
 open Expr
 open Eval
 
-type state = rho * gamma * Files.t
 let ext x = x ^ ".anders"
+
+type state = rho * gamma * Files.t
+let empty : state = (Env.empty, Env.empty, Files.empty)
 
 let rec listLast : 'a list -> 'a = function
   | []      -> raise (Failure "listLast")
@@ -16,7 +18,14 @@ let getDeclName : decl -> string = function
   | Annotated (p, _, _)
   | NotAnnotated (p, _) -> p
 
-let checkDecl rho gma d : rho * gamma = match d with
+let constant (rho, gma, checked) (p, t) : state =
+  let decl = Annotated (p, t, EAxiom (p, t)) in
+  (upDec rho decl, upGlobal gma (name p) (eval t rho), checked)
+
+let checkDecl rho gma d : rho * gamma =
+  let x = getDeclName d in if Env.mem (name x) gma then
+    raise (AlreadyDeclared x);
+  match d with
   | Annotated (p, a, e) ->
     let b = infer rho gma a in
     if not (isVSet b) then raise (ExpectedVSet b) else ();

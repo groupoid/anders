@@ -17,5 +17,4 @@ let tokenToString : token -> string = function
   | IMPORT     -> "IMPORT"      | DIRSEP     -> "DIRSEP"
   | LT         -> "LT"          | GT         -> "GT"
   | APPFORMULA -> "APPFORMULA"  | NEGATE     -> "NEGATE"
-  | ZERO       -> "ZERO"        | ONE        -> "ONE"
   | AND        -> "AND"         | OR         -> "OR"

@@ -37,7 +37,11 @@ let rec check (rho : rho) (gma : gamma) (e0 : exp) (t0 : value) = traceCheck e0 
   | EPair (e1, e2), VSig (t, g) -> let _ = check rho gma e1 t in check rho gma e2 (closByVal g (eval e1 rho))
   | EHole, v -> print_string ("\nHole:\n\n" ^ Expr.showGamma gma ^ "\n" ^ String.make 80 '-' ^ "\n" ^ Expr.showValue v ^ "\n\n")
   | EAxiom (_, u), v -> eqNf (eval u rho) v
-  | EKan u, VPre v -> if u + 1 = v then () else raise (TypeIneq (VPre (u + 1), VPre v))
+  | e, VPre u -> begin
+    match infer rho gma e with
+    | VKan v | VPre v -> if ieq u v then () else raise (TypeIneq (VPre u, VPre v))
+    | t -> raise (TypeIneq (VPre u, t))
+  end
   | e, t -> eqNf t (infer rho gma e)
 and infer rho gma e0 : value = traceInfer e0; match e0 with
   | EVar x -> lookup x gma

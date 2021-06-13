@@ -10,7 +10,7 @@
 %token DEFEQ PROD ARROW FST SND LAM DEF
 %token DIRSEP MODULE WHERE IMPORT AXIOM
 %token SIGMA PI OPTION LT GT APPFORMULA
-%token AND OR ZERO ONE NEGATE
+%token AND OR NEGATE
 
 %left OR
 %left AND
@@ -39,10 +39,9 @@ exp1:
   | LAM telescope COMMA exp1 { telescope eLam $4 $2 }
   | PI telescope COMMA exp1 { telescope ePi $4 $2 }
   | SIGMA telescope COMMA exp1 { telescope eSig $4 $2 }
-  | exp2 ARROW exp1 { EPi ((No, $1), $3) }
+  | exp2 ARROW exp1 { impl $1 $3 }
   | exp2 PROD exp1 { ESig ((No, $1), $3) }
   | LT vars GT exp1 { pLam $4 $2 }
-  | ZERO { i0 } | ONE { i1 }
   | exp2 { $1 }
 
 exp3:
@@ -51,7 +50,7 @@ exp3:
   | KAN { EKan $1 }
   | exp3 FST { EFst $1 }
   | exp3 SND { ESnd $1 }
-  | NEGATE exp3 { neg $2 }
+  | NEGATE exp3 { ineg $2 }
   | exp3 AND exp3 { iand $1 $3 }
   | exp3 OR exp3 { ior $1 $3 }
   | LPARENS exp0 RPARENS { $2 }

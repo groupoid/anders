@@ -7,16 +7,18 @@ exception ExpectedPi of value
 exception ExpectedESet of exp
 exception ExpectedSig of value
 exception ExpectedVSet of value
+exception Parser of int * string
 exception UnknownOption of string
 exception UnknownCommand of string
 exception VariableNotFound of name
 exception TypeIneq of value * value
-exception Parser of int * string
+exception AlreadyDeclared of string
 exception InvalidApplication of value * value
 exception InvalidModuleName of string * string
 exception UnknownOptionValue of string * string
 
 let prettyPrintError : exn -> unit = function
+  | AlreadyDeclared p -> Printf.printf "“%s” is already declared.\n" p
   | TypeIneq (u, v) -> Printf.printf "Type mismatch:\n%s\n  =/=\n%s\n" (showValue u) (showValue v)
   | InferError e -> Printf.printf "Cannot infer type of\n  %s\n" (showExp e)
   | VariableNotFound p -> Printf.printf "Variable %s was not found\n" (showName p)

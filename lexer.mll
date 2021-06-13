@@ -68,7 +68,6 @@ rule main = parse
 | ".2"            { SND }              | pi              { PI }
 | sigma           { SIGMA }            | "?"             { HOLE }
 | "<"             { LT }               | ">"             { GT }
-| "0"             { ZERO }             | "1"             { ONE }
 | negFormula      { NEGATE }           | andFormula      { AND }
 | orFormula       { OR }               | "@"             { APPFORMULA }
 | axiom           { AXIOM }            | defeq           { DEFEQ }

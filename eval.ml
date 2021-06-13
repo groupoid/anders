@@ -53,6 +53,11 @@ let traceConv (v1 : value) (v2 : value) : unit = if !Prefs.trace then
 let traceEqNF (v1 : value) (v2 : value) : unit = if !Prefs.trace then
   begin Printf.printf "EQNF: %s = %s\n" (showValue v1) (showValue v2); flush_all () end else ()
 
+let evalPrim k v =
+  let default = VNt (NApp (k, v)) in
+  match k, v with
+  | _ -> default
+
 let rec eval (e : exp) (rho : rho) = traceEval e; match e with
   | EPre u             -> VPre u
   | EKan u             -> VKan u
@@ -68,7 +73,7 @@ let rec eval (e : exp) (rho : rho) = traceEval e; match e with
   | EAxiom (p, e)      -> VNt (NAxiom (p, eval e rho))
 and app : value * value -> value = function
   | VLam (_, f), v     -> closByVal f v
-  | VNt k, m           -> VNt (NApp (k, m))
+  | VNt k, m           -> evalPrim k m
   | x, y               -> raise (InvalidApplication (x, y))
 and getRho rho x = match Env.find_opt x rho with
   | Some (Value v)     -> v

@@ -19,22 +19,41 @@ let eLam x y = ELam (x, y)
 let ePi  x y = EPi  (x, y)
 let eSig x y = ESig (x, y)
 
-let global x = EVar (Name (x, 0))
+let name x = Name (x, 0)
+let decl x = EVar (name x)
 
 let rec telescope (f : tele -> exp -> exp) (e : exp) : tele list -> exp = function
   | []      -> e
   | x :: xs -> f x (telescope f e xs)
 
-let interval = global "I"
-let i0 = global "zero"
-let i1 = global "one"
+let impl a b = EPi ((No, a), b)
 
-let iand u v = EApp (EApp (global "meet", u), v)
-let ior  u v = EApp (EApp (global "join", u), v)
-let neg  u   = EApp (global "neg", u)
+let ival = "I"
+let i0   = "0"
+let i1   = "1"
 
-let pApp f x = EApp (EApp (global "papp", f), x)
-let pLam e v = EApp (global "plam", telescope eLam e (List.map (fun p -> (p, interval)) v))
+let meet = "meet"
+let join = "join"
+let neg  = "neg"
+
+let pathp = "PathP"
+let papp  = "papp"
+let plam  = "plam"
+
+let iand u v = EApp (EApp (decl meet, u), v)
+let ior  u v = EApp (EApp (decl join, u), v)
+let ineg u   = EApp (decl neg, u)
+
+let pApp f x = EApp (EApp (decl papp, f), x)
+let pLam e v = EApp (decl plam, telescope eLam e (List.map (fun p -> (p, decl ival)) v))
+
+let iexp = decl ival
+let line = name "A"
+let cubical : (string * exp) list =
+  [(ival, EPre 0); (i0, iexp); (i1, iexp); (neg, impl iexp iexp);
+   (meet, impl iexp (impl iexp iexp)); (join, impl iexp (impl iexp iexp));
+   (pathp, EPi ((line, impl iexp (EKan 0)),
+    impl (EApp (EVar line, decl i0)) (impl (EApp (EVar line, decl i1)) (EKan 0))))]
 
 let getDigit x = Char.chr (x + 0x80) |> Printf.sprintf "\xE2\x82%c"
 let rec showLevel x =

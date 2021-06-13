@@ -18,16 +18,16 @@ let getDeclName : decl -> string = function
 
 let checkDecl rho gma d : rho * gamma = match d with
   | Annotated (p, a, e) ->
-    let b = infer 0 rho gma a in
+    let b = infer rho gma a in
     if not (isVSet b) then raise (ExpectedVSet b) else ();
     let a' = eval a rho in
     let gma' = upGlobal gma (Name (p, 0)) a' in
-    ignore (check 0 rho gma' e a');
+    check rho gma' e a';
     (upDec rho d, gma')
   | NotAnnotated (p, e) ->
-    let a = infer 0 rho gma e in
+    let a = infer rho gma e in
     let gma' = upGlobal gma (Name (p, 0)) a in
-    ignore (check 0 rho gma' e a);
+    check rho gma' e a;
     (upDec rho d, gma')
 
 let rec checkLine st : line -> state =

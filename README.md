@@ -7,7 +7,7 @@ Features
 --------
 
 * MLTT with Leibniz equality (axiomatic J and comp₆) in 500 LOC
-* CHM-style PathP and PartialP primitives
+* CHM-style primitives with non-fibrant hierarchy Vₙ of pretypes
 * Parser in 50 LOC
 * Lexer in 50 LOC
 * Full Agda-style UTF-8 support including universe levels

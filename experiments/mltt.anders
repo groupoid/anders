@@ -19,14 +19,13 @@ def eta (A : U) (a : A) : singl A a ≔ (a, refl A a)
 
 axiom trans (A B: U) (p: Equ U A B) (a: A): B -- := transport p a -- comp p a []
 axiom subst (A: U) (P: A -> U) (a b: A) (p: Equ A a b) (e: P a): P b -- := comp (<i> P (p @ i)) e []
+axiom trans_comp (A:U)(a: A): Equ A a (trans A A (<i> A) a) -- := fill (<i> A) a []
 
 def contr (A : U) (a b : A) (p : Equ A a b) : Equ (singl A a) (eta A a) (b, p) := <i> (p @ i, <j> p @ i /\ j)
 def J (A: U) (x: A) (C: D A) (d: C x x (refl A x)) (y: A) (p: Equ A x y): C x y p
   ≔ subst (singl A x) (\ (z: singl A x), C x (z.1) (z.2)) (eta A x) (y, p) (contr A x y p) d
-
---
--- def trans_comp (A:U)(a: A): Equ A a (trans A A (<i> A) a) = fill (<i> A) a []
--- def subst_comp (A:U)(P:A → U)(a:A)(e:P(a)): Equ (P a) e (subst A P a a (refl A a) e) = trans_comp (P a) e
+axiom subst_comp (A: U) (P: A → U) (a: A) (e: P a): Equ (P a) e (subst A P a a (refl A a) e)
+--   ≔ trans_comp (P a) e
 
 definition comp₁ (A : U) (B : A → U) (a : A) (f : Pi A B) : Equ (B a) (app A B (lambda A B f) a) (f a) ≔ refl (B a) (f a)
 definition comp₂ (A : U) (B : A → U) (a : A) (f : Pi A B) : Equ (Pi A B) f (λ (x : A), f x) ≔ refl (Pi A B) f
@@ -34,10 +33,7 @@ definition comp₃ (A : U) (B : A → U) (a : A) (b : B a) : Equ A a (pr₁ A B 
 definition comp₄ (A : U) (B : A → U) (a : A) (b : B a) : Equ (B a) b (pr₂ A B (a, b)) ≔ refl (B a) b
 definition comp₅ (A : U) (B : A → U) (p : Sigma A B) : Equ (Sigma A B) p (pr₁ A B p, pr₂ A B p) ≔ refl (Sigma A B) p
 axiom comp₆ (A : U) (a : A) (C : D A) (d: C a a (refl A a)) : Equ (C a a (refl A a)) d (J A a C d a (refl A a))
-
--- def comp6 (A:U)(a:A)(C: D A) (d: C a a (refl A a))
---     : Equ (C a a (refl A a)) d (J A a C d a (refl A a)) ≔
---       subst_comp (singl A a) T (eta A a) d where T (z: singl A a) : U ≔ C a (z.1) (z.2)
+--   ≔ subst_comp (singl A a) (\ (z: singl A a), C a (z.1) (z.2)) (eta A a) d
 
 def MLTT (A : U) : U ≔ Σ
     (Π-form  : Π (B : A → U), U)

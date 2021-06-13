@@ -56,4 +56,10 @@ and infer rho gma e0 : value = traceInfer e0; match e0 with
   | EI -> VPre 0
   | EZero -> VNt NI
   | EOne -> VNt NI
+  | ENeg e ->
+    if infer rho gma e = VNt NI
+    then VNt NI else raise (InferError e0)
+  | EOr (e1, e2) | EAnd (e1, e2) ->
+    if infer rho gma e1 = VNt NI && infer rho gma e2 = VNt NI
+    then VNt NI else raise (InferError e0)
   | e -> raise (InferError e)

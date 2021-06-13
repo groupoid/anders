@@ -1,4 +1,3 @@
-open Formula
 open Ident
 
 type exp =

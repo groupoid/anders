@@ -13,12 +13,18 @@ exception UnknownCommand of string
 exception VariableNotFound of name
 exception TypeIneq of value * value
 exception AlreadyDeclared of string
+exception InvalidFormulaNeg of value
+exception InvalidFormulaOr of value * value
+exception InvalidFormulaAnd of value * value
 exception InvalidApplication of value * value
 exception InvalidModuleName of string * string
 exception UnknownOptionValue of string * string
 
 let prettyPrintError : exn -> unit = function
   | AlreadyDeclared p -> Printf.printf "“%s” is already declared.\n" p
+  | InvalidFormulaNeg v -> Printf.printf "Cannot evaluate invalid formula:\n  -%s\n" (showValue v)
+  | InvalidFormulaOr (u, v) -> Printf.printf "Cannot evaluate invalid formula:\n  %s ∨ %s\n" (showValue u) (showValue v)
+  | InvalidFormulaAnd (u, v) -> Printf.printf "Cannot evaluate invalid formula:\n  %s ∧ %s\n" (showValue u) (showValue v)
   | TypeIneq (u, v) -> Printf.printf "Type mismatch:\n%s\n  =/=\n%s\n" (showValue u) (showValue v)
   | InferError e -> Printf.printf "Cannot infer type of\n  %s\n" (showExp e)
   | VariableNotFound p -> Printf.printf "Variable %s was not found\n" (showName p)

@@ -73,10 +73,18 @@ let rec eval (e : exp) (rho : rho) = traceEval e; match e with
   | EPre u             -> VPre u
   | EPathP e           -> VPathP (eval e rho)
   | EPLam e            -> VPLam (eval e rho)
-  | EAppFormula (f, x) -> VAppFormula (eval f rho, eval x rho)
+  | EAppFormula (e, x) -> begin
+    let v = eval e rho in match v with
+    | VPLam f -> app (f, eval x rho)
+    | VNt k   -> VAppFormula (v, eval x rho)
+    | _       -> raise (InvalidApplication (v, eval x rho))
+  end
   | EI                 -> VNt NI
   | EZero              -> VNt NZero
   | EOne               -> VNt NOne
+  | EAnd (e1, e2)      -> andFormula (eval e1 rho) (eval e2 rho)
+  | EOr (e1, e2 )      -> orFormula (eval e1 rho) (eval e2 rho)
+  | ENeg e             -> negFormula (eval e rho)
 and app : value * value -> value = function
   | VLam (_, f), v     -> closByVal f v
   | VNt k, m           -> evalPrim k m
@@ -110,18 +118,27 @@ let prune rho x = match Env.find_opt x rho with
   | None             -> raise (VariableNotFound x)
 
 let rec weak (e : exp) (rho : rho) = match e with
-  | EPre u           -> EPre u
-  | EKan u           -> EKan u
-  | ELam ((p, a), b) -> weakTele eLam rho p a b
-  | EPi  ((p, a), b) -> weakTele ePi  rho p a b
-  | ESig ((p, a), b) -> weakTele eSig rho p a b
-  | EFst e           -> EFst (weak e rho)
-  | ESnd e           -> ESnd (weak e rho)
-  | EApp (f, x)      -> EApp (weak f rho, weak x rho)
-  | EVar x           -> prune rho x
-  | EPair (e1, e2)   -> EPair (weak e1 rho, weak e2 rho)
-  | EHole            -> EHole
-  | EAxiom (p, e)    -> EAxiom (p, weak e rho)
+  | EKan u             -> EKan u
+  | ELam ((p, a), b)   -> weakTele eLam rho p a b
+  | EPi  ((p, a), b)   -> weakTele ePi  rho p a b
+  | ESig ((p, a), b)   -> weakTele eSig rho p a b
+  | EFst e             -> EFst (weak e rho)
+  | ESnd e             -> ESnd (weak e rho)
+  | EApp (f, x)        -> EApp (weak f rho, weak x rho)
+  | EVar x             -> prune rho x
+  | EPair (e1, e2)     -> EPair (weak e1 rho, weak e2 rho)
+  | EHole              -> EHole
+  | EAxiom (p, e)      -> EAxiom (p, weak e rho)
+  | EPre u             -> EPre u
+  | EPathP u           -> EPathP (weak u rho)
+  | EPLam u            -> EPLam (weak u rho)
+  | EAppFormula (f, x) -> EAppFormula (weak f rho, weak x rho)
+  | EI                 -> EI
+  | EZero              -> EZero
+  | EOne               -> EOne
+  | EAnd (e1, e2)      -> EAnd (weak e1 rho, weak e2 rho)
+  | EOr (e1, e2)       -> EOr (weak e1 rho, weak e2 rho)
+  | ENeg e             -> ENeg (weak e rho)
 and weakTele ctor rho p a b : exp =
   ctor (p, weak a rho) (weak b (upVar rho p (var p)))
 

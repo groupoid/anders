@@ -1,47 +1,39 @@
-open Ident
+open Error
+open Expr
 
-type dir = Zero | One
-type face = dir Env.t
+let andNeut : neut * neut -> neut = function
+  | NZero, _ -> NZero
+  | _, NZero -> NZero
+  | NOne, f  -> f
+  | f, NOne  -> f
+  | f, g     -> NAnd (f, g)
 
-let showDir : dir -> string = function
-  | Zero -> "0"
-  | One  -> "1"
+let orNeut : neut * neut -> neut = function
+  | NOne, _  -> NOne
+  | _, NOne  -> NOne
+  | NZero, f -> f
+  | f, NZero -> f
+  | f, g     -> NOr (f, g)
 
-let negate : dir -> dir = function
-  | Zero -> One
-  | One  -> Zero
+let rec negNeut : neut -> neut = function
+  | NZero       -> NOne
+  | NOne        -> NZero
+  | NVar p      -> NNeg (NVar p)
+  | NNeg n      -> n
+  | NAnd (f, g) -> andNeut (negNeut f, negNeut g)
+  | NOr (f, g)  -> orNeut (negNeut f, negNeut g)
 
-type formula =
-  | Dir of dir
-  | Atom of name
-  | Neg of name
-  | And of formula * formula
-  | Or of formula * formula
+let andFormula a b =
+  match a, b with
+  | VNt u, VNt v -> VNt (andNeut (u, v))
+  | _, _         -> raise (InvalidFormulaAnd (a, b))
 
-let rec showFormula : formula -> string = function
-  | Dir dir    -> showDir dir
-  | Atom i     -> showName i
-  | Neg i      -> "-" ^ showName i
-  | And (f, g) -> showFormula f ^ " ∧ " ^ showFormula g
-  | Or (f, g)  -> showFormula f ^ " ∨ " ^ showFormula g
+let orFormula a b =
+  match a, b with
+  | VNt u, VNt v -> VNt (orNeut (u, v))
+  | _, _         -> raise (InvalidFormulaOr (a, b))
 
-let andFormula : formula * formula -> formula = function
-  | Dir Zero, _ -> Dir Zero
-  | _, Dir Zero -> Dir Zero
-  | Dir One, f  -> f
-  | f, Dir One  -> f
-  | f, g        -> And (f, g)
-
-let orFormula : formula * formula -> formula = function
-  | Dir One, _  -> Dir One
-  | _, Dir One  -> Dir One
-  | Dir Zero, f -> f
-  | f, Dir Zero -> f
-  | f, g        -> Or (f, g)
-
-let rec negFormula : formula -> formula = function
-  | Dir dir    -> Dir (negate dir)
-  | Atom i     -> Neg i
-  | Neg i      -> Atom i
-  | And (f, g) -> orFormula (negFormula f, negFormula g)
-  | Or (f, g)  -> andFormula (negFormula f, negFormula g)
+let negFormula a =
+  match a with
+  | VNt u -> VNt (negNeut u)
+  | _     -> raise (InvalidFormulaNeg a)

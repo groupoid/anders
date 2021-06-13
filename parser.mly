@@ -1,5 +1,4 @@
-%{ open Formula
-   open Ident
+%{ open Ident
    open Expr
 %}
 

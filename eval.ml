@@ -97,20 +97,29 @@ and closByVal (x : clos) (v : value) = let (p, e, rho) = x in
   begin traceClos e p v; eval e (upVar rho p v) end
 
 let rec rbV : value  -> exp = function
-  | VLam (t, g)      -> let (p, _, _) = g in let q = pat p in ELam ((q, rbV t), rbV (closByVal g (var q)))
-  | VPair (u, v)     -> EPair (rbV u, rbV v)
-  | VPre u           -> EPre u
-  | VKan u           -> EKan u
-  | VPi (t, g)       -> let (p, _, _) = g in let q = pat p in EPi ((q, rbV t), rbV (closByVal g (var q)))
-  | VSig (t, g)      -> let (p, _, _) = g in let q = pat p in ESig ((q, rbV t), rbV (closByVal g (var q)))
-  | VNt l            -> rbN l
+  | VLam (t, g)        -> let (p, _, _) = g in let q = pat p in ELam ((q, rbV t), rbV (closByVal g (var q)))
+  | VPair (u, v)       -> EPair (rbV u, rbV v)
+  | VKan u             -> EKan u
+  | VPi (t, g)         -> let (p, _, _) = g in let q = pat p in EPi ((q, rbV t), rbV (closByVal g (var q)))
+  | VSig (t, g)        -> let (p, _, _) = g in let q = pat p in ESig ((q, rbV t), rbV (closByVal g (var q)))
+  | VNt l              -> rbN l
+  | VPre u             -> EPre u
+  | VPathP v           -> EPathP (rbV v)
+  | VPLam f            -> EPLam (rbV f)
+  | VAppFormula (f, x) -> EAppFormula (rbV f, rbV x)
 and rbN : neut -> exp = function
-  | NVar s           -> EVar s
-  | NApp (k, m)      -> EApp (rbN k, rbV m)
-  | NFst k           -> EFst (rbN k)
-  | NSnd k           -> ESnd (rbN k)
-  | NHole            -> EHole
-  | NAxiom (p, v)    -> EAxiom (p, rbV v)
+  | NVar s             -> EVar s
+  | NApp (k, m)        -> EApp (rbN k, rbV m)
+  | NFst k             -> EFst (rbN k)
+  | NSnd k             -> ESnd (rbN k)
+  | NHole              -> EHole
+  | NAxiom (p, v)      -> EAxiom (p, rbV v)
+  | NI                 -> EI
+  | NZero              -> EZero
+  | NOne               -> EOne
+  | NAnd (u, v)        -> EAnd (rbN u, rbN v)
+  | NOr (u, v)         -> EOr (rbN u, rbN v)
+  | NNeg u             -> ENeg (rbN u)
 
 let prune rho x = match Env.find_opt x rho with
   | Some (Value v)   -> rbV v

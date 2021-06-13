@@ -22,6 +22,7 @@ let rec negNeut : neut -> neut = function
   | NNeg n      -> n
   | NAnd (f, g) -> andNeut (negNeut f, negNeut g)
   | NOr (f, g)  -> orNeut (negNeut f, negNeut g)
+  | k           -> raise (InvalidFormulaNeg (VNt k))
 
 let andFormula a b =
   match a, b with

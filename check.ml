@@ -45,6 +45,12 @@ let ieq u v : bool = !girard || u = v
 let traceEval (e : exp) : unit = if !Prefs.trace then
   begin Printf.printf "EVAL: %s\n" (showExp e); flush_all () end else ()
 
+let traceRbV (v : value) : unit = if !Prefs.trace then
+  begin Printf.printf "RBV: %s\n" (showValue v); flush_all () end else ()
+
+let traceRbN (n : neut) : unit = if !Prefs.trace then
+  begin Printf.printf "RBN: %s\n" (showNeut n); flush_all () end else ()
+
 let traceClos (e : exp) (p : name) (v : value) : unit = if !Prefs.trace then
   begin Printf.printf "CLOSBYVAL: (%s)(%s := %s)\n" (showExp e) (showName p) (showValue v); flush_all () end else ()
 
@@ -55,7 +61,8 @@ let traceEqNF (v1 : value) (v2 : value) : unit = if !Prefs.trace then
   begin Printf.printf "EQNF: %s = %s\n" (showValue v1) (showValue v2); flush_all () end else ()
 
 let rec eval (e : exp) (env : env) =
-  let (rho, gma) = env in traceEval e; match e with
+  let (rho, gma) = env in traceEval e;
+  match e with
   | EKan u             -> VKan u
   | ELam ((p, a), b)   -> VLam (eval a env, (p, b, rho))
   | EPi  ((p, a), b)   -> VPi  (eval a env, (p, b, rho))
@@ -73,7 +80,7 @@ let rec eval (e : exp) (env : env) =
   | EAppFormula (e, x) ->
     begin let v = eval e env in match v with
     | VPLam f -> app gma (f, eval x env)
-    | _       -> begin match infer env e with
+    | _       -> begin match infer env (rbV gma v) with
       | VNt (NApp (NApp (NPathP _, u0), u1)) ->
         begin let y = eval x env in match y with
         | VNt NZero -> u0
@@ -89,27 +96,27 @@ let rec eval (e : exp) (env : env) =
   | ENeg e             -> negFormula (eval e env)
 
 and app gma : value * value -> value = function
-  | VLam (_, f), v     -> closByVal gma f v
+  | VLam (t, f), v     -> closByVal gma t f v
   | VNt k, m           -> VNt (NApp (k, m))
   | x, y               -> raise (InvalidApplication (x, y))
 and getRho (rho, gma) x = match Env.find_opt x rho with
   | Some (Value v)     -> v
   | Some (Exp e)       -> eval e (rho, gma)
   | None               -> VNt (NVar x)
-and closByVal gma (x : clos) (v : value) = let (p, e, rho) = x in
-  begin traceClos e p v; eval e (upVar rho p v, gma) end
+and closByVal gma t x v = let (p, e, rho) = x in
+  begin traceClos e p v; eval e (upVar rho p v, upLocal gma p t) end
 
-and rbV gma : value -> exp = function
-  | VLam (t, g)        -> let (p, _, _) = g in let q = pat p in ELam ((q, rbV gma t), rbV gma (closByVal gma g (var q)))
+and rbV gma v : exp = traceRbV v; match v with
+  | VLam (t, g)        -> rbVTele eLam gma t g
   | VPair (u, v)       -> EPair (rbV gma u, rbV gma v)
   | VKan u             -> EKan u
-  | VPi (t, g)         -> let (p, _, _) = g in let q = pat p in EPi ((q, rbV gma t), rbV gma (closByVal gma g (var q)))
-  | VSig (t, g)        -> let (p, _, _) = g in let q = pat p in ESig ((q, rbV gma t), rbV gma (closByVal gma g (var q)))
+  | VPi (t, g)         -> rbVTele ePi gma t g
+  | VSig (t, g)        -> rbVTele eSig gma t g
   | VNt l              -> rbN gma l
   | VPre u             -> EPre u
   | VPLam f            -> EPLam (rbV gma f)
   | VAppFormula (f, x) -> EAppFormula (rbV gma f, rbV gma x)
-and rbN gma : neut -> exp = function
+and rbN gma n : exp = traceRbN n; match n with
   | NVar s             -> EVar s
   | NApp (k, m)        -> EApp (rbN gma k, rbV gma m)
   | NFst k             -> EFst (rbN gma k)
@@ -123,6 +130,9 @@ and rbN gma : neut -> exp = function
   | NAnd (u, v)        -> EAnd (rbN gma u, rbN gma v)
   | NOr (u, v)         -> EOr (rbN gma u, rbN gma v)
   | NNeg u             -> ENeg (rbN gma u)
+and rbVTele ctor gma t g =
+  let (p, _, _) = g in let q = pat p in let gma' = upLocal gma q t in
+  ctor (q, rbV gma t) (rbV gma' (closByVal gma' t g (var q)))
 
 and prune (rho, gma) x = match Env.find_opt x rho with
   | Some (Value v)   -> rbV gma v
@@ -152,7 +162,8 @@ and weak (e : exp) env = match e with
   | EOr (e1, e2)       -> EOr (weak e1 env, weak e2 env)
   | ENeg e             -> ENeg (weak e env)
 and weakTele ctor (rho, gma) p a b : exp =
-  ctor (p, weak a (rho, gma)) (weak b (upVar rho p (var p), gma))
+  let t = weak a (rho, gma) in let v = eval t (rho, gma) in
+  ctor (p, t) (weak b (upVar rho p (var p), upLocal gma p v))
 
 and conv env v1 v2 : bool = let (rho, gma) = env in traceConv v1 v2;
   v1 = v2 || match v1, v2 with
@@ -163,15 +174,19 @@ and conv env v1 v2 : bool = let (rho, gma) = env in traceConv v1 v2;
   | v, VPair (a, b) -> conv env (vfst v) a && conv env (vsnd v) b
   | VPi (a, g), VPi (b, h) | VSig (a, g), VSig (b, h)
   | VLam (a, g), VLam (b, h) -> let (p, e1, rho1) = g in let (q, e2, rho2) = h in
-    let v = genV p in conv env a b &&
-      (weak e1 (upVar rho1 p v, gma) = weak e2 (upVar rho2 q v, gma) ||
-       conv env (closByVal gma g v) (closByVal gma h v))
+    let u = pat p in let v = var u in let gma' = upLocal gma u a in
+    conv env a b &&
+      (weak e1 (upVar rho1 p v, upLocal gma' p a) =
+       weak e2 (upVar rho2 q v, upLocal gma' q b) ||
+       conv (rho, gma') (closByVal gma' a g v) (closByVal gma' a h v))
   | VLam (a, (p, o, v)), b | b, VLam (a, (p, o, v)) ->
-    let u = genV p in conv env (app gma (b, u)) (closByVal gma (p, o, v) u)
+    let u = pat p in let f = var u in let gma' = upLocal gma u a in
+    conv (rho, gma') (app gma' (b, f)) (closByVal gma' a (p, o, v) f)
   | VPre u, VPre v -> ieq u v
   | VPLam f, VPLam g -> conv env f g
-  | VPLam f, v | v, VPLam f -> let p = genV (name "i") in
-    conv env (eval (EAppFormula (rbV gma v, rbV gma p)) env) (app gma (f, p))
+  | VPLam f, v | v, VPLam f -> let p = pat (name "i") in
+    let i = var p in let gma' = upLocal gma p (VNt NI) in
+    conv (rho, gma') (eval (EAppFormula (rbV gma' v, rbV gma' i)) env) (app gma' (f, i))
   | VAppFormula (f, x), VAppFormula (g, y) -> conv env f g && conv env x y
   | _, _ -> false
 
@@ -198,9 +213,9 @@ and check env (e0 : exp) (t0 : value) = let (rho, gma) = env in
   | ELam ((p, a), e), VPi (t, g) -> eqNf env (eval a env) t;
     let q = pat p in let gen = var q in
     let gma' = upLocal (upLocal gma p t) q t in
-    check (upVar rho p gen, gma') e (closByVal gma g gen)
-  | EPair (e1, e2), VSig (t, g) -> let _ = check env e1 t in
-    check env e2 (closByVal gma g (eval e1 env))
+    check (upVar rho p gen, gma') e (closByVal gma' t g gen)
+  | EPair (e1, e2), VSig (t, g) -> check env e1 t;
+    check env e2 (closByVal gma t g (eval e1 env))
   | EHole, v -> traceHole v gma
   | EAxiom (_, u), v -> eqNf env (eval u env) v
   | EPLam e, VNt (NApp (NApp (NPathP (VPLam g), u0), u1)) ->
@@ -219,15 +234,14 @@ and infer env e0 : value = let (rho, gma) = env in traceInfer e0;
   match e0 with
   | EVar x -> lookup x gma
   | EKan u -> VKan (u + 1)
-  | EPi ((p, a), b) ->
-    let q = pat p in let gen = var q in let t = eval a env in
-    let rho' = upLocal (upLocal gma p t) q t in
-    let v = infer (upVar rho p gen, rho') b in imax (infer env a) v
-  | ESig (x, y) -> infer env (EPi (x, y))
+  | ESig ((p, a), b) | EPi ((p, a), b) ->
+    let t = eval a env in let q = pat p in let gen = var q in
+    let gma' = upLocal (upLocal gma p t) q t in
+    let v = infer (upVar rho p gen, gma') b in imax (infer env a) v
   | EApp (f, x) -> let (t, g) = extPiG (infer env f) in
-    ignore (check env x t); closByVal gma g (eval x env)
+    ignore (check env x t); closByVal gma t g (eval x env)
   | EFst e -> fst (extSigG (infer env e))
-  | ESnd e -> let (_, g) = extSigG (infer env e) in closByVal gma g (vfst (eval e env))
+  | ESnd e -> let (t, g) = extSigG (infer env e) in closByVal gma t g (vfst (eval e env))
   | EAxiom (_, e) -> eval e env
   | EPre u -> VPre (u + 1)
   | EPathP (EPLam e) ->

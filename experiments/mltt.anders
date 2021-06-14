@@ -28,8 +28,8 @@ axiom subst (A: U) (P: A -> U) (a b: A) (p: Equ A a b) (e: P a): P b -- := comp 
 axiom trans_comp (A:U)(a: A): Equ A a (trans A A (<i> A) a) -- := fill (<i> A) a []
 
 def contr (A : U) (a b : A) (p : Equ A a b) : Equ (singl A a) (eta A a) (b, p) := <i> (p @ i, <j> p @ i /\ j)
-axiom J (A: U) (x: A) (C: D A) (d: C x x (refl A x)) (y: A) (p: Equ A x y): C x y p
---  ≔ subst (singl A x) (\ (z: singl A x), C x (z.1) (z.2)) (eta A x) (y, p) (contr A x y p) d
+def J (A: U) (x: A) (C: D A) (d: C x x (refl A x)) (y: A) (p: Equ A x y): C x y p
+  ≔ subst (singl A x) (\ (z: singl A x), C x (z.1) (z.2)) (eta A x) (y, p) (contr A x y p) d
 axiom subst_comp (A: U) (P: A → U) (a: A) (e: P a): Equ (P a) e (subst A P a a (refl A a) e)
 --   ≔ trans_comp (P a) e
 

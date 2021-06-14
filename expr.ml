@@ -36,13 +36,9 @@ let rec telescope (f : tele -> exp -> exp) (e : exp) : tele list -> exp = functi
 
 let impl a b = EPi ((No, a), b)
 
-let ival = "I"
-let i0   = "0"
-let i1   = "1"
-
 let rec pLam e : name list -> exp = function
   | [] -> e
-  | x :: xs -> EPLam (ELam ((x, decl ival), pLam e xs))
+  | x :: xs -> EPLam (ELam ((x, EI), pLam e xs))
 
 let getDigit x = Char.chr (x + 0x80) |> Printf.sprintf "\xE2\x82%c"
 let rec showLevel x =

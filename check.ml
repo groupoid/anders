@@ -1,5 +1,6 @@
 open Formula
 open Error
+open Trace
 open Ident
 open Expr
 open Univ
@@ -35,27 +36,6 @@ let pat : name -> name = (gen := !gen + 1); function | No -> No | Name (p, _) ->
 let genV n = var (pat n)
 let girard : bool ref = ref false
 let ieq u v : bool = !girard || u = v
-
-let traceEval (e : exp) : unit = if !Prefs.trace then
-  begin Printf.printf "EVAL: %s\n" (showExp e); flush_all () end else ()
-
-let traceWeak (e : exp) : unit = if !Prefs.trace then
-  begin Printf.printf "WEAK: %s\n" (showExp e); flush_all () end else ()
-
-let traceRbV (v : value) : unit = if !Prefs.trace then
-  begin Printf.printf "RBV: %s\n" (showValue v); flush_all () end else ()
-
-let traceRbN (n : neut) : unit = if !Prefs.trace then
-  begin Printf.printf "RBN: %s\n" (showNeut n); flush_all () end else ()
-
-let traceClos (e : exp) (p : name) (v : value) : unit = if !Prefs.trace then
-  begin Printf.printf "CLOSBYVAL: (%s)(%s := %s)\n" (showExp e) (showName p) (showValue v); flush_all () end else ()
-
-let traceConv (v1 : value) (v2 : value) : unit = if !Prefs.trace then
-  begin Printf.printf "CONV: %s = %s\n" (showValue v1) (showValue v2); flush_all () end else ()
-
-let traceEqNF (v1 : value) (v2 : value) : unit = if !Prefs.trace then
-  begin Printf.printf "EQNF: %s = %s\n" (showValue v1) (showValue v2); flush_all () end else ()
 
 let rec eval (e : exp) (ctx : ctx) = traceEval e; match e with
   | EKan u             -> VKan u

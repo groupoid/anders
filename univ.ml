@@ -2,15 +2,6 @@ open Ident
 open Error
 open Expr
 
-let traceHole v gma =
-  print_string ("\nHole:\n\n" ^ Expr.showGamma gma ^ "\n" ^ String.make 80 '-' ^ "\n" ^ Expr.showValue v ^ "\n\n")
-
-let traceCheck (e0 : exp) (t0 : value) : unit =
-  if !Prefs.trace then (Printf.printf "CHECK: %s : %s\n" (showExp e0) (showValue t0); flush_all ()) else ()
-
-let traceInfer (e0 : exp) : unit =
-  if !Prefs.trace then (Printf.printf "INFER: %s\n" (showExp e0); flush_all ()) else ()
-
 let extPiG : value -> value * clos = function
   | VPi (t, g) -> (t, g)
   | u          -> raise (ExpectedPi u)

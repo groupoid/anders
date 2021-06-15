@@ -14,14 +14,14 @@ let help =
 let init : state = empty
 let st : state ref = ref init
 
-let checkAndEval env e : value * value =
-  (Check.infer env e, Check.eval e env)
+let checkAndEval ctx e : value * value =
+  (Check.infer ctx e, Check.eval e ctx)
 
-let main env : command -> unit = function
-  | Eval e -> let (t, v) = checkAndEval env e in
+let main ctx : command -> unit = function
+  | Eval e -> let (t, v) = checkAndEval ctx e in
     Printf.printf "TYPE: %s\nEVAL: %s\n" (showValue t) (showValue v)
-  | Command ("n", e) -> let (t0, v0) = checkAndEval env e in
-    let (_, gma) = env in let t = Check.rbV gma t0 in let v = Check.rbV gma v0 in
+  | Command ("n", e) -> let (t0, v0) = checkAndEval ctx e in
+    let t = Check.rbV ctx t0 in let v = Check.rbV ctx v0 in
     Printf.printf "TYPE: %s\nNORMEVAL: %s\n" (showExp t) (showExp v)
   | Action "q" -> exit 0
   | Action "r" -> st := init; raise Restart
@@ -33,12 +33,12 @@ let check filename =
   st := handleErrors (checkFile !st) filename !st
 
 let repl () =
-  let (env, _) = !st in
+  let (ctx, _) = !st in
   try while true do
     print_string "> ";
     let line = read_line () in
     handleErrors (fun x ->
       let exp = Lexparse.parseErr Parser.repl
                   (Lexing.from_string x) in
-      main env exp) line ()
+      main ctx exp) line ()
   done with End_of_file -> ()

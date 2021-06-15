@@ -1,25 +1,27 @@
 open Ident
 
+type scope = Local | Global
+
 type exp =
-  | ELam of tele * exp
-  | EKan of int
-  | EPi of tele * exp
-  | ESig of tele * exp
-  | EPair of exp * exp
-  | EFst of exp
-  | ESnd of exp
-  | EApp of exp * exp
-  | EVar of name
+  | ELam   of tele * exp
+  | EKan   of int
+  | EPi    of tele * exp
+  | ESig   of tele * exp
+  | EPair  of exp * exp
+  | EFst   of exp
+  | ESnd   of exp
+  | EApp   of exp * exp
+  | EVar   of name
   | EAxiom of string * exp
   | EHole
   (* cubical part *)
-  | EPre of int
-  | EPathP of exp
-  | EPLam of exp
+  | EPre        of int
+  | EPathP      of exp
+  | EPLam       of exp
   | EAppFormula of exp * exp
   | EI | EZero | EOne
   | EAnd of exp * exp
-  | EOr of exp * exp
+  | EOr  of exp * exp
   | ENeg of exp
 and tele = name * exp
 
@@ -98,14 +100,14 @@ let showFile : file -> string = function
   | (p, x) -> Printf.sprintf "module %s where\n%s" p (showContent x)
 
 type value =
-  | VLam of value * clos
+  | VLam  of value * clos
   | VPair of value * value
-  | VKan of int
-  | VPi of value * clos
-  | VSig of value * clos
-  | VNt of neut
+  | VKan  of int
+  | VPi   of value * clos
+  | VSig  of value * clos
+  | VNt   of neut
   (* cubical part *)
-  | VPre of int
+  | VPre  of int
   | VPLam of value
   | VAppFormula of value * value
 and neut =
@@ -119,13 +121,14 @@ and neut =
   | NPathP of value
   | NI | NZero | NOne
   | NAnd of neut * neut
-  | NOr of neut * neut
+  | NOr  of neut * neut
   | NNeg of neut
-and clos = name * exp * rho
+and clos = name * exp * ctx
 and term =
-  | Exp of exp
+  | Exp   of exp
   | Value of value
-and rho = term Env.t
+and record = scope * value * term
+and ctx = record Env.t
 
 (* Compatibility with OCaml 4.05
    From: https://github.com/ocaml/ocaml/blob/trunk/stdlib/list.ml *)
@@ -138,9 +141,9 @@ let filterMap f =
       | Some v -> aux (v :: accu) l
   in aux []
 
-let isTermVisible : term -> bool = function
-  | Exp _   -> false
-  | Value _ -> true
+let isGlobal : record -> bool = function
+  | Global, _, _ -> false
+  | Local,  _, _ -> true
 
 let rec showValue : value -> string = function
   | VLam (x, (p, e, rho)) -> Printf.sprintf "λ %s, %s" (showTele p x rho) (showExp e)
@@ -166,34 +169,36 @@ and showNeut : neut -> string = function
   | NAnd (a, b) -> Printf.sprintf "(%s ∧ %s)" (showNeut a) (showNeut b)
   | NOr (a, b) -> Printf.sprintf "(%s ∨ %s)" (showNeut a) (showNeut b)
   | NNeg a -> Printf.sprintf "-%s" (showNeut a)
-and showTermBind : name * term -> string option = function
-  | p, Value v -> Some (Printf.sprintf "%s := %s" (showName p) (showValue v))
-  | _, _       -> None
-and showRho (rho : rho) : string =
-  Env.bindings rho |> filterMap showTermBind |> String.concat ", "
+and showTermBind : name * record -> string option = function
+  | p, (Local, _, t) -> Some (Printf.sprintf "%s := %s" (showName p) (showTerm t))
+  | _, _             -> None
+and showRho ctx : string =
+  Env.bindings ctx |> filterMap showTermBind |> String.concat ", "
 and showTele p x rho : string =
-  if Env.exists (fun _ -> isTermVisible) rho then
+  if Env.exists (fun _ -> isGlobal) rho then
     Printf.sprintf "(%s : %s, %s)" (showName p) (showValue x) (showRho rho)
   else Printf.sprintf "(%s : %s)" (showName p) (showValue x)
+and showTerm : term -> string = function
+  | Exp e   -> showExp e
+  | Value v -> showValue v
 
-type scope =
-  | Local  of value
-  | Global of value
-type gamma = scope Env.t
-
-let showGamma (gma : gamma) : string =
-  Env.bindings gma
+let showGamma (ctx : ctx) : string =
+  Env.bindings ctx
   |> filterMap
-      (fun x -> let (p, y) = x in
-        match y with
-        | Local v -> Some (Printf.sprintf "%s : %s" (showName p) (showValue v))
-        | _       -> None)
+      (fun (p, x) -> match x with
+        | Local, v, _ -> Some (Printf.sprintf "%s : %s" (showName p) (showValue v))
+        | _, _, _     -> None)
   |> String.concat "\n"
 
-type env = rho * gamma
+let merge ctx1 ctx2 : ctx =
+  Env.merge (fun k x y ->
+    match x, y with
+    | Some v, _      -> Some v
+    | None,   Some u -> Some u
+    | None,   None   -> None) ctx1 ctx2
 
 type command =
   | Nope
-  | Eval of exp
-  | Action of string
+  | Eval    of exp
+  | Action  of string
   | Command of string * exp

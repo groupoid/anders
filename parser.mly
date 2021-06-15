@@ -56,10 +56,10 @@ exp3:
   | PATHP exp3 { EPathP $2 }
   | LPARENS exp0 RPARENS { $2 }
   | IDENT { match $1 with
-            | "0" -> EZero
-            | "1" -> EOne
-            | "I" -> EI
-            | _   -> decl $1 }
+            | "i0" | "i₀" -> EZero
+            | "i1" | "i₁" -> EOne
+            | "interval"  -> EI
+            | _           -> decl $1 }
   | NO { EVar No }
 
 declarations:

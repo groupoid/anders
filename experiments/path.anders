@@ -1,7 +1,9 @@
 module path where
-option girard true
 
-def NonFibrant : V := I
+def I : V := interval
+def 0 := i₀
+def 1 := i₁
+
 def Path (A : U) (x y : A) : U := PathP (<_> A) x y
 def rfl (A : U) (x : A) : Path A x x := <_> x
 def singl (A: U) (a: A): U := Σ (x: A), Path A a x
@@ -10,10 +12,10 @@ def sym (A: U) (a b : A) (p : Path A a b) : Path A b a := <i> p @ -i
 def contr (A : U) (a b : A) (p : Path A a b) : Path (singl A a) (eta A a) (b, p) := <i> (p @ i, <j> p @ i /\ j)
 def cong (A B : U) (f : A -> B) (a b : A) (p : Path A a b) : Path B (f a) (f b) := <i> f (p @ i)
 def ap (A: U) (a x: A) (B: A -> U) (f: A -> B a) (b: B a) (p: Path A a x): Path (B a) (f a) (f x) := <i> f (p @ i)
-axiom trans (A B: U) (p: Path U A B) (a: A): B -- := transport p a -- comp p a []
+axiom trans (A B: U) (p: PathP (<_> U) A B) (a: A): B -- := transport p a -- comp p a []
 axiom subst (A: U) (P: A -> U) (a b: A) (p: Path A a b) (e: P a): P b -- := comp (<i> P (p @ i)) e []
 def inv (A: U) (a b: A) (p: Path A a b): Path A b a := <i> p @ -i
-def coerce (A B: U) (p: Path U A B): A -> B := λ (x : A), trans A B p x
+def coerce (A B: U) (p: PathP (<_> U) A B): A -> B := λ (x : A), trans A B p x
 
 def Path-η (A : U) (x y : A) (p : Path A x y) :
   Path (Path A x y) p (<i> p @ i) := <_> p

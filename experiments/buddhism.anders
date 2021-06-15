@@ -1,6 +1,8 @@
 module buddhism where
 import experiments/path
 
+option girard true
+
 -- from Favonia's PhD
 
 def concept (o: U): U := o -> U

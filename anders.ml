@@ -1,3 +1,4 @@
+open Prefs
 open Check
 open Error
 open Expr

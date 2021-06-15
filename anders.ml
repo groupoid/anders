@@ -36,13 +36,13 @@ let needRepl : cmdline -> bool = function
 
 let rec parseArgs : string list -> cmdline list = function
   | [] -> []
-  | "check"   :: filename :: rest -> Check     filename :: parseArgs rest
-  | "lex"     :: filename :: rest -> Lex       filename :: parseArgs rest
-  | "parse"   :: filename :: rest -> Parse     filename :: parseArgs rest
-  | "cubical" :: filename :: rest -> Cubicaltt filename :: parseArgs rest
-  | "help"    :: rest             -> Help :: parseArgs rest
-  | "trace"   :: rest             -> Trace :: parseArgs rest
-  | "girard"  :: rest             -> Girard :: parseArgs rest
+  | "check"     :: filename :: rest -> Check     filename :: parseArgs rest
+  | "lex"       :: filename :: rest -> Lex       filename :: parseArgs rest
+  | "parse"     :: filename :: rest -> Parse     filename :: parseArgs rest
+  | "cubicaltt" :: filename :: rest -> Cubicaltt filename :: parseArgs rest
+  | "help"      :: rest             -> Help :: parseArgs rest
+  | "trace"     :: rest             -> Trace :: parseArgs rest
+  | "girard"    :: rest             -> Girard :: parseArgs rest
   | x :: xs ->
     Printf.printf "Unknown command “%s”\n" x;
     parseArgs xs

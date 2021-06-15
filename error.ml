@@ -13,6 +13,7 @@ exception UnknownOption of string
 exception ExpectedFibrant of value
 exception UnknownCommand of string
 exception VariableNotFound of name
+exception ExtractionError of string
 exception TypeIneq of value * value
 exception AlreadyDeclared of string
 exception InvalidFormulaNeg of value
@@ -23,6 +24,7 @@ exception InvalidModuleName of string * string
 exception UnknownOptionValue of string * string
 
 let prettyPrintError : exn -> unit = function
+  | ExtractionError s -> Printf.printf "Error occured during extraction: %s\n" s
   | ExpectedPath e -> Printf.printf "“%s” expected to be a path.\n" (showExp e)
   | AlreadyDeclared p -> Printf.printf "“%s” is already declared.\n" p
   | InvalidFormulaNeg v -> Printf.printf "Cannot evaluate invalid formula:\n  -%s\n" (showValue v)

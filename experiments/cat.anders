@@ -1,8 +1,7 @@
 module cat where
 
-def unit : U₁ := U
 def cat : U₂ := Σ (A: U₁), A -> A -> U₁
-axiom isSet (A: U₁) : U₁
+def isSet (A : U₁) : U₁ := Π (a b : A) (a0 b0 : PathP (<i> A) a b), PathP (<i> PathP (<i> A) a b) a0 b0
 
 -- HoTT Definition 9.1.1. Precategory Properties
 def isPrecategory (C: cat) : U₁ := Σ

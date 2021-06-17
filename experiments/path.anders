@@ -5,9 +5,9 @@ def 0 := i₀
 def 1 := i₁
 
 def Path (A : U) (x y : A) : U := PathP (<_> A) x y
-def rfl (A : U) (x : A) : Path A x x := <_> x
+def idp (A : U) (x : A) : Path A x x := <_> x
 def singl (A: U) (a: A): U := Σ (x: A), Path A a x
-def eta (A: U) (a: A): singl A a := (a, rfl A a)
+def eta (A: U) (a: A): singl A a := (a, idp A a)
 def sym (A: U) (a b : A) (p : Path A a b) : Path A b a := <i> p @ -i
 def contr (A : U) (a b : A) (p : Path A a b) : Path (singl A a) (eta A a) (b, p) := <i> (p @ i, <j> p @ i /\ j)
 def cong (A B : U) (f : A -> B) (a b : A) (p : Path A a b) : Path B (f a) (f b) := <i> f (p @ i)
@@ -20,10 +20,10 @@ def coerce (A B: U) (p: PathP (<_> U) A B): A -> B := λ (x : A), trans A B p x
 def Path-η (A : U) (x y : A) (p : Path A x y) :
   Path (Path A x y) p (<i> p @ i) := <_> p
 
-def refl-left (A : U) (x y : A) (p : Path A x y) :
+def idp-left (A : U) (x y : A) (p : Path A x y) :
   Path (Path A x x) (<_> x) (<_> p @ 0) := <_ _> x
 
-def refl-right (A : U) (x y : A) (p : Path A x y) :
+def idp-right (A : U) (x y : A) (p : Path A x y) :
   Path (Path A y y) (<_> y) (<_> p @ 1) := <_ _> y
 
 def sym-sym-eq-idp (A : U) (x y : A) (p : Path A x y) :
@@ -34,3 +34,16 @@ def hmtpy (A : U) (x y : A) (p : Path A x y) :
   <j i> p @ j /\ i /\ -i
 
 def plam (A : U) (f : I -> A) : Path A (f 0) (f 1) := <i> f i
+def elim (A : U) (a b : A) (p : Path A a b) : I -> A :=
+λ (i : I), p @ i
+
+def Eq (A : V) (x y : A) : V₁ := Π (P : A -> V), P x -> P y
+def refl (A : V) (x : A) : Eq A x x := λ (P : A -> V) (u : P x), u
+
+def plam-elim (A : U) (f : I -> A) :
+  Eq (I -> A) (elim A (f 0) (f 1) (plam A f)) f :=
+refl (I -> A) f
+
+def elim-plam (A : U) (a b : A) (p : Path A a b) :
+  Eq (Path A a b) (plam A (elim A a b p)) p :=
+refl (Path A a b) p

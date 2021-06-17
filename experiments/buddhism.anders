@@ -11,7 +11,7 @@ def nondual (o: U) (p: concept o): U := Π (x y: o), Path U (p x) (p y)
 
 def encode (o: U): (Π (p: concept o), nondual o p) -> allpaths o :=
     \ (nd: Π (p: concept o), nondual o p) (a b: o),
-      coerce (Path o a a) (Path o a b) (nd (\ (z: o), Path o a z) a b) (rfl o a)
+      coerce (Path o a a) (Path o a b) (nd (\ (z: o), Path o a z) a b) (idp o a)
 
 def decode (o: U): allpaths o -> (Π (p: concept o), nondual o p) :=
     \ (all: allpaths o) (p: concept o)(x y: o), cong o U p x y (all x y)

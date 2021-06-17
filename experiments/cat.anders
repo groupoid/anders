@@ -1,0 +1,14 @@
+module cat where
+
+def cat : U₂ := Σ (A: U₁), A -> A -> U₁
+axiom isSet (A: U₁) : U₁
+
+-- HoTT Definition 9.1.1. Precategory Properties
+def isPrecategory (C: cat) : U₁ := Σ
+    (id: Π (x: C.1), C.2 x x)
+    (∘: Π (x y z:C.1), C.2 x y -> C.2 y z -> C.2 x z)
+    (homSet: Π (x y: C.1), isSet (C.2 x y))
+    (∘-left: Π (x y: C.1) (f: C.2 x y), PathP (<_>(C.2 x y)) (∘ x x y (id x) f) f)
+    (∘-right: Π (x y: C.1) (f: C.2 x y), PathP (<_>(C.2 x y)) (∘ x y y f (id y)) f)
+    (∘-assoc: Π (x y z w: C.1) (f: C.2 x y) (g: C.2 y z) (h: C.2 z w),
+      PathP (<_>(C.2 x w)) (∘ x z w (∘ x y z f g) h) (∘ x y w f (∘ y z w g h))), U₀

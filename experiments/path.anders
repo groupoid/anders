@@ -32,3 +32,5 @@ def sym-sym-eq-idp (A : U) (x y : A) (p : Path A x y) :
 def hmtpy (A : U) (x y : A) (p : Path A x y) :
   Path (Path A x x) (<_> x) (<i> p @ i /\ -i) :=
   <j i> p @ j /\ i /\ -i
+
+def plam (A : U) (f : I -> A) : Path A (f 0) (f 1) := <i> f i

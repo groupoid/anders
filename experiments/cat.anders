@@ -1,5 +1,6 @@
 module cat where
 
+def unit : U₁ := U
 def cat : U₂ := Σ (A: U₁), A -> A -> U₁
 axiom isSet (A: U₁) : U₁
 
@@ -9,6 +10,28 @@ def isPrecategory (C: cat) : U₁ := Σ
     (∘: Π (x y z:C.1), C.2 x y -> C.2 y z -> C.2 x z)
     (homSet: Π (x y: C.1), isSet (C.2 x y))
     (∘-left: Π (x y: C.1) (f: C.2 x y), PathP (<_>(C.2 x y)) (∘ x x y (id x) f) f)
-    (∘-right: Π (x y: C.1) (f: C.2 x y), PathP (<_>(C.2 x y)) (∘ x y y f (id y)) f)
-    (∘-assoc: Π (x y z w: C.1) (f: C.2 x y) (g: C.2 y z) (h: C.2 z w),
-      PathP (<_>(C.2 x w)) (∘ x z w (∘ x y z f g) h) (∘ x y w f (∘ y z w g h))), U₀
+    (∘-right: Π (x y: C.1) (f: C.2 x y), PathP (<_>(C.2 x y)) (∘ x y y f (id y)) f),
+     Π (x y z w: C.1) (f: C.2 x y) (g: C.2 y z) (h: C.2 z w),
+      PathP (<_>(C.2 x w)) (∘ x z w (∘ x y z f g) h) (∘ x y w f (∘ y z w g h))
+
+def precategory: U₂ := Σ (C: cat), isPrecategory C
+def carrier (C: precategory): U₁ := C.1.1
+def hom (C: precategory) (a b: carrier C): U₁ := C.1.2 a b
+def homSet (C: precategory) (a b: carrier C): isSet (hom C a b) := C.2.2.2.1 a b
+def compose (C: precategory) (x y z: carrier C) (f: hom C x y) (g: hom C y z): hom C x z := C.2.2.1 x y z f g
+def path (C: precategory) (x: carrier C): hom C x x := C.2.1 x
+
+def pathL (C: precategory) (x y: carrier C) (f: hom C x y): PathP (<_>(hom C x y)) (compose C x x y (path C x) f) f := C.2.2.2.2.1 x y f
+def pathR (C: precategory) (x y: carrier C) (f: hom C x y): PathP (<_>(hom C x y)) (compose C x y y f (path C y)) f := C.2.2.2.2.2.1 x y f
+def pathC (C: precategory) (x y z w: carrier C) (f: hom C x y) (g: hom C y z) (h: hom C z w)
+  : PathP (<_>(hom C x w)) (compose C x z w (compose C x y z f g) h) (compose C x y w f (compose C y z w g h))
+ := C.2.2.2.2.2.2 x y z w f g h
+
+def iso (C: precategory) (A B: carrier C): U₂ := Σ
+    (f: hom C A B)
+    (g: hom C B A)
+    (retract: PathP (<_>(hom C A A)) (compose C A B A f g) (path C A))
+    (section: PathP (<_>(hom C B B)) (compose C B A B g f) (path C B)), U₁
+
+def cat₁ (P: precategory): precategory := ((carrier P,hom P),path P,compose P,homSet P,pathL P,pathR P,pathC P)
+

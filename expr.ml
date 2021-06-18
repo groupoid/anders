@@ -190,6 +190,9 @@ let showGamma (ctx : ctx) : string =
         | _, _, _     -> None)
   |> String.concat "\n"
 
+let var x = VNt (NVar x)
+let genV n = var (pat n)
+
 let merge ctx1 ctx2 : ctx =
   Env.merge (fun k x y ->
     match x, y with

@@ -31,10 +31,6 @@ let upLocal (ctx : ctx) (p : name) t v : ctx =
 let upGlobal (ctx : ctx) (p : name) t v : ctx =
   Env.add p (Global, t, Value v) ctx |> ignoreAnon p ctx
 
-let gen : int ref = ref 0
-let var x = VNt (NVar x)
-let pat : name -> name = (gen := !gen + 1); function | No -> No | Name (p, _) -> Name (p, !gen)
-let genV n = var (pat n)
 let ieq u v : bool = !girard || u = v
 
 let rec eval (e : exp) (ctx : ctx) = traceEval e; match e with

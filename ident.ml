@@ -18,5 +18,11 @@ module Name = struct
       else compare p q
 end
 
-module Env = Map.Make(Name)
+module Env   = Map.Make(Name)
 module Files = Set.Make(String)
+
+let inc : int ref = ref 0
+let gen () = inc := !inc + 1; !inc
+
+let pat : name -> name = function
+  | No -> No | Name (p, _) -> Name (p, gen ())

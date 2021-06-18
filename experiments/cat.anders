@@ -4,7 +4,9 @@ def cat : U₁ := Σ (A: U), A -> A -> U
 def isSet (A : U) : U := Π (a b : A) (a0 b0 : PathP (<i> A) a b), PathP (<i> PathP (<i> A) a b) a0 b0
 
 -- HoTT Definition 9.1.1. Precategory Properties
-def isPrecategory (C: cat) : U := Σ
+def isPrecategory (C: cat)
+  : U
+ := Σ
     (id: Π (x: C.1), C.2 x x)
     (∘: Π (x y z:C.1), C.2 x y -> C.2 y z -> C.2 x z)
     (homSet: Π (x y: C.1), isSet (C.2 x y))
@@ -19,20 +21,13 @@ def hom (C: precategory) (a b: carrier C): U := C.1.2 a b
 def homSet (C: precategory) (a b: carrier C): isSet (hom C a b) := C.2.2.2.1 a b
 def compose (C: precategory) (x y z: carrier C) (f: hom C x y) (g: hom C y z): hom C x z := C.2.2.1 x y z f g
 def path (C: precategory) (x: carrier C): hom C x x := C.2.1 x
-
 def pathL (C: precategory) (x y: carrier C) (f: hom C x y): PathP (<_>(hom C x y)) (compose C x x y (path C x) f) f := C.2.2.2.2.1 x y f
 def pathR (C: precategory) (x y: carrier C) (f: hom C x y): PathP (<_>(hom C x y)) (compose C x y y f (path C y)) f := C.2.2.2.2.2.1 x y f
 def pathC (C: precategory) (x y z w: carrier C) (f: hom C x y) (g: hom C y z) (h: hom C z w)
-  : PathP (<_>(hom C x w)) (compose C x z w (compose C x y z f g) h) (compose C x y w f (compose C y z w g h))
- := C.2.2.2.2.2.2 x y z w f g h
+  : PathP (<_>(hom C x w)) (compose C x z w (compose C x y z f g) h) (compose C x y w f (compose C y z w g h)) := C.2.2.2.2.2.2 x y z w f g h
 
-def iso (C: precategory) (A B: carrier C): U₁ :=
-  Σ (f: hom C A B)
-    (g: hom C B A)
-    (retract: PathP (<_>(hom C A A)) (compose C A B A f g) (path C A))
-    (section: PathP (<_>(hom C B B)) (compose C B A B g f) (path C B)), U
-
-def catᵒᵖ (P: precategory): precategory
+def catᵒᵖ (P: precategory)
+  : precategory
  := ((carrier P,(\(A B: carrier P), hom P B A)),
     (\(A: carrier P),path P A),
     (\(A B C: carrier P) (f: hom P B A) (g: hom P C B), compose P C B A g f),
@@ -41,4 +36,14 @@ def catᵒᵖ (P: precategory): precategory
     (\(A B: carrier P) (f: hom P B A), pathL P B A f),
     (\(A B C D: carrier P) (f: hom P B A) (g: hom P C B) (h: hom P D C), <i> (pathC P D C B A h g f) @ -i))
 
-def opPreserve (C: precategory) : PathP (<_>precategory) (catᵒᵖ (catᵒᵖ C)) C := <i> C
+def opPreserve (C: precategory)
+  : PathP (<_>precategory) (catᵒᵖ (catᵒᵖ C)) C
+ := <i> C
+
+def iso (C: precategory) (A B: carrier C)
+  : U₁
+ := Σ
+    (f: hom C A B)
+    (g: hom C B A)
+    (retract: PathP (<_>(hom C A A)) (compose C A B A f g) (path C A))
+    (section: PathP (<_>(hom C B B)) (compose C B A B g f) (path C B)), U

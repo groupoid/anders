@@ -148,8 +148,7 @@ and conv ctx v1 v2 : bool = traceConv v1 v2;
   | VKan u, VKan v -> ieq u v
   | VNt x, VNt y -> convNeut ctx x y
   | VPair (a, b), VPair (c, d) -> conv ctx a c && conv ctx b d
-  | VPair (a, b), v -> conv ctx a (vfst v) && conv ctx b (vsnd v)
-  | v, VPair (a, b) -> conv ctx (vfst v) a && conv ctx (vsnd v) b
+  | VPair (a, b), v | v, VPair (a, b) -> conv ctx (vfst v) a && conv ctx (vsnd v) b
   | VPi (a, g), VPi (b, h) | VSig (a, g), VSig (b, h)
   | VLam (a, g), VLam (b, h) -> let (p, e1, ctx1) = g in let (q, e2, ctx2) = h in
     let u = pat p in let v = var u in let ctx' = upLocal ctx u a v in
@@ -207,7 +206,7 @@ and check ctx (e0 : exp) (t0 : value) =
     match infer ctx e with
     | VKan v | VPre v -> if ieq u v then () else raise (TypeIneq (VPre u, VPre v))
     | t -> raise (TypeIneq (VPre u, t)) end
-  | e, t -> eqNf ctx t (infer ctx e)
+  | e, t -> eqNf ctx (infer ctx e) t
 
 and infer ctx e : value = traceInfer e; match e with
   | EVar x -> lookup x ctx

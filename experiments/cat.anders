@@ -1,10 +1,10 @@
 module cat where
 
-def cat : U₂ := Σ (A: U₁), A -> A -> U₁
-def isSet (A : U₁) : U₁ := Π (a b : A) (a0 b0 : PathP (<i> A) a b), PathP (<i> PathP (<i> A) a b) a0 b0
+def cat : U₁ := Σ (A: U), A -> A -> U
+def isSet (A : U) : U := Π (a b : A) (a0 b0 : PathP (<i> A) a b), PathP (<i> PathP (<i> A) a b) a0 b0
 
 -- HoTT Definition 9.1.1. Precategory Properties
-def isPrecategory (C: cat) : U₁ := Σ
+def isPrecategory (C: cat) : U := Σ
     (id: Π (x: C.1), C.2 x x)
     (∘: Π (x y z:C.1), C.2 x y -> C.2 y z -> C.2 x z)
     (homSet: Π (x y: C.1), isSet (C.2 x y))
@@ -13,9 +13,9 @@ def isPrecategory (C: cat) : U₁ := Σ
      Π (x y z w: C.1) (f: C.2 x y) (g: C.2 y z) (h: C.2 z w),
       PathP (<_>(C.2 x w)) (∘ x z w (∘ x y z f g) h) (∘ x y w f (∘ y z w g h))
 
-def precategory: U₂ := Σ (C: cat), isPrecategory C
-def carrier (C: precategory): U₁ := C.1.1
-def hom (C: precategory) (a b: carrier C): U₁ := C.1.2 a b
+def precategory: U₁ := Σ (C: cat), isPrecategory C
+def carrier (C: precategory): U := C.1.1
+def hom (C: precategory) (a b: carrier C): U := C.1.2 a b
 def homSet (C: precategory) (a b: carrier C): isSet (hom C a b) := C.2.2.2.1 a b
 def compose (C: precategory) (x y z: carrier C) (f: hom C x y) (g: hom C y z): hom C x z := C.2.2.1 x y z f g
 def path (C: precategory) (x: carrier C): hom C x x := C.2.1 x
@@ -26,11 +26,11 @@ def pathC (C: precategory) (x y z w: carrier C) (f: hom C x y) (g: hom C y z) (h
   : PathP (<_>(hom C x w)) (compose C x z w (compose C x y z f g) h) (compose C x y w f (compose C y z w g h))
  := C.2.2.2.2.2.2 x y z w f g h
 
-def iso (C: precategory) (A B: carrier C): U₂ :=
+def iso (C: precategory) (A B: carrier C): U₁ :=
   Σ (f: hom C A B)
     (g: hom C B A)
     (retract: PathP (<_>(hom C A A)) (compose C A B A f g) (path C A))
-    (section: PathP (<_>(hom C B B)) (compose C B A B g f) (path C B)), U₁
+    (section: PathP (<_>(hom C B B)) (compose C B A B g f) (path C B)), U
 
 def catᵒᵖ (P: precategory): precategory
  := ((carrier P,(\(A B: carrier P), hom P B A)),

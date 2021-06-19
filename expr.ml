@@ -66,8 +66,8 @@ let rec showExp : exp -> string = function
   | EPLam e -> Printf.sprintf "(pLam %s)" (showExp e)
   | EAppFormula (f, x) -> Printf.sprintf "(%s @ %s)" (showExp f) (showExp x)
   | EI -> "I" | EZero -> "0" | EOne -> "1"
-  | EAnd (a, b) -> Printf.sprintf "(%s ∧ %s)" (showExp a) (showExp b)
-  | EOr (a, b) -> Printf.sprintf "(%s ∨ %s)" (showExp a) (showExp b)
+  | EAnd (a, b) -> Printf.sprintf "(%s /\\ %s)" (showExp a) (showExp b)
+  | EOr (a, b) -> Printf.sprintf "(%s \\/ %s)" (showExp a) (showExp b)
   | ENeg a -> Printf.sprintf "-%s" (showExp a)
 and showTele : tele -> string =
   fun (p, x) -> Printf.sprintf "(%s : %s)" (showName p) (showExp x)
@@ -166,8 +166,8 @@ and showNeut : neut -> string = function
   | NAxiom (p, _) -> p
   | NPathP v -> "PathP " ^ showValue v
   | NI -> "I" | NZero -> "0" | NOne -> "1"
-  | NAnd (a, b) -> Printf.sprintf "(%s ∧ %s)" (showNeut a) (showNeut b)
-  | NOr (a, b) -> Printf.sprintf "(%s ∨ %s)" (showNeut a) (showNeut b)
+  | NAnd (a, b) -> Printf.sprintf "(%s /\\ %s)" (showNeut a) (showNeut b)
+  | NOr (a, b) -> Printf.sprintf "(%s \\/ %s)" (showNeut a) (showNeut b)
   | NNeg a -> Printf.sprintf "-%s" (showNeut a)
 and showTermBind : name * record -> string option = function
   | p, (Local, _, t) -> Some (Printf.sprintf "%s := %s" (showName p) (showTerm t))

@@ -13,7 +13,7 @@ let rec extractExp : exp -> string = function
   | EApp (EApp (EPathP p, a), b) ->
     Printf.sprintf "PathP %s %s %s" (extractExp p) (extractExp a) (extractExp b)
   | EApp (EPathP _, _) | EPathP _ ->
-  fail "cubicaltt does not support (partial) currying of PathP"
+    fail "cubicaltt does not support (partial) currying of PathP"
   | EPLam (ELam ((p, EI), e)) ->
     Printf.sprintf "(<%s> %s)" (showName p) (extractExp e)
   | EPLam _ -> fail "invalid path lambda (should never happen)"

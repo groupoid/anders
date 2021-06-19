@@ -171,8 +171,8 @@ and convNeut ctx n1 n2 : bool =
   | NSnd x, NSnd y -> convNeut ctx x y
   | NAxiom (p, x), NAxiom (q, y) -> p = q && conv ctx x y
   | NPathP a, NPathP b -> conv ctx a b
-  | NOr (x1, y1), NOr (x2, y2) | NAnd (x1, y1), NAnd (x2, y2) ->
-    convNeut ctx x1 x2 && convNeut ctx y1 y2
+  | NOr _, NOr _ -> orEq n1 n2
+  | NAnd _, NAnd _ -> andEq n1 n2
   | NNeg x, NNeg y -> convNeut ctx x y
   | NI, NI -> true
   | NZero, NZero -> true

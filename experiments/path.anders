@@ -48,6 +48,10 @@ def elim-plam (A : U) (a b : A) (p : Path A a b) :
   Eq (Path A a b) (plam A (elim A a b p)) p :=
 refl (Path A a b) p
 
+def ⊕ (i j : I) : I := (i ∧ -j) ∨ (-i ∧ j)
+def ⊕-comm (i j : I) : Eq I (⊕ i j) (⊕ j i) :=
+refl I (⊕ i j)
+
 def ∧-comm (i j : I) : Eq I (i ∧ j) (j ∧ i) :=
 refl I (i ∧ j)
 
@@ -62,7 +66,3 @@ refl I ((i ∨ j) ∧ k)
 
 def ∨-distrib-∧ (i j k : I) : Eq I ((i ∧ j) ∨ k) ((i ∨ k) ∧ (j ∨ k)) :=
 refl I ((i ∧ j) ∨ k)
-
-def ⊕ (i j : I) : I := (i ∨ j) ∧ -(i ∨ j)
-def ⊕-comm (i j : I) : Eq I (⊕ i j) (⊕ j i) :=
-refl I (⊕ i j)

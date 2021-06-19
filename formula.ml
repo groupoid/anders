@@ -21,8 +21,8 @@ let rec negNeut : neut -> neut = function
   | NOne        -> NZero
   | NVar p      -> NNeg (NVar p)
   | NNeg n      -> n
-  | NAnd (f, g) -> andNeut (negNeut f, negNeut g)
-  | NOr (f, g)  -> orNeut (negNeut f, negNeut g)
+  | NAnd (f, g) -> orNeut (negNeut f, negNeut g)
+  | NOr (f, g)  -> andNeut (negNeut f, negNeut g)
   | k           -> raise (InvalidFormulaNeg (VNt k))
 
 let andFormula a b =
@@ -62,8 +62,8 @@ let rec extOr : neut -> disjunction = function
   | k          -> [extAnd k]
 
 let uniq f =
-  List.filter (fun x -> not (List.exists (fun y ->
-    not (Atoms.equal x y) && Atoms.subset y x) f)) f
+  let super x y = not (Atoms.equal x y) && Atoms.subset y x in
+  List.filter (fun x -> not (List.exists (super x) f)) f
 
 let orSubset xs ys =
   List.for_all (fun y -> List.exists (Atoms.equal y) xs) ys

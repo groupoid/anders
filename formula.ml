@@ -68,7 +68,7 @@ let rec extOr : neut -> disjunction = function
   | NOr (x, y) -> List.rev_append (extOr x) (extOr y)
   | k          -> [extAnd k]
 
-(* uniq removes all conjunctions that are subset of another,
+(* uniq removes all conjunctions that are superset of another,
    i. e. xy ∨ x = (x ∧ y) ∨ (x ∧ 1) = x ∧ (y ∨ 1) = x ∧ 1 = x.
    It does not remove conjuctions like (x ∧ −x), because algebra of interval
    is not boolean, it is De Morgan algebra: distributive lattice with De Morgan laws.

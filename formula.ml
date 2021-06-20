@@ -29,18 +29,15 @@ let rec negNeut : neut -> neut = function
    will have form (α₁ ∧ ... ∧ αₙ) ∨ ... ∨ (β₁ ∧ ... ∧ βₘ),
    where “∧” and “∨” are right-associative,
    and each αᵢ/βⱼ has form “γ” or “−γ” for some variable “γ”. *)
-let andFormula a b =
-  match a, b with
+let andFormula a b = match a, b with
   | VNt u, VNt v -> VNt (andNeut (u, v))
   | _, _         -> raise (InvalidFormulaAnd (a, b))
 
-let orFormula a b =
-  match a, b with
+let orFormula a b = match a, b with
   | VNt u, VNt v -> VNt (orNeut (u, v))
   | _, _         -> raise (InvalidFormulaOr (a, b))
 
-let negFormula a =
-  match a with
+let negFormula a = match a with
   | VNt u -> VNt (negNeut u)
   | _     -> raise (InvalidFormulaNeg a)
 

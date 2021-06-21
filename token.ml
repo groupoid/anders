@@ -18,4 +18,4 @@ let tokenToString : token -> string = function
   | LT         -> "LT"          | GT         -> "GT"
   | APPFORMULA -> "APPFORMULA"  | NEGATE     -> "NEGATE"
   | AND        -> "AND"         | OR         -> "OR"
-  | PATHP      -> "PATHP"
+  | PATHP      -> "PATHP"       | TRANSP     -> "TRANSP"

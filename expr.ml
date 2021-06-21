@@ -17,6 +17,7 @@ type exp =
   (* cubical part *)
   | EPre        of int
   | EPathP      of exp
+  | ETransp     of exp * exp
   | EPLam       of exp
   | EAppFormula of exp * exp
   | EI | EZero | EOne
@@ -63,6 +64,7 @@ let rec showExp : exp -> string = function
   | EAxiom (p, _) -> p
   | EPre n -> "V" ^ showLevel n
   | EPathP e -> "PathP " ^ showExp e
+  | ETransp (p, i) -> Printf.sprintf "transp %s %s" (showExp p) (showExp i)
   | EPLam e -> Printf.sprintf "(pLam %s)" (showExp e)
   | EAppFormula (f, x) -> Printf.sprintf "(%s @ %s)" (showExp f) (showExp x)
   | EI -> "I" | EZero -> "0" | EOne -> "1"
@@ -119,6 +121,7 @@ and neut =
   | NHole
   (* cubical part *)
   | NPathP of value
+  | NTransp of value * value
   | NI | NZero | NOne
   | NAnd of neut * neut
   | NOr  of neut * neut
@@ -165,6 +168,7 @@ and showNeut : neut -> string = function
   | NHole -> "?"
   | NAxiom (p, _) -> p
   | NPathP v -> "PathP " ^ showValue v
+  | NTransp (p, i) -> Printf.sprintf "transp %s %s" (showValue p) (showValue i)
   | NI -> "I" | NZero -> "0" | NOne -> "1"
   | NAnd (a, b) -> Printf.sprintf "(%s /\\ %s)" (showNeut a) (showNeut b)
   | NOr (a, b) -> Printf.sprintf "(%s \\/ %s)" (showNeut a) (showNeut b)

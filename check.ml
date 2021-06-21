@@ -49,15 +49,15 @@ let rec eval (e : exp) (ctx : ctx) = traceEval e; match e with
   | EPathP e           -> VNt (NPathP (eval e ctx))
   | EPLam e            -> VPLam (eval e ctx)
   | EAppFormula (e, x) ->
-    begin let v = eval e ctx in match v with
+    begin match eval e ctx with
     | VPLam f -> app ctx (f, eval x ctx)
-    | _       -> begin match infer ctx (rbV ctx v) with
-      | VNt (NApp (NApp (NPathP _, u0), u1)) ->
-        begin let y = eval x ctx in match y with
-        | VNt NZero -> u0
-        | VNt NOne  -> u1
-        | _         -> VAppFormula (v, y) end
-      | _ -> raise (InvalidApplication (v, eval x ctx)) end
+    | v       ->
+      let (_, u0, u1) = extPathP ctx (rbV ctx v) in
+      begin match eval x ctx with
+      | VNt NZero -> u0
+      | VNt NOne  -> u1
+      | u         -> VAppFormula (v, u)
+      end
     end
   | EI                 -> VNt NI
   | EZero              -> VNt NZero
@@ -78,6 +78,11 @@ and getRho ctx x = match Env.find_opt x ctx with
 
 and closByVal ctx1 t x v = let (p, e, ctx2) = x in traceClos e p v;
   let ctx' = merge ctx2 ctx1 in eval e (upLocal ctx' p t v)
+
+and extPathP ctx e =
+  match infer ctx e with
+  | VNt (NApp (NApp (NPathP VPLam p, u0), u1)) -> (p, u0, u1)
+  | _ -> raise (ExpectedPath e)
 
 and rbV ctx v : exp = traceRbV v; match v with
   | VLam (t, g)        -> rbVTele eLam ctx t g
@@ -229,10 +234,8 @@ and infer ctx e : value = traceInfer e; match e with
       else raise (TypeIneq (VKan u, VKan v))
     | _, _ -> ExpectedFibrant (if isVSet t0 then t1 else t0) |> raise end
   | EAppFormula (f, x) ->
-    check ctx x (VNt NI);
-    begin match infer ctx f with
-    | VNt (NApp (NApp (NPathP (VPLam g), _), _)) -> app ctx (g, eval x ctx)
-    | _ -> raise (ExpectedPath f) end
+    check ctx x (VNt NI); let (p, _, _) = extPathP ctx f
+    in app ctx (p, eval x ctx)
   | EI -> VPre 0 | EZero -> VNt NI | EOne -> VNt NI
   | ENeg e ->
     if infer ctx e = VNt NI

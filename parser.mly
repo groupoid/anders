@@ -9,11 +9,11 @@
 %token DEFEQ PROD ARROW FST SND LAM DEF
 %token DIRSEP MODULE WHERE IMPORT AXIOM
 %token SIGMA PI OPTION LT GT APPFORMULA
-%token PATHP AND OR NEGATE
+%token PATHP TRANSP AND OR NEGATE
 
 %left OR
 %left AND
-%nonassoc PATHP
+%nonassoc PATHP TRANSP
 %nonassoc NEGATE
 %nonassoc FST SND
 
@@ -54,6 +54,7 @@ exp3:
   | exp3 AND exp3 { EAnd ($1, $3) }
   | exp3 OR exp3 { EOr ($1, $3) }
   | PATHP exp3 { EPathP $2 }
+  | TRANSP exp3 exp3 { ETransp ($2, $3) }
   | LPARENS exp0 RPARENS { $2 }
   | IDENT { match $1 with
             | "i0" | "i₀" -> EZero

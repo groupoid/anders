@@ -6,10 +6,11 @@ open Expr
 let fail x = raise (ExtractionError x)
 
 let rec extractExp : exp -> string = function
-  | EKan 0 -> "U"
-  | EKan u -> fail "cubicaltt does not support universe hierarchy"
-  | EPre _ -> fail "cubicaltt does not support explicit pretypes"
-  | EI     -> fail "cubicaltt does not support explicit interval"
+  | EKan 0    -> "U"
+  | EKan u    -> fail "cubicaltt does not support universe hierarchy"
+  | EPre _    -> fail "cubicaltt does not support explicit pretypes"
+  | EI        -> fail "cubicaltt does not support explicit interval"
+  | ETransp _ -> fail "cubicaltt does not support generalized transport"
   | EApp (EApp (EPathP p, a), b) ->
     Printf.sprintf "PathP %s %s %s" (extractExp p) (extractExp a) (extractExp b)
   | EApp (EPathP _, _) | EPathP _ ->

@@ -10,7 +10,8 @@ let rec extractExp : exp -> string = function
   | EKan u    -> fail "cubicaltt does not support universe hierarchy"
   | EPre _    -> fail "cubicaltt does not support explicit pretypes"
   | EI        -> fail "cubicaltt does not support explicit interval"
-  | ETransp _ -> fail "cubicaltt does not support generalized transport"
+  | EApp (ETransp (p, i), a) -> Printf.sprintf "transGen %s %s %s" (extractExp p) (extractExp i) (extractExp a)
+  | ETransp _ -> fail "cubicaltt does not support currying of generalized transport"
   | EApp (EApp (EPathP p, a), b) ->
     Printf.sprintf "PathP %s %s %s" (extractExp p) (extractExp a) (extractExp b)
   | EApp (EPathP _, _) | EPathP _ ->

@@ -12,8 +12,8 @@ def sym (A: U) (a b : A) (p : Path A a b) : Path A b a := <i> p @ -i
 def contr (A : U) (a b : A) (p : Path A a b) : Path (singl A a) (eta A a) (b, p) := <i> (p @ i, <j> p @ i /\ j)
 def cong (A B : U) (f : A -> B) (a b : A) (p : Path A a b) : Path B (f a) (f b) := <i> f (p @ i)
 def ap (A: U) (a x: A) (B: A -> U) (f: A -> B a) (b: B a) (p: Path A a x): Path (B a) (f a) (f x) := <i> f (p @ i)
-def trans (A B: U) (p: PathP (<_> U) A B) (a: A): B := transp p 0 a -- comp p a []
-axiom subst (A: U) (P: A -> U) (a b: A) (p: Path A a b) (e: P a): P b -- := comp (<i> P (p @ i)) e []
+def trans (A B: U) (p: PathP (<_> U) A B) (a: A): B := transp p 0 a
+def subst (A: U) (P: A -> U) (a b: A) (p: Path A a b) (e: P a): P b := transp (<i> P (p @ i)) 0 e
 def inv (A: U) (a b: A) (p: Path A a b): Path A b a := <i> p @ -i
 def coerce (A B: U) (p: PathP (<_> U) A B): A -> B := λ (x : A), trans A B p x
 

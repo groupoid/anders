@@ -13,6 +13,7 @@ Features
 * Full Agda-style UTF-8 support including universe levels
 * Lean comma-syntax for ΠΣ
 * Non-2D syntax with top-level specificators
+* Groupoid Infinity CCHM base library: https://groupoid.space/math
 * Best suited for academic papers
 
 Prerequisites

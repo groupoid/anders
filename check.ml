@@ -216,10 +216,8 @@ and check ctx (e0 : exp) (t0 : value) =
 and infer ctx e : value = traceInfer e; match e with
   | EVar x -> lookup x ctx
   | EKan u -> VKan (u + 1)
-  | ESig ((p, a), b) | EPi ((p, a), b) ->
-    let t = eval a ctx in let u = pat p in let gen = var u in
-    let ctx' = upLocal (upLocal ctx p t gen) u t gen in
-    let v = infer ctx' b in univImpl (infer ctx a) v
+  | ESig (t, e) -> inferTele ctx imax t e
+  | EPi (t, e) -> inferTele ctx univImpl t e
   | EApp (f, x) -> let (t, g) = extPiG (infer ctx f) in
     ignore (check ctx x t); closByVal ctx t g (eval x ctx)
   | EFst e -> fst (extSigG (infer ctx e))
@@ -250,3 +248,8 @@ and infer ctx e : value = traceInfer e; match e with
   | EIsOne -> implv (VNt NI) (EPre 0) ctx
   | EOneRefl -> VNt (NApp (NIsOne, VNt NOne))
   | e -> raise (InferError e)
+
+and inferTele ctx binop (p, a) b =
+  let t = eval a ctx in let u = pat p in let gen = var u in
+  let ctx' = upLocal (upLocal ctx p t gen) u t gen in
+  let v = infer ctx' b in binop (infer ctx a) v

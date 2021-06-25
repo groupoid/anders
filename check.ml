@@ -169,8 +169,7 @@ and conv ctx v1 v2 : bool = traceConv v1 v2;
   | _, _ ->
     begin match infer ctx (rbV ctx v1), infer ctx (rbV ctx v2) with
     | VNt (NApp (NIsOne, u1)), VNt (NApp (NIsOne, u2)) -> conv ctx u1 u2
-    | _, _ -> false
-    end
+    | _, _ -> false end
 
 and convNeut ctx n1 n2 : bool =
   n1 == n2 || match n1, n2 with
@@ -220,7 +219,7 @@ and infer ctx e : value = traceInfer e; match e with
   | ESig ((p, a), b) | EPi ((p, a), b) ->
     let t = eval a ctx in let u = pat p in let gen = var u in
     let ctx' = upLocal (upLocal ctx p t gen) u t gen in
-    let v = infer ctx' b in imax (infer ctx a) v
+    let v = infer ctx' b in univImpl (infer ctx a) v
   | EApp (f, x) -> let (t, g) = extPiG (infer ctx f) in
     ignore (check ctx x t); closByVal ctx t g (eval x ctx)
   | EFst e -> fst (extSigG (infer ctx e))

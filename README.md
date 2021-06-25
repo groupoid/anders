@@ -19,6 +19,8 @@ Features
 Prerequisites
 -------------
 
+Here is example for Ubuntu:
+
 ```shell
 $ apt install ocaml ocamlbuild menhir
 ```
@@ -26,7 +28,7 @@ $ apt install ocaml ocamlbuild menhir
 Try
 ---
 
-Reality checking.
+Reality checking by internalizing MLTT:
 
 ```Lean
 def MLTT (A: U) : U := Σ
@@ -65,6 +67,8 @@ $ ./anders.native girard check experiments/mltt.anders
 Papers
 ------
 
+Anders was built by strictly following these publications:
+
 * <a href="http://www.cse.chalmers.se/~bengt/papers/GKminiTT.pdf">A simple type-theoretic language: Mini-TT</a> [Coquand, Kinoshita, Nordström, Takeyama]
 * <a href="https://arxiv.org/pdf/1611.02108.pdf">Cubical Type Theory: a constructive interpretation of the univalence axiom</a> [Cohen, Coquand, Huber, Mörtberg]
 * <a href="https://arxiv.org/pdf/1802.01170.pdf">On Higher Inductive Types in Cubical Type Theory</a> [Coquand, Huber, Mörtberg]
@@ -74,8 +78,8 @@ Papers
 * <a href="https://staff.math.su.se/anders.mortberg/papers/unifying.pdf">Unifying Cubical Models of Univalent Type Theory</a> [Cavallo, Mörtberg, Swan]
 * <a href="https://staff.math.su.se/anders.mortberg/papers/cubicalagda.pdf">Cubical Agda: A Dependently Typed PL with Univalence and HITs</a> [Vezzosi, Mörtberg, Abel]
 
-Credits
--------
+Acknowledgements
+----------------
 
 * Siegmentation Fault
 * Univalent People

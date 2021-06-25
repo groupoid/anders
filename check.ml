@@ -59,6 +59,8 @@ let rec eval (e : exp) (ctx : ctx) = traceEval e; match e with
       | u         -> VAppFormula (v, u)
       end
     end
+  | EIsOne             -> VNt NIsOne
+  | EOneRefl           -> VNt NOneRefl
   | EI                 -> VNt NI
   | EZero              -> VNt NZero
   | EOne               -> VNt NOne
@@ -102,6 +104,9 @@ and rbN ctx n : exp = traceRbN n; match n with
   | NHole              -> EHole
   | NAxiom (p, v)      -> EAxiom (p, rbV ctx v)
   | NPathP v           -> EPathP (rbV ctx v)
+  | NTransp (p, i)     -> ETransp (rbV ctx p, rbN ctx i)
+  | NIsOne             -> EIsOne
+  | NOneRefl           -> EOneRefl
   | NI                 -> EI
   | NZero              -> EZero
   | NOne               -> EOne
@@ -120,27 +125,22 @@ and prune ctx x =
   | None                 -> raise (VariableNotFound x)
 
 and weak (e : exp) ctx = traceWeak e; match e with
-  | EKan u             -> EKan u
+  | EVar x             -> prune ctx x
   | ELam ((p, a), b)   -> weakTele eLam ctx p a b
   | EPi  ((p, a), b)   -> weakTele ePi  ctx p a b
   | ESig ((p, a), b)   -> weakTele eSig ctx p a b
   | EFst e             -> EFst (weak e ctx)
   | ESnd e             -> ESnd (weak e ctx)
   | EApp (f, x)        -> EApp (weak f ctx, weak x ctx)
-  | EVar x             -> prune ctx x
   | EPair (e1, e2)     -> EPair (weak e1 ctx, weak e2 ctx)
-  | EHole              -> EHole
   | EAxiom (p, e)      -> EAxiom (p, weak e ctx)
-  | EPre u             -> EPre u
   | EPathP u           -> EPathP (weak u ctx)
   | EPLam u            -> EPLam (weak u ctx)
   | EAppFormula (f, x) -> EAppFormula (weak f ctx, weak x ctx)
-  | EI                 -> EI
-  | EZero              -> EZero
-  | EOne               -> EOne
   | EAnd (e1, e2)      -> EAnd (weak e1 ctx, weak e2 ctx)
   | EOr (e1, e2)       -> EOr (weak e1 ctx, weak e2 ctx)
   | ENeg e             -> ENeg (weak e ctx)
+  | e                  -> e
 and weakTele ctor ctx p a b : exp =
   let t = weak a ctx in ctor (p, t) (weak b (upLocal ctx p (eval t ctx) (var p)))
 
@@ -166,7 +166,11 @@ and conv ctx v1 v2 : bool = traceConv v1 v2;
     let i = var p in let ctx' = upLocal ctx p (VNt NI) i in
     conv ctx' (eval (EAppFormula (rbV ctx' v, EVar p)) ctx') (app ctx' (f, i))
   | VAppFormula (f, x), VAppFormula (g, y) -> conv ctx f g && conv ctx x y
-  | _, _ -> false
+  | _, _ ->
+    begin match infer ctx (rbV ctx v1), infer ctx (rbV ctx v2) with
+    | VNt (NApp (NIsOne, u1)), VNt (NApp (NIsOne, u2)) -> conv ctx u1 u2
+    | _, _ -> false
+    end
 
 and convNeut ctx n1 n2 : bool =
   n1 == n2 || match n1, n2 with
@@ -182,6 +186,7 @@ and convNeut ctx n1 n2 : bool =
   | NI, NI -> true
   | NZero, NZero -> true
   | NOne, NOne -> true
+  | NIsOne, NIsOne -> true
   | _, _ -> false
 
 and eqNf ctx v1 v2 : unit = traceEqNF v1 v2;
@@ -243,4 +248,6 @@ and infer ctx e : value = traceInfer e; match e with
   | EOr (e1, e2) | EAnd (e1, e2) ->
     if infer ctx e1 = VNt NI && infer ctx e2 = VNt NI
     then VNt NI else raise (InferError e)
+  | EIsOne -> implv (VNt NI) (EPre 0) ctx
+  | EOneRefl -> VNt (NApp (NIsOne, VNt NOne))
   | e -> raise (InferError e)

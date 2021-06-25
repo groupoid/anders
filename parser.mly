@@ -60,6 +60,8 @@ exp3:
             | "i0" | "i₀" -> EZero
             | "i1" | "i₁" -> EOne
             | "interval"  -> EI
+            | "is-one?"   -> EIsOne
+            | "1-refl"    -> EOneRefl
             | _           -> decl $1 }
   | NO { EVar No }
 

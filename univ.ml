@@ -26,4 +26,4 @@ let imax a b = match a, b with
   | VKan u, VPre v -> VPre (max u v)
   | u, v -> ExpectedVSet (if isVSet u then v else u) |> raise
 
-let implv a b rho = VPi (a, (No, b, rho))
+let implv a b ctx = VPi (a, (No, b, ctx))

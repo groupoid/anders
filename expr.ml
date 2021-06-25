@@ -1,6 +1,10 @@
 open Ident
 
 type scope = Local | Global
+type dir = Zero | One
+
+let showDir : dir -> string = function
+  | Zero -> "0" | One -> "1"
 
 type exp =
   | ELam   of tele * exp
@@ -21,7 +25,7 @@ type exp =
   | EPLam       of exp
   | EAppFormula of exp * exp
   | EIsOne | EOneRefl
-  | EI | EZero | EOne
+  | EI | EDir of dir
   | EAnd of exp * exp
   | EOr  of exp * exp
   | ENeg of exp
@@ -69,7 +73,7 @@ let rec showExp : exp -> string = function
   | ETransp (p, i) -> Printf.sprintf "transp %s %s" (showExp p) (showExp i)
   | EPLam e -> Printf.sprintf "(pLam %s)" (showExp e)
   | EAppFormula (f, x) -> Printf.sprintf "(%s @ %s)" (showExp f) (showExp x)
-  | EI -> "I" | EZero -> "0" | EOne -> "1"
+  | EI -> "I" | EDir d -> showDir d
   | EAnd (a, b) -> Printf.sprintf "(%s /\\ %s)" (showExp a) (showExp b)
   | EOr (a, b) -> Printf.sprintf "(%s \\/ %s)" (showExp a) (showExp b)
   | ENeg a -> Printf.sprintf "-%s" (showExp a)
@@ -125,7 +129,7 @@ and neut =
   | NPathP of value
   | NTransp of value * neut
   | NIsOne | NOneRefl
-  | NI | NZero | NOne
+  | NI | NDir of dir
   | NAnd of neut * neut
   | NOr  of neut * neut
   | NNeg of neut
@@ -173,7 +177,7 @@ and showNeut : neut -> string = function
   | NPathP v -> "PathP " ^ showValue v
   | NIsOne -> "is-one?" | NOneRefl -> "1-refl"
   | NTransp (p, i) -> Printf.sprintf "transp %s %s" (showValue p) (showNeut i)
-  | NI -> "I" | NZero -> "0" | NOne -> "1"
+  | NI -> "I" | NDir d -> showDir d
   | NAnd (a, b) -> Printf.sprintf "(%s /\\ %s)" (showNeut a) (showNeut b)
   | NOr (a, b) -> Printf.sprintf "(%s \\/ %s)" (showNeut a) (showNeut b)
   | NNeg a -> Printf.sprintf "-%s" (showNeut a)
@@ -200,6 +204,9 @@ let showGamma (ctx : ctx) : string =
 
 let var x = VNt (NVar x)
 let genV n = var (pat n)
+
+let zero = VNt (NDir Zero)
+let one  = VNt (NDir One)
 
 let merge ctx1 ctx2 : ctx =
   Env.merge (fun k x y ->

@@ -3,22 +3,24 @@ open Error
 open Expr
 
 let rec orNeut : neut * neut -> neut = function
-  | NOne, _  | _, NOne  -> NOne
-  | NZero, f | f, NZero -> f
+  | NDir One, _  | _, NDir One  -> NDir One
+  | NDir Zero, f | f, NDir Zero -> f
   | NOr (f, g), h -> orNeut (f, orNeut (g, h))
   | f, g -> NOr (f, g)
 
 let rec andNeut : neut * neut -> neut = function
-  | NZero, _ | _, NZero -> NZero
-  | NOne, f  | f, NOne  -> f
+  | NDir Zero, _ | _, NDir Zero -> NDir Zero
+  | NDir One, f  | f, NDir One  -> f
   | NAnd (f, g), h -> andNeut (f, andNeut (g, h))
   | NOr (f, g), h | h, NOr (f, g) ->
     orNeut (andNeut (f, h), andNeut (g, h))
   | f, g -> NAnd (f, g)
 
+let negDir : dir -> dir = function
+  | Zero -> One | One -> Zero
+
 let rec negNeut : neut -> neut = function
-  | NZero       -> NOne
-  | NOne        -> NZero
+  | NDir d      -> NDir (negDir d)
   | NVar p      -> NNeg (NVar p)
   | NNeg n      -> n
   | NAnd (f, g) -> orNeut (negNeut f, negNeut g)

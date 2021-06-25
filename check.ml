@@ -54,16 +54,15 @@ let rec eval (e : exp) (ctx : ctx) = traceEval e; match e with
     | v       ->
       let (_, u0, u1) = extPathP ctx (rbV ctx v) in
       begin match eval x ctx with
-      | VNt NZero -> u0
-      | VNt NOne  -> u1
-      | u         -> VAppFormula (v, u)
+      | VNt (NDir Zero) -> u0
+      | VNt (NDir One)  -> u1
+      | u               -> VAppFormula (v, u)
       end
     end
   | EIsOne             -> VNt NIsOne
   | EOneRefl           -> VNt NOneRefl
   | EI                 -> VNt NI
-  | EZero              -> VNt NZero
-  | EOne               -> VNt NOne
+  | EDir d             -> VNt (NDir d)
   | EAnd (e1, e2)      -> andFormula (eval e1 ctx) (eval e2 ctx)
   | EOr (e1, e2)       -> orFormula (eval e1 ctx) (eval e2 ctx)
   | ENeg e             -> negFormula (eval e ctx)
@@ -108,8 +107,7 @@ and rbN ctx n : exp = traceRbN n; match n with
   | NIsOne             -> EIsOne
   | NOneRefl           -> EOneRefl
   | NI                 -> EI
-  | NZero              -> EZero
-  | NOne               -> EOne
+  | NDir d             -> EDir d
   | NAnd (u, v)        -> EAnd (rbN ctx u, rbN ctx v)
   | NOr (u, v)         -> EOr (rbN ctx u, rbN ctx v)
   | NNeg u             -> ENeg (rbN ctx u)
@@ -183,8 +181,7 @@ and convNeut ctx n1 n2 : bool =
   | NAnd _, NAnd _ -> andEq n1 n2
   | NNeg x, NNeg y -> convNeut ctx x y
   | NI, NI -> true
-  | NZero, NZero -> true
-  | NOne, NOne -> true
+  | NDir u, NDir v -> u = v
   | NIsOne, NIsOne -> true
   | _, _ -> false
 
@@ -202,10 +199,10 @@ and check ctx (e0 : exp) (t0 : value) =
   | EHole, v -> traceHole v ctx
   | EAxiom (_, u), v -> eqNf ctx (eval u ctx) v
   | EPLam e, VNt (NApp (NApp (NPathP (VPLam g), u0), u1)) ->
-    let v0 = app ctx (eval e ctx, VNt NZero) in
-    let v1 = app ctx (eval e ctx, VNt NOne) in
-    check ctx (rbV ctx v0) (app ctx (g, VNt NZero));
-    check ctx (rbV ctx v1) (app ctx (g, VNt NOne));
+    let v0 = app ctx (eval e ctx, zero) in
+    let v1 = app ctx (eval e ctx, one) in
+    check ctx (rbV ctx v0) (app ctx (g, zero));
+    check ctx (rbV ctx v1) (app ctx (g, one));
     eqNf ctx v0 u0; eqNf ctx v1 u1
   | e, VPre u -> begin
     match infer ctx e with
@@ -226,8 +223,8 @@ and infer ctx e : value = traceInfer e; match e with
   | EPre u -> VPre (u + 1)
   | EPathP (EPLam e) ->
     let v = eval e ctx in
-    let v0 = app ctx (v, VNt NZero) in
-    let v1 = app ctx (v, VNt NOne) in
+    let v0 = app ctx (v, zero) in
+    let v1 = app ctx (v, one) in
     let t0 = infer ctx (rbV ctx v0) in
     let t1 = infer ctx (rbV ctx v1) in
     begin match t0, t1 with
@@ -238,7 +235,7 @@ and infer ctx e : value = traceInfer e; match e with
   | EAppFormula (f, x) ->
     check ctx x (VNt NI); let (p, _, _) = extPathP ctx f
     in app ctx (p, eval x ctx)
-  | EI -> VPre 0 | EZero -> VNt NI | EOne -> VNt NI
+  | EI -> VPre 0 | EDir _ -> VNt NI
   | ENeg e ->
     if infer ctx e = VNt NI
     then VNt NI else raise (InferError e)
@@ -246,7 +243,7 @@ and infer ctx e : value = traceInfer e; match e with
     if infer ctx e1 = VNt NI && infer ctx e2 = VNt NI
     then VNt NI else raise (InferError e)
   | EIsOne -> implv (VNt NI) (EPre 0) ctx
-  | EOneRefl -> VNt (NApp (NIsOne, VNt NOne))
+  | EOneRefl -> VNt (NApp (NIsOne, one))
   | e -> raise (InferError e)
 
 and inferTele ctx binop (p, a) b =

@@ -20,7 +20,7 @@ let rec extractExp : exp -> string = function
     Printf.sprintf "(<%s> %s)" (showName p) (extractExp e)
   | EPLam _ -> fail "invalid path lambda (should never happen)"
   | EAppFormula (f, x) -> Printf.sprintf "(%s @ %s)" (extractExp f) (extractExp x)
-  | EZero -> "0" | EOne -> "1"
+  | EDir d -> showDir d
   | EAnd (a, b) -> Printf.sprintf "(%s /\\ %s)" (extractExp a) (extractExp b)
   | EOr (a, b) -> Printf.sprintf "(%s \\/ %s)" (extractExp a) (extractExp b)
   | ENeg a -> Printf.sprintf "-%s" (extractExp a)

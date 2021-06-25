@@ -28,8 +28,10 @@ context default
     keyword whole happly brightmagenta
     keyword whole Path brightmagenta
     keyword whole PathP brightmagenta
+    keyword whole LineP brightmagenta
+    keyword whole PartialP brightmagenta
     keyword whole J brightmagenta
-    keyword whole refl brightmagenta
+    keyword whole idp brightmagenta
     keyword whole sym brightmagenta
     keyword whole trans brightmagenta
     keyword whole isSet brightmagenta
@@ -45,6 +47,8 @@ context default
     keyword whole conjugate brightmagenta
     keyword whole empty brightmagenta
     keyword whole unit brightmagenta
+    keyword whole comp brightmagenta
+    keyword whole fill brightmagenta
     keyword whole Σ brightmagenta
     keyword whole Π brightmagenta
     keyword whole module cyan
@@ -52,6 +56,8 @@ context default
     keyword whole ctor cyan
     keyword whole elim cyan
     keyword whole form cyan
+    keyword whole hcomp cyan
+    keyword whole transp cyan
     keyword whole definition cyan
     keyword whole axiom cyan
     keyword whole theorem cyan
@@ -64,6 +70,8 @@ context default
     keyword whole false cyan
     keyword whole module cyan
     keyword whole where cyan
+    keyword whole is-one? cyan
+    keyword whole λ cyan
     keyword .1 cyan
     keyword .2 cyan
     keyword whole comp cyan
@@ -72,6 +80,8 @@ context default
     keyword < cyan
     keyword * cyan
     keyword | cyan
+    keyword V cyan
+    keyword U cyan
     keyword whole /\\ cyan
     keyword whole \\/ cyan
     keyword whole → cyan

@@ -117,7 +117,6 @@ type value =
   (* cubical part *)
   | VPre  of int
   | VPLam of value
-  | VAppFormula of value * value
 and neut =
   | NVar of name
   | NApp of neut * value
@@ -128,6 +127,7 @@ and neut =
   (* cubical part *)
   | NPathP of value
   | NTransp of value * neut
+  | NAppFormula of value * value
   | NIsOne | NOneRefl
   | NI | NDir of dir
   | NAnd of neut * neut
@@ -166,7 +166,6 @@ let rec showValue : value -> string = function
   | VNt n -> showNeut n
   | VPre n -> "V" ^ showLevel n
   | VPLam v -> Printf.sprintf "(pLam %s)" (showValue v)
-  | VAppFormula (f, x) -> Printf.sprintf "(%s @ %s)" (showValue f) (showValue x)
 and showNeut : neut -> string = function
   | NVar p -> showName p
   | NApp (f, x) -> Printf.sprintf "(%s %s)" (showNeut f) (showValue x)
@@ -177,6 +176,7 @@ and showNeut : neut -> string = function
   | NPathP v -> "PathP " ^ showValue v
   | NIsOne -> "is-one?" | NOneRefl -> "1-refl"
   | NTransp (p, i) -> Printf.sprintf "transp %s %s" (showValue p) (showNeut i)
+  | NAppFormula (f, x) -> Printf.sprintf "(%s @ %s)" (showValue f) (showValue x)
   | NI -> "I" | NDir d -> showDir d
   | NAnd (a, b) -> Printf.sprintf "(%s /\\ %s)" (showNeut a) (showNeut b)
   | NOr (a, b) -> Printf.sprintf "(%s \\/ %s)" (showNeut a) (showNeut b)

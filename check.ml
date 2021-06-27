@@ -56,7 +56,7 @@ let rec eval (e : exp) (ctx : ctx) = traceEval e; match e with
       begin match eval x ctx with
       | VNt (NDir Zero) -> u0
       | VNt (NDir One)  -> u1
-      | u               -> VAppFormula (v, u)
+      | u               -> VNt (NAppFormula (v, u))
       end
     end
   | EIsOne             -> VNt NIsOne
@@ -94,7 +94,6 @@ and rbV ctx v : exp = traceRbV v; match v with
   | VNt l              -> rbN ctx l
   | VPre u             -> EPre u
   | VPLam f            -> EPLam (rbV ctx f)
-  | VAppFormula (f, x) -> EAppFormula (rbV ctx f, rbV ctx x)
 and rbN ctx n : exp = traceRbN n; match n with
   | NVar s             -> EVar s
   | NApp (k, m)        -> EApp (rbN ctx k, rbV ctx m)
@@ -104,6 +103,7 @@ and rbN ctx n : exp = traceRbN n; match n with
   | NAxiom (p, v)      -> EAxiom (p, rbV ctx v)
   | NPathP v           -> EPathP (rbV ctx v)
   | NTransp (p, i)     -> ETransp (rbV ctx p, rbN ctx i)
+  | NAppFormula (f, x) -> EAppFormula (rbV ctx f, rbV ctx x)
   | NIsOne             -> EIsOne
   | NOneRefl           -> EOneRefl
   | NI                 -> EI
@@ -163,7 +163,6 @@ and conv ctx v1 v2 : bool = traceConv v1 v2;
   | VPLam f, v | v, VPLam f -> let p = pat (name "i") in
     let i = var p in let ctx' = upLocal ctx p (VNt NI) i in
     conv ctx' (eval (EAppFormula (rbV ctx' v, EVar p)) ctx') (app ctx' (f, i))
-  | VAppFormula (f, x), VAppFormula (g, y) -> conv ctx f g && conv ctx x y
   | _, _ ->
     begin match infer ctx (rbV ctx v1), infer ctx (rbV ctx v2) with
     | VNt (NApp (NIsOne, u1)), VNt (NApp (NIsOne, u2)) -> conv ctx u1 u2
@@ -177,6 +176,7 @@ and convNeut ctx n1 n2 : bool =
   | NSnd x, NSnd y -> convNeut ctx x y
   | NAxiom (p, x), NAxiom (q, y) -> p = q && conv ctx x y
   | NPathP a, NPathP b -> conv ctx a b
+  | NAppFormula (f, x), NAppFormula (g, y) -> conv ctx f g && conv ctx x y
   | NOr _, NOr _ -> orEq n1 n2
   | NAnd _, NAnd _ -> andEq n1 n2
   | NNeg x, NNeg y -> convNeut ctx x y

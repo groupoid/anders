@@ -16,15 +16,18 @@ option girard true
 def unitEnc' : U := Π (X : U), isSet X -> X -> X
 def isUnitEnc (one: unitEnc') : U := Π (X Y: U) (x: isSet X) (y: isSet Y) (f: X -> Y), naturality X Y f (one X x) (one Y y)
 def unitEnc : U := Σ (x: unitEnc'), isUnitEnc x
-def unitEncStar: unitEnc := (\ (X: U) (_: isSet X), idfun X, \ (X Y: U) (_: isSet X) (_: isSet Y), refl (X -> Y))
+def unitEncStar: unitEnc := (\ (X: U) (_: isSet X), idfun X, \ (X Y: U) (_: isSet X) (_: isSet Y), idp (X -> Y))
 def unitEncRec  (C: U) (s: isSet C) (c: C): unitEnc -> C := \ (z: unitEnc), z.1 C s c
-def unitEncBeta (C: U) (s: isSet C) (c: C): Path C (unitEncRec C s c unitEncStar) c := refl C c
+def unitEncBeta (C: U) (s: isSet C) (c: C): Path C (unitEncRec C s c unitEncStar) c := idp C c
 axiom unitEncEta (z: unitEnc): Path unitEnc unitEncStar z
-def unitEncInd (P: unitEnc -> U) (a: unitEnc): P unitEncStar -> P a := subst unitEnc P unitEncStar a (unitEncEta a)
+--def unitEncInd (P: unitEnc -> U) (a: unitEnc): P unitEncStar -> P a := subst unitEnc P unitEncStar a (unitEncEta a)
+
+def isProp (A : U) : U := Π (x y : A), Path A x y
+
 def unitEncCondition (n: unitEnc'): isProp (isUnitEnc n)
   := \ (f g: isUnitEnc n), <h> \ (x y: U), \ (X: isSet x), \ (Y: isSet y),
      \ (F: x -> y), (<i> \ (R: x),
-     Y (F (n x X R)) (n y Y (F R)) (<j> f x y X Y F @ j R) (<j> g x y X Y F @ j R) @ h @ i)
+     Y (F (n x X R)) (n y Y (F R)) (<j> (f x y X Y F @ j) R) (<j> (g x y X Y F @ j) R) @ h @ i)
 
 {-
    Church Encoding Nat:

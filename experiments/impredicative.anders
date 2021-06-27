@@ -4,17 +4,16 @@
 
 module impredicative where
 -- option impredicative true
+option girard true
 import experiments/path
 
 def ⚬ (A B C: U) : U := (B -> C) -> (A -> B) -> (A -> C)
 def idfun (A : U) (a : A) : A := a
 def ∘ (A B C : U) : ⚬ A B C := \ (g: B -> C) (f: A -> B) (x: A), g (f x)
-
 def isSet (A : U) : U := Π (a b : A) (a0 b0 : PathP (<i> A) a b), PathP (<i> PathP (<i> A) a b) a0 b0
 def isProp (A : U) : U := Π (a b : A), PathP (<i> A) a b
-def naturality (X Y: U) (f : X -> Y) (a : X -> X) (b : Y -> Y) : U := Path (X -> Y) (∘ X X Y f a) (∘ X Y Y b f)
 
-option girard true
+def naturality (X Y: U) (f : X -> Y) (a : X -> X) (b : Y -> Y) : U := Path (X -> Y) (∘ X X Y f a) (∘ X Y Y b f)
 def unitEnc' : U := Π (X : U), isSet X -> X -> X
 def isUnitEnc (one: unitEnc') : U := Π (X Y: U) (x: isSet X) (y: isSet Y) (f: X -> Y), naturality X Y f (one X x) (one Y y)
 def unitEnc : U := Σ (x: unitEnc'), isUnitEnc x
@@ -22,13 +21,22 @@ def unitEncStar: unitEnc := ((\ (X: U) (_: isSet X), idfun X), (\ (X Y: U) (_: i
 def unitEncRec  (C: U) (s: isSet C) (c: C): unitEnc -> C := \ (z: unitEnc), z.1 C s c
 def unitEncBeta (C: U) (s: isSet C) (c: C): Path C (unitEncRec C s c unitEncStar) c := idp C c
 axiom unitEncEta (z: unitEnc): Path unitEnc unitEncStar z
---def unitEncInd (P: unitEnc -> U) (a: unitEnc): P unitEncStar -> P a := subst unitEnc P unitEncStar a (unitEncEta a)
-
-def unitEncCondition (n: unitEnc'): isProp (isUnitEnc n)
-  := \ (f g: isUnitEnc n), <h> \ (x y: U) (X: isSet x) (Y: isSet y) (F: x -> y), <i> \ (R: x),
-     Y (F (n x X R)) (n y Y (F R)) (<j> (f x y X Y F @ j) R) (<j> (g x y X Y F @ j) R) @ h @ i
+def unitEncInd (P: unitEnc -> U) (a: unitEnc): P unitEncStar -> P a := subst unitEnc P unitEncStar a (unitEncEta a)
+def unitEncCondition (n: unitEnc'): isProp (isUnitEnc n) :=
+    \ (f g: isUnitEnc n), <h> \ (x y: U) (X: isSet x) (Y: isSet y) (F: x -> y), <i> \ (R: x),
+    Y (F (n x X R)) (n y Y (F R)) (<j> f x y X Y F @ j R) (<j> g x y X Y F @ j R) @ h @ i
 
 {-
+   Literature:
+
+   [1]. https://github.com/sspeight93/Papers/
+   [2]. https://homotopytypetheory.org/2017/10/11/impredicative-encodings-of-inductive-types-in-hott/
+   [3]. https://www.newton.ac.uk/files/seminar/20170711090010001-1009680.pdf
+-}
+
+{-
+   Abstract:
+
    Church Encoding Nat:
 
       Nat = (X: U) -> (X -> X) -> X -> X
@@ -58,8 +66,3 @@ def unitEncCondition (n: unitEnc'): isProp (isUnitEnc n)
       Arbitrary (A:U) type = (X: U) -> isSet X -> (A -> X) -> X
 -}
 
-{-
-   [1]. https://github.com/sspeight93/Papers/
-   [2]. https://homotopytypetheory.org/2017/10/11/impredicative-encodings-of-inductive-types-in-hott/
-   [3]. https://www.newton.ac.uk/files/seminar/20170711090010001-1009680.pdf
--}

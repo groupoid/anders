@@ -17,8 +17,8 @@
 
 module path where
 
-def ⚬ (A B C: U) : U := (B -> C) -> (A -> B) -> (A -> C)
-def ∘ (A B C : U) : ⚬ A B C := \ (g: B -> C) (f: A -> B) (x: A), g (f x)
+def ∘ᵀ (A B C: U) : U := (B -> C) -> (A -> B) -> (A -> C)
+def ∘ (A B C : U) : ∘ᵀ A B C := \ (g: B -> C) (f: A -> B) (x: A), g (f x)
 
 def const (α β : U) : α → β → α ≔ λ (a : α) (b : β), a
 def idᵀ (A: U): U := A -> A

@@ -31,7 +31,7 @@ def isSet (A : U) : U := Π (a b : A) (a0 b0 : PathP (<i> A) a b), PathP (<i> Pa
 
 def naturality (X Y: U) (f : X -> Y) (a : X -> X) (b : Y -> Y) : U := Path (X -> Y) (o X X Y f a) (o X Y Y b f)
 def unitEnc' : U := Π (X : U), isSet X -> X -> X
-def isUnitEnc (one: unitEnc') : U := (X Y: U) (x: isSet X) (y: isSet Y) (f: X -> Y) -> naturality X Y f (one X x) (one Y y)
+def isUnitEnc (one: unitEnc') : U := Π (X Y: U) (x: isSet X) (y: isSet Y) (f: X -> Y), naturality X Y f (one X x) (one Y y)
 
 -- Truncation ||A|| parametrized by (A: U) type = (X: U) -> isProp X -> (A -> X) -> X
 -- S^1 = (X: U) -> isGroupoid X -> (x: X) -> Path X x x -> X
@@ -44,7 +44,7 @@ def unitEncBeta (C: U) (s: isSet C) (c: C): Path C (unitEncRec C s c unitEncStar
 axiom unitEncEta (z: unitEnc): Path unitEnc unitEncStar z
 def unitEncInd (P: unitEnc -> U) (a: unitEnc): P unitEncStar -> P a := subst unitEnc P unitEncStar a (unitEncEta a)
 def unitEncCondition (n: unitEnc'): isProp (isUnitEnc n)
-  =  \ (f g: isUnitEnc n), <h> \ (x y: U), \ (X: isSet x), \ (Y: isSet y)
+  := \ (f g: isUnitEnc n), <h> \ (x y: U), \ (X: isSet x), \ (Y: isSet y)
   -> \ (F: x -> y), <i> \ (R: x), Y (F (n x X R)) (n y Y (F R))
        (<j> f x y X Y F @ j R) (<j> g x y X Y F @ j R) @ h @ i
 

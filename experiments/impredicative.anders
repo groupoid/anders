@@ -6,9 +6,9 @@ module impredicative where
 -- option impredicative true
 import experiments/path
 
-def ot (A B C: U) : U := (B -> C) -> (A -> B) -> (A -> C)
+def ⚬ (A B C: U) : U := (B -> C) -> (A -> B) -> (A -> C)
 def idfun (A : U) (a : A) : A := a
-def ∘ (A B C : U) : ot A B C := \ (g: B -> C) (f: A -> B) (x: A), g (f x)
+def ∘ (A B C : U) : ⚬ A B C := \ (g: B -> C) (f: A -> B) (x: A), g (f x)
 
 def isSet (A : U) : U := Π (a b : A) (a0 b0 : PathP (<i> A) a b), PathP (<i> PathP (<i> A) a b) a0 b0
 def isProp (A : U) : U := Π (a b : A), PathP (<i> A) a b
@@ -25,8 +25,8 @@ axiom unitEncEta (z: unitEnc): Path unitEnc unitEncStar z
 def unitEncInd (P: unitEnc -> U) (a: unitEnc): P unitEncStar -> P a := subst unitEnc P unitEncStar a (unitEncEta a)
 def unitEncCondition (n: unitEnc'): isProp (isUnitEnc n)
   := \ (f g: isUnitEnc n), <h> \ (x y: U), \ (X: isSet x), \ (Y: isSet y),
-     \ (F: x -> y), (<i> \ (R: x),
-     Y (F (n x X R)) (n y Y (F R)) (<j> f x y X Y F @ j R) (<j> g x y X Y F @ j R) @ h @ i)
+     \ (F: x -> y), <i> \ (R: x),
+     Y (F (n x X R)) (n y Y (F R)) (<j> (f x y X Y F) @ (j R)) (<j> (g x y X Y F) @ (j R)) @ h @ i
 
 {-
    Church Encoding Nat:

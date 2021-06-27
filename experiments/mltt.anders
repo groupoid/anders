@@ -1,15 +1,9 @@
+{- MLTT Reality Check:
+   - Empty, Pi, Sigma, Equ, W.
+   Copyright (c) Groupoid Infinity, 2014-2018. -}
+
 module mltt where
-
 option girard true
-
-option pre-eval false
-
-def W (A : U) (B : A → U) : U ≔ Σ (x : A), B x → W A B
-def Wrec (A : U) (B : A → U) (P : U) (alg : Π (a : A), (B a  → W A B) → (Π (b : B a), P) → P)
-  : Π (w : W A B), P ≔ λ (w : W A B), alg w.1 w.2 (λ (b : B w.1), Wrec A B P alg (w.2 b))
-def Wind (A : U) (B : A → U) (P : W A B → U) (alg : Π (a : A) (f : B a → W A B), (Π (b : B a), P (f b)) → P (a,f))
-  : Π (w : W A B), P w ≔ λ (w : W A B), alg w.1 w.2 (λ (b : B w.1), Wind A B P alg (w.2 b))
-
 option pre-eval true
 
 def Pi (A: U) (B: A → U): U ≔ Π (x: A), B x

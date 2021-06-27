@@ -8,6 +8,7 @@ context default
     keyword whole Equ brightmagenta
     keyword whole = brightmagenta
     keyword whole lam brightmagenta
+    keyword whole apply brightmagenta
     keyword whole app brightmagenta
     keyword whole pair brightmagenta
     keyword whole lambda brightmagenta

@@ -1,0 +1,45 @@
+{- Pi Type:
+   * Pi;
+   * FunExt.
+
+   HoTT 1.5 Product types
+   HoTT 2.9 Pi-types and the function extensionality axiom.
+
+   Copyright (c) Groupoid Infinity, 2014-2018.
+-}
+
+module pi where
+import experiments/path
+
+def Pi (A : U) (B : A -> U) : U ≔ Π (x : A), B x
+def lambda (A: U) (B: A → U) (b: Pi A B) : Pi A B ≔ λ (x : A), b x
+def apply (A: U) (B: A → U) (f: Pi A B) (a: A) : B a ≔ f a
+def app (A B: U) (f: A -> B) (x: A): B := f x
+def Π-β (A : U) (B : A → U) (a : A) (f : Pi A B) : Path (B a) (apply A B (lambda A B f) a) (f a) ≔ idp (B a) (f a)
+def Π-η (A : U) (B : A → U) (a : A) (f : Pi A B) : Path (Pi A B) f (λ (x : A), f x) ≔ idp (Pi A B) f
+
+def funext-form (A B: U) (f g: A -> B): U := Path (A -> B) f g
+def funext (A B: U) (f g: A -> B) (p: Π (x: A), Path B (f x) (g x)) : funext-form A B f g := <i> \(a: A), p a @ i
+def happly (A B: U) (f g : A -> B) (p: funext-form A B f g) (x : A) : Path B (f x) (g x) := cong (A -> B) B (\ (h: A -> B), app A B h x) f g p
+def funext-β (A B: U) (f g: A -> B) (p: Π (x: A), Path B (f x) (g x)) : Π (x: A), Path B (f x) (g x) := \(x: A), happly A B f g (funext A B f g p) x
+def funext-η (A B: U) (f g: A -> B) (p: Path (A -> B) f g) : Path (Path (A -> B) f g) (funext A B f g (happly A B f g p)) p := idp (Path (A -> B) f g) p
+
+def piext (A: U) (B: A -> U) (f g: Π (x: A), B x) (p: Π (x: A), Path (B x) (f x) (g x)) : Path (Π (y: A), B y) f g := <i> \(a: A), (p a) @ i
+def setPi (A: U) (B: A -> U) (h: Π (x: A), isSet (B x)) (f g: Pi A B) (p q: Path (Pi A B) f g) : Path (Path (Pi A B) f g) p q
+ := <i j> \(x: A), (h x (f x) (g x) (<i> (p @ i) x) (<i> (q @ i) x)) @ i @ j
+
+def setFun' (X Y: U) (p: X -> isSet Y) : isSet (X -> Y) := setPi X (\(_: X), Y) p
+def setFun (A B : U) (sB: isSet B) : isSet (A -> B) := setPi A (\(x: A), B) (\(x: A), sB)
+
+{-
+
+  def piIsContr (A: U) (B: A -> U) (u: isContr A) (q: (x: A) -> isContr (B x))
+  : isContr (Pi A B)
+  = (g,r) where
+    a: A = u.1
+    p: (x:A) -> Path A a x = u.2
+    g (x:A): B x = (q x).1
+    h (x:A): (y:B x) -> Path (B x) (g x) y = (q x).2
+    r (z:Pi A B): Path (Pi A B) g z = piext A B g z (\(x:A) -> h x (z x))
+-}
+

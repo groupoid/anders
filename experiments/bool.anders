@@ -1,8 +1,6 @@
 module bool where
 
-definition bool := Π (α : U), α → α → α
-
-definition true  : bool := λ (α : U) (t f : α), t
-definition false : bool := λ (α : U) (t f : α), f
-
-definition ite (α : U) (a b : α) (f : bool) : α := f α a b
+def bool := Π (α : U), α → α → α
+def true  : bool := λ (α : U) (t f : α), t
+def false : bool := λ (α : U) (t f : α), f
+def ite (α : U) (a b : α) (f : bool) : α := f α a b

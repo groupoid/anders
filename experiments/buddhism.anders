@@ -6,12 +6,12 @@ option girard true
 -- from Favonia's PhD
 
 def concept (o: U): U := o -> U
-def allpaths (o: U): U := Π (x y: o), Path o x y
+def all-paths (o: U): U := Π (x y: o), Path o x y
 def nondual (o: U) (p: concept o): U := Π (x y: o), Path U (p x) (p y)
 
-def encode (o: U): (Π (p: concept o), nondual o p) -> allpaths o :=
+def encode (o: U): (Π (p: concept o), nondual o p) -> all-paths o :=
     \ (nd: Π (p: concept o), nondual o p) (a b: o),
       coerce (Path o a a) (Path o a b) (nd (\ (z: o), Path o a z) a b) (idp o a)
 
-def decode (o: U): allpaths o -> (Π (p: concept o), nondual o p) :=
-    \ (all: allpaths o) (p: concept o)(x y: o), cong o U p x y (all x y)
+def decode (o: U): all-paths o -> (Π (p: concept o), nondual o p) :=
+    \ (all: all-paths o) (p: concept o)(x y: o), cong o U p x y (all x y)

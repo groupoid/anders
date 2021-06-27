@@ -6,8 +6,7 @@ module church where
 
 definition N := Π (A : U), (A -> A) -> A -> A
 definition N0 : N := λ (A : U) (S : A -> A) (Z : A), Z
-
-definition succ : N -> N      := λ (n : N) (A : U) (S : A -> A) (Z : A), S (n A S Z)
+definition succ : N -> N := λ (n : N) (A : U) (S : A -> A) (Z : A), S (n A S Z)
 definition plus (m n : N) : N := λ (A : U) (S : A -> A) (Z : A), m A S (n A S Z)
 definition mult (m n : N) : N := λ (A : U) (S : A -> A) (Z : A), m A (n A S) Z
 definition pow (m n : N) : N  := λ (A : U) (S : A -> A) (Z : A), n (A -> A) (m A) S Z

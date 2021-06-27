@@ -1,17 +1,10 @@
 module test where
 
 def id (A : U) (a : A) : A := a
-
 def sigmaIntro (A : U) (B : A -> U) (x : A) (u : B (id A x)) : Σ (x : A), B x := (x, u)
-
-def sigmaProj₂ : Π (A : U) (B : A -> U) (z : Σ (x : A), B x), B z.1 :=
-    λ (A : U) (B : A -> U) (z : Σ (x : A), B x), z.2
-
+def sigmaProj₂ : Π (A : U) (B : A -> U) (z : Σ (x : A), B x), B z.1 := λ (A : U) (B : A -> U) (z : Σ (x : A), B x), z.2
 def const (A : U) (B : U) (a : A) (b : B) : A := a
-
-def test : Π (A : U) (B : U), (A -> B) -> A -> B :=
-    λ (A : U) (B : U) (f : A -> B) (x : A), f x
-
+def test : Π (A : U) (B : U), (A -> B) -> A -> B := λ (A : U) (B : U) (f : A -> B) (x : A), f x
 def trio : U₂ := Σ (fst : U₁) (snd : U₁), U₁
 def lower : U₁₁₂₁₂ := U₁₁₂₁₁
 def instance : trio := (U, U -> U, U -> U -> U)

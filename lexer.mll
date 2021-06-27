@@ -42,8 +42,8 @@ let defeq   = ":=" | "\xE2\x89\x94" | "\xE2\x89\x9C" | "\xE2\x89\x9D" (* ≔ | �
 let arrow   = "->" | "\xE2\x86\x92" (* → *)
 let prod    = "*"  | "\xC3\x97"     (* × *)
 let lam     = "\\" | "\xCE\xBB"     (* λ *)
-let pi      = "pi" | "\xCE\xA0"     (* Π *)
-let sigma   = "sigma" | "\xCE\xA3"  (* Σ *)
+let pi      = "\xCE\xA0"            (* Π *)
+let sigma   = "\xCE\xA3"            (* Σ *)
 let def     = "definition" | "def" | "theorem" | "lemma" | "corollary" | "proposition"
 let axiom   = "axiom"|"postulate"
 

@@ -1,10 +1,25 @@
+{- Path Type:
+   - Reflexivity, Symmetry, Composition, Kan;
+   - De Morgan laws;
+   - Connections;
+   - Congruence and Respect;
+   - Contractability of Singletons;
+   - Substitution, Transport, J.
+
+   HoTT 1.12 Identity types
+   HoTT 1.12.1 Path induction
+   HoTT 2.1 Types are higher groupoids
+   HoTT 2.11 Identity type
+   HoTT 3.11 Contractibility
+   HoTT 6.2 Induction principles and dependent paths.
+
+   Copyright (c) Groupoid Infinity, 2014-2018. -}
+
 module path where
 
 def I : V := interval def 0 := i₀ def 1 := i₁
 def LineP (A : I -> U) : U := Π (i : I), A i
-
 def 1-is-1 : is-one? 1 := 1-refl
-
 def Path (A : U) (x y : A) : U := PathP (<_> A) x y
 def idp (A : U) (x : A) : Path A x x := <_> x
 def singl (A: U) (a: A): U := Σ (x: A), Path A a x
@@ -14,18 +29,15 @@ def contr (A : U) (a b : A) (p : Path A a b) : Path (singl A a) (eta A a) (b, p)
 def cong (A B : U) (f : A -> B) (a b : A) (p : Path A a b) : Path B (f a) (f b) := <i> f (p @ i)
 def ap (A: U) (a x: A) (B: A -> U) (f: A -> B a) (b: B a) (p: Path A a x): Path (B a) (f a) (f x) := <i> f (p @ i)
 def inv (A: U) (a b: A) (p: Path A a b): Path A b a := <i> p @ -i
-
 def Path-η (A : U) (x y : A) (p : Path A x y) : Path (Path A x y) p (<i> p @ i) := <_> p
 def idp-left (A : U) (x y : A) (p : Path A x y) : Path (Path A x x) (<_> x) (<_> p @ 0) := <_ _> x
 def idp-right (A : U) (x y : A) (p : Path A x y) : Path (Path A y y) (<_> y) (<_> p @ 1) := <_ _> y
 def sym-sym-eq-idp (A : U) (x y : A) (p : Path A x y) : Path (Path A x y) p (sym A y x (sym A x y p)) := <_> p
 def hmtpy (A : U) (x y : A) (p : Path A x y) : Path (Path A x x) (<_> x) (<i> p @ i /\ -i) := <j i> p @ j /\ i /\ -i
-
 def plam (A : U) (f : I -> A) : Path A (f 0) (f 1) := <i> f i
 def elim (A : U) (a b : A) (p : Path A a b) : I -> A := λ (i : I), p @ i
 def Eq (A : V) (x y : A) : V₁ := Π (P : A -> V), P x -> P y
 def refl (A : V) (x : A) : Eq A x x := λ (P : A -> V) (u : P x), u
-
 def plam-elim (A : U) (f : I -> A) : Eq (I -> A) (elim A (f 0) (f 1) (plam A f)) f := refl (I -> A) f
 def elim-plam (A : U) (a b : A) (p : Path A a b) : Eq (Path A a b) (plam A (elim A a b p)) p := refl (Path A a b) p
 def ⊕ (i j : I) : I := (i ∧ -j) ∨ (-i ∧ j)
@@ -37,15 +49,12 @@ def ∧-distrib-∨ (i j k : I) : Eq I ((i ∨ j) ∧ k) ((i ∧ k) ∨ (j ∧ k
 def ∨-distrib-∧ (i j k : I) : Eq I ((i ∧ j) ∨ k) ((i ∨ k) ∧ (j ∨ k)) := refl I ((i ∧ j) ∨ k)
 def ¬-of-∧ (i j : I) : Eq I -(i ∧ j) (-i ∨ -j) := refl I -(i ∧ j)
 def ¬-of-∨ (i j : I) : Eq I -(i ∨ j) (-i ∧ -j) := refl I -(i ∨ j)
+def isSet (A : U) : U := Π (a b : A) (a0 b0 : PathP (<i> A) a b), PathP (<i> PathP (<i> A) a b) a0 b0
+def isProp (A : U) : U := Π (a b : A), PathP (<i> A) a b
+-- def trans (A B: U) (p: PathP (<_> U) A B) (a: A): B := transp p 0 a
+-- def subst (A: U) (P: A -> U) (a b: A) (p: Path A a b) (e: P a): P b := transp (<i> P (p @ i)) 0 e
+-- def coerce (A B: U) (p: PathP (<_> U) A B): A -> B := λ (x : A), trans A B p x
 
 axiom trans (A B: U) (p: PathP (<_> U) A B) (a: A): B
 axiom subst (A: U) (P: A -> U) (a b: A) (p: Path A a b) (e: P a): P b
 axiom coerce (A B: U) (p: PathP (<_> U) A B): A -> B
-
-{-
-
-def trans (A B: U) (p: PathP (<_> U) A B) (a: A): B := transp p 0 a
-def subst (A: U) (P: A -> U) (a b: A) (p: Path A a b) (e: P a): P b := transp (<i> P (p @ i)) 0 e
-def coerce (A B: U) (p: PathP (<_> U) A B): A -> B := λ (x : A), trans A B p x
-
--}

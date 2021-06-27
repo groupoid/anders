@@ -17,6 +17,13 @@
 
 module path where
 
+def ⚬ (A B C: U) : U := (B -> C) -> (A -> B) -> (A -> C)
+def ∘ (A B C : U) : ⚬ A B C := \ (g: B -> C) (f: A -> B) (x: A), g (f x)
+
+def const (α β : U) : α → β → α ≔ λ (a : α) (b : β), a
+def idᵀ (A: U): U := A -> A
+def id (A : U) (a : A) : A := a
+
 def I : V := interval def 0 := i₀ def 1 := i₁
 def LineP (A : I → U) : U := Π (i : I), A i
 def 1-is-1 : is-one? 1 := 1-refl
@@ -26,6 +33,7 @@ def singl (A: U) (a: A): U := Σ (x: A), Path A a x
 def eta (A: U) (a: A): singl A a := (a, idp A a)
 def sym (A: U) (a b : A) (p : Path A a b) : Path A b a := <i> p @ -i
 def contr (A : U) (a b : A) (p : Path A a b) : Path (singl A a) (eta A a) (b, p) := <i> (p @ i, <j> p @ i /\ j)
+def isContr (A: U) : U := Σ (x: A), Π (y: A), Path A x y
 def cong (A B : U) (f : A → B) (a b : A) (p : Path A a b) : Path B (f a) (f b) := <i> f (p @ i)
 def ap (A: U) (a x: A) (B: A → U) (f: A → B a) (b: B a) (p: Path A a x): Path (B a) (f a) (f x) := <i> f (p @ i)
 def inv (A: U) (a b: A) (p: Path A a b): Path A b a := <i> p @ -i
@@ -49,8 +57,9 @@ def ∧-distrib-∨ (i j k : I) : Eq I ((i ∨ j) ∧ k) ((i ∧ k) ∨ (j ∧ k
 def ∨-distrib-∧ (i j k : I) : Eq I ((i ∧ j) ∨ k) ((i ∨ k) ∧ (j ∨ k)) := refl I ((i ∧ j) ∨ k)
 def ¬-of-∧ (i j : I) : Eq I -(i ∧ j) (-i ∨ -j) := refl I -(i ∧ j)
 def ¬-of-∨ (i j : I) : Eq I -(i ∨ j) (-i ∧ -j) := refl I -(i ∨ j)
-def isSet (A : U) : U := Π (a b : A) (a0 b0 : PathP (<i> A) a b), PathP (<i> PathP (<i> A) a b) a0 b0
-def isProp (A : U) : U := Π (a b : A), PathP (<i> A) a b
+def isProp (A : U) : U := Π (a b : A), Path A a b
+def isSet (A : U) : U := Π (a b : A) (a0 b0 : Path A a b), Path (Path A a b) a0 b0
+def isGroupoid (A : U) : U := Π (a b : A) (a0 b0 : Path A a b) (a1 b1 : Path (Path A a b) a0 b0), Path (Path (Path A a b) a0 b0) a1 b1
 -- def trans (A B: U) (p: PathP (<_> U) A B) (a: A): B := transp p 0 a
 -- def subst (A: U) (P: A -> U) (a b: A) (p: Path A a b) (e: P a): P b := transp (<i> P (p @ i)) 0 e
 -- def coerce (A B: U) (p: PathP (<_> U) A B): A -> B := λ (x : A), trans A B p x
@@ -58,3 +67,4 @@ def isProp (A : U) : U := Π (a b : A), PathP (<i> A) a b
 axiom trans (A B: U) (p: PathP (<_> U) A B) (a: A): B
 axiom subst (A: U) (P: A -> U) (a b: A) (p: Path A a b) (e: P a): P b
 axiom coerce (A B: U) (p: PathP (<_> U) A B): A -> B
+def pcomp (A: U) (a b c: A) (p: Path A a b) (q: Path A b c): Path A a c := subst A (Path A a) b c q p

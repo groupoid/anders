@@ -6,8 +6,13 @@ module impredicative where
 -- option impredicative true
 import experiments/path
 
+def idfun (A : U) (a : A) : A := a
+def ∘ (A B C : U) (f : B -> C) (g : A -> B) : A -> C := \(x : A), f (g x)
+
 def isSet (A : U) : U := Π (a b : A) (a0 b0 : PathP (<i> A) a b), PathP (<i> PathP (<i> A) a b) a0 b0
-def naturality (X Y: U) (f : X -> Y) (a : X -> X) (b : Y -> Y) : U := Path (X -> Y) (o X X Y f a) (o X Y Y b f)
+def naturality (X Y: U) (f : X -> Y) (a : X -> X) (b : Y -> Y) : U := Path (X -> Y) (∘ X X Y f a) (∘ X Y Y b f)
+
+option girard true
 def unitEnc' : U := Π (X : U), isSet X -> X -> X
 def isUnitEnc (one: unitEnc') : U := Π (X Y: U) (x: isSet X) (y: isSet Y) (f: X -> Y), naturality X Y f (one X x) (one Y y)
 def unitEnc : U := Σ (x: unitEnc'), isUnitEnc x

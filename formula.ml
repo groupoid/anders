@@ -99,3 +99,14 @@ let orEq f g =
 (* andEq check equivalence of two formulas
    of the form (α₁ ∧ ... ∧ αₙ) *)
 let andEq f g = Conjunction.equal (extAnd f) (extAnd g)
+
+module Face = Map.Make(Name)
+type face = dir Face.t
+
+let meet phi psi : face =
+  Face.merge (fun k x y ->
+    match x, y with
+    | Some u, Some v -> failwith "meet: incompatible faces"
+    | Some u, None   -> Some u
+    | None,   Some v -> Some v
+    | None,   None   -> None) phi psi

@@ -1,3 +1,11 @@
+{- Run-time Bool Type:
+   - Bool type.
+   - Theorems are in bool_theory module.
+
+   HoTT 1.8 The type of booleans
+
+   Copyright (c) Groupoid Infinity, 2014-2021. -}
+
 module bool where
 
 def bool := Π (α : U), α → α → α

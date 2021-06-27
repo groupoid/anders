@@ -6,7 +6,7 @@
    HoTT 9.1 Categories and precategories
    HoTT 9.9 The Rezk completion
 
-   Copyright (c) Groupoid Infinity, 2014-2018 -}
+   Copyright (c) Groupoid Infinity, 2014-2021. -}
 
 module cat where
 

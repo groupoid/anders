@@ -1,6 +1,6 @@
 {- MLTT Reality Check:
    - Empty, Pi, Sigma, Equ, W.
-   Copyright (c) Groupoid Infinity, 2014-2018. -}
+   Copyright (c) Groupoid Infinity, 2014-2021. -}
 
 module mltt where
 option girard true

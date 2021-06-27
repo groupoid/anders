@@ -1,7 +1,7 @@
 {- Run-Time List Type:
    - List;
    - Polymorphic funtions.
-   Copyright (c) Groupoid Infinity, 2014-2018. -}
+   Copyright (c) Groupoid Infinity, 2014-2021. -}
 
 module list where
 import experiments/leibniz

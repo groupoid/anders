@@ -26,7 +26,7 @@ def unitEncInd (P: unitEnc -> U) (a: unitEnc): P unitEncStar -> P a := subst uni
 def unitEncCondition (n: unitEnc'): isProp (isUnitEnc n)
   := \ (f g: isUnitEnc n), <h> \ (x y: U), \ (X: isSet x), \ (Y: isSet y),
      \ (F: x -> y), <i> \ (R: x),
-     Y (F (n x X R)) (n y Y (F R)) (<j> (f x y X Y F) @ (j R)) (<j> (g x y X Y F) @ (j R)) @ h @ i
+     Y (F (n x X R)) (n y Y (F R)) (<j> f x y X Y F @ j R) (<j> g x y X Y F @ j R) @ h @ i
 
 {-
    Church Encoding Nat:

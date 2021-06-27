@@ -43,42 +43,52 @@ let negFormula a = match a with
   | VNt u -> VNt (negNeut u)
   | _     -> raise (InvalidFormulaNeg a)
 
-module Atom = struct
-  type t = name * bool
-  let compare (a, x) (b, y) =
-    if a = b then Bool.compare x y else Name.compare a b
+module Dir = struct
+  type t = dir
+  let compare a b =
+    match a, b with
+    | One, Zero -> 1
+    | Zero, One -> -1
+    | _, _      -> 0
 end
 
-module Atoms = Set.Make(Atom)
+module Atom = struct
+  type t = name * dir
+  let compare (a, x) (b, y) =
+    if a = b then Dir.compare x y else Name.compare a b
+end
+
+module Conjunction = Set.Make(Atom)
+type conjunction = Conjunction.t
 
 (* extAnd converts (α₁ ∧ ... ∧ αₙ) into set of names equipped with sign. *)
-let rec extAnd : neut -> Atoms.t = function
-  | NVar x               -> Atoms.singleton (x, true)
-  | NNeg (NVar x)        -> Atoms.singleton (x, false)
-  | NAxiom (x, _)        -> Atoms.singleton (name x, true)
-  | NNeg (NAxiom (x, _)) -> Atoms.singleton (name x, false)
-  | NAnd (x, y)          -> Atoms.union (extAnd x) (extAnd y)
-  | k -> failwith (Printf.sprintf "“%s” expected to be conjuction (should never happen)" (showNeut k))
+let rec extAnd : neut -> conjunction = function
+  | NVar x               -> Conjunction.singleton (x, One)
+  | NNeg (NVar x)        -> Conjunction.singleton (x, Zero)
+  | NAxiom (x, _)        -> Conjunction.singleton (name x, One)
+  | NNeg (NAxiom (x, _)) -> Conjunction.singleton (name x, Zero)
+  | NAnd (x, y)          -> Conjunction.union (extAnd x) (extAnd y)
+  | k -> failwith (Printf.sprintf "“%s” expected to be conjunction (should never happen)" (showNeut k))
 
 (* extOr converts (α₁ ∧ ... ∧ αₙ) ∨ ... ∨ (β₁ ∧ ... ∧ βₘ)
    into list of extAnd results. *)
-type disjunction = Atoms.t list
+type disjunction = conjunction list
 let rec extOr : neut -> disjunction = function
   | NOr (x, y) -> List.rev_append (extOr x) (extOr y)
   | k          -> [extAnd k]
 
 (* uniq removes all conjunctions that are superset of another,
    i. e. xy ∨ x = (x ∧ y) ∨ (x ∧ 1) = x ∧ (y ∨ 1) = x ∧ 1 = x.
-   It does not remove conjuctions like (x ∧ −x), because algebra of interval
+   It does not remove conjunction like (x ∧ −x), because algebra of interval
    is not boolean, it is De Morgan algebra: distributive lattice with De Morgan laws.
    https://ncatlab.org/nlab/show/De+Morgan+algebra *)
 let uniq f =
-  let super x y = not (Atoms.equal x y) && Atoms.subset y x in
+  let super x y = not (Conjunction.equal x y) && Conjunction.subset y x in
   List.filter (fun x -> not (List.exists (super x) f)) f
 
 (* orSubset checks that all conjunctions from xs present in ys. *)
 let orSubset xs ys =
-  List.for_all (fun x -> List.exists (Atoms.equal x) ys) xs
+  List.for_all (fun x -> List.exists (Conjunction.equal x) ys) xs
 
 (* orEq checks equivalence of two formulas
    of the form (α₁ ∧ ... ∧ αₙ) ∨ ... ∨ (β₁ ∧ ... ∧ βₘ) *)
@@ -88,4 +98,4 @@ let orEq f g =
 
 (* andEq check equivalence of two formulas
    of the form (α₁ ∧ ... ∧ αₙ) *)
-let andEq f g = Atoms.equal (extAnd f) (extAnd g)
+let andEq f g = Conjunction.equal (extAnd f) (extAnd g)

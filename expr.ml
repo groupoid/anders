@@ -211,8 +211,8 @@ let one  = VNt (NDir One)
 let merge ctx1 ctx2 : ctx =
   Env.merge (fun k x y ->
     match x, y with
-    | Some v, _      -> Some v
-    | None,   Some u -> Some u
+    | Some u, _      -> Some u
+    | None,   Some v -> Some v
     | None,   None   -> None) ctx1 ctx2
 
 type command =

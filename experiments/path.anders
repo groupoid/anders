@@ -1,9 +1,6 @@
 module path where
 
-def I : V := interval
-def 0 := i₀
-def 1 := i₁
-
+def I : V := interval def 0 := i₀ def 1 := i₁
 def LineP (A : I -> U) : U := Π (i : I), A i
 
 def 1-is-1 : is-one? 1 := 1-refl

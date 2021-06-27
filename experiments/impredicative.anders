@@ -24,9 +24,8 @@ def unitEncBeta (C: U) (s: isSet C) (c: C): Path C (unitEncRec C s c unitEncStar
 axiom unitEncEta (z: unitEnc): Path unitEnc unitEncStar z
 def unitEncInd (P: unitEnc -> U) (a: unitEnc): P unitEncStar -> P a := subst unitEnc P unitEncStar a (unitEncEta a)
 def unitEncCondition (n: unitEnc'): isProp (isUnitEnc n)
-  := \ (f g: isUnitEnc n), <h> \ (x y: U), \ (X: isSet x), \ (Y: isSet y),
-     \ (F: x -> y), <i> \ (R: x),
-     Y (F (n x X R)) (n y Y (F R)) (<j> f x y X Y F @ j R) (<j> g x y X Y F @ j R) @ h @ i
+  := \ (f g: isUnitEnc n), <h> \ (x y: U) (X: isSet x) (Y: isSet y) (F: x -> y), <i> \ (R: x),
+     Y (F (n x X R)) (n y Y (F R)) (<j> (f x y X Y F @ j) R) (<j> (g x y X Y F @ j) R) @ h @ i
 
 {-
    Church Encoding Nat:

@@ -33,13 +33,13 @@ def pathC (C: precategory) (x y z w: carrier C) (f: hom C x y) (g: hom C y z) (h
   : Path (hom C x w) (compose C x z w (compose C x y z f g) h) (compose C x y w f (compose C y z w g h)) := C.2.2.2.2.2.2 x y z w f g h
 
 def catᵒᵖ (P: precategory) : precategory :=
-    ((carrier P,(\(A B: carrier P), hom P B A)),
-    (\(A: carrier P), path P A),
-    (\(A B C: carrier P) (f: hom P B A) (g: hom P C B), compose P C B A g f),
-    (\(A B: carrier P), homSet P B A),
-    (\(A B: carrier P) (f: hom P B A), pathR P B A f),
-    (\(A B: carrier P) (f: hom P B A), pathL P B A f),
-    (\(A B C D: carrier P) (f: hom P B A) (g: hom P C B) (h: hom P D C), <i> (pathC P D C B A h g f) @ -i))
+    ((carrier P, λ (A B: carrier P), hom P B A),
+    λ (A: carrier P), path P A,
+    λ (A B C: carrier P) (f: hom P B A) (g: hom P C B), compose P C B A g f,
+    λ (A B: carrier P), homSet P B A,
+    λ (A B: carrier P) (f: hom P B A), pathR P B A f,
+    λ (A B: carrier P) (f: hom P B A), pathL P B A f,
+    λ (A B C D: carrier P) (f: hom P B A) (g: hom P C B) (h: hom P D C), <i> (pathC P D C B A h g f) @ -i)
 
 def opPreserve (C: precategory) : PathP (<_>precategory) (catᵒᵖ (catᵒᵖ C)) C := <i> C
 

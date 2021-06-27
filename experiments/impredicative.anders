@@ -13,16 +13,16 @@ def isSet (A : U) : U := Π (a b : A) (a0 b0 : PathP (<i> A) a b), PathP (<i> Pa
 def isProp (A : U) : U := Π (a b : A), PathP (<i> A) a b
 
 def naturality (X Y: U) (f : X -> Y) (a : X -> X) (b : Y -> Y) : U := Path (X -> Y) (∘ X X Y f a) (∘ X Y Y b f)
-def ①' : U := Π (X : U), isSet X -> X -> X
-def is-① (one: ①') : U := Π (X Y: U) (x: isSet X) (y: isSet Y) (f: X -> Y), naturality X Y f (one X x) (one Y y)
-def ① : U := Σ (x: ①'), is-① x
-def ①-★ : ① := ((\ (X: U) (_: isSet X), \(x:X), x), (\ (X Y: U) (_: isSet X) (_: isSet Y), idp (X -> Y)))
-def ①-rec (C: U) (s: isSet C) (c: C): ① -> C := \ (z: ①), z.1 C s c
-axiom ①-η (z: ①): Path ① ①-★ z
-def ①-ind (P: ① -> U) (a: ①): P ①-★ -> P a := subst ① P ①-★ a (①-η a)
-def ①-β (C: U) (s: isSet C) (c: C): Path C (①-rec C s c ①-★) c := idp C c
-def ①-condition (n: ①'): isProp (is-① n) :=
-    \ (f g: is-① n), <h> \ (x y: U) (X: isSet x) (Y: isSet y) (F: x -> y), <i> \ (R: x),
+def 𝟙' : U := Π (X : U), isSet X -> X -> X
+def is-𝟙 (one: 𝟙') : U := Π (X Y: U) (x: isSet X) (y: isSet Y) (f: X -> Y), naturality X Y f (one X x) (one Y y)
+def 𝟙 : U := Σ (x: 𝟙'), is-𝟙 x
+def 𝟙-★ : 𝟙 := ((\ (X: U) (_: isSet X), \(x:X), x), (\ (X Y: U) (_: isSet X) (_: isSet Y), idp (X -> Y)))
+def 𝟙-rec (C: U) (s: isSet C) (c: C): 𝟙 -> C := \ (z: 𝟙), z.1 C s c
+axiom 𝟙-η (z: 𝟙): Path 𝟙 𝟙-★ z
+def 𝟙-ind (P: 𝟙 -> U) (a: 𝟙): P 𝟙-★ -> P a := subst 𝟙 P 𝟙-★ a (𝟙-η a)
+def 𝟙-β (C: U) (s: isSet C) (c: C): Path C (𝟙-rec C s c 𝟙-★) c := idp C c
+def 𝟙-condition (n: 𝟙'): isProp (is-𝟙 n) :=
+    \ (f g: is-𝟙 n), <h> \ (x y: U) (X: isSet x) (Y: isSet y) (F: x -> y), <i> \ (R: x),
     Y (F (n x X R)) (n y Y (F R)) (<j> f x y X Y F @ j R) (<j> g x y X Y F @ j R) @ h @ i
 
 {-

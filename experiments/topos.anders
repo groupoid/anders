@@ -1,0 +1,49 @@
+{- Topos Theory:
+   - Category, Pullback, Mono, Epi, Set, subobjectClassifier, CCC;
+   - setSig, setPi, SET, Path;
+   - Topos, Set Topos.
+
+   https://groupoid.space/math/topos/
+   http://www.ams.org/notices/200409/what-is-illusie.pdf
+
+   Copyright (c) Groupoid Infinity, 2014-2021. -}
+
+module topos where
+import experiments/cat
+import experiments/fun
+import experiments/pi
+
+def epi (P: precategory) (X Y: carrier P) (f: hom P X Y): U := Π (Z: carrier P) (g1 g2: hom P Y Z),
+    Path (hom P X Z) (compose P X Y Z f g1) (compose P X Y Z f g2) -> Path (hom P Y Z) g1 g2
+
+def mono (P: precategory) (Y Z: carrier P) (f: hom P Y Z): U := Π (X: carrier P) (g1 g2: hom P X Y),
+    Path (hom P X Z) (compose P X Y Z g1 f) (compose P X Y Z g2 f) -> Path (hom P X Y) g1 g2
+
+def subobjectClassifier (C: precategory): U := Σ
+    (omega: carrier C)
+    (end: terminal C)
+    (trueHom: hom C end.1 omega)
+    (xi: Π (Y X: carrier C) (j: hom C Y X), hom C X omega)
+    (square: Π (Y X: carrier C) (j: hom C Y X), mono C Y X j -> hasPullback C (omega,(end.1,trueHom),(X,xi Y X j))),
+    Π (Y X: carrier C) (j: hom C Y X) (k: hom C X omega),
+    (mono C Y X j) -> (hasPullback C (omega,(end.1,trueHom),(X,k))) -> (Path (hom C X omega) (xi Y X j) k)
+
+def isCCC (C: precategory): U := Σ
+    (Exp: Π(A B: carrier C), carrier C)
+    (Prod: Π (A B: carrier C), carrier C)
+    (Apply: Π (A B: carrier C), hom C (Prod (Exp A B) A) B)
+    (P1: Π (A B: carrier C), hom C (Prod A B) A)
+    (P2: Π (A B: carrier C), hom C (Prod A B) B), terminal C
+
+axiom Set : precategory
+axiom cartesianClosed : isCCC Set
+axiom hasSubobject : subobjectClassifier Set
+
+def Topos (cat: precategory) : U := Σ (cartesianClosed: isCCC cat), subobjectClassifier cat
+def internal : Topos Set := (cartesianClosed,hasSubobject)
+def presheaf (C: precategory): U := catfunctor (catᵒᵖ C) Set
+def Co (C: precategory) (cod: carrier C) : U := Σ (dom: carrier C), hom C dom cod
+def Delta (C: precategory) (d: carrier C) : U₁ := Σ (index: U), index -> Co C d
+def Coverage (C: precategory): U₁ := Σ (cod: carrier C) (fam: Delta C cod) (coverings: carrier C -> Delta C cod -> U), coverings cod fam
+def site  (C: precategory): U₁ := Σ (C: precategory), Coverage C
+def sheaf (C: precategory): U₁ := Σ (S: site C), presheaf S.1

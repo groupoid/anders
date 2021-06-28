@@ -25,7 +25,8 @@ def const (α β : U) : α → β → α := λ (a : α) (b : β), a
 
 def I : V := interval def 0 := i₀ def 1 := i₁
 def LineP (A : I → U) : U := Π (i : I), A i
-def 1-is-1 : is-one? 1 := 1-refl
+def vunit : V := is-one? 1
+def 1=1 : vunit := 1-refl
 def Path (A : U) (x y : A) : U := PathP (<_> A) x y
 def idp (A : U) (x : A) : Path A x x := <_> x
 def singl (A: U) (a: A): U := Σ (x: A), Path A a x

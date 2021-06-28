@@ -12,9 +12,10 @@ Features
 * Lexer in 50 LOC
 * Full Agda-style UTF-8 support including universe levels
 * Lean comma-syntax for ΠΣ
-* Non-2D syntax with top-level specificators
+* 1D syntax with top-level declarations
 * Groupoid Infinity CCHM base library: https://groupoid.space/math
 * Best suited for academic papers
+* Homepage: https://groupoid.space/homotopy
 
 Prerequisites
 -------------

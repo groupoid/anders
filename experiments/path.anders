@@ -17,12 +17,11 @@
 
 module path where
 
-def ∘ᵀ (A B C: U) : U := (B -> C) -> (A -> B) -> (A -> C)
-def ∘ (A B C : U) : ∘ᵀ A B C := \ (g: B -> C) (f: A -> B) (x: A), g (f x)
-
-def const (α β : U) : α → β → α ≔ λ (a : α) (b : β), a
-def idᵀ (A: U): U := A -> A
-def id (A : U) (a : A) : A := a
+def ∘ᵀ (α β γ: U) : U := (β → γ) -> (α → β) -> (α → γ)
+def ∘ (α β γ : U) : ∘ᵀ α β γ := λ (g: β → γ) (f: α → β) (x: α), g (f x)
+def idᵀ (α: U): U := α → α
+def id (α : U) (a : α) : α := a
+def const (α β : U) : α → β → α := λ (a : α) (b : β), a
 
 def I : V := interval def 0 := i₀ def 1 := i₁
 def LineP (A : I → U) : U := Π (i : I), A i

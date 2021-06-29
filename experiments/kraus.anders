@@ -1,7 +1,12 @@
 module kraus where
 import experiments/path
 
+-- http://www.cs.nott.ac.uk/~psztxa/publ/tt-in-tt.pdf
+-- https://arxiv.org/ftp/arxiv/papers/1907/1907.07562.pdf
 -- https://arxiv.org/pdf/2009.01883.pdf
+-- https://arxiv.org/pdf/1604.03799.pdf
+-- https://ncatlab.org/nlab/show/two-level+type+theory
+-- https://ncatlab.org/homotopytypetheory/show/Homotopy+Type+System
 
 def algebra : U₁ := Σ
     -- a semicategory of contexts and substitutions:

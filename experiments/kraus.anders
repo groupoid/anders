@@ -1,0 +1,45 @@
+module kraus where
+import experiments/path
+
+-- https://arxiv.org/pdf/2009.01883.pdf
+
+def algebra : U₁ := Σ
+    -- a semicategory of contexts and substitutions:
+    (Con: U)
+    (Sub: Con → Con → U)
+    (◊: Π (Г Θ ∆ : Con), Sub Г Θ → Sub Θ ∆ → Sub Г ∆)
+    (◊-assoc: Π (Г Θ ∆ Ф : Con) (σ: Sub Г Θ) (δ: Sub Θ ∆) (ν: Sub ∆ Ф), Path (Sub Г Ф) (◊ Г ∆ Ф (◊ Г Θ ∆ σ δ) ν) (◊ Г Θ Ф σ (◊ Θ ∆ Ф δ ν)))
+    -- identity morphisms as identity substitutions:
+    (id: Π (Г : Con), Sub Г Г)
+    (id-left: Π (Θ ∆ : Con) (δ : Sub Θ ∆), Path (Sub Θ ∆) δ (◊ Θ ∆ ∆ δ (id ∆)))
+    (id-right: Π (Θ ∆ : Con) (δ : Sub Θ ∆), Path (Sub Θ ∆) δ (◊ Θ Θ ∆ (id Θ) δ))
+    -- a terminal oject as empty context:
+    (•: Con)
+    (є: Π (Г : Con), Sub Г •)
+    (•-η: Π (Г: Con) (δ: Sub Г •), Path (Sub Г •) (є Г) δ)
+    -- a presheaf of types:
+    (Ty: Con → U)
+    (_[_]ᵀ: Π (Г ∆ : Con), Ty ∆ → Sub Г ∆ → Ty Г)
+    ([id]ᵀ: Π (∆ : Con) (A : Ty ∆), Path (Ty ∆) (_[_]ᵀ ∆ ∆ A (id ∆)) A)
+    ([◊]ᵀ: U)
+    -- a (covariant) presheaf on the category of elements as terms:
+    (Tm: Π (Г : Con), Ty Г → U)
+    (_[_]ᵗ: Π (Г ∆ : Con) (A : Ty ∆) (σ: Sub Г ∆), Tm Г (_[_]ᵀ Г ∆ A σ))
+    ([id]ᵗ: Π (∆ : Con) (A : Ty ∆) (t: Tm ∆ (_[_]ᵀ ∆ ∆ A (id ∆))), Path (Tm ∆ (_[_]ᵀ ∆ ∆ A (id ∆))) (_[_]ᵗ ∆ ∆ A (id ∆)) t)
+    ([◊]ᵗ: U)
+    -- context extensions
+    (_⊳_: U)
+    (p: U)
+    (q: U)
+    (_⋅_: U)
+    (⊳-β₁: U)
+    (⊳-β₂: U)
+    (⊳-η: U)
+    (_⋅_◊_: U)
+    -- truncated structure (in HoTT)
+    (Con-isSet: isSet Con)
+    (Sub-isSet: Π (Г ∆ : Con), isSet (Sub Г ∆))
+    (Ty-isSet: Π (Г : Con), isSet (Ty Г))
+    (Tm-isSet: Π (Г : Con) (A: Ty Г), isSet (Tm Г A)), U
+
+axiom standard-model : algebra 

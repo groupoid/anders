@@ -37,9 +37,9 @@ def algebra : U₁ := Σ
     (⊳-η: U)
     (_⋅_◊_: U)
     -- truncated structure (in HoTT)
-    (Con-isSet: isSet Con)
-    (Sub-isSet: Π (Г ∆ : Con), isSet (Sub Г ∆))
-    (Ty-isSet: Π (Г : Con), isSet (Ty Г))
-    (Tm-isSet: Π (Г : Con) (A: Ty Г), isSet (Tm Г A)), U
+    (Conᴷ: isSet Con)
+    (Subᴷ: Π (Г ∆ : Con), isSet (Sub Г ∆))
+    (Tyᴷ: Π (Г : Con), isSet (Ty Г))
+    (Tmᴷ: Π (Г : Con) (A: Ty Г), isSet (Tm Г A)), U
 
 axiom standard-model : algebra 

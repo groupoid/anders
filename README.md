@@ -29,7 +29,8 @@ $ apt install ocaml ocamlbuild menhir
 Samples
 -------
 
-You can find some examples in the `experiments` directory. For instance reality checking by internalizing MLTT can be performed by the following usage:
+You can find some examples in the `experiments` directory.
+For instance reality checking by internalizing MLTT can be performed by the following usage:
 
 ```Lean
 def MLTT (A: U) : U := Σ

@@ -17,7 +17,7 @@
 
 module path where
 
-def ∘ᵀ (α β γ: U) : U := (β → γ) -> (α → β) -> (α → γ)
+def ∘ᵀ (α β γ: U) : U := (β → γ) → (α → β) → (α → γ)
 def ∘ (α β γ : U) : ∘ᵀ α β γ := λ (g: β → γ) (f: α → β) (x: α), g (f x)
 def idᵀ (α: U): U := α → α
 def id (α : U) (a : α) : α := a
@@ -61,9 +61,8 @@ def isProp (A : U) : U := Π (a b : A), Path A a b
 def isSet (A : U) : U := Π (a b : A) (a0 b0 : Path A a b), Path (Path A a b) a0 b0
 def isGroupoid (A : U) : U := Π (a b : A) (a0 b0 : Path A a b) (a1 b1 : Path (Path A a b) a0 b0), Path (Path (Path A a b) a0 b0) a1 b1
 def trans (A B: U) (p: PathP (<_> U) A B) (a: A): B := transp p 0 a
-def subst (A: U) (P: A -> U) (a b: A) (p: Path A a b) (e: P a): P b := transp (<i> P (p @ i)) 0 e
-def coerce (A B: U) (p: PathP (<_> U) A B): A -> B := λ (x : A), trans A B p x
+def subst (A: U) (P: A → U) (a b: A) (p: Path A a b) (e: P a): P b := transp (<i> P (p @ i)) 0 e
+def coerce (A B: U) (p: PathP (<_> U) A B): A → B := λ (x : A), trans A B p x
 def pcomp (A: U) (a b c: A) (p: Path A a b) (q: Path A b c): Path A a c := subst A (Path A a) b c q p
-def idfun-transp (A : U) (p : PathP (<_> U) A A) : A -> A := transp p 1
-def transfill (A B : U) (p : PathP (<_> U) A B) (a : A) : PathP p a (transp p 0 a) :=
-<j> transp (<i> p @ i /\ j) -j a
+def transId (A : U) (p : PathP (<_> U) A A) : A → A := transp p 1
+def transFill (A B : U) (p : PathP (<_> U) A B) (a : A) : PathP p a (transp p 0 a) := <j> transp (<i> p @ i /\ j) -j a

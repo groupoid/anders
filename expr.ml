@@ -205,8 +205,11 @@ let showGamma (ctx : ctx) : string =
 let var x = VNt (NVar x)
 let genV n = var (pat n)
 
-let zero = VNt (NDir Zero)
-let one  = VNt (NDir One)
+let ezero = EDir Zero
+let eone  = EDir One
+
+let vzero = VNt (NDir Zero)
+let vone  = VNt (NDir One)
 
 let merge ctx1 ctx2 : ctx =
   Env.merge (fun k x y ->

@@ -199,10 +199,10 @@ and check ctx (e0 : exp) (t0 : value) =
   | EHole, v -> traceHole v ctx
   | EAxiom (_, u), v -> eqNf ctx (eval u ctx) v
   | EPLam e, VNt (NApp (NApp (NPathP (VPLam g), u0), u1)) ->
-    let v0 = app ctx (eval e ctx, zero) in
-    let v1 = app ctx (eval e ctx, one) in
-    check ctx (rbV ctx v0) (app ctx (g, zero));
-    check ctx (rbV ctx v1) (app ctx (g, one));
+    let v0 = app ctx (eval e ctx, vzero) in
+    let v1 = app ctx (eval e ctx, vone) in
+    check ctx (rbV ctx v0) (app ctx (g, vzero));
+    check ctx (rbV ctx v1) (app ctx (g, vone));
     eqNf ctx v0 u0; eqNf ctx v1 u1
   | e, VPre u -> begin
     match infer ctx e with
@@ -223,8 +223,8 @@ and infer ctx e : value = traceInfer e; match e with
   | EPre u -> VPre (u + 1)
   | EPathP (EPLam e) ->
     let v = eval e ctx in
-    let v0 = app ctx (v, zero) in
-    let v1 = app ctx (v, one) in
+    let v0 = app ctx (v, vzero) in
+    let v1 = app ctx (v, vone) in
     let t0 = infer ctx (rbV ctx v0) in
     let t1 = infer ctx (rbV ctx v1) in
     begin match t0, t1 with
@@ -235,6 +235,18 @@ and infer ctx e : value = traceInfer e; match e with
   | EAppFormula (f, x) ->
     check ctx x (VNt NI); let (p, _, _) = extPathP ctx f
     in app ctx (p, eval x ctx)
+  | ETransp (p, i) ->
+    let u0 = eval (EAppFormula (p, ezero)) ctx in
+    let u1 = eval (EAppFormula (p, eone)) ctx in
+
+    let t0 = infer ctx (rbV ctx u0) in
+    let t1 = infer ctx (rbV ctx u1) in
+    eqUniv t0 t1;
+
+    begin match eval i ctx with
+    | VNt k -> List.iter (fun phi -> eqNf (faceEnv phi ctx) u0 u1) (solve k One);
+      implv u0 (rbV ctx u1) ctx
+    | _ -> failwith (Printf.sprintf "“%s” expected to be neutral" (showExp i)) end
   | EI -> VPre 0 | EDir _ -> VNt NI
   | ENeg e ->
     if infer ctx e = VNt NI
@@ -243,10 +255,17 @@ and infer ctx e : value = traceInfer e; match e with
     if infer ctx e1 = VNt NI && infer ctx e2 = VNt NI
     then VNt NI else raise (InferError e)
   | EIsOne -> implv (VNt NI) (EPre 0) ctx
-  | EOneRefl -> VNt (NApp (NIsOne, one))
+  | EOneRefl -> VNt (NApp (NIsOne, vone))
   | e -> raise (InferError e)
 
 and inferTele ctx binop (p, a) b =
   let t = eval a ctx in let u = pat p in let gen = var u in
   let ctx' = upLocal (upLocal ctx p t gen) u t gen in
   let v = infer ctx' b in binop (infer ctx a) v
+
+and eqUniv t0 t1 =
+  match t0, t1 with
+  | VKan u, VKan v | VPre u, VPre v ->
+    if ieq u v then () else raise (TypeIneq (t0, t1))
+  | VPre _, _ | VKan _, _ -> raise (ExpectedVSet t1)
+  | _, _ -> raise (ExpectedVSet t0)

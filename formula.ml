@@ -125,3 +125,22 @@ let meets xs ys =
       try zs := meet x y :: !zs
       with IncompatibleFaces -> ()) ys) xs;
   nubRev !zs
+
+let union xs ys =
+  nubRev (List.append xs ys)
+
+let eps : face = Face.empty
+let singleton p x = Face.add p x Face.empty
+
+let rec solve k x =
+  match k, x with
+  | NDir y, _ -> if x = y then [eps] else []
+  | NVar p, _ -> [singleton p x]
+  | NNeg n, _ -> solve n (negDir x)
+  | NOr (f, g), One  | NAnd (f, g), Zero ->
+    union (solve f Zero) (solve g Zero)
+  | NOr (f, g), Zero | NAnd (f, g), One ->
+    meets (solve f x) (solve f x)
+  | _, _ -> failwith (Printf.sprintf "Cannot solve: %s = %s" (showNeut k) (showDir x))
+
+let faceEnv = Face.fold (fun p dir -> Env.add p (Local, VNt NI, Value (VNt (NDir dir))))

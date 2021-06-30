@@ -124,4 +124,4 @@ let meets xs ys =
     List.iter (fun y ->
       try zs := meet x y :: !zs
       with IncompatibleFaces -> ()) ys) xs;
-  !zs
+  nubRev !zs

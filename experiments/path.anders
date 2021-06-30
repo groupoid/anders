@@ -1,3 +1,20 @@
+{- Path Type:
+   - Reflexivity, Symmetry, Composition, Kan;
+   - De Morgan laws;
+   - Connections;
+   - Congruence and Respect;
+   - Contractability of Singletons;
+   - Substitution, Transport, J.
+
+   HoTT 1.12 Identity types
+   HoTT 1.12.1 Path induction
+   HoTT 2.1 Types are higher groupoids
+   HoTT 2.11 Identity type
+   HoTT 3.11 Contractibility
+   HoTT 6.2 Induction principles and dependent paths.
+
+   Copyright (c) Groupoid Infinity, 2014-2021. -}
+
 module path where
 
 def ∘ᵀ (α β γ: U) : U := (β → γ) -> (α → β) -> (α → γ)
@@ -43,25 +60,7 @@ def ¬-of-∨ (i j : I) : Eq I -(i ∨ j) (-i ∧ -j) := refl I -(i ∨ j)
 def isProp (A : U) : U := Π (a b : A), Path A a b
 def isSet (A : U) : U := Π (a b : A) (a0 b0 : Path A a b), Path (Path A a b) a0 b0
 def isGroupoid (A : U) : U := Π (a b : A) (a0 b0 : Path A a b) (a1 b1 : Path (Path A a b) a0 b0), Path (Path (Path A a b) a0 b0) a1 b1
-
 def trans (A B: U) (p: PathP (<_> U) A B) (a: A): B := transp p 0 a
 def subst (A: U) (P: A -> U) (a b: A) (p: Path A a b) (e: P a): P b := transp (<i> P (p @ i)) 0 e
 def coerce (A B: U) (p: PathP (<_> U) A B): A -> B := λ (x : A), trans A B p x
 def pcomp (A: U) (a b c: A) (p: Path A a b) (q: Path A b c): Path A a c := subst A (Path A a) b c q p
-
-{- Path Type:
-   - Reflexivity, Symmetry, Composition, Kan;
-   - De Morgan laws;
-   - Connections;
-   - Congruence and Respect;
-   - Contractability of Singletons;
-   - Substitution, Transport, J.
-
-   HoTT 1.12 Identity types
-   HoTT 1.12.1 Path induction
-   HoTT 2.1 Types are higher groupoids
-   HoTT 2.11 Identity type
-   HoTT 3.11 Contractibility
-   HoTT 6.2 Induction principles and dependent paths.
-
-   Copyright (c) Groupoid Infinity, 2014-2021. -}

@@ -106,7 +106,22 @@ type face = dir Face.t
 let meet phi psi : face =
   Face.merge (fun k x y ->
     match x, y with
-    | Some u, Some v -> failwith "meet: incompatible faces"
+    | Some u, Some v -> raise IncompatibleFaces
     | Some u, None   -> Some u
     | None,   Some v -> Some v
     | None,   None   -> None) phi psi
+
+let nubRev xs =
+  let ys = ref [] in
+  List.iter (fun x ->
+    if not (List.mem x !ys) then
+      ys := x :: !ys) xs;
+  !ys
+
+let meets xs ys =
+  let zs = ref [] in
+  List.iter (fun x ->
+    List.iter (fun y ->
+      try zs := meet x y :: !zs
+      with IncompatibleFaces -> ()) ys) xs;
+  !zs

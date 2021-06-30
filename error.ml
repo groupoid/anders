@@ -2,6 +2,7 @@ open Ident
 open Expr
 
 exception Restart
+exception IncompatibleFaces
 exception InferError of exp
 exception ExpectedPath of exp
 exception ExpectedPi of value
@@ -44,6 +45,7 @@ let prettyPrintError : exn -> unit = function
   | UnknownOption opt -> Printf.printf "Unknown option “%s”\n" opt
   | UnknownOptionValue (opt, value) -> Printf.printf "Unknown value “%s” of option “%s”\n" value opt
   | Parser (x, buf) -> Printf.printf "Parsing error at line %d: “%s”\n" x buf
+  | IncompatibleFaces -> Printf.printf "Incompatible faces\n"
   | Sys_error s -> print_endline s
   | Restart -> raise Restart
   | ex -> Printf.printf "Uncaught exception: %s\n" (Printexc.to_string ex)

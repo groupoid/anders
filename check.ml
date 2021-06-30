@@ -64,7 +64,9 @@ let rec eval (e : exp) (ctx : ctx) = traceEval e; match e with
     | VNt (NDir One) ->
       let a = pat (name "a") in
       VLam (eval (EAppFormula (p, ezero)) ctx, (a, EVar a, ctx))
-    | _ -> failwith "not implemented yet" end
+    (* not implemented yet *)
+    | VNt k -> VNt (NTransp (eval p ctx, k))
+    | v -> failwith (Printf.sprintf "“%s” expected to be neutral" (showValue v)) end
   | EIsOne             -> VNt NIsOne
   | EOneRefl           -> VNt NOneRefl
   | EI                 -> VNt NI
@@ -204,11 +206,11 @@ and check ctx (e0 : exp) (t0 : value) =
     check ctx e2 (closByVal ctx t g (eval e1 ctx))
   | EHole, v -> traceHole v ctx
   | EAxiom (_, u), v -> eqNf ctx (eval u ctx) v
-  | EPLam e, VNt (NApp (NApp (NPathP (VPLam g), u0), u1)) ->
-    let v0 = app ctx (eval e ctx, vzero) in
-    let v1 = app ctx (eval e ctx, vone) in
-    check ctx (rbV ctx v0) (app ctx (g, vzero));
-    check ctx (rbV ctx v1) (app ctx (g, vone));
+  | e, VNt (NApp (NApp (NPathP p, u0), u1)) ->
+    let v0 = act e ezero ctx in
+    let v1 = act e eone  ctx in
+    check ctx (rbV ctx v0) (act (rbV ctx p) ezero ctx);
+    check ctx (rbV ctx v1) (act (rbV ctx p) eone  ctx);
     eqNf ctx v0 u0; eqNf ctx v1 u1
   | e, VPre u -> begin
     match infer ctx e with
@@ -227,10 +229,9 @@ and infer ctx e : value = traceInfer e; match e with
   | ESnd e -> let (t, g) = extSigG (infer ctx e) in closByVal ctx t g (vfst (eval e ctx))
   | EAxiom (_, e) -> eval e ctx
   | EPre u -> VPre (u + 1)
-  | EPathP (EPLam e) ->
-    let v = eval e ctx in
-    let v0 = app ctx (v, vzero) in
-    let v1 = app ctx (v, vone) in
+  | EPathP p ->
+    let v0 = act p ezero ctx in
+    let v1 = act p eone  ctx in
     let t0 = infer ctx (rbV ctx v0) in
     let t1 = infer ctx (rbV ctx v1) in
     begin match t0, t1 with
@@ -242,8 +243,8 @@ and infer ctx e : value = traceInfer e; match e with
     check ctx x (VNt NI); let (p, _, _) = extPathP ctx f
     in app ctx (p, eval x ctx)
   | ETransp (p, i) ->
-    let u0 = eval (EAppFormula (p, ezero)) ctx in
-    let u1 = eval (EAppFormula (p, eone)) ctx in
+    let u0 = act p ezero ctx in
+    let u1 = act p eone  ctx in
 
     let t0 = infer ctx (rbV ctx u0) in
     let t1 = infer ctx (rbV ctx u1) in
@@ -275,3 +276,5 @@ and eqUniv t0 t1 =
     if ieq u v then () else raise (TypeIneq (t0, t1))
   | VPre _, _ | VKan _, _ -> raise (ExpectedVSet t1)
   | _, _ -> raise (ExpectedVSet t0)
+
+and act e i ctx = eval (EAppFormula (e, i)) ctx

@@ -135,7 +135,6 @@ let rec solve k x = match k, x with
   | NDir y, _ -> if x = y then [eps] else []
   | NVar p, _ -> [singleton p x]
   | NNeg n, _ -> solve n (negDir x)
-  | NOr (f, g), One  | NAnd (f, g), Zero -> union (solve f Zero) (solve g Zero)
-  | NOr (f, g), Zero | NAnd (f, g), One  -> meets (solve f x)    (solve f x)
+  | NOr (f, g), One  | NAnd (f, g), Zero -> union (solve f x) (solve g x)
+  | NOr (f, g), Zero | NAnd (f, g), One  -> meets (solve f x) (solve g x)
   | _, _ -> failwith (Printf.sprintf "Cannot solve: %s = %s" (showNeut k) (showDir x))
-

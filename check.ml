@@ -249,7 +249,7 @@ and infer ctx e : value = traceInfer e; match e with
 
     let t0 = infer ctx (rbV ctx u0) in
     let t1 = infer ctx (rbV ctx u1) in
-    eqUniv t0 t1;
+    eqUniv t0 t1; check ctx i (VNt NI);
 
     begin match eval i ctx with
     | VNt k -> List.iter (fun phi -> eqNf (faceEnv phi ctx) u0 u1) (solve k One);

@@ -185,6 +185,7 @@ and convNeut ctx n1 n2 : bool =
   | NAxiom (p, x), NAxiom (q, y) -> p = q && conv ctx x y
   | NPathP a, NPathP b -> conv ctx a b
   | NAppFormula (f, x), NAppFormula (g, y) -> conv ctx f g && conv ctx x y
+  | NTransp (p, i), NTransp (q, j) -> conv ctx p q && convNeut ctx i j
   | NOr _, NOr _ -> orEq n1 n2
   | NAnd _, NAnd _ -> andEq n1 n2
   | NNeg x, NNeg y -> convNeut ctx x y

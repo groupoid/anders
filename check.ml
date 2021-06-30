@@ -59,6 +59,12 @@ let rec eval (e : exp) (ctx : ctx) = traceEval e; match e with
       | u               -> VNt (NAppFormula (v, u))
       end
     end
+  | ETransp (p, i)     ->
+    begin match eval i ctx with
+    | VNt (NDir One) ->
+      let a = pat (name "a") in
+      VLam (eval (EAppFormula (p, ezero)) ctx, (a, EVar a, ctx))
+    | _ -> failwith "not implemented yet" end
   | EIsOne             -> VNt NIsOne
   | EOneRefl           -> VNt NOneRefl
   | EI                 -> VNt NI

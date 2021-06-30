@@ -64,3 +64,4 @@ def trans (A B: U) (p: PathP (<_> U) A B) (a: A): B := transp p 0 a
 def subst (A: U) (P: A -> U) (a b: A) (p: Path A a b) (e: P a): P b := transp (<i> P (p @ i)) 0 e
 def coerce (A B: U) (p: PathP (<_> U) A B): A -> B := λ (x : A), trans A B p x
 def pcomp (A: U) (a b c: A) (p: Path A a b) (q: Path A b c): Path A a c := subst A (Path A a) b c q p
+def idfun-transp (A : U) (p : PathP (<_> U) A A) : A -> A := transp p 1

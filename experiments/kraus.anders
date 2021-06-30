@@ -12,12 +12,12 @@ def algebra : U₁ := Σ
     -- a semicategory of contexts and substitutions:
     (Con: U)
     (Sub: Con → Con → U)
-    (◊: Π (Г Θ ∆ : Con), Sub Г Θ → Sub Θ ∆ → Sub Г ∆)
-    (◊-assoc: Π (Г Θ ∆ Ф : Con) (σ: Sub Г Θ) (δ: Sub Θ ∆) (ν: Sub ∆ Ф), Path (Sub Г Ф) (◊ Г ∆ Ф (◊ Г Θ ∆ σ δ) ν) (◊ Г Θ Ф σ (◊ Θ ∆ Ф δ ν)))
+    (◊: Π (Г Θ ∆ : Con), Sub Θ ∆ → Sub Г Θ → Sub Г ∆)
+    (◊-assoc: Π (Г Θ ∆ Ф : Con) (σ: Sub Г Θ) (δ: Sub Θ ∆) (ν: Sub ∆ Ф), Path (Sub Г Ф) (◊ Г ∆ Ф ν (◊ Г Θ ∆ δ σ)) (◊ Г Θ Ф (◊ Θ ∆ Ф ν δ) σ))
     -- identity morphisms as identity substitutions:
     (id: Π (Г : Con), Sub Г Г)
-    (id-left: Π (Θ ∆ : Con) (δ : Sub Θ ∆), Path (Sub Θ ∆) δ (◊ Θ ∆ ∆ δ (id ∆)))
-    (id-right: Π (Θ ∆ : Con) (δ : Sub Θ ∆), Path (Sub Θ ∆) δ (◊ Θ Θ ∆ (id Θ) δ))
+    (id-left: Π (Θ ∆ : Con) (δ : Sub Θ ∆), Path (Sub Θ ∆) δ (◊ Θ ∆ ∆ (id ∆) δ))
+    (id-right: Π (Θ ∆ : Con) (δ : Sub Θ ∆), Path (Sub Θ ∆) δ (◊ Θ Θ ∆ δ (id Θ)))
     -- a terminal oject as empty context:
     (•: Con)
     (є: Π (Г : Con), Sub Г •)
@@ -26,12 +26,12 @@ def algebra : U₁ := Σ
     (Ty: Con → U)
     (_[_]ᵀ: Π (Г ∆ : Con), Ty ∆ → Sub Г ∆ → Ty Г)
     ([id]ᵀ: Π (∆ : Con) (A : Ty ∆), Path (Ty ∆) (_[_]ᵀ ∆ ∆ A (id ∆)) A)
-    ([◊]ᵀ: U)
+    ([◊]ᵀ: Π (Г ∆ Ф: Con) (A : Ty Ф) (σ : Sub Г ∆) (δ : Sub ∆ Ф), Path (Ty Г) (_[_]ᵀ Г Ф A (◊ Г ∆ Ф δ σ)) (_[_]ᵀ Г ∆ (_[_]ᵀ ∆ Ф A δ) σ))
     -- a (covariant) presheaf on the category of elements as terms:
     (Tm: Π (Г : Con), Ty Г → U)
     (_[_]ᵗ: Π (Г ∆ : Con) (A : Ty ∆) (σ: Sub Г ∆), Tm Г (_[_]ᵀ Г ∆ A σ))
-    ([id]ᵗ: Π (∆ : Con) (A : Ty ∆) (t: Tm ∆ (_[_]ᵀ ∆ ∆ A (id ∆))), Path (Tm ∆ (_[_]ᵀ ∆ ∆ A (id ∆))) (_[_]ᵗ ∆ ∆ A (id ∆)) t)
-    ([◊]ᵗ: U)
+    -- ([id]ᵗ: Π (∆ : Con) (A : Ty ∆) (t: Tm ∆ A), Path (Tm ∆ A) (_[_]ᵗ ∆ ∆ A (t (id ∆))) t)
+    -- ([◊]ᵗ: Π (Г ∆ Ф: Con) (A : Ty Ф) (t: Tm Ф A) (σ : Sub Г ∆) (δ : Sub ∆ Ф), Path (Tm Г A) (_[_]ᵗ Г Ф A (◊ Г ∆ Ф δ σ)) (_[_]ᵗ Г ∆ (_[_]ᵗ ∆ Ф A δ) σ))
     -- context extensions
     (_⊳_: U)
     (p: U)

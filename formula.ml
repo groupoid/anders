@@ -100,11 +100,10 @@ let orEq f g =
    of the form (α₁ ∧ ... ∧ αₙ) *)
 let andEq f g = Conjunction.equal (extAnd f) (extAnd g)
 
-module Face = Map.Make(Name)
-type face = dir Face.t
+type face = dir Env.t
 
 let meet phi psi : face =
-  Face.merge (fun k x y ->
+  Env.merge (fun k x y ->
     match x, y with
     | Some u, Some v -> raise IncompatibleFaces
     | Some u, None   -> Some u
@@ -127,9 +126,9 @@ let meets xs ys =
   nubRev !zs
 
 let union xs ys = nubRev (List.append xs ys)
-let eps : face = Face.empty
-let singleton p x = Face.add p x Face.empty
-let faceEnv = Face.fold (fun p dir -> Env.add p (Local, VNt NI, Value (VNt (NDir dir))))
+let eps : face = Env.empty
+let singleton p x = Env.add p x Env.empty
+let faceEnv = Env.fold (fun p dir -> Env.add p (Local, VNt NI, Value (VNt (NDir dir))))
 
 let rec solve k x = match k, x with
   | NDir y, _ -> if x = y then [eps] else []

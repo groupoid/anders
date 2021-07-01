@@ -168,7 +168,7 @@ and conv ctx v1 v2 : bool = traceConv v1 v2;
     conv ctx' (app ctx' (b, gen)) (closByVal ctx' a (p, o, v) gen)
   | VPre u, VPre v -> ieq u v
   | VPLam f, VPLam g -> conv ctx f g
-  | VPLam f, v | v, VPLam f -> let p = pat (name "i") in
+  | VPLam f, v | v, VPLam f -> let p = pat (name "x") in
     let i = var p in let ctx' = upLocal ctx p (VNt NI) i in
     conv ctx' (eval (EAppFormula (rbV ctx' v, EVar p)) ctx') (app ctx' (f, i))
   | _, _ ->
@@ -210,8 +210,9 @@ and check ctx (e0 : exp) (t0 : value) =
   | e, VNt (NApp (NApp (NPathP p, u0), u1)) ->
     let v0 = act e ezero ctx in
     let v1 = act e eone  ctx in
-    check ctx (rbV ctx v0) (act (rbV ctx p) ezero ctx);
-    check ctx (rbV ctx v1) (act (rbV ctx p) eone  ctx);
+    let i = pat (name "x") in let gen = EVar i in
+    let ctx' = upLocal ctx i (VNt NI) (var i) in
+    check ctx' (rbV ctx' (act e gen ctx')) (act (rbV ctx p) gen ctx');
     eqNf ctx v0 u0; eqNf ctx v1 u1
   | e, VPre u -> begin
     match infer ctx e with
@@ -252,7 +253,12 @@ and infer ctx e : value = traceInfer e; match e with
     eqUniv t0 t1; check ctx i (VNt NI);
 
     begin match eval i ctx with
-    | VNt k -> List.iter (fun phi -> eqNf (faceEnv phi ctx) u0 u1) (solve k One);
+    | VNt k ->
+      let x = pat (name "x") in let gen = EVar x in
+      let ctx' = upLocal ctx x (VNt NI) (var x) in
+      List.iter (fun phi ->
+        let ctx'' = faceEnv phi ctx' in
+        eqNf ctx'' u0 (act p gen ctx'')) (solve k One);
       implv u0 (rbV ctx u1) ctx
     | _ -> failwith (Printf.sprintf "“%s” expected to be neutral" (showExp i)) end
   | EI -> VPre 0 | EDir _ -> VNt NI

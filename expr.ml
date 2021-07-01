@@ -71,7 +71,8 @@ let rec showExp : exp -> string = function
   | EPathP e -> "PathP " ^ showExp e
   | EIsOne -> "is-one?" | EOneRefl -> "1-refl"
   | ETransp (p, i) -> Printf.sprintf "transp %s %s" (showExp p) (showExp i)
-  | EPLam e -> Printf.sprintf "(pLam %s)" (showExp e)
+  | EPLam (ELam ((i, _), e)) -> Printf.sprintf "(<%s> %s)" (showName i) (showExp e)
+  | EPLam _ -> failwith "showExp: unreachable code was reached"
   | EAppFormula (f, x) -> Printf.sprintf "(%s @ %s)" (showExp f) (showExp x)
   | EI -> "I" | EDir d -> showDir d
   | EAnd (a, b) -> Printf.sprintf "(%s /\\ %s)" (showExp a) (showExp b)
@@ -165,7 +166,11 @@ let rec showValue : value -> string = function
   | VSig (x, (p, e, rho)) -> Printf.sprintf "Σ %s, %s" (showTele p x rho) (showExp e)
   | VNt n -> showNeut n
   | VPre n -> "V" ^ showLevel n
-  | VPLam v -> Printf.sprintf "(pLam %s)" (showValue v)
+  | VPLam (VLam (_, (p, e, rho))) ->
+    if isRhoVisible rho then
+      Printf.sprintf "(<%s, %s> %s)" (showName p) (showRho rho) (showExp e)
+    else Printf.sprintf "(<%s> %s)" (showName p) (showExp e)
+  | VPLam _ -> failwith "showExp: unreachable code was reached"
 and showNeut : neut -> string = function
   | NVar p -> showName p
   | NApp (f, x) -> Printf.sprintf "(%s %s)" (showNeut f) (showValue x)
@@ -184,10 +189,11 @@ and showNeut : neut -> string = function
 and showTermBind : name * record -> string option = function
   | p, (Local, _, t) -> Some (Printf.sprintf "%s := %s" (showName p) (showTerm t))
   | _, _             -> None
+and isRhoVisible = Env.exists (fun _ -> isGlobal)
 and showRho ctx : string =
   Env.bindings ctx |> filterMap showTermBind |> String.concat ", "
 and showTele p x rho : string =
-  if Env.exists (fun _ -> isGlobal) rho then
+  if isRhoVisible rho then
     Printf.sprintf "(%s : %s, %s)" (showName p) (showValue x) (showRho rho)
   else Printf.sprintf "(%s : %s)" (showName p) (showValue x)
 and showTerm : term -> string = function

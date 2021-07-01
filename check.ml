@@ -16,8 +16,7 @@ let vsnd : value -> value = function
   | VNt k -> VNt (NSnd k)
   | v -> raise (ExpectedSig v)
 
-let lookup (x : name) (ctx : ctx) =
-  match Env.find_opt x ctx with
+let lookup (x : name) (ctx : ctx) = match Env.find_opt x ctx with
   | Some (_, v, _) -> v
   | None           -> raise (VariableNotFound x)
 
@@ -25,12 +24,8 @@ let ignoreAnon (p : name) a b = match p with
   | No -> a
   | _  -> b
 
-let upLocal (ctx : ctx) (p : name) t v : ctx =
-  Env.add p (Local, t, Value v) ctx |> ignoreAnon p ctx
-
-let upGlobal (ctx : ctx) (p : name) t v : ctx =
-  Env.add p (Global, t, Value v) ctx |> ignoreAnon p ctx
-
+let upLocal (ctx : ctx) (p : name) t v : ctx = Env.add p (Local, t, Value v) ctx |> ignoreAnon p ctx
+let upGlobal (ctx : ctx) (p : name) t v : ctx = Env.add p (Global, t, Value v) ctx |> ignoreAnon p ctx
 let ieq u v : bool = !girard || u = v
 
 let rec eval (e : exp) (ctx : ctx) = traceEval e; match e with
@@ -48,25 +43,8 @@ let rec eval (e : exp) (ctx : ctx) = traceEval e; match e with
   | EPre u             -> VPre u
   | EPathP e           -> VNt (NPathP (eval e ctx))
   | EPLam e            -> VPLam (eval e ctx)
-  | EAppFormula (e, x) ->
-    begin match eval e ctx with
-    | VPLam f -> app ctx (f, eval x ctx)
-    | v       ->
-      let (_, u0, u1) = extPathP ctx (rbV ctx v) in
-      begin match eval x ctx with
-      | VNt (NDir Zero) -> u0
-      | VNt (NDir One)  -> u1
-      | u               -> VNt (NAppFormula (v, u))
-      end
-    end
-  | ETransp (p, i)     ->
-    begin match eval i ctx with
-    | VNt (NDir One) ->
-      let a = pat (name "a") in
-      VLam (eval (EAppFormula (p, ezero)) ctx, (a, EVar a, ctx))
-    (* not implemented yet *)
-    | VNt k -> VNt (NTransp (eval p ctx, k))
-    | v -> failwith (Printf.sprintf "“%s” expected to be neutral" (showValue v)) end
+  | EAppFormula (e, x) -> begin match eval e ctx with | VPLam f -> app ctx (f, eval x ctx) | v -> pathExt ctx v x end
+  | ETransp (p, i)     -> transport ctx p i
   | EIsOne             -> VNt NIsOne
   | EOneRefl           -> VNt NOneRefl
   | EI                 -> VNt NI
@@ -74,6 +52,11 @@ let rec eval (e : exp) (ctx : ctx) = traceEval e; match e with
   | EAnd (e1, e2)      -> andFormula (eval e1 ctx) (eval e2 ctx)
   | EOr (e1, e2)       -> orFormula (eval e1 ctx) (eval e2 ctx)
   | ENeg e             -> negFormula (eval e ctx)
+
+and transport (ctx : ctx) (p : exp) (i : exp) = match eval i ctx with
+  | VNt (NDir One) -> let a = pat (name "a") in VLam (eval (EAppFormula (p, ezero)) ctx, (a, EVar a, ctx))
+  | VNt k -> VNt (NTransp (eval p ctx, k))
+  | v -> failwith (Printf.sprintf "“%s” expected to be neutral" (showValue v))
 
 and app ctx : value * value -> value = function
   | VLam (t, f), v     -> closByVal ctx t f v
@@ -88,10 +71,17 @@ and getRho ctx x = match Env.find_opt x ctx with
 and closByVal ctx1 t x v = let (p, e, ctx2) = x in traceClos e p v;
   let ctx' = merge ctx2 ctx1 in eval e (upLocal ctx' p t v)
 
-and extPathP ctx e =
-  match infer ctx e with
+and extPathP ctx e = match infer ctx e with
   | VNt (NApp (NApp (NPathP VPLam p, u0), u1)) -> (p, u0, u1)
   | _ -> raise (ExpectedPath e)
+
+and pathExt (ctx : ctx) (v: value) (e : exp) =
+  let (_, u0, u1) = extPathP ctx (rbV ctx v) in
+  begin match eval e ctx with
+    | VNt (NDir Zero) -> u0
+    | VNt (NDir One)  -> u1
+    | u               -> VNt (NAppFormula (v, u))
+  end
 
 and rbV ctx v : exp = traceRbV v; match v with
   | VLam (t, g)        -> rbVTele eLam ctx t g
@@ -102,6 +92,7 @@ and rbV ctx v : exp = traceRbV v; match v with
   | VNt l              -> rbN ctx l
   | VPre u             -> EPre u
   | VPLam f            -> EPLam (rbV ctx f)
+
 and rbN ctx n : exp = traceRbN n; match n with
   | NVar s             -> EVar s
   | NApp (k, m)        -> EApp (rbN ctx k, rbV ctx m)
@@ -119,6 +110,7 @@ and rbN ctx n : exp = traceRbN n; match n with
   | NAnd (u, v)        -> EAnd (rbN ctx u, rbN ctx v)
   | NOr (u, v)         -> EOr (rbN ctx u, rbN ctx v)
   | NNeg u             -> ENeg (rbN ctx u)
+
 and rbVTele ctor ctx t g =
   let (p, _, _) = g in let u = pat p in let gen = var u in
   let ctx' = upLocal ctx u t gen in
@@ -147,6 +139,7 @@ and weak (e : exp) ctx = traceWeak e; match e with
   | EOr (e1, e2)       -> EOr (weak e1 ctx, weak e2 ctx)
   | ENeg e             -> ENeg (weak e ctx)
   | e                  -> e
+
 and weakTele ctor ctx p a b : exp =
   let t = weak a ctx in ctor (p, t) (weak b (upLocal ctx p (eval t ctx) (var p)))
 
@@ -225,54 +218,48 @@ and infer ctx e : value = traceInfer e; match e with
   | EKan u -> VKan (u + 1)
   | ESig (t, e) -> inferTele ctx imax t e
   | EPi (t, e) -> inferTele ctx univImpl t e
-  | EApp (f, x) -> let (t, g) = extPiG (infer ctx f) in
-    ignore (check ctx x t); closByVal ctx t g (eval x ctx)
+  | EApp (f, x) -> let (t, g) = extPiG (infer ctx f) in ignore (check ctx x t); closByVal ctx t g (eval x ctx)
   | EFst e -> fst (extSigG (infer ctx e))
   | ESnd e -> let (t, g) = extSigG (infer ctx e) in closByVal ctx t g (vfst (eval e ctx))
   | EAxiom (_, e) -> eval e ctx
   | EPre u -> VPre (u + 1)
-  | EPathP p ->
-    let v0 = act p ezero ctx in
-    let v1 = act p eone  ctx in
-    let t0 = infer ctx (rbV ctx v0) in
-    let t1 = infer ctx (rbV ctx v1) in
-    begin match t0, t1 with
+  | EPathP p -> inferPath ctx p
+  | EAppFormula (f, x) -> check ctx x (VNt NI); let (p, _, _) = extPathP ctx f in app ctx (p, eval x ctx)
+  | ETransp (p, i) -> inferTransport ctx p i
+  | EI -> VPre 0 | EDir _ -> VNt NI
+  | ENeg e -> if infer ctx e = VNt NI then VNt NI else raise (InferError e)
+  | EOr (e1, e2) | EAnd (e1, e2) -> if infer ctx e1 = VNt NI && infer ctx e2 = VNt NI then VNt NI else raise (InferError e)
+  | EIsOne -> implv (VNt NI) (EPre 0) ctx
+  | EOneRefl -> VNt (NApp (NIsOne, vone))
+  | e -> raise (InferError e)
+
+and inferPath (ctx : ctx) (p : exp) =
+  let v0 = act p ezero ctx in
+  let v1 = act p eone  ctx in
+  let t0 = infer ctx (rbV ctx v0) in
+  let t1 = infer ctx (rbV ctx v1) in
+  begin match t0, t1 with
     | VKan u, VKan v ->
       if ieq u v then implv v0 (impl (rbV ctx v1) (EKan u)) ctx
       else raise (TypeIneq (VKan u, VKan v))
     | _, _ -> ExpectedFibrant (if isVSet t0 then t1 else t0) |> raise end
-  | EAppFormula (f, x) ->
-    check ctx x (VNt NI); let (p, _, _) = extPathP ctx f
-    in app ctx (p, eval x ctx)
-  | ETransp (p, i) ->
-    check ctx i (VNt NI);
 
-    let u0 = act p ezero ctx in
-    let u1 = act p eone  ctx in
-
-    let x = pat (name "x") in let gen = EVar x in
-    let ctx' = upLocal ctx x (VNt NI) (var x) in
-    begin match infer ctx' (rbV ctx' (act p gen ctx')) with
+and inferTransport (ctx : ctx) (p : exp) (i : exp) =
+  check ctx i (VNt NI);
+  let u0 = act p ezero ctx in
+  let u1 = act p eone  ctx in
+  let x = pat (name "x") in let gen = EVar x in
+  let ctx' = upLocal ctx x (VNt NI) (var x) in
+  begin match infer ctx' (rbV ctx' (act p gen ctx')) with
     | VKan _ -> ()
     | v      -> raise (ExpectedFibrant v) end;
-
-    begin match eval i ctx with
+  begin match eval i ctx with
     | VNt k ->
       List.iter (fun phi ->
         let ctx'' = faceEnv phi ctx' in
         eqNf ctx'' u0 (act p gen ctx'')) (solve k One);
       implv u0 (rbV ctx u1) ctx
     | _ -> failwith (Printf.sprintf "“%s” expected to be neutral" (showExp i)) end
-  | EI -> VPre 0 | EDir _ -> VNt NI
-  | ENeg e ->
-    if infer ctx e = VNt NI
-    then VNt NI else raise (InferError e)
-  | EOr (e1, e2) | EAnd (e1, e2) ->
-    if infer ctx e1 = VNt NI && infer ctx e2 = VNt NI
-    then VNt NI else raise (InferError e)
-  | EIsOne -> implv (VNt NI) (EPre 0) ctx
-  | EOneRefl -> VNt (NApp (NIsOne, vone))
-  | e -> raise (InferError e)
 
 and inferTele ctx binop (p, a) b =
   let t = eval a ctx in let u = pat p in let gen = var u in

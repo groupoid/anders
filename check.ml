@@ -245,17 +245,19 @@ and infer ctx e : value = traceInfer e; match e with
     check ctx x (VNt NI); let (p, _, _) = extPathP ctx f
     in app ctx (p, eval x ctx)
   | ETransp (p, i) ->
+    check ctx i (VNt NI);
+
     let u0 = act p ezero ctx in
     let u1 = act p eone  ctx in
 
-    let t0 = infer ctx (rbV ctx u0) in
-    let t1 = infer ctx (rbV ctx u1) in
-    eqUniv t0 t1; check ctx i (VNt NI);
+    let x = pat (name "x") in let gen = EVar x in
+    let ctx' = upLocal ctx x (VNt NI) (var x) in
+    begin match infer ctx' (rbV ctx' (act p gen ctx')) with
+    | VKan _ -> ()
+    | v      -> raise (ExpectedFibrant v) end;
 
     begin match eval i ctx with
     | VNt k ->
-      let x = pat (name "x") in let gen = EVar x in
-      let ctx' = upLocal ctx x (VNt NI) (var x) in
       List.iter (fun phi ->
         let ctx'' = faceEnv phi ctx' in
         eqNf ctx'' u0 (act p gen ctx'')) (solve k One);

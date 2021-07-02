@@ -66,9 +66,9 @@ and closByVal ctx1 t x v = let (p, e, ctx2) = x in traceClos e p v;
   let ctx' = merge ctx2 ctx1 in eval e (upLocal ctx' p t v)
 
 and app ctx : value * value -> value = function
-  | VLam (t, f), v     -> closByVal ctx t f v
-  | VNt k, m           -> VNt (NApp (k, m))
-  | x, y               -> raise (InvalidApplication (x, y))
+  | VLam (t, f), v -> closByVal ctx t f v
+  | VNt k, m       -> VNt (NApp (k, m))
+  | x, y           -> raise (InvalidApplication (x, y))
 
 and getRho ctx x = match Env.find_opt x ctx with
   | Some (_, _, Value v) -> v

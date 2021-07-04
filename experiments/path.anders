@@ -48,19 +48,19 @@ def sym-sym-eq-idp (A : U) (x y : A) (p : Path A x y) : Path (Path A x y) p (sym
 def hmtpy (A : U) (x y : A) (p : Path A x y) : Path (Path A x x) (<_> x) (<i> p @ i /\ -i) := <j i> p @ j /\ i /\ -i
 def plam (A : U) (f : I → A) : Path A (f 0) (f 1) := <i> f i
 def elim (A : U) (a b : A) (p : Path A a b) : I → A := λ (i : I), p @ i
-def Eq (A : V) (x y : A) : V₁ := Π (P : A → V), P x → P y
-def refl (A : V) (x : A) : Eq A x x := λ (P : A → V) (u : P x), u
-def plam-elim (A : U) (f : I → A) : Eq (I → A) (elim A (f 0) (f 1) (plam A f)) f := refl (I → A) f
-def elim-plam (A : U) (a b : A) (p : Path A a b) : Eq (Path A a b) (plam A (elim A a b p)) p := refl (Path A a b) p
+
+def plam-elim (A : U) (f : I → A) : Id (I → A) (elim A (f 0) (f 1) (plam A f)) f := ref f
+def elim-plam (A : U) (a b : A) (p : Path A a b) : Id (Path A a b) (plam A (elim A a b p)) p := ref p
 def ⊕ (i j : I) : I := (i ∧ -j) ∨ (-i ∧ j)
-def ⊕-comm (i j : I) : Eq I (⊕ i j) (⊕ j i) := refl I (⊕ i j)
-def ∧-comm (i j : I) : Eq I (i ∧ j) (j ∧ i) := refl I (i ∧ j)
-def ∨-comm (i j : I) : Eq I (i ∨ j) (j ∨ i) := refl I (i ∨ j)
-def ∧-assoc (i j k : I) : Eq I (i ∧ (j ∧ k)) ((i ∧ j) ∧ k) := refl I (i ∧ (j ∧ k))
-def ∧-distrib-∨ (i j k : I) : Eq I ((i ∨ j) ∧ k) ((i ∧ k) ∨ (j ∧ k)) := refl I ((i ∨ j) ∧ k)
-def ∨-distrib-∧ (i j k : I) : Eq I ((i ∧ j) ∨ k) ((i ∨ k) ∧ (j ∨ k)) := refl I ((i ∧ j) ∨ k)
-def ¬-of-∧ (i j : I) : Eq I -(i ∧ j) (-i ∨ -j) := refl I -(i ∧ j)
-def ¬-of-∨ (i j : I) : Eq I -(i ∨ j) (-i ∧ -j) := refl I -(i ∨ j)
+def ⊕-comm (i j : I) : Id I (⊕ i j) (⊕ j i) := ref (⊕ i j)
+def ∧-comm (i j : I) : Id I (i ∧ j) (j ∧ i) := ref (i ∧ j)
+def ∨-comm (i j : I) : Id I (i ∨ j) (j ∨ i) := ref (i ∨ j)
+def ∧-assoc (i j k : I) : Id I (i ∧ (j ∧ k)) ((i ∧ j) ∧ k) := ref (i ∧ (j ∧ k))
+def ∧-distrib-∨ (i j k : I) : Id I ((i ∨ j) ∧ k) ((i ∧ k) ∨ (j ∧ k)) := ref ((i ∨ j) ∧ k)
+def ∨-distrib-∧ (i j k : I) : Id I ((i ∧ j) ∨ k) ((i ∨ k) ∧ (j ∨ k)) := ref ((i ∧ j) ∨ k)
+def ¬-of-∧ (i j : I) : Id I -(i ∧ j) (-i ∨ -j) := ref -(i ∧ j)
+def ¬-of-∨ (i j : I) : Id I -(i ∨ j) (-i ∧ -j) := ref -(i ∨ j)
+
 def isProp (A : U) : U := Π (a b : A), Path A a b
 def isSet (A : U) : U := Π (a b : A) (a0 b0 : Path A a b), Path (Path A a b) a0 b0
 def isGroupoid (A : U) : U := Π (a b : A) (a0 b0 : Path A a b) (a1 b1 : Path (Path A a b) a0 b0), Path (Path (Path A a b) a0 b0) a1 b1

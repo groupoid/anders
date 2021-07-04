@@ -26,6 +26,7 @@ def const (α β : U) : α → β → α := λ (a : α) (b : β), a
 def I : V := interval def 0 := zero def 1 := one
 def LineP (A : I → U) : U := Π (i : I), A i
 
+-- Like in https://git.abby.how/abby/cubical/src/branch/master/intro.tt#L141
 def is-one? : I -> V := Id I 1
 def 1=1 : is-one? 1 := ref 1
 def UIP (A : V) (a b : A) (p q : Id A a b) : Id (Id A a b) p q := ref p

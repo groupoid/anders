@@ -19,7 +19,7 @@ def pr₂ (A: U) (B: A → U) (x: Sigma A B) : B (pr₁ A B x) ≔ x.2
 
 -- pretypes V
 
-def I : V := interval def 0 := i₀ def 1 := i₁
+def I : V := interval def 0 := zero def 1 := one
 def Equ (A : U) (x y : A) : U := PathP (<_> A) x y
 def refl (A : U) (x : A) : Equ A x x := <_> x
 def D (A : U) : U₁ ≔ Π (x y : A), Equ A x y → U

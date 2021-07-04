@@ -57,12 +57,12 @@ exp3:
   | TRANSP exp3 exp3 { ETransp ($2, $3) }
   | LPARENS exp0 RPARENS { $2 }
   | IDENT { match $1 with
-            | "i0" | "i₀" -> EDir Zero
-            | "i1" | "i₁" -> EDir One
-            | "interval"  -> EI
-            | "is-one?"   -> EIsOne
-            | "1-refl"    -> EOneRefl
-            | _           -> decl $1 }
+            | "zero"     -> EDir Zero
+            | "one"      -> EDir One
+            | "interval" -> EI
+            | "is-one?"  -> EIsOne
+            | "1-refl"   -> EOneRefl
+            | _          -> decl $1 }
   | NO { EVar No }
 
 declarations:

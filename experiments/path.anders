@@ -23,7 +23,7 @@ def idᵀ (α: U): U := α → α
 def id (α : U) (a : α) : α := a
 def const (α β : U) : α → β → α := λ (a : α) (b : β), a
 
-def I : V := interval def 0 := i₀ def 1 := i₁
+def I : V := interval def 0 := zero def 1 := one
 def LineP (A : I → U) : U := Π (i : I), A i
 def vunit : V := is-one? 1
 def 1=1 : vunit := 1-refl

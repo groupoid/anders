@@ -1,0 +1,20 @@
+opam-version: "2.0"
+name: "anders"
+version: "1.0"
+maintainer: "Namdak Tonpa <maxim@synrc.com>"
+authors: ["Siegmentation Fault","Namdak Tonpa"]
+homepage: "https://groupoid.space/homotopy/"
+bug-reports: "https://github.com/groupoid/anders/issues"
+dev-repo: "git+https://github.com/groupoid/anders"
+synopsis: "CCHM homotopy system type checker based on Mini-TT for OCaml"
+license: "ISC"
+depends: [
+  "dune" {>= "2.0"}
+  "ocaml" {>= "4.10.0"}
+  "menhir" {>= "2.7"}
+  "odoc" {with-doc}
+]
+build: [
+  ["dune" "build" "-p" name "-j" jobs]
+  ["dune" "build" "-p" name "-j" jobs "@doc"] {with-doc}
+]

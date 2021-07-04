@@ -51,6 +51,7 @@ let rec eval (e : exp) (ctx : ctx) = traceEval e; match e with
   | ETransp (p, i)     -> transport ctx p i
   | EId e              -> VNt (NId (eval e ctx))
   | ERef e             -> VNt (NRef (eval e ctx))
+  | EJ e               -> VNt (NJ (eval e ctx))
   | EI                 -> VNt NI
   | EDir d             -> VNt (NDir d)
   | EAnd (e1, e2)      -> andFormula (eval e1 ctx) (eval e2 ctx)
@@ -66,6 +67,7 @@ and closByVal ctx1 t x v = let (p, e, ctx2) = x in traceClos e p v;
   let ctx' = merge ctx2 ctx1 in eval e (upLocal ctx' p t v)
 
 and app ctx : value * value -> value = function
+  | VNt (NApp (NApp (NApp (NApp (NJ _, _), f), _), _)), VNt (NRef v) -> app ctx (f, v)
   | VLam (t, f), v -> closByVal ctx t f v
   | VNt k, m       -> VNt (NApp (k, m))
   | x, y           -> raise (InvalidApplication (x, y))
@@ -109,6 +111,7 @@ and rbN ctx n : exp = traceRbN n; match n with
   | NAppFormula (f, x) -> EAppFormula (rbV ctx f, rbV ctx x)
   | NId v              -> EId (rbV ctx v)
   | NRef v             -> ERef (rbV ctx v)
+  | NJ v               -> EJ (rbV ctx v)
   | NI                 -> EI
   | NDir d             -> EDir d
   | NAnd (u, v)        -> EAnd (rbN ctx u, rbN ctx v)
@@ -142,6 +145,9 @@ and weak (e : exp) ctx = traceWeak e; match e with
   | EAnd (e1, e2)      -> EAnd (weak e1 ctx, weak e2 ctx)
   | EOr (e1, e2)       -> EOr (weak e1 ctx, weak e2 ctx)
   | ENeg e             -> ENeg (weak e ctx)
+  | EId e              -> EId (weak e ctx)
+  | ERef e             -> ERef (weak e ctx)
+  | EJ e               -> EJ (weak e ctx)
   | e                  -> e
 
 and weakTele ctor ctx p a b : exp =
@@ -187,6 +193,7 @@ and convNeut ctx n1 n2 : bool =
   | NI, NI -> true
   | NDir u, NDir v -> u = v
   | NId u, NId v -> conv ctx u v
+  | NJ u, NJ v -> conv ctx u v
   | _, _ -> false
 
 and convId ctx v1 v2 =
@@ -245,6 +252,11 @@ and infer ctx e : value = traceInfer e; match e with
   | EOr (e1, e2) | EAnd (e1, e2) -> if infer ctx e1 = VNt NI && infer ctx e2 = VNt NI then VNt NI else raise (InferError e)
   | EId e -> let v = eval e ctx in let n = extSet (infer ctx e) in implv v (impl e (EPre n)) ctx
   | ERef e -> let v = eval e ctx in let t = infer ctx e in VNt (NApp (NApp (NId t, v), v))
+  | EJ e -> let n = extSet (infer ctx e) in let x = name "x" in let y = name "y" in
+    let pi = name "P" in let p = name "p" in let id = EApp (EApp (EId e, EVar x), EVar y) in
+    VPi (eval (EPi ((x, e), EPi ((y, e), impl id (EPre n)))) ctx,
+         (pi, impl (EPi ((x, e), EApp (EApp (EApp (EVar pi, EVar x), EVar x), ERef (EVar x))))
+                   (EPi ((x, e), EPi ((y, e), EPi ((p, id), EApp (EApp (EApp (EVar pi, EVar x), EVar y), EVar p))))), ctx))
   | e -> raise (InferError e)
 
 and inferPath (ctx : ctx) (p : exp) =

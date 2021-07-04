@@ -10,11 +10,11 @@
 %token DIRSEP MODULE WHERE IMPORT AXIOM
 %token SIGMA PI OPTION LT GT
 %token APPFORMULA PATHP TRANSP AND OR NEGATE
-%token ID REF
+%token ID REF IDJ
 
 %left OR
 %left AND
-%nonassoc PATHP TRANSP ID REF
+%nonassoc PATHP TRANSP ID REF IDJ
 %nonassoc NEGATE
 %nonassoc FST SND
 
@@ -56,6 +56,7 @@ exp3:
   | exp3 OR exp3 { EOr ($1, $3) }
   | ID exp3 { EId $2 }
   | REF exp3 { ERef $2 }
+  | IDJ exp3 { EJ $2 }
   | PATHP exp3 { EPathP $2 }
   | TRANSP exp3 exp3 { ETransp ($2, $3) }
   | LPARENS exp0 RPARENS { $2 }

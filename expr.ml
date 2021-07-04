@@ -22,6 +22,7 @@ type exp =
   | EPre        of int
   | EId         of exp
   | ERef        of exp
+  | EJ          of exp
   | EPathP      of exp
   | ETransp     of exp * exp
   | EPLam       of exp
@@ -72,6 +73,7 @@ let rec showExp : exp -> string = function
   | EPathP e -> "PathP " ^ showExp e
   | EId e -> Printf.sprintf "Id %s" (showExp e)
   | ERef e -> Printf.sprintf "ref %s" (showExp e)
+  | EJ e -> Printf.sprintf "idJ %s" (showExp e)
   | ETransp (p, i) -> Printf.sprintf "transp %s %s" (showExp p) (showExp i)
   | EPLam (ELam ((i, _), e)) -> Printf.sprintf "(<%s> %s)" (showName i) (showExp e)
   | EPLam _ -> failwith "showExp: unreachable code was reached"
@@ -132,6 +134,7 @@ and neut =
   | NTransp of value * neut
   | NId of value
   | NRef of value
+  | NJ of value
   | NAppFormula of value * value
   | NI | NDir of dir
   | NAnd of neut * neut
@@ -184,6 +187,7 @@ and showNeut : neut -> string = function
   | NPathP v -> "PathP " ^ showValue v
   | NId v -> Printf.sprintf "Id %s" (showValue v)
   | NRef v -> Printf.sprintf "ref %s" (showValue v)
+  | NJ v -> Printf.sprintf "idJ %s" (showValue v)
   | NTransp (p, i) -> Printf.sprintf "transp %s %s" (showValue p) (showNeut i)
   | NAppFormula (f, x) -> Printf.sprintf "(%s @ %s)" (showValue f) (showValue x)
   | NI -> "I" | NDir d -> showDir d

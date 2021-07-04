@@ -20,3 +20,4 @@ let tokenToString : token -> string = function
   | AND        -> "AND"         | OR         -> "OR"
   | PATHP      -> "PATHP"       | TRANSP     -> "TRANSP"
   | ID         -> "ID"          | REF        -> "REF"
+  | IDJ        -> "IDJ"

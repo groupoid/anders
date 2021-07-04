@@ -18,7 +18,7 @@
             "name": "keyword.other.anders"
         },
         {
-            "match": "(?<=^|[\\s()])(λ|Σ|Π|Id|ref|forall|sigma|PathP|hcomp|transp|Glue|glue|unglue)(?=$|[\\s()])",
+            "match": "(?<=^|[\\s()])(λ|Σ|Π|Id|ref|idJ|forall|sigma|PathP|hcomp|transp|Glue|glue|unglue)(?=$|[\\s()])",
             "name": "keyword.control.anders"
         },
         {

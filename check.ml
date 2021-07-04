@@ -67,7 +67,7 @@ and closByVal ctx1 t x v = let (p, e, ctx2) = x in traceClos e p v;
   let ctx' = merge ctx2 ctx1 in eval e (upLocal ctx' p t v)
 
 and app ctx : value * value -> value = function
-  | VNt (NApp (NApp (NApp (NApp (NJ _, _), f), _), _)), VNt (NRef v) -> app ctx (f, v)
+  | VNt (NApp (NApp (NApp (NApp (NJ _, _), _), f), _)), VNt (NRef v) -> f
   | VLam (t, f), v -> closByVal ctx t f v
   | VNt k, m       -> VNt (NApp (k, m))
   | x, y           -> raise (InvalidApplication (x, y))
@@ -255,8 +255,8 @@ and infer ctx e : value = traceInfer e; match e with
   | EJ e -> let n = extSet (infer ctx e) in let x = name "x" in let y = name "y" in
     let pi = name "P" in let p = name "p" in let id = EApp (EApp (EId e, EVar x), EVar y) in
     VPi (eval (EPi ((x, e), EPi ((y, e), impl id (EPre n)))) ctx,
-         (pi, impl (EPi ((x, e), EApp (EApp (EApp (EVar pi, EVar x), EVar x), ERef (EVar x))))
-                   (EPi ((x, e), EPi ((y, e), EPi ((p, id), EApp (EApp (EApp (EVar pi, EVar x), EVar y), EVar p))))), ctx))
+          (pi, EPi ((x, e), impl (EApp (EApp (EApp (EVar pi, EVar x), EVar x), ERef (EVar x)))
+            (EPi ((y, e), EPi ((p, id), EApp (EApp (EApp (EVar pi, EVar x), EVar y), EVar p))))), ctx))
   | e -> raise (InferError e)
 
 and inferPath (ctx : ctx) (p : exp) =

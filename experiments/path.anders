@@ -30,9 +30,11 @@ def LineP (A : I → U) : U := Π (i : I), A i
 def is-one? : I -> V := Id I 1
 def 1=1 : is-one? 1 := ref 1
 def UIP (A : V) (a b : A) (p q : Id A a b) : Id (Id A a b) p q := ref p
-def J (A : V) (B : Π (a b : A), Id A a b -> V) (d : Π (a : A), B a a (ref a)) (a b : A) (p : Id A a b) : B a b p := idJ A B d a b p
-def J-β (A : V) (B : Π (a b : A), Id A a b -> V) (d : Π (a : A), B a a (ref a)) (a : A) :
-   Id (B a a (ref a)) (J A B d a a (ref a)) (d a) := ref (d a)
+def J (A : V) (B : Π (a b : A), Id A a b -> V) (a b : A) (d : B a a (ref a)) (p : Id A a b) : B a b p := idJ A B a d b p
+def J-β (A : V) (B : Π (a b : A), Id A a b -> V) (a : A) (d : B a a (ref a)) :
+   Id (B a a (ref a)) (J A B a a d (ref a)) d := ref d
+def rev (A : V) (a b : A) (p : Id A a b) : Id A b a :=
+idJ A (λ (a b : A) (_ : Id A a b), Id A b a) a (ref a) b p
 
 def Path (A : U) (x y : A) : U := PathP (<_> A) x y
 def idp (A : U) (x : A) : Path A x x := <_> x

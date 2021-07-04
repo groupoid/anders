@@ -10,8 +10,8 @@ synopsis: "CCHM homotopy system type checker based on Mini-TT for OCaml"
 license: "ISC"
 depends: [
   "dune" {>= "2.0"}
-  "ocaml" {>= "4.10.0"}
-  "menhir" {>= "2.7"}
+  "ocaml" {>= "4.02.0"}
+  "menhir" {>= "2.0"}
   "odoc" {with-doc}
 ]
 build: [

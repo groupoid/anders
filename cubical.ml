@@ -7,7 +7,8 @@ let fail x = raise (ExtractionError x)
 
 let rec extractExp : exp -> string = function
   | EKan 0 -> "U"
-  | EOneRefl | EIsOne | EI -> fail "cubicaltt does not support explicit interval"
+  | EId _ | ERef _ -> fail "cubicaltt does not support strict equality"
+  | EI     -> fail "cubicaltt does not support explicit interval"
   | EKan u -> fail "cubicaltt does not support universe hierarchy"
   | EPre _ -> fail "cubicaltt does not support explicit pretypes"
   | EApp (ETransp (p, i), a) -> Printf.sprintf "transGen %s %s %s" (extractExp p) (extractExp i) (extractExp a)

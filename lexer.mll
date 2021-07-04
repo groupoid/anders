@@ -74,5 +74,6 @@ rule main = parse
 | lam             { LAM }              | arrow           { ARROW }
 | prod            { PROD }             | kan as s        { KAN (getLevel s) }
 | "PathP"         { PATHP }            | "transp"        { TRANSP }
+| "Id"            { ID }               | "ref"           { REF }
 | pre as s        { PRE (getLevel s) } | ident as s      { IDENT s }
 | eof             { EOF }

@@ -1,4 +1,4 @@
-FLAGS = -use-menhir -yaccflag "--explain" +ocamldoc
+FLAGS = -use-menhir -yaccflag "--explain"
 OPTFLAGS = -classic-display -ocamlopt "ocamlopt -O3" 
 
 default: native

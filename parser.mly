@@ -8,12 +8,13 @@
 %token LPARENS RPARENS COMMA COLON NO EOF HOLE
 %token DEFEQ PROD ARROW FST SND LAM DEF
 %token DIRSEP MODULE WHERE IMPORT AXIOM
-%token SIGMA PI OPTION LT GT APPFORMULA
-%token PATHP TRANSP AND OR NEGATE
+%token SIGMA PI OPTION LT GT
+%token APPFORMULA PATHP TRANSP AND OR NEGATE
+%token ID REF
 
 %left OR
 %left AND
-%nonassoc PATHP TRANSP
+%nonassoc PATHP TRANSP ID REF
 %nonassoc NEGATE
 %nonassoc FST SND
 
@@ -53,6 +54,8 @@ exp3:
   | NEGATE exp3 { ENeg $2 }
   | exp3 AND exp3 { EAnd ($1, $3) }
   | exp3 OR exp3 { EOr ($1, $3) }
+  | ID exp3 { EId $2 }
+  | REF exp3 { ERef $2 }
   | PATHP exp3 { EPathP $2 }
   | TRANSP exp3 exp3 { ETransp ($2, $3) }
   | LPARENS exp0 RPARENS { $2 }
@@ -60,8 +63,6 @@ exp3:
             | "zero"     -> EDir Zero
             | "one"      -> EDir One
             | "interval" -> EI
-            | "is-one?"  -> EIsOne
-            | "1-refl"   -> EOneRefl
             | _          -> decl $1 }
   | NO { EVar No }
 

@@ -19,3 +19,4 @@ let tokenToString : token -> string = function
   | APPFORMULA -> "APPFORMULA"  | NEGATE     -> "NEGATE"
   | AND        -> "AND"         | OR         -> "OR"
   | PATHP      -> "PATHP"       | TRANSP     -> "TRANSP"
+  | ID         -> "ID"          | REF        -> "REF"

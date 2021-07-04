@@ -49,8 +49,8 @@ let rec eval (e : exp) (ctx : ctx) = traceEval e; match e with
       | v       -> appFormulaNeut ctx v x
     end
   | ETransp (p, i)     -> transport ctx p i
-  | EIsOne             -> VNt NIsOne
-  | EOneRefl           -> VNt NOneRefl
+  | EId e              -> VNt (NId (eval e ctx))
+  | ERef e             -> VNt (NRef (eval e ctx))
   | EI                 -> VNt NI
   | EDir d             -> VNt (NDir d)
   | EAnd (e1, e2)      -> andFormula (eval e1 ctx) (eval e2 ctx)
@@ -107,8 +107,8 @@ and rbN ctx n : exp = traceRbN n; match n with
   | NPathP v           -> EPathP (rbV ctx v)
   | NTransp (p, i)     -> ETransp (rbV ctx p, rbN ctx i)
   | NAppFormula (f, x) -> EAppFormula (rbV ctx f, rbV ctx x)
-  | NIsOne             -> EIsOne
-  | NOneRefl           -> EOneRefl
+  | NId v              -> EId (rbV ctx v)
+  | NRef v             -> ERef (rbV ctx v)
   | NI                 -> EI
   | NDir d             -> EDir d
   | NAnd (u, v)        -> EAnd (rbN ctx u, rbN ctx v)
@@ -148,30 +148,28 @@ and weakTele ctor ctx p a b : exp =
   let t = weak a ctx in ctor (p, t) (weak b (upLocal ctx p (eval t ctx) (var p)))
 
 and conv ctx v1 v2 : bool = traceConv v1 v2;
-  v1 == v2 || match v1, v2 with
-  | VKan u, VKan v -> ieq u v
-  | VNt x, VNt y -> convNeut ctx x y
-  | VPair (a, b), VPair (c, d) -> conv ctx a c && conv ctx b d
-  | VPair (a, b), v | v, VPair (a, b) -> conv ctx (vfst v) a && conv ctx (vsnd v) b
-  | VPi (a, g), VPi (b, h) | VSig (a, g), VSig (b, h)
-  | VLam (a, g), VLam (b, h) -> let (p, e1, ctx1) = g in let (q, e2, ctx2) = h in
-    let u = pat p in let v = var u in let ctx' = upLocal ctx u a v in
-    conv ctx a b &&
-      (weak e1 (upLocal (merge ctx' ctx1) p a v) =
-       weak e2 (upLocal (merge ctx' ctx2) q a v) ||
-       conv ctx' (closByVal ctx' a g v) (closByVal ctx' a h v))
-  | VLam (a, (p, o, v)), b | b, VLam (a, (p, o, v)) ->
-    let u = pat p in let gen = var u in let ctx' = upLocal ctx u a gen in
-    conv ctx' (app ctx' (b, gen)) (closByVal ctx' a (p, o, v) gen)
-  | VPre u, VPre v -> ieq u v
-  | VPLam f, VPLam g -> conv ctx f g
-  | VPLam f, v | v, VPLam f -> let p = pat (name "x") in
-    let i = var p in let ctx' = upLocal ctx p (VNt NI) i in
-    conv ctx' (eval (EAppFormula (rbV ctx' v, EVar p)) ctx') (app ctx' (f, i))
-  | _, _ ->
-    begin match infer ctx (rbV ctx v1), infer ctx (rbV ctx v2) with
-    | VNt (NApp (NIsOne, u1)), VNt (NApp (NIsOne, u2)) -> conv ctx u1 u2
-    | _, _ -> false end
+  v1 == v2 || begin match v1, v2 with
+    | VKan u, VKan v -> ieq u v
+    | VNt x, VNt y -> convNeut ctx x y
+    | VPair (a, b), VPair (c, d) -> conv ctx a c && conv ctx b d
+    | VPair (a, b), v | v, VPair (a, b) -> conv ctx (vfst v) a && conv ctx (vsnd v) b
+    | VPi (a, g), VPi (b, h) | VSig (a, g), VSig (b, h)
+    | VLam (a, g), VLam (b, h) -> let (p, e1, ctx1) = g in let (q, e2, ctx2) = h in
+      let u = pat p in let v = var u in let ctx' = upLocal ctx u a v in
+      conv ctx a b &&
+        (weak e1 (upLocal (merge ctx' ctx1) p a v) =
+         weak e2 (upLocal (merge ctx' ctx2) q a v) ||
+         conv ctx' (closByVal ctx' a g v) (closByVal ctx' a h v))
+    | VLam (a, (p, o, v)), b | b, VLam (a, (p, o, v)) ->
+      let u = pat p in let gen = var u in let ctx' = upLocal ctx u a gen in
+      conv ctx' (app ctx' (b, gen)) (closByVal ctx' a (p, o, v) gen)
+    | VPre u, VPre v -> ieq u v
+    | VPLam f, VPLam g -> conv ctx f g
+    | VPLam f, v | v, VPLam f -> let p = pat (name "x") in
+      let i = var p in let ctx' = upLocal ctx p (VNt NI) i in
+      conv ctx' (eval (EAppFormula (rbV ctx' v, EVar p)) ctx') (app ctx' (f, i))
+    | _, _ -> false
+  end || convId ctx v1 v2
 
 and convNeut ctx n1 n2 : bool =
   n1 == n2 || match n1, n2 with
@@ -188,7 +186,14 @@ and convNeut ctx n1 n2 : bool =
   | NNeg x, NNeg y -> convNeut ctx x y
   | NI, NI -> true
   | NDir u, NDir v -> u = v
-  | NIsOne, NIsOne -> true
+  | NId u, NId v -> conv ctx u v
+  | _, _ -> false
+
+and convId ctx v1 v2 =
+  match infer ctx (rbV ctx v1), infer ctx (rbV ctx v2) with
+  | VNt (NApp (NApp (NId t1, a1), b1)),
+    VNt (NApp (NApp (NId t2, a2), b2)) ->
+    conv ctx t1 t2 && conv ctx a1 a2 && conv ctx b1 b2
   | _, _ -> false
 
 and eqNf ctx v1 v2 : unit = traceEqNF v1 v2;
@@ -233,8 +238,8 @@ and infer ctx e : value = traceInfer e; match e with
   | EI -> VPre 0 | EDir _ -> VNt NI
   | ENeg e -> if infer ctx e = VNt NI then VNt NI else raise (InferError e)
   | EOr (e1, e2) | EAnd (e1, e2) -> if infer ctx e1 = VNt NI && infer ctx e2 = VNt NI then VNt NI else raise (InferError e)
-  | EIsOne -> implv (VNt NI) (EPre 0) ctx
-  | EOneRefl -> VNt (NApp (NIsOne, vone))
+  | EId e -> let v = eval e ctx in let n = extSet (infer ctx e) in implv v (impl e (EPre n)) ctx
+  | ERef e -> let v = eval e ctx in let t = infer ctx e in VNt (NApp (NApp (NId t, v), v))
   | e -> raise (InferError e)
 
 and inferPath (ctx : ctx) (p : exp) =
@@ -246,7 +251,8 @@ and inferPath (ctx : ctx) (p : exp) =
     | VKan u, VKan v ->
       if ieq u v then implv v0 (impl (rbV ctx v1) (EKan u)) ctx
       else raise (TypeIneq (VKan u, VKan v))
-    | _, _ -> ExpectedFibrant (if isVSet t0 then t1 else t0) |> raise end
+    | _, _ -> ExpectedFibrant (if isSet t0 then t1 else t0) |> raise
+  end
 
 and inferTransport (ctx : ctx) (p : exp) (i : exp) =
   check ctx i (VNt NI);

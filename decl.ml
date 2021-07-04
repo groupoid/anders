@@ -27,7 +27,7 @@ let checkDecl ctx d : ctx =
   match d with
   | Annotated (p, a, e) ->
     let set = infer ctx a in let t = eval a ctx in
-    if not (isVSet set) then raise (ExpectedVSet set) else ();
+    if not (isSet set) then raise (ExpectedVSet set) else ();
     let v = name p in check (upGlobal ctx v t (var v)) e t;
     Env.add (name p) (Global, t, getTerm e ctx) ctx
   | NotAnnotated (p, e) ->

@@ -20,11 +20,12 @@ type exp =
   | EHole
   (* cubical part *)
   | EPre        of int
+  | EId         of exp
+  | ERef        of exp
   | EPathP      of exp
   | ETransp     of exp * exp
   | EPLam       of exp
   | EAppFormula of exp * exp
-  | EIsOne | EOneRefl
   | EI | EDir of dir
   | EAnd of exp * exp
   | EOr  of exp * exp
@@ -69,7 +70,8 @@ let rec showExp : exp -> string = function
   | EAxiom (p, _) -> p
   | EPre n -> "V" ^ showLevel n
   | EPathP e -> "PathP " ^ showExp e
-  | EIsOne -> "is-one?" | EOneRefl -> "1-refl"
+  | EId e -> Printf.sprintf "Id %s" (showExp e)
+  | ERef e -> Printf.sprintf "ref %s" (showExp e)
   | ETransp (p, i) -> Printf.sprintf "transp %s %s" (showExp p) (showExp i)
   | EPLam (ELam ((i, _), e)) -> Printf.sprintf "(<%s> %s)" (showName i) (showExp e)
   | EPLam _ -> failwith "showExp: unreachable code was reached"
@@ -128,8 +130,9 @@ and neut =
   (* cubical part *)
   | NPathP of value
   | NTransp of value * neut
+  | NId of value
+  | NRef of value
   | NAppFormula of value * value
-  | NIsOne | NOneRefl
   | NI | NDir of dir
   | NAnd of neut * neut
   | NOr  of neut * neut
@@ -179,7 +182,8 @@ and showNeut : neut -> string = function
   | NHole -> "?"
   | NAxiom (p, _) -> p
   | NPathP v -> "PathP " ^ showValue v
-  | NIsOne -> "is-one?" | NOneRefl -> "1-refl"
+  | NId v -> Printf.sprintf "Id %s" (showValue v)
+  | NRef v -> Printf.sprintf "ref %s" (showValue v)
   | NTransp (p, i) -> Printf.sprintf "transp %s %s" (showValue p) (showNeut i)
   | NAppFormula (f, x) -> Printf.sprintf "(%s @ %s)" (showValue f) (showValue x)
   | NI -> "I" | NDir d -> showDir d

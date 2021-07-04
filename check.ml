@@ -116,9 +116,9 @@ and rbN ctx n : exp = traceRbN n; match n with
   | NNeg u             -> ENeg (rbN ctx u)
 
 and rbVTele ctor ctx t g =
-  let (p, _, _) = g in let u = pat p in let gen = var u in
-  let ctx' = upLocal ctx u t gen in
-  ctor (u, rbV ctx t) (rbV ctx' (closByVal ctx' t g gen))
+  let (p, _, _) = g in let n = pat p in let gen = var n in
+  let ctx' = upLocal ctx n t gen in
+  ctor (n, rbV ctx t) (rbV ctx' (closByVal ctx' t g gen))
 
 and prune ctx x =
   match Env.find_opt x ctx with
@@ -155,13 +155,13 @@ and conv ctx v1 v2 : bool = traceConv v1 v2;
     | VPair (a, b), v | v, VPair (a, b) -> conv ctx (vfst v) a && conv ctx (vsnd v) b
     | VPi (a, g), VPi (b, h) | VSig (a, g), VSig (b, h)
     | VLam (a, g), VLam (b, h) -> let (p, e1, ctx1) = g in let (q, e2, ctx2) = h in
-      let u = pat p in let v = var u in let ctx' = upLocal ctx u a v in
+      let n = pat p in let v = var n in let ctx' = upLocal ctx n a v in
       conv ctx a b &&
         (weak e1 (upLocal (merge ctx' ctx1) p a v) =
          weak e2 (upLocal (merge ctx' ctx2) q a v) ||
          conv ctx' (closByVal ctx' a g v) (closByVal ctx' a h v))
     | VLam (a, (p, o, v)), b | b, VLam (a, (p, o, v)) ->
-      let u = pat p in let gen = var u in let ctx' = upLocal ctx u a gen in
+      let n = pat p in let gen = var n in let ctx' = upLocal ctx n a gen in
       conv ctx' (app ctx' (b, gen)) (closByVal ctx' a (p, o, v) gen)
     | VPre u, VPre v -> ieq u v
     | VPLam f, VPLam g -> conv ctx f g
@@ -203,8 +203,8 @@ and eqNf ctx v1 v2 : unit = traceEqNF v1 v2;
 and check ctx (e0 : exp) (t0 : value) =
   traceCheck e0 t0; match e0, t0 with
   | ELam ((p, a), e), VPi (t, g) -> eqNf ctx (eval a ctx) t;
-    let u = pat p in let gen = var u in
-    let ctx' = upLocal (upLocal ctx p t gen) u t gen in
+    let n = pat p in let gen = var n in
+    let ctx' = upLocal (upLocal ctx p t gen) n t gen in
     check ctx' e (closByVal ctx' t g gen)
   | EPair (e1, e2), VSig (t, g) -> check ctx e1 t;
     check ctx e2 (closByVal ctx t g (eval e1 ctx))
@@ -228,6 +228,10 @@ and infer ctx e : value = traceInfer e; match e with
   | EKan u -> VKan (u + 1)
   | ESig (t, e) -> inferTele ctx imax t e
   | EPi (t, e) -> inferTele ctx univImpl t e
+  | ELam ((p, a), e) ->
+    let n = pat p in let gen = var n in let t = eval a ctx in
+    let ctx' = upLocal (upLocal ctx p t gen) n t gen in
+    VPi (t, (n, rbV ctx' (infer ctx' e), ctx))
   | EApp (f, x) -> let (t, g) = extPiG (infer ctx f) in ignore (check ctx x t); closByVal ctx t g (eval x ctx)
   | EFst e -> fst (extSigG (infer ctx e))
   | ESnd e -> let (t, g) = extSigG (infer ctx e) in closByVal ctx t g (vfst (eval e ctx))
@@ -273,8 +277,8 @@ and inferTransport (ctx : ctx) (p : exp) (i : exp) =
     | _ -> failwith (Printf.sprintf "“%s” expected to be neutral" (showExp i)) end
 
 and inferTele ctx binop (p, a) b =
-  let t = eval a ctx in let u = pat p in let gen = var u in
-  let ctx' = upLocal (upLocal ctx p t gen) u t gen in
+  let t = eval a ctx in let n = pat p in let gen = var n in
+  let ctx' = upLocal (upLocal ctx p t gen) n t gen in
   let v = infer ctx' b in binop (infer ctx a) v
 
 and act e i ctx = eval (EAppFormula (e, i)) ctx

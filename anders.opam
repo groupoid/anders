@@ -2,7 +2,7 @@ opam-version: "2.0"
 name: "anders"
 version: "1.0"
 maintainer: "Namdak Tonpa <maxim@synrc.com>"
-authors: ["Siegmentation Fault","Namdak Tonpa"]
+authors: ["Groupoid Infinity"]
 homepage: "https://groupoid.space/homotopy/"
 bug-reports: "https://github.com/groupoid/anders/issues"
 dev-repo: "git+https://github.com/groupoid/anders"

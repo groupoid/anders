@@ -1,6 +1,6 @@
 opam-version: "2.0"
 name: "anders"
-version: "1.0"
+version: "0.7"
 maintainer: "Namdak Tonpa <maxim@synrc.com>"
 authors: ["Groupoid Infinity"]
 homepage: "https://groupoid.space/homotopy/"

@@ -38,12 +38,12 @@ let utf8    = lat1|bytes2|bytes3|bytes4
 let ident   = beg utf8*
 let ws      = ['\t' ' ']
 let colon   = ':'
-let defeq   = ":=" | "\xE2\x89\x94" | "\xE2\x89\x9C" | "\xE2\x89\x9D" (* ≔ | ≜ | ≝ *)
-let arrow   = "->" | "\xE2\x86\x92" (* → *)
-let prod    = "*"  | "\xC3\x97"     (* × *)
-let lam     = "\\" | "\xCE\xBB"     (* λ *)
-let pi      = "\xCE\xA0"            (* Π *)
-let sigma   = "\xCE\xA3"            (* Σ *)
+let defeq   = ":="  | "\xE2\x89\x94" | "\xE2\x89\x9C" | "\xE2\x89\x9D" (* ≔ | ≜ | ≝ *)
+let arrow   = "->"  | "\xE2\x86\x92" (* → *)
+let prod    = "*"   | "\xC3\x97"     (* × *)
+let lam     = "\\"  | "\xCE\xBB"     (* λ *)
+let pi      = "Pi"  | "\xCE\xA0"     (* Π *)
+let sigma   = "Sig" | "\xCE\xA3"     (* Σ *)
 let def     = "definition" | "def" | "theorem" | "lemma" | "corollary" | "proposition"
 let axiom   = "axiom"|"postulate"
 

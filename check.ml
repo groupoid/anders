@@ -190,6 +190,7 @@ and convNeut ctx n1 n2 : bool =
   | _, _ -> false
 
 and convId ctx v1 v2 =
+  (* Id A a b is proof-irrelevant *)
   match infer ctx (rbV ctx v1), infer ctx (rbV ctx v2) with
   | VNt (NApp (NApp (NId t1, a1), b1)),
     VNt (NApp (NApp (NId t2, a2), b2)) ->

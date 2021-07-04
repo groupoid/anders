@@ -58,6 +58,12 @@ def elim (A : U) (a b : A) (p : Path A a b) : I → A := λ (i : I), p @ i
 def plam-elim (A : U) (f : I → A) : Path (I → A) (elim A (f 0) (f 1) (plam A f)) f := <_> f
 def elim-plam (A : U) (a b : A) (p : Path A a b) : Path (Path A a b) (plam A (elim A a b p)) p := <_> p
 
+-- (<i j> p @ i /\ j) @ 0 ≡ <j> p @ 0 /\ j ≡ <j> p @ 0 ≡ <_> a,
+-- (<i j> p @ i /\ j) @ 1 ≡ <j> p @ 1 /\ j ≡ <j> p @ j ≡ p,
+-- but it doesn’t check since <j> p @ i /\ j : Path A (p @ i /\ 0) (p @ i /\ 1) ≡ Path A a (p @ i),
+-- which is “Path A a a” only propositionally
+--def K (A : U) (a : A) (p : Path A a a) : Path (Path A a a) (<_> a) p := <i j> p @ i /\ j
+
 def ⊕ (i j : I) : I := (i ∧ -j) ∨ (-i ∧ j)
 def ⊕-comm (i j : I) : Id I (⊕ i j) (⊕ j i) := ref (⊕ i j)
 def ∧-comm (i j : I) : Id I (i ∧ j) (j ∧ i) := ref (i ∧ j)

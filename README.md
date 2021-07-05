@@ -25,7 +25,7 @@ Prerequisites
 Here is example for Ubuntu:
 
 ```shell
-opam install ocaml ocamlbuild ocamlfind menhir
+$ apt install ocaml ocamlbuild menhir
 ```
 
 Samples

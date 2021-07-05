@@ -60,7 +60,8 @@ let rec showExp : exp -> string = function
   | ELam (p, x) -> Printf.sprintf "λ %s, %s" (showTele p) (showExp x)
   | EPi (p, x) -> let (var, dom) = p in begin match var with
     | No -> Printf.sprintf "(%s → %s)" (showExp dom) (showExp x)
-    | _  -> Printf.sprintf "Π %s, %s" (showTele p) (showExp x) end
+    | _  -> Printf.sprintf "Π %s, %s" (showTele p) (showExp x)
+  end
   | ESig (p, x) -> Printf.sprintf "Σ %s, %s" (showTele p) (showExp x)
   | EPair (fst, snd) -> Printf.sprintf "(%s, %s)" (showExp fst) (showExp snd)
   | EFst exp -> showExp exp ^ ".1"
@@ -113,33 +114,30 @@ let showFile : file -> string = function
   | (p, x) -> Printf.sprintf "module %s where\n%s" p (showContent x)
 
 type value =
-  | VLam  of value * clos
-  | VPair of value * value
-  | VKan  of int
-  | VPi   of value * clos
-  | VSig  of value * clos
-  | VNt   of neut
+  | VLam   of value * clos
+  | VKan   of int
+  | VPi    of value * clos
+  | VSig   of value * clos
+  | VPair  of value * value
+  | VFst   of value
+  | VSnd   of value
+  | VApp   of value * value
+  | Var    of name
+  | VAxiom of string * value
+  | VHole
   (* cubical part *)
-  | VPre  of int
-  | VPLam of value
-and neut =
-  | NVar of name
-  | NApp of neut * value
-  | NFst of neut
-  | NSnd of neut
-  | NAxiom of string * value
-  | NHole
-  (* cubical part *)
-  | NPathP of value
-  | NTransp of value * neut
-  | NId of value
-  | NRef of value
-  | NJ of value
-  | NAppFormula of value * value
-  | NI | NDir of dir
-  | NAnd of neut * neut
-  | NOr  of neut * neut
-  | NNeg of neut
+  | VPre        of int
+  | VId         of value
+  | VRef        of value
+  | VPLam       of value
+  | VJ          of value
+  | VPathP      of value
+  | VTransp     of value * value
+  | VAppFormula of value * value
+  | VI | VDir of dir
+  | VAnd of value * value
+  | VOr  of value * value
+  | VNeg of value
 and clos = name * exp * ctx
 and term =
   | Exp   of exp
@@ -163,37 +161,36 @@ let isGlobal : record -> bool = function
   | Local,  _, _ -> true
 
 let rec showValue : value -> string = function
-  | VLam (x, (p, e, rho)) -> Printf.sprintf "λ %s, %s" (showTele p x rho) (showExp e)
-  | VPair (fst, snd) -> Printf.sprintf "(%s, %s)" (showValue fst) (showValue snd)
   | VKan n -> "U" ^ showLevel n
+  | VLam (x, (p, e, rho)) -> Printf.sprintf "λ %s, %s" (showTele p x rho) (showExp e)
   | VPi (x, (p, e, rho)) -> begin match p with
     | No -> Printf.sprintf "(%s → %s)" (showValue x) (showExp e)
-    | _  -> Printf.sprintf "Π %s, %s" (showTele p x rho) (showExp e) end
+    | _  -> Printf.sprintf "Π %s, %s" (showTele p x rho) (showExp e)
+  end
   | VSig (x, (p, e, rho)) -> Printf.sprintf "Σ %s, %s" (showTele p x rho) (showExp e)
-  | VNt n -> showNeut n
+  | VPair (fst, snd) -> Printf.sprintf "(%s, %s)" (showValue fst) (showValue snd)
+  | VFst v -> showValue v ^ ".1"
+  | VSnd v -> showValue v ^ ".2"
+  | VApp (f, x) -> Printf.sprintf "(%s %s)" (showValue f) (showValue x)
+  | Var p -> showName p
+  | VHole -> "?"
+  | VAxiom (p, _) -> p
   | VPre n -> "V" ^ showLevel n
+  | VPathP v -> "PathP " ^ showValue v
+  | VId v -> Printf.sprintf "Id %s" (showValue v)
+  | VRef v -> Printf.sprintf "ref %s" (showValue v)
+  | VJ v -> Printf.sprintf "idJ %s" (showValue v)
+  | VTransp (p, i) -> Printf.sprintf "transp %s %s" (showValue p) (showValue i)
   | VPLam (VLam (_, (p, e, rho))) ->
     if isRhoVisible rho then
       Printf.sprintf "(<%s, %s> %s)" (showName p) (showRho rho) (showExp e)
     else Printf.sprintf "(<%s> %s)" (showName p) (showExp e)
   | VPLam _ -> failwith "showExp: unreachable code was reached"
-and showNeut : neut -> string = function
-  | NVar p -> showName p
-  | NApp (f, x) -> Printf.sprintf "(%s %s)" (showNeut f) (showValue x)
-  | NFst v -> showNeut v ^ ".1"
-  | NSnd v -> showNeut v ^ ".2"
-  | NHole -> "?"
-  | NAxiom (p, _) -> p
-  | NPathP v -> "PathP " ^ showValue v
-  | NId v -> Printf.sprintf "Id %s" (showValue v)
-  | NRef v -> Printf.sprintf "ref %s" (showValue v)
-  | NJ v -> Printf.sprintf "idJ %s" (showValue v)
-  | NTransp (p, i) -> Printf.sprintf "transp %s %s" (showValue p) (showNeut i)
-  | NAppFormula (f, x) -> Printf.sprintf "(%s @ %s)" (showValue f) (showValue x)
-  | NI -> "I" | NDir d -> showDir d
-  | NAnd (a, b) -> Printf.sprintf "(%s /\\ %s)" (showNeut a) (showNeut b)
-  | NOr (a, b) -> Printf.sprintf "(%s \\/ %s)" (showNeut a) (showNeut b)
-  | NNeg a -> Printf.sprintf "-%s" (showNeut a)
+  | VAppFormula (f, x) -> Printf.sprintf "(%s @ %s)" (showValue f) (showValue x)
+  | VI -> "I" | VDir d -> showDir d
+  | VAnd (a, b) -> Printf.sprintf "(%s /\\ %s)" (showValue a) (showValue b)
+  | VOr (a, b) -> Printf.sprintf "(%s \\/ %s)" (showValue a) (showValue b)
+  | VNeg a -> Printf.sprintf "-%s" (showValue a)
 and showTermBind : name * record -> string option = function
   | p, (Local, _, t) -> Some (Printf.sprintf "%s := %s" (showName p) (showTerm t))
   | _, _             -> None
@@ -216,14 +213,14 @@ let showGamma (ctx : ctx) : string =
         | _, _, _     -> None)
   |> String.concat "\n"
 
-let var x = VNt (NVar x)
+let var x = Var x
 let genV n = var (pat n)
 
 let ezero = EDir Zero
 let eone  = EDir One
 
-let vzero = VNt (NDir Zero)
-let vone  = VNt (NDir One)
+let vzero = VDir Zero
+let vone  = VDir One
 
 let merge ctx1 ctx2 : ctx =
   Env.merge (fun k x y ->

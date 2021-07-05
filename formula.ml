@@ -2,46 +2,34 @@ open Ident
 open Error
 open Expr
 
-let rec orNeut : neut * neut -> neut = function
-  | NDir One, _  | _, NDir One  -> NDir One
-  | NDir Zero, f | f, NDir Zero -> f
-  | NOr (f, g), h -> orNeut (f, orNeut (g, h))
-  | f, g -> NOr (f, g)
-
-let rec andNeut : neut * neut -> neut = function
-  | NDir Zero, _ | _, NDir Zero -> NDir Zero
-  | NDir One, f  | f, NDir One  -> f
-  | NAnd (f, g), h -> andNeut (f, andNeut (g, h))
-  | NOr (f, g), h | h, NOr (f, g) ->
-    orNeut (andNeut (f, h), andNeut (g, h))
-  | f, g -> NAnd (f, g)
-
 let negDir : dir -> dir = function
   | Zero -> One | One -> Zero
-
-let rec negNeut : neut -> neut = function
-  | NDir d      -> NDir (negDir d)
-  | NVar p      -> NNeg (NVar p)
-  | NNeg n      -> n
-  | NAnd (f, g) -> orNeut (negNeut f, negNeut g)
-  | NOr (f, g)  -> andNeut (negNeut f, negNeut g)
-  | k           -> raise (InvalidFormulaNeg (VNt k))
 
 (* Arbitrary formula φ after calling andFormula/orFormula/negFormula
    will have form (α₁ ∧ ... ∧ αₙ) ∨ ... ∨ (β₁ ∧ ... ∧ βₘ),
    where “∧” and “∨” are right-associative,
    and each αᵢ/βⱼ has form “γ” or “−γ” for some variable “γ”. *)
-let andFormula a b = match a, b with
-  | VNt u, VNt v -> VNt (andNeut (u, v))
-  | _, _         -> raise (InvalidFormulaAnd (a, b))
+let rec orFormula : value * value -> value = function
+  | VDir One, _  | _, VDir One  -> VDir One
+  | VDir Zero, f | f, VDir Zero -> f
+  | VOr (f, g), h -> orFormula (f, orFormula (g, h))
+  | f, g -> VOr (f, g)
 
-let orFormula a b = match a, b with
-  | VNt u, VNt v -> VNt (orNeut (u, v))
-  | _, _         -> raise (InvalidFormulaOr (a, b))
+let rec andFormula : value * value -> value = function
+  | VDir Zero, _ | _, VDir Zero -> VDir Zero
+  | VDir One, f  | f, VDir One  -> f
+  | VAnd (f, g), h -> andFormula (f, andFormula (g, h))
+  | VOr (f, g), h | h, VOr (f, g) ->
+    orFormula (andFormula (f, h), andFormula (g, h))
+  | f, g -> VAnd (f, g)
 
-let negFormula a = match a with
-  | VNt u -> VNt (negNeut u)
-  | _     -> raise (InvalidFormulaNeg a)
+let rec negFormula : value -> value = function
+  | VDir d      -> VDir (negDir d)
+  | Var p       -> VNeg (Var p)
+  | VNeg n      -> n
+  | VAnd (f, g) -> orFormula (negFormula f, negFormula g)
+  | VOr (f, g)  -> andFormula (negFormula f, negFormula g)
+  | v           -> raise (InvalidFormulaNeg v)
 
 module Dir = struct
   type t = dir
@@ -62,19 +50,19 @@ module Conjunction = Set.Make(Atom)
 type conjunction = Conjunction.t
 
 (* extAnd converts (α₁ ∧ ... ∧ αₙ) into set of names equipped with sign. *)
-let rec extAnd : neut -> conjunction = function
-  | NVar x               -> Conjunction.singleton (x, One)
-  | NNeg (NVar x)        -> Conjunction.singleton (x, Zero)
-  | NAxiom (x, _)        -> Conjunction.singleton (name x, One)
-  | NNeg (NAxiom (x, _)) -> Conjunction.singleton (name x, Zero)
-  | NAnd (x, y)          -> Conjunction.union (extAnd x) (extAnd y)
-  | k -> failwith (Printf.sprintf "“%s” expected to be conjunction (should never happen)" (showNeut k))
+let rec extAnd : value -> conjunction = function
+  | Var x                -> Conjunction.singleton (x, One)
+  | VNeg (Var x)         -> Conjunction.singleton (x, Zero)
+  | VAxiom (x, _)        -> Conjunction.singleton (name x, One)
+  | VNeg (VAxiom (x, _)) -> Conjunction.singleton (name x, Zero)
+  | VAnd (x, y)          -> Conjunction.union (extAnd x) (extAnd y)
+  | v -> failwith (Printf.sprintf "“%s” expected to be conjunction (should never happen)" (showValue v))
 
 (* extOr converts (α₁ ∧ ... ∧ αₙ) ∨ ... ∨ (β₁ ∧ ... ∧ βₘ)
    into list of extAnd results. *)
 type disjunction = conjunction list
-let rec extOr : neut -> disjunction = function
-  | NOr (x, y) -> List.rev_append (extOr x) (extOr y)
+let rec extOr : value -> disjunction = function
+  | VOr (x, y) -> List.rev_append (extOr x) (extOr y)
   | k          -> [extAnd k]
 
 (* uniq removes all conjunctions that are superset of another,
@@ -128,12 +116,12 @@ let meets xs ys =
 let union xs ys = nubRev (List.append xs ys)
 let eps : face = Env.empty
 let singleton p x = Env.add p x Env.empty
-let faceEnv = Env.fold (fun p dir -> Env.add p (Local, VNt NI, Value (VNt (NDir dir))))
+let faceEnv = Env.fold (fun p dir -> Env.add p (Local, VI, Value (VDir dir)))
 
 let rec solve k x = match k, x with
-  | NDir y, _ -> if x = y then [eps] else []
-  | NVar p, _ -> [singleton p x]
-  | NNeg n, _ -> solve n (negDir x)
-  | NOr (f, g), One  | NAnd (f, g), Zero -> union (solve f x) (solve g x)
-  | NOr (f, g), Zero | NAnd (f, g), One  -> meets (solve f x) (solve g x)
-  | _, _ -> failwith (Printf.sprintf "Cannot solve: %s = %s" (showNeut k) (showDir x))
+  | VDir y, _ -> if x = y then [eps] else []
+  | Var p, _  -> [singleton p x]
+  | VNeg n, _ -> solve n (negDir x)
+  | VOr (f, g), One  | VAnd (f, g), Zero -> union (solve f x) (solve g x)
+  | VOr (f, g), Zero | VAnd (f, g), One  -> meets (solve f x) (solve g x)
+  | _, _ -> failwith (Printf.sprintf "Cannot solve: %s = %s" (showValue k) (showDir x))

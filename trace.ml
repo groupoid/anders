@@ -22,9 +22,6 @@ let traceWeak (e : exp) : unit = if !Prefs.trace then
 let traceRbV (v : value) : unit = if !Prefs.trace then
   trace (Printf.sprintf "RBV: %s\n" (showValue v))
 
-let traceRbN (n : neut) : unit = if !Prefs.trace then
-  trace (Printf.sprintf "RBN: %s\n" (showNeut n))
-
 let traceClos (e : exp) (p : name) (v : value) : unit = if !Prefs.trace then
   trace (Printf.sprintf "CLOSBYVAL: (%s)(%s := %s)\n" (showExp e) (showName p) (showValue v))
 

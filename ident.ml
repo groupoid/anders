@@ -26,3 +26,23 @@ let gen () = inc := !inc + 1; !inc
 
 let pat : name -> name = function
   | No -> No | Name (p, _) -> Name (p, gen ())
+
+type dir = Zero | One
+
+let negDir : dir -> dir = function
+  | Zero -> One | One -> Zero
+
+module Dir = struct
+  type t = dir
+  let compare a b =
+    match a, b with
+    | One, Zero -> 1
+    | Zero, One -> -1
+    | _, _      -> 0
+end
+
+module Atom = struct
+  type t = name * dir
+  let compare (a, x) (b, y) =
+    if a = b then Dir.compare x y else Name.compare a b
+end

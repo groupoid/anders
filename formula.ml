@@ -2,9 +2,6 @@ open Ident
 open Error
 open Expr
 
-let negDir : dir -> dir = function
-  | Zero -> One | One -> Zero
-
 (* Arbitrary formula φ after calling andFormula/orFormula/negFormula
    will have form (α₁ ∧ ... ∧ αₙ) ∨ ... ∨ (β₁ ∧ ... ∧ βₘ),
    where “∧” and “∨” are right-associative,
@@ -30,21 +27,6 @@ let rec negFormula : value -> value = function
   | VAnd (f, g) -> orFormula (negFormula f, negFormula g)
   | VOr (f, g)  -> andFormula (negFormula f, negFormula g)
   | v           -> raise (InvalidFormulaNeg v)
-
-module Dir = struct
-  type t = dir
-  let compare a b =
-    match a, b with
-    | One, Zero -> 1
-    | Zero, One -> -1
-    | _, _      -> 0
-end
-
-module Atom = struct
-  type t = name * dir
-  let compare (a, x) (b, y) =
-    if a = b then Dir.compare x y else Name.compare a b
-end
 
 module Conjunction = Set.Make(Atom)
 type conjunction = Conjunction.t

@@ -1,10 +1,18 @@
 open Ident
 
 type scope = Local | Global
-type dir = Zero | One
+type 'a system = (Atom.t list * 'a) list
 
 let showDir : dir -> string = function
   | Zero -> "0" | One -> "1"
+
+let showAtom (p, d) = Printf.sprintf "(%s = %s)" (showName p) (showDir d)
+let showSystem (xs : 'a system) (show : 'a -> string) =
+  List.map (fun (ys, e) ->
+    let zs = String.concat " " (List.map showAtom ys) in
+    Printf.sprintf "%s -> %s" zs (show e)) xs
+  |> String.concat ", "
+  |> fun x -> "[" ^ x ^ "]"
 
 type exp =
   | ELam   of tele * exp
@@ -27,6 +35,8 @@ type exp =
   | ETransp     of exp * exp
   | EPLam       of exp
   | EAppFormula of exp * exp
+  | EPartial    of exp
+  | ESystem     of exp system
   | EI | EDir of dir
   | EAnd of exp * exp
   | EOr  of exp * exp
@@ -79,6 +89,8 @@ let rec showExp : exp -> string = function
   | EPLam (ELam ((i, _), e)) -> Printf.sprintf "(<%s> %s)" (showName i) (showExp e)
   | EPLam _ -> failwith "showExp: unreachable code was reached"
   | EAppFormula (f, x) -> Printf.sprintf "(%s @ %s)" (showExp f) (showExp x)
+  | EPartial e -> Printf.sprintf "Partial %s" (showExp e)
+  | ESystem e -> showSystem e showExp
   | EI -> "I" | EDir d -> showDir d
   | EAnd (a, b) -> Printf.sprintf "(%s /\\ %s)" (showExp a) (showExp b)
   | EOr (a, b) -> Printf.sprintf "(%s \\/ %s)" (showExp a) (showExp b)
@@ -134,6 +146,8 @@ type value =
   | VPathP      of value
   | VTransp     of value * value
   | VAppFormula of value * value
+  | VPartial    of value
+  | VSystem     of value system
   | VI | VDir of dir
   | VAnd of value * value
   | VOr  of value * value
@@ -187,6 +201,8 @@ let rec showValue : value -> string = function
     else Printf.sprintf "(<%s> %s)" (showName p) (showExp e)
   | VPLam _ -> failwith "showExp: unreachable code was reached"
   | VAppFormula (f, x) -> Printf.sprintf "(%s @ %s)" (showValue f) (showValue x)
+  | VPartial e -> Printf.sprintf "Partial %s" (showValue e)
+  | VSystem e -> showSystem e showValue
   | VI -> "I" | VDir d -> showDir d
   | VAnd (a, b) -> Printf.sprintf "(%s /\\ %s)" (showValue a) (showValue b)
   | VOr (a, b) -> Printf.sprintf "(%s \\/ %s)" (showValue a) (showValue b)

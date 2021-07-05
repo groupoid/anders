@@ -39,6 +39,7 @@ let rec eval (e : exp) (ctx : ctx) = traceEval e; match e with
   | EPre u             -> VPre u
   | EPathP e           -> VPathP (eval e ctx)
   | EPLam e            -> VPLam (eval e ctx)
+  | EPartial e         -> VPartial (eval e ctx)
   | EAppFormula (e, x) ->
     begin match eval e ctx with
       | VPLam f -> app ctx (f, eval x ctx)
@@ -101,6 +102,7 @@ and rbV ctx v : exp = traceRbV v; match v with
   | VHole              -> EHole
   | VAxiom (p, v)      -> EAxiom (p, rbV ctx v)
   | VPathP v           -> EPathP (rbV ctx v)
+  | VPartial v         -> EPartial (rbV ctx v)
   | VTransp (p, i)     -> ETransp (rbV ctx p, rbV ctx i)
   | VAppFormula (f, x) -> EAppFormula (rbV ctx f, rbV ctx x)
   | VId v              -> EId (rbV ctx v)
@@ -135,6 +137,7 @@ and weak (e : exp) ctx = traceWeak e; match e with
   | EAxiom (p, e)      -> EAxiom (p, weak e ctx)
   | EPathP u           -> EPathP (weak u ctx)
   | EPLam u            -> EPLam (weak u ctx)
+  | EPartial e         -> EPartial (weak e ctx)
   | EAppFormula (f, x) -> EAppFormula (weak f ctx, weak x ctx)
   | EAnd (e1, e2)      -> EAnd (weak e1 ctx, weak e2 ctx)
   | EOr (e1, e2)       -> EOr (weak e1 ctx, weak e2 ctx)
@@ -172,6 +175,7 @@ and conv ctx v1 v2 : bool = traceConv v1 v2;
     | VFst x, VFst y | VSnd x, VSnd y -> conv ctx x y
     | VAxiom (p, x), VAxiom (q, y) -> p = q && conv ctx x y
     | VPathP a, VPathP b -> conv ctx a b
+    | VPartial a, VPartial b -> conv ctx a b
     | VAppFormula (f, x), VAppFormula (g, y) -> conv ctx f g && conv ctx x y
     | VTransp (p, i), VTransp (q, j) -> conv ctx p q && conv ctx i j
     | VOr _, VOr _ -> orEq v1 v2
@@ -232,6 +236,7 @@ and infer ctx e : value = traceInfer e; match e with
   | EAxiom (_, e) -> eval e ctx
   | EPre u -> VPre (u + 1)
   | EPathP p -> inferPath ctx p
+  | EPartial e -> let n = extSet (infer ctx e) in implv VI (EPre n) ctx
   | EAppFormula (f, x) -> check ctx x VI; let (p, _, _) = extPathP ctx f in app ctx (p, eval x ctx)
   | ETransp (p, i) -> inferTransport ctx p i
   | EI -> VPre 0 | EDir _ -> VI

@@ -107,6 +107,7 @@ and rbV ctx v : exp = traceRbV v; match v with
   | VAxiom (p, v)      -> EAxiom (p, rbV ctx v)
   | VPathP v           -> EPathP (rbV ctx v)
   | VPartial v         -> EPartial (rbV ctx v)
+  | VSystem x          -> ESystem (List.map (fun (y, v) -> (y, rbV ctx v)) x)
   | VTransp (p, i)     -> ETransp (rbV ctx p, rbV ctx i)
   | VAppFormula (f, x) -> EAppFormula (rbV ctx f, rbV ctx x)
   | VId v              -> EId (rbV ctx v)

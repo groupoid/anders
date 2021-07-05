@@ -1,10 +1,7 @@
 Anders
 ======
 
-[![Release][release-img]][release]
-
-release-img: https://img.shields.io/github/v/release/groupoid/anders.svg
-release: https://github.com/groupoid/anders/releases
+[![OPAM](https://img.shields.io/github/v/release/groupoid/anders.svg)](https://github.com/groupoid/anders/releases)
 
 CCHM homotopy system type checker based on Mini-TT for OCaml.
 

@@ -45,11 +45,11 @@ let rec checkLine st : line -> state =
     Printf.printf "Checking: %s\n" name; flush_all ();
     (checkDecl ctx d, checked)
   | Option (opt, value) ->
-    (match opt with
-    | "girard"   -> girard  := getBoolVal opt value
-    | "pre-eval" -> preeval := getBoolVal opt value
-    | _          -> raise (UnknownOption opt));
-    st
+    begin match opt with
+      | "girard"   -> girard  := getBoolVal opt value
+      | "pre-eval" -> preeval := getBoolVal opt value
+      | _          -> raise (UnknownOption opt)
+    end; st
   | Import x -> let path = ext x in if Files.mem path checked then st else checkFile st path
 and checkFile p path =
   let (ctx, checked) = p in

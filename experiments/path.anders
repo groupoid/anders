@@ -23,7 +23,6 @@ def idᵀ (α: U): U := α → α
 def id (α : U) (a : α) : α := a
 def const (α β : U) : α → β → α := λ (a : α) (b : β), a
 
-def I : V := interval def 0 := zero def 1 := one
 def LineP (A : I → U) : U := Π (i : I), A i
 
 -- Like in https://git.abby.how/abby/cubical/src/branch/master/intro.tt#L141

@@ -1,6 +1,7 @@
 open Prefs
 open Check
 open Error
+open Ident
 open Expr
 
 type cmdline =
@@ -8,27 +9,35 @@ type cmdline =
   | Lex       of string
   | Parse     of string
   | Cubicaltt of string
+  | Prim      of string * string
   | Repl  | Help
   | Trace | Girard
 
 let banner = "Anders theorem prover [MLTT].\n"
 let help =
-"   invoke = anders | anders list
-     list = [] | command list
-  command = check filename     | lex filename
-          | parse filename     | help
-          | cubicaltt filename | girard
-          | trace"
+"    invoke = anders | anders list
+      list = [] | command list
+   command = check filename      | lex filename
+           | parse filename      | help
+           | cubicaltt filename  | girard
+           | prim primitive name | trace
+ primitive = zero | one | interval"
 
 let cmd : cmdline -> unit = function
   | Check     filename -> Repl.check filename
   | Lex       filename -> Lexparse.lex filename
   | Parse     filename -> Lexparse.parse filename
   | Cubicaltt filename -> Cubical.extract filename
+  | Prim (prim, value) -> begin match prim with
+    | "zero"     -> zeroPrim     := value
+    | "one"      -> onePrim      := value
+    | "interval" -> intervalPrim := value
+    | _ -> raise (UnknownPrimitive prim)
+  end
   | Help -> print_endline help
   | Repl -> Repl.repl ()
-  | Trace -> (Prefs.trace := true)
-  | Girard -> (girard := true)
+  | Trace -> Prefs.trace := true
+  | Girard -> girard := true
 
 let needRepl : cmdline -> bool = function
   | Check _ -> true
@@ -36,6 +45,7 @@ let needRepl : cmdline -> bool = function
 
 let rec parseArgs : string list -> cmdline list = function
   | [] -> []
+  | "prim" :: prim :: value :: rest -> Prim (prim, value) :: parseArgs rest
   | "check"     :: filename :: rest -> Check     filename :: parseArgs rest
   | "lex"       :: filename :: rest -> Lex       filename :: parseArgs rest
   | "parse"     :: filename :: rest -> Parse     filename :: parseArgs rest

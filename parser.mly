@@ -62,11 +62,7 @@ exp3:
   | TRANSP exp3 exp3 { ETransp ($2, $3) }
   | PARTIAL exp3 { EPartial $2 }
   | LPARENS exp0 RPARENS { $2 }
-  | IDENT { match $1 with
-            | "zero"     -> EDir Zero
-            | "one"      -> EDir One
-            | "interval" -> EI
-            | _          -> decl $1 }
+  | IDENT { getVar $1 }
   | NO { EVar No }
 
 declarations:

@@ -4,7 +4,7 @@ type scope = Local | Global
 type 'a system = (Atom.t list * 'a) list
 
 let showDir : dir -> string = function
-  | Zero -> "0" | One -> "1"
+  | Zero -> !zeroPrim | One -> !onePrim
 
 let showAtom (p, d) = Printf.sprintf "(%s = %s)" (showName p) (showDir d)
 let showSystem (xs : 'a system) (show : 'a -> string) =
@@ -50,6 +50,13 @@ let eSig x y = ESig (x, y)
 let name x = Name (x, 0)
 let decl x = EVar (name x)
 
+let getVar x =
+  let xs = [(!zeroPrim, EDir Zero);
+            (!onePrim, EDir One);
+            (!intervalPrim, EI)] in
+  match List.assoc_opt x xs with
+  | Some e -> e | None -> decl x
+
 let rec telescope (f : tele -> exp -> exp) (e : exp) : tele list -> exp = function
   | []      -> e
   | x :: xs -> f x (telescope f e xs)
@@ -91,7 +98,7 @@ let rec showExp : exp -> string = function
   | EAppFormula (f, x) -> Printf.sprintf "(%s @ %s)" (showExp f) (showExp x)
   | EPartial e -> Printf.sprintf "Partial %s" (showExp e)
   | ESystem e -> showSystem e showExp
-  | EI -> "I" | EDir d -> showDir d
+  | EI -> !intervalPrim | EDir d -> showDir d
   | EAnd (a, b) -> Printf.sprintf "(%s /\\ %s)" (showExp a) (showExp b)
   | EOr (a, b) -> Printf.sprintf "(%s \\/ %s)" (showExp a) (showExp b)
   | ENeg a -> Printf.sprintf "-%s" (showExp a)
@@ -203,7 +210,7 @@ let rec showValue : value -> string = function
   | VAppFormula (f, x) -> Printf.sprintf "(%s @ %s)" (showValue f) (showValue x)
   | VPartial e -> Printf.sprintf "Partial %s" (showValue e)
   | VSystem e -> showSystem e showValue
-  | VI -> "I" | VDir d -> showDir d
+  | VI -> !intervalPrim | VDir d -> showDir d
   | VAnd (a, b) -> Printf.sprintf "(%s /\\ %s)" (showValue a) (showValue b)
   | VOr (a, b) -> Printf.sprintf "(%s \\/ %s)" (showValue a) (showValue b)
   | VNeg a -> Printf.sprintf "-%s" (showValue a)

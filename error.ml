@@ -17,6 +17,7 @@ exception VariableNotFound of name
 exception ExtractionError of string
 exception TypeIneq of value * value
 exception AlreadyDeclared of string
+exception UnknownPrimitive of string
 exception InvalidFormulaNeg of value
 exception InvalidFormulaOr of value * value
 exception InvalidFormulaAnd of value * value

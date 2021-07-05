@@ -46,3 +46,7 @@ module Atom = struct
   let compare (a, x) (b, y) =
     if a = b then Dir.compare x y else Name.compare a b
 end
+
+let zeroPrim     = ref "0"
+let onePrim      = ref "1"
+let intervalPrim = ref "I"

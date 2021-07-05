@@ -23,7 +23,10 @@ Prerequisites
 Here is example for Ubuntu:
 
 ```shell
-$ apt install ocaml ocamlbuild menhir
+$ apt install ocaml opam
+$ opam init
+$ eval $(opam env)
+$ opam install ocamlbuild ocamlfind menhir
 ```
 
 Samples

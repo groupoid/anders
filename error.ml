@@ -18,24 +18,17 @@ exception ExtractionError of string
 exception TypeIneq of value * value
 exception AlreadyDeclared of string
 exception UnknownPrimitive of string
-exception InvalidFormulaNeg of value
-exception InvalidFormulaOr of value * value
-exception InvalidFormulaAnd of value * value
-exception InvalidApplication of value * value
 exception InvalidModuleName of string * string
 exception UnknownOptionValue of string * string
 
 let prettyPrintError : exn -> unit = function
+  | ExpectedDir s -> Printf.printf "“%s” expected to be “%s” or “%s”" s !zeroPrim !onePrim
   | ExtractionError s -> Printf.printf "Error occured during extraction: %s\n" s
   | ExpectedPath e -> Printf.printf "“%s” expected to be a path.\n" (showExp e)
   | AlreadyDeclared p -> Printf.printf "“%s” is already declared.\n" p
-  | InvalidFormulaNeg v -> Printf.printf "Cannot evaluate invalid formula:\n  -%s\n" (showValue v)
-  | InvalidFormulaOr (u, v) -> Printf.printf "Cannot evaluate invalid formula:\n  %s ∨ %s\n" (showValue u) (showValue v)
-  | InvalidFormulaAnd (u, v) -> Printf.printf "Cannot evaluate invalid formula:\n  %s ∧ %s\n" (showValue u) (showValue v)
   | TypeIneq (u, v) -> Printf.printf "Type mismatch:\n%s\n  =/=\n%s\n" (showValue u) (showValue v)
   | InferError e -> Printf.printf "Cannot infer type of\n  %s\n" (showExp e)
   | VariableNotFound p -> Printf.printf "Variable %s was not found\n" (showName p)
-  | InvalidApplication (x, y) -> Printf.printf "Invalid application \n  %s\nto\n  %s\n" (showValue x) (showValue y)
   | InvalidModuleName (name, filename) -> Printf.printf "Module “%s” does not match name of its file: %s\n" name filename
   | ExpectedESet x -> Printf.printf "  %s\nexpected to be universe\n" (showExp x)
   | ExpectedVSet x -> Printf.printf "  %s\nexpected to be universe\n" (showValue x)

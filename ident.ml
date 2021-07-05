@@ -50,3 +50,6 @@ end
 let zeroPrim     = ref "0"
 let onePrim      = ref "1"
 let intervalPrim = ref "I"
+
+exception ExpectedDir of string
+let getDir x = if x = !zeroPrim then Zero else if x = !onePrim then One else raise (ExpectedDir x)

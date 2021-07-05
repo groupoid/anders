@@ -64,6 +64,7 @@ rule main = parse
 | def             { DEF }              | colon           { COLON }
 | ','             { COMMA }            | '_'             { NO }
 | '('             { LPARENS }          | ')'             { RPARENS }
+| '['             { LSQ }              | ']'             { RSQ }
 | '/'             { DIRSEP }           | ".1"            { FST }
 | ".2"            { SND }              | pi              { PI }
 | sigma           { SIGMA }            | "?"             { HOLE }

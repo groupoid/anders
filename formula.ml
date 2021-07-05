@@ -26,7 +26,7 @@ let rec negFormula : value -> value = function
   | VNeg n      -> n
   | VAnd (f, g) -> orFormula (negFormula f, negFormula g)
   | VOr (f, g)  -> andFormula (negFormula f, negFormula g)
-  | v           -> raise (InvalidFormulaNeg v)
+  | v           -> VNeg v
 
 module Conjunction = Set.Make(Atom)
 type conjunction = Conjunction.t

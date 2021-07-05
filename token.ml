@@ -7,6 +7,7 @@ let tokenToString : token -> string = function
   | DEF        -> "DEF"         | SIGMA      -> "SIGMA"
   | PI         -> "PI"          | HOLE       -> "HOLE"
   | RPARENS    -> "RPARENS"     | LPARENS    -> "LPARENS"
+  | RSQ        -> "RSQ"         | LSQ        -> "LSQ"
   | LAM        -> "LAM"         | PROD       -> "PROD"
   | OPTION     -> "OPTION"      | AXIOM      -> "AXIOM"
   | NO         -> "NO"          | EOF        -> "EOF"

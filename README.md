@@ -1,6 +1,8 @@
 Anders
 ======
 
+[![Release][https://img.shields.io/github/v/release/groupoid/anders.svg]][https://github.com/ocaml/dune/releases]
+
 CCHM homotopy system type checker based on Mini-TT for OCaml.
 
 Features

@@ -40,6 +40,8 @@ let rec eval (e : exp) (ctx : ctx) = traceEval e; match e with
   | EPathP e           -> VPathP (eval e ctx)
   | EPLam e            -> VPLam (eval e ctx)
   | EPartial e         -> VPartial (eval e ctx)
+  | ESystem xs         -> VSystem (List.map (fun (x, e) ->
+    (Conjunction.map (fun (p, d) -> (update ctx p, d)) x, eval e ctx)) xs)
   | EAppFormula (e, x) ->
     begin match eval e ctx with
       | VPLam f -> app ctx (f, eval x ctx)
@@ -71,6 +73,8 @@ and getRho ctx x = match Env.find_opt x ctx with
   | Some (_, _, Value v) -> v
   | Some (_, _, Exp e)   -> eval e ctx
   | None                 -> raise (VariableNotFound x)
+
+and update ctx x = match getRho ctx x with Var y -> y | _ -> x
 
 and extPathP ctx e = match infer ctx e with
   | VApp (VApp (VPathP v, u0), u1) ->
@@ -219,6 +223,14 @@ and check ctx (e0 : exp) (t0 : value) =
     match infer ctx e with
     | VKan v | VPre v -> if ieq u v then () else raise (TypeIneq (VPre u, VPre v))
     | t -> raise (TypeIneq (VPre u, t)) end
+  | ESystem x, VApp (VPartial v, i) ->
+    eqNf ctx (eval (getFormula x) ctx) i;
+    List.iter (fun (_, e) -> check ctx e v) x;
+    (* check overlapping cases *)
+    List.iter (fun (x1, e1) ->
+      List.iter (fun (x2, e2) ->
+        if not (Conjunction.disjoint x1 x2) then
+          eqNf ctx (eval e1 ctx) (eval e2 ctx)) x) x
   | e, t -> eqNf ctx (infer ctx e) t
 
 and infer ctx e : value = traceInfer e; match e with

@@ -43,7 +43,7 @@ face : LPARENS IDENT IDENT IDENT RPARENS {
   | "=" -> (name $2, getDir $4)
   | _   -> failwith "invalid face"
 }
-partial : face+ ARROW exp1 { ($1, $3) }
+partial : face+ ARROW exp1 { (Conjunction.of_seq (List.to_seq $1), $3) }
 
 exp1:
   | LAM telescope COMMA exp1 { telescope eLam $4 $2 }

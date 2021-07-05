@@ -47,6 +47,9 @@ module Atom = struct
     if a = b then Dir.compare x y else Name.compare a b
 end
 
+module Conjunction = Set.Make(Atom)
+type conjunction = Conjunction.t
+
 let zeroPrim     = ref "0"
 let onePrim      = ref "1"
 let intervalPrim = ref "I"

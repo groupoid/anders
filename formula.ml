@@ -2,6 +2,16 @@ open Ident
 open Error
 open Expr
 
+let getSign p : dir -> exp = function
+  | Zero -> ENeg (EVar p)
+  | One  -> EVar p
+
+let mergeConj xs =
+  Conjunction.fold (fun (p, d) v -> EAnd (getSign p d, v)) xs(EDir One)
+
+let getFormula : exp system -> exp =
+  List.fold_left (fun v (x, _) -> EOr (mergeConj x, v)) (EDir Zero)
+
 (* Arbitrary formula φ after calling andFormula/orFormula/negFormula
    will have form (α₁ ∧ ... ∧ αₙ) ∨ ... ∨ (β₁ ∧ ... ∧ βₘ),
    where “∧” and “∨” are right-associative,
@@ -27,9 +37,6 @@ let rec negFormula : value -> value = function
   | VAnd (f, g) -> orFormula (negFormula f, negFormula g)
   | VOr (f, g)  -> andFormula (negFormula f, negFormula g)
   | v           -> VNeg v
-
-module Conjunction = Set.Make(Atom)
-type conjunction = Conjunction.t
 
 (* extAnd converts (α₁ ∧ ... ∧ αₙ) into set of names equipped with sign. *)
 let rec extAnd : value -> conjunction = function

@@ -1,18 +1,21 @@
 open Ident
 
 type scope = Local | Global
-type 'a system = (Atom.t list * 'a) list
+type 'a system = (conjunction * 'a) list
 
 let showDir : dir -> string = function
   | Zero -> !zeroPrim | One -> !onePrim
 
 let showAtom (p, d) = Printf.sprintf "(%s = %s)" (showName p) (showDir d)
+
+let showConjunction xs =
+    Conjunction.elements xs
+    |> List.map showAtom
+    |> String.concat " "
+
 let showSystem (xs : 'a system) (show : 'a -> string) =
-  List.map (fun (ys, e) ->
-    let zs = String.concat " " (List.map showAtom ys) in
-    Printf.sprintf "%s -> %s" zs (show e)) xs
-  |> String.concat ", "
-  |> fun x -> "[" ^ x ^ "]"
+  List.map (fun (x, e) -> Printf.sprintf "%s -> %s" (showConjunction x) (show e)) xs
+  |> String.concat ", " |> fun x -> "[" ^ x ^ "]"
 
 type exp =
   | ELam   of tele * exp

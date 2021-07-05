@@ -78,7 +78,10 @@ and getRho ctx x = match Env.find_opt x ctx with
   | None                 -> raise (VariableNotFound x)
 
 and extPathP ctx e = match infer ctx e with
-  | VNt (NApp (NApp (NPathP VPLam p, u0), u1)) -> (p, u0, u1)
+  | VNt (NApp (NApp (NPathP v, u0), u1)) ->
+    let i = pat (name "x") in let gen = EVar i in
+    let ctx' = upLocal ctx i (VNt NI) (var i) in
+    (VLam (VNt NI, (i, rbV ctx' (act (rbV ctx v) gen ctx'), ctx')), u0, u1)
   | _ -> raise (ExpectedPath e)
 
 and appFormulaNeut (ctx : ctx) (v : value) (e : exp) =

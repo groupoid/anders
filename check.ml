@@ -243,7 +243,7 @@ and infer ctx e : value = traceInfer e; match e with
     let n = pat p in let gen = var n in let t = eval a ctx in
     let ctx' = upLocal (upLocal ctx p t gen) n t gen in
     VPi (t, (n, rbV ctx' (infer ctx' e), ctx))
-  | EApp (f, x) -> let (t, g) = extPiG (infer ctx f) in ignore (check ctx x t); closByVal ctx t g (eval x ctx)
+  | EApp (f, x) -> let (t, g) = extPiG ctx (infer ctx f) in ignore (check ctx x t); closByVal ctx t g (eval x ctx)
   | EFst e -> fst (extSigG (infer ctx e))
   | ESnd e -> let (t, g) = extSigG (infer ctx e) in closByVal ctx t g (vfst (eval e ctx))
   | EAxiom (_, e) -> eval e ctx
@@ -298,3 +298,8 @@ and inferTele ctx binop (p, a) b =
   let v = infer ctx' b in binop (infer ctx a) v
 
 and act e i ctx = eval (EAppFormula (e, i)) ctx
+
+and extPiG ctx : value -> value * clos = function
+  | VApp (VPartial t, i) -> (VApp (VApp (VId VI, VDir One), i), (No, rbV ctx t, ctx))
+  | VPi (t, g) -> (t, g)
+  | u -> raise (ExpectedPi u)

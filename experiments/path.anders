@@ -94,6 +94,8 @@ def φ (i : I) : Partial U₁ (i ∨ -i) :=
 def ψ (i j : I) : Partial U₁ (-i ∨ i ∨ (i ∧ j)) :=
 [ (i = 1) → U, (i = 1) (j = 1) → U, (i = 0) → U → U ]
 
+def Partial-app (A : U) (i : I) (u : Partial A i) (p : is-one? i) : A := u p
+
 {-
 
    Simon Huber notes: http://www.cse.chalmers.se/~simonhu/misc/hcomp.pdf

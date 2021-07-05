@@ -91,6 +91,9 @@ def trans-Σ (A : I -> U) (B : Π (i : I), A i -> U) (z : Σ (x : A 0), B 0 x) :
 def φ (i : I) : Partial U₁ (i ∨ -i) :=
 [ (i = 0) → U, (i = 1) → U → U ]
 
+def φ-0 : PathP (<_> U₁) (φ 0 1=1) U := <_> U
+def φ-1 : PathP (<_> U₁) (φ 1 1=1) (U → U) := <_> U → U
+
 def ψ (i j : I) : Partial U₁ (-i ∨ i ∨ (i ∧ j)) :=
 [ (i = 1) → U, (i = 1) (j = 1) → U, (i = 0) → U → U ]
 

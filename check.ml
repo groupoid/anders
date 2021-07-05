@@ -41,7 +41,7 @@ let rec eval (e : exp) (ctx : ctx) = traceEval e; match e with
   | EPLam e            -> VPLam (eval e ctx)
   | EPartial e         -> VPartial (eval e ctx)
   | ESystem xs         -> VSystem (List.map (fun (x, e) ->
-    (Conjunction.map (fun (p, d) -> (update ctx p, d)) x, eval e ctx)) xs)
+    (Conjunction.map (fun (p, d) -> (update ctx p, d)) x, eval e ctx)) xs, ctx)
   | EAppFormula (e, x) ->
     begin match eval e ctx with
       | VPLam f -> app ctx (f, eval x ctx)
@@ -64,9 +64,14 @@ and transport (ctx : ctx) (p : exp) (i : exp) = match eval i ctx with
 and closByVal ctx1 t x v = let (p, e, ctx2) = x in traceClos e p v;
   let ctx' = merge ctx2 ctx1 in eval e (upLocal ctx' p t v)
 
-and app ctx : value * value -> value = function
+and app ctx1 : value * value -> value = function
   | VApp (VApp (VApp (VApp (VJ _, _), _), f), _), VRef v -> f
-  | VLam (t, f), v -> closByVal ctx t f v
+  | VSystem (e, ctx2), VRef _ ->
+    let ctx' = merge ctx2 ctx1 in
+    snd (List.find (fun (x, _) ->
+      Conjunction.for_all (fun (p, d) ->
+        conv ctx' (getRho ctx' p) (VDir d)) x) e)
+  | VLam (t, f), v -> closByVal ctx1 t f v
   | f, x -> VApp (f, x)
 
 and getRho ctx x = match Env.find_opt x ctx with
@@ -107,7 +112,7 @@ and rbV ctx v : exp = traceRbV v; match v with
   | VAxiom (p, v)      -> EAxiom (p, rbV ctx v)
   | VPathP v           -> EPathP (rbV ctx v)
   | VPartial v         -> EPartial (rbV ctx v)
-  | VSystem x          -> ESystem (List.map (fun (y, v) -> (y, rbV ctx v)) x)
+  | VSystem (x, ctx')  -> ESystem (List.map (fun (y, v) -> (y, rbV (merge ctx' ctx) v)) x)
   | VTransp (p, i)     -> ETransp (rbV ctx p, rbV ctx i)
   | VAppFormula (f, x) -> EAppFormula (rbV ctx f, rbV ctx x)
   | VId v              -> EId (rbV ctx v)
@@ -243,7 +248,7 @@ and infer ctx e : value = traceInfer e; match e with
     let n = pat p in let gen = var n in let t = eval a ctx in
     let ctx' = upLocal (upLocal ctx p t gen) n t gen in
     VPi (t, (n, rbV ctx' (infer ctx' e), ctx))
-  | EApp (f, x) -> let (t, g) = extPiG ctx (infer ctx f) in ignore (check ctx x t); closByVal ctx t g (eval x ctx)
+  | EApp (f, x) -> let (t, g) = extPiG ctx (infer ctx f) in check ctx x t; closByVal ctx t g (eval x ctx)
   | EFst e -> fst (extSigG (infer ctx e))
   | ESnd e -> let (t, g) = extSigG (infer ctx e) in closByVal ctx t g (vfst (eval e ctx))
   | EAxiom (_, e) -> eval e ctx

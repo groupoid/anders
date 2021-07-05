@@ -100,7 +100,7 @@ let rec showExp : exp -> string = function
   | EPLam _ -> failwith "showExp: unreachable code was reached"
   | EAppFormula (f, x) -> Printf.sprintf "(%s @ %s)" (showExp f) (showExp x)
   | EPartial e -> Printf.sprintf "Partial %s" (showExp e)
-  | ESystem e -> showSystem e showExp
+  | ESystem x -> showSystem x showExp
   | EI -> !intervalPrim | EDir d -> showDir d
   | EAnd (a, b) -> Printf.sprintf "(%s /\\ %s)" (showExp a) (showExp b)
   | EOr (a, b) -> Printf.sprintf "(%s \\/ %s)" (showExp a) (showExp b)
@@ -157,7 +157,7 @@ type value =
   | VTransp     of value * value
   | VAppFormula of value * value
   | VPartial    of value
-  | VSystem     of value system
+  | VSystem     of value system * ctx
   | VI | VDir of dir
   | VAnd of value * value
   | VOr  of value * value
@@ -211,8 +211,8 @@ let rec showValue : value -> string = function
     else Printf.sprintf "(<%s> %s)" (showName p) (showExp e)
   | VPLam _ -> failwith "showExp: unreachable code was reached"
   | VAppFormula (f, x) -> Printf.sprintf "(%s @ %s)" (showValue f) (showValue x)
-  | VPartial e -> Printf.sprintf "Partial %s" (showValue e)
-  | VSystem e -> showSystem e showValue
+  | VPartial v -> Printf.sprintf "Partial %s" (showValue v)
+  | VSystem (x, _) -> showSystem x showValue
   | VI -> !intervalPrim | VDir d -> showDir d
   | VAnd (a, b) -> Printf.sprintf "(%s /\\ %s)" (showValue a) (showValue b)
   | VOr (a, b) -> Printf.sprintf "(%s \\/ %s)" (showValue a) (showValue b)

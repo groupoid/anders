@@ -10,7 +10,7 @@ let vfst : value -> value = function
   | VPair (u, _) -> u
   | v            -> VFst v
 
-  let vsnd : value -> value = function
+let vsnd : value -> value = function
   | VPair (_, u) -> u
   | v            -> VSnd v
 
@@ -18,12 +18,10 @@ let lookup (x : name) (ctx : ctx) = match Env.find_opt x ctx with
   | Some (_, v, _) -> v
   | None           -> raise (VariableNotFound x)
 
-let ignoreAnon (p : name) a b = match p with
-  | No -> a
-  | _  -> b
+let upVar p x ctx = match p with No -> ctx | _ -> Env.add p x ctx
+let upLocal (ctx : ctx) (p : name) t v : ctx = upVar p (Local, t, Value v) ctx
+let upGlobal (ctx : ctx) (p : name) t v : ctx = upVar p (Global, t, Value v) ctx
 
-let upLocal (ctx : ctx) (p : name) t v : ctx = Env.add p (Local, t, Value v) ctx |> ignoreAnon p ctx
-let upGlobal (ctx : ctx) (p : name) t v : ctx = Env.add p (Global, t, Value v) ctx |> ignoreAnon p ctx
 let ieq u v : bool = !girard || u = v
 
 let rec eval (e : exp) (ctx : ctx) = traceEval e; match e with

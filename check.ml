@@ -40,8 +40,7 @@ let rec eval (e : exp) (ctx : ctx) = traceEval e; match e with
   | EPathP e           -> VPathP (eval e ctx)
   | EPLam e            -> VPLam (eval e ctx)
   | EPartial e         -> VPartial (eval e ctx)
-  | ESystem xs         -> VSystem (List.map (fun (x, e) ->
-    (Conjunction.map (fun (p, d) -> (update ctx p, d)) x, eval e ctx)) xs, ctx)
+  | ESystem x          -> VSystem (x, ctx)
   | EAppFormula (e, x) ->
     begin match eval e ctx with
       | VPLam f -> app ctx (f, eval x ctx)
@@ -68,9 +67,9 @@ and app ctx1 : value * value -> value = function
   | VApp (VApp (VApp (VApp (VJ _, _), _), f), _), VRef v -> f
   | VSystem (e, ctx2), VRef _ ->
     let ctx' = merge ctx2 ctx1 in
-    snd (List.find (fun (x, _) ->
+    eval (snd (List.find (fun (x, _) ->
       Conjunction.for_all (fun (p, d) ->
-        conv ctx' (getRho ctx' p) (VDir d)) x) e)
+        conv ctx' (getRho ctx' p) (VDir d)) x) e)) ctx'
   | VLam (t, f), v -> closByVal ctx1 t f v
   | f, x -> VApp (f, x)
 
@@ -112,7 +111,8 @@ and rbV ctx v : exp = traceRbV v; match v with
   | VAxiom (p, v)      -> EAxiom (p, rbV ctx v)
   | VPathP v           -> EPathP (rbV ctx v)
   | VPartial v         -> EPartial (rbV ctx v)
-  | VSystem (x, ctx')  -> ESystem (List.map (fun (y, v) -> (y, rbV (merge ctx' ctx) v)) x)
+  | VSystem (x, ctx')  -> ESystem (List.map (fun (y, v) ->
+    let ctx'' = merge ctx' ctx in (y, rbV ctx'' (eval v ctx''))) x)
   | VTransp (p, i)     -> ETransp (rbV ctx p, rbV ctx i)
   | VAppFormula (f, x) -> EAppFormula (rbV ctx f, rbV ctx x)
   | VId v              -> EId (rbV ctx v)

@@ -1,7 +1,6 @@
 open Ident
 
 type scope = Local | Global
-type 'a system = (conjunction * 'a) list
 
 let showDir : dir -> string = function
   | Zero -> !zeroPrim | One -> !onePrim
@@ -13,7 +12,7 @@ let showConjunction xs =
     |> List.map showAtom
     |> String.concat " "
 
-let showSystem (xs : 'a system) (show : 'a -> string) =
+let showSystem xs show =
   List.map (fun (x, e) -> Printf.sprintf "%s -> %s" (showConjunction x) (show e)) xs
   |> String.concat ", " |> fun x -> "[" ^ x ^ "]"
 
@@ -39,12 +38,13 @@ type exp =
   | EPLam       of exp
   | EAppFormula of exp * exp
   | EPartial    of exp
-  | ESystem     of exp system
+  | ESystem     of system
   | EI | EDir of dir
   | EAnd of exp * exp
   | EOr  of exp * exp
   | ENeg of exp
 and tele = name * exp
+and system = (conjunction * exp) list
 
 let eLam x y = ELam (x, y)
 let ePi  x y = EPi  (x, y)
@@ -157,7 +157,7 @@ type value =
   | VTransp     of value * value
   | VAppFormula of value * value
   | VPartial    of value
-  | VSystem     of value system * ctx
+  | VSystem     of system * ctx
   | VI | VDir of dir
   | VAnd of value * value
   | VOr  of value * value
@@ -201,7 +201,7 @@ let rec showValue : value -> string = function
   | VPLam _ -> failwith "showExp: unreachable code was reached"
   | VAppFormula (f, x) -> Printf.sprintf "(%s @ %s)" (showValue f) (showValue x)
   | VPartial v -> Printf.sprintf "Partial %s" (showValue v)
-  | VSystem (x, _) -> showSystem x showValue
+  | VSystem (x, _) -> showSystem x showExp
   | VI -> !intervalPrim | VDir d -> showDir d
   | VAnd (a, b) -> Printf.sprintf "(%s /\\ %s)" (showValue a) (showValue b)
   | VOr (a, b) -> Printf.sprintf "(%s \\/ %s)" (showValue a) (showValue b)

@@ -169,17 +169,6 @@ and term =
 and record = scope * value * term
 and ctx = record Env.t
 
-(* Compatibility with OCaml 4.05
-   From: https://github.com/ocaml/ocaml/blob/trunk/stdlib/list.ml *)
-let filterMap f =
-  let rec aux accu = function
-    | [] -> List.rev accu
-    | x :: l ->
-      match f x with
-      | None -> aux accu l
-      | Some v -> aux (v :: accu) l
-  in aux []
-
 let isGlobal : record -> bool = function
   | Global, _, _ -> false
   | Local,  _, _ -> true
@@ -222,7 +211,7 @@ and showTermBind : name * record -> string option = function
   | _, _             -> None
 and isRhoVisible = Env.exists (fun _ -> isGlobal)
 and showRho ctx : string =
-  Env.bindings ctx |> filterMap showTermBind |> String.concat ", "
+  Env.bindings ctx |> List.filter_map showTermBind |> String.concat ", "
 and showTele p x rho : string =
   if isRhoVisible rho then
     Printf.sprintf "(%s : %s, %s)" (showName p) (showValue x) (showRho rho)
@@ -233,7 +222,7 @@ and showTerm : term -> string = function
 
 let showGamma (ctx : ctx) : string =
   Env.bindings ctx
-  |> filterMap
+  |> List.filter_map
       (fun (p, x) -> match x with
         | Local, v, _ -> Some (Printf.sprintf "%s : %s" (showName p) (showValue v))
         | _, _, _     -> None)

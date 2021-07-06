@@ -1,20 +1,6 @@
 open Ident
 
-type scope = Local | Global
-
-let showDir : dir -> string = function
-  | Zero -> !zeroPrim | One -> !onePrim
-
-let showAtom (p, d) = Printf.sprintf "(%s = %s)" (showName p) (showDir d)
-
-let showConjunction xs =
-    Conjunction.elements xs
-    |> List.map showAtom
-    |> String.concat " "
-
-let showSystem xs show =
-  List.map (fun (x, e) -> Printf.sprintf "%s -> %s" (showConjunction x) (show e)) xs
-  |> String.concat ", " |> fun x -> "[" ^ x ^ "]"
+(* Interface *)
 
 type exp =
   | ELam   of tele * exp
@@ -39,41 +25,120 @@ type exp =
   | EAppFormula of exp * exp
   | EPartial    of exp
   | ESystem     of system
-  | EI | EDir of dir
+  | EI
+  | EDir of dir
   | EAnd of exp * exp
   | EOr  of exp * exp
   | ENeg of exp
 and tele = name * exp
 and system = (conjunction * exp) list
 
+type decl =
+  | NotAnnotated of string * exp
+  | Annotated of string * exp * exp
+
+type line =
+  | Import of string
+  | Option of string * string
+  | Decl of decl
+
+type content = line list
+type file = string * content
+type scope = Local | Global
+
+type value =
+  | VLam   of value * clos
+  | VKan   of int
+  | VPi    of value * clos
+  | VSig   of value * clos
+  | VPair  of value * value
+  | VFst   of value
+  | VSnd   of value
+  | VApp   of value * value
+  | Var    of name * value
+  | VAxiom of string * value
+  | VHole
+  (* cubical part *)
+  | VPre        of int
+  | VId         of value
+  | VRef        of value
+  | VPLam       of value
+  | VJ          of value
+  | VPathP      of value
+  | VTransp     of value * value
+  | VAppFormula of value * value
+  | VPartial    of value
+  | VSystem     of system * ctx
+  | VI | VDir of dir
+  | VAnd of value * value
+  | VOr  of value * value
+  | VNeg of value
+and clos = name * exp * ctx
+and term = Exp of exp | Value of value
+and record = scope * term * term
+and ctx = record Env.t
+
+(* Implementation *)
+
 let eLam x y = ELam (x, y)
 let ePi  x y = EPi  (x, y)
 let eSig x y = ESig (x, y)
-
+let ezero = EDir Zero
+let eone  = EDir One
+let vzero = VDir Zero
+let vone  = VDir One
 let name x = Name (x, 0)
 let decl x = EVar (name x)
-
-let getVar x =
-  let xs = [(!zeroPrim, EDir Zero);
-            (!onePrim, EDir One);
-            (!intervalPrim, EI)] in
-  match List.assoc_opt x xs with
-  | Some e -> e | None -> decl x
-
-let rec telescope (f : tele -> exp -> exp) (e : exp) : tele list -> exp = function
-  | []      -> e
-  | x :: xs -> f x (telescope f e xs)
-
+let isGlobal : record -> bool = function | Global, _, _ -> false | Local,  _, _ -> true
+let fresh ns n = match Env.find_opt n ns with | Some x -> x | None -> n
+let freshConj ns = Conjunction.map (fun (p, d) -> (fresh ns p, d))
+let rec telescope (f : tele -> exp -> exp) (e : exp) : tele list -> exp = function | [] -> e | x :: xs -> f x (telescope f e xs)
 let impl a b = EPi ((No, a), b)
-
-let rec pLam e : name list -> exp = function
-  | [] -> e
-  | x :: xs -> EPLam (ELam ((x, EI), pLam e xs))
-
+let rec pLam e : name list -> exp = function | [] -> e | x :: xs -> EPLam (ELam ((x, EI), pLam e xs))
 let getDigit x = Char.chr (x + 0x80) |> Printf.sprintf "\xE2\x82%c"
+let getVar x =
+  let xs = [(!zeroPrim, EDir Zero); (!onePrim, EDir One); (!intervalPrim, EI)] in
+  match List.assoc_opt x xs with | Some e -> e | None -> decl x
+
+let rec salt (ns : name Env.t) : exp -> exp = function
+  | ELam ((p, a), b)    -> let x = pat p in ELam ((x, salt ns a), salt (Env.add p x ns) b)
+  | EKan n              -> EKan n
+  | EPi ((p, a), b)     -> let x = pat p in EPi ((x, salt ns a), salt (Env.add p x ns) b)
+  | ESig ((p, a), b)    -> let x = pat p in ESig ((x, salt ns a), salt (Env.add p x ns) b)
+  | EPair (a, b)        -> EPair (salt ns a, salt ns b)
+  | EFst e              -> EFst (salt ns e)
+  | ESnd e              -> ESnd (salt ns e)
+  | EApp (f, x)         -> EApp (salt ns f, salt ns x)
+  | EVar x              -> EVar (fresh ns x)
+  | EAxiom (p, e)       -> EAxiom (p, salt ns e)
+  | EHole               -> EHole
+  | EPre n              -> EPre n
+  | EId e               -> EId (salt ns e)
+  | ERef e              -> ERef (salt ns e)
+  | EJ e                -> EJ (salt ns e)
+  | EPathP e            -> EPathP (salt ns e)
+  | ETransp (p, i)      -> ETransp (salt ns p, salt ns i)
+  | EPLam e             -> EPLam (salt ns e)
+  | EAppFormula (p, i)  -> EAppFormula (salt ns p, salt ns i)
+  | EPartial e          -> EPartial (salt ns e)
+  | ESystem x           -> ESystem (List.map (fun (phi, e) -> (freshConj ns phi, salt ns e)) x)
+  | EI                  -> EI
+  | EDir d              -> EDir d
+  | EAnd (a, b)         -> EAnd (salt ns a, salt ns b)
+  | EOr (a, b)          -> EOr (salt ns a, salt ns b)
+  | ENeg e              -> ENeg (salt ns e)
+
 let rec showLevel x =
   if x < 0 then failwith "showLevel: expected positive integer"
   else if x = 0 then "" else showLevel (x / 10) ^ getDigit (x mod 10)
+
+let showDir : dir -> string = function | Zero -> !zeroPrim | One -> !onePrim
+let showAtom (p, d) = Printf.sprintf "(%s = %s)" (showName p) (showDir d)
+let showConjunction xs = Conjunction.elements xs |> List.map showAtom |> String.concat " "
+let freshExp = salt Env.empty
+let showSystem xs show =
+  List.map (fun (x, e) -> Printf.sprintf "%s -> %s" (showConjunction x) (show e)) xs
+  |> String.concat ", " |> fun x -> "[" ^ x ^ "]"
 
 let rec showExp : exp -> string = function
   | EKan n -> "U" ^ showLevel n
@@ -105,112 +170,9 @@ let rec showExp : exp -> string = function
   | EAnd (a, b) -> Printf.sprintf "(%s /\\ %s)" (showExp a) (showExp b)
   | EOr (a, b) -> Printf.sprintf "(%s \\/ %s)" (showExp a) (showExp b)
   | ENeg a -> Printf.sprintf "-%s" (showExp a)
+
 and showTele : tele -> string =
   fun (p, x) -> Printf.sprintf "(%s : %s)" (showName p) (showExp x)
-
-let fresh ns n = match Env.find_opt n ns with
-  | Some x -> x
-  | None   -> n
-
-let freshConj ns = Conjunction.map (fun (p, d) -> (fresh ns p, d))
-
-let rec salt (ns : name Env.t) : exp -> exp = function
-  | ELam ((p, a), b)    -> let x = pat p in ELam ((x, salt ns a), salt (Env.add p x ns) b)
-  | EKan n              -> EKan n
-  | EPi ((p, a), b)     -> let x = pat p in EPi ((x, salt ns a), salt (Env.add p x ns) b)
-  | ESig ((p, a), b)    -> let x = pat p in ESig ((x, salt ns a), salt (Env.add p x ns) b)
-  | EPair (a, b)        -> EPair (salt ns a, salt ns b)
-  | EFst e              -> EFst (salt ns e)
-  | ESnd e              -> ESnd (salt ns e)
-  | EApp (f, x)         -> EApp (salt ns f, salt ns x)
-  | EVar x              -> EVar (fresh ns x)
-  | EAxiom (p, e)       -> EAxiom (p, salt ns e)
-  | EHole               -> EHole
-  | EPre n              -> EPre n
-  | EId e               -> EId (salt ns e)
-  | ERef e              -> ERef (salt ns e)
-  | EJ e                -> EJ (salt ns e)
-  | EPathP e            -> EPathP (salt ns e)
-  | ETransp (p, i)      -> ETransp (salt ns p, salt ns i)
-  | EPLam e             -> EPLam (salt ns e)
-  | EAppFormula (p, i)  -> EAppFormula (salt ns p, salt ns i)
-  | EPartial e          -> EPartial (salt ns e)
-  | ESystem x           -> ESystem (List.map (fun (phi, e) -> (freshConj ns phi, salt ns e)) x)
-  | EI                  -> EI
-  | EDir d              -> EDir d
-  | EAnd (a, b)         -> EAnd (salt ns a, salt ns b)
-  | EOr (a, b)          -> EOr (salt ns a, salt ns b)
-  | ENeg e              -> ENeg (salt ns e)
-
-let freshExp = salt Env.empty
-
-type decl =
-  | NotAnnotated of string * exp
-  | Annotated of string * exp * exp
-
-let freshDecl : decl -> decl = function
-  | Annotated (p, exp1, exp2) -> Annotated (p, freshExp exp1, freshExp exp2)
-  | NotAnnotated (p, exp) -> NotAnnotated (p, freshExp exp)
-
-let showDecl : decl -> string = function
-  | Annotated (p, exp1, exp2) -> Printf.sprintf "def %s : %s := %s" p (showExp exp1) (showExp exp2)
-  | NotAnnotated (p, exp) -> Printf.sprintf "def %s := %s" p (showExp exp)
-
-type line =
-  | Import of string
-  | Option of string * string
-  | Decl of decl
-
-type content = line list
-type file = string * content
-
-let showLine : line -> string = function
-  | Import p -> Printf.sprintf "import %s" p
-  | Option (opt, value) -> Printf.sprintf "option %s %s" opt value
-  | Decl d -> showDecl d
-
-let showContent x = String.concat "\n" (List.map showLine x)
-
-let showFile : file -> string = function
-  | (p, x) -> Printf.sprintf "module %s where\n%s" p (showContent x)
-
-type value =
-  | VLam   of value * clos
-  | VKan   of int
-  | VPi    of value * clos
-  | VSig   of value * clos
-  | VPair  of value * value
-  | VFst   of value
-  | VSnd   of value
-  | VApp   of value * value
-  | Var    of name * value
-  | VAxiom of string * value
-  | VHole
-  (* cubical part *)
-  | VPre        of int
-  | VId         of value
-  | VRef        of value
-  | VPLam       of value
-  | VJ          of value
-  | VPathP      of value
-  | VTransp     of value * value
-  | VAppFormula of value * value
-  | VPartial    of value
-  | VSystem     of system * ctx
-  | VI | VDir of dir
-  | VAnd of value * value
-  | VOr  of value * value
-  | VNeg of value
-and clos = name * exp * ctx
-and term =
-  | Exp   of exp
-  | Value of value
-and record = scope * term * term
-and ctx = record Env.t
-
-let isGlobal : record -> bool = function
-  | Global, _, _ -> false
-  | Local,  _, _ -> true
 
 let rec showValue : value -> string = function
   | VKan n -> "U" ^ showLevel n
@@ -249,15 +211,11 @@ and showTermBind : name * record -> string option = function
   | p, (Local, _, t) -> Some (Printf.sprintf "%s := %s" (showName p) (showTerm t))
   | _, _             -> None
 and isRhoVisible = Env.exists (fun _ -> isGlobal)
-and showRho ctx : string =
-  Env.bindings ctx |> List.filter_map showTermBind |> String.concat ", "
+and showRho ctx : string = Env.bindings ctx |> List.filter_map showTermBind |> String.concat ", "
 and showTele p x rho : string =
-  if isRhoVisible rho then
-    Printf.sprintf "(%s : %s, %s)" (showName p) (showValue x) (showRho rho)
+  if isRhoVisible rho then Printf.sprintf "(%s : %s, %s)" (showName p) (showValue x) (showRho rho)
   else Printf.sprintf "(%s : %s)" (showName p) (showValue x)
-and showTerm : term -> string = function
-  | Exp e   -> showExp e
-  | Value v -> showValue v
+and showTerm : term -> string = function | Exp e -> showExp e | Value v -> showValue v
 
 let showGamma (ctx : ctx) : string =
   Env.bindings ctx
@@ -267,14 +225,24 @@ let showGamma (ctx : ctx) : string =
         | _, _, _ -> None)
   |> String.concat "\n"
 
-let ezero = EDir Zero
-let eone  = EDir One
-
-let vzero = VDir Zero
-let vone  = VDir One
-
 type command =
   | Nope
   | Eval    of exp
   | Action  of string
   | Command of string * exp
+
+let freshDecl : decl -> decl = function
+  | Annotated (p, exp1, exp2) -> Annotated (p, freshExp exp1, freshExp exp2)
+  | NotAnnotated (p, exp) -> NotAnnotated (p, freshExp exp)
+
+let showDecl : decl -> string = function
+  | Annotated (p, exp1, exp2) -> Printf.sprintf "def %s : %s := %s" p (showExp exp1) (showExp exp2)
+  | NotAnnotated (p, exp) -> Printf.sprintf "def %s := %s" p (showExp exp)
+
+let showLine : line -> string = function
+  | Import p -> Printf.sprintf "import %s" p
+  | Option (opt, value) -> Printf.sprintf "option %s %s" opt value
+  | Decl d -> showDecl d
+
+let showContent x = String.concat "\n" (List.map showLine x)
+let showFile : file -> string = function | (p, x) -> Printf.sprintf "module %s where\n%s" p (showContent x)

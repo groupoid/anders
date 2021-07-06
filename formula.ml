@@ -32,7 +32,6 @@ let rec andFormula : value * value -> value = function
 
 let rec negFormula : value -> value = function
   | VDir d      -> VDir (negDir d)
-  | Var p       -> VNeg (Var p)
   | VNeg n      -> n
   | VAnd (f, g) -> orFormula (negFormula f, negFormula g)
   | VOr (f, g)  -> andFormula (negFormula f, negFormula g)
@@ -40,8 +39,8 @@ let rec negFormula : value -> value = function
 
 (* extAnd converts (α₁ ∧ ... ∧ αₙ) into set of names equipped with sign. *)
 let rec extAnd : value -> conjunction = function
-  | Var x                -> Conjunction.singleton (x, One)
-  | VNeg (Var x)         -> Conjunction.singleton (x, Zero)
+  | Var (x, _)           -> Conjunction.singleton (x, One)
+  | VNeg (Var (x, _))    -> Conjunction.singleton (x, Zero)
   | VAxiom (x, _)        -> Conjunction.singleton (name x, One)
   | VNeg (VAxiom (x, _)) -> Conjunction.singleton (name x, Zero)
   | VAnd (x, y)          -> Conjunction.union (extAnd x) (extAnd y)
@@ -105,11 +104,11 @@ let meets xs ys =
 let union xs ys = nubRev (List.append xs ys)
 let eps : face = Env.empty
 let singleton p x = Env.add p x Env.empty
-let faceEnv = Env.fold (fun p dir -> Env.add p (Local, VI, Value (VDir dir)))
+let faceEnv = Env.fold (fun p dir -> Env.add p (Local, Value VI, Value (VDir dir)))
 
 let rec solve k x = match k, x with
   | VDir y, _ -> if x = y then [eps] else []
-  | Var p, _  -> [singleton p x]
+  | Var (p, _), _ -> [singleton p x]
   | VNeg n, _ -> solve n (negDir x)
   | VOr (f, g), One  | VAnd (f, g), Zero -> union (solve f x) (solve g x)
   | VOr (f, g), Zero | VAnd (f, g), One  -> meets (solve f x) (solve g x)

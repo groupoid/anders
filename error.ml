@@ -4,10 +4,10 @@ open Expr
 exception Restart
 exception IncompatibleFaces
 exception InferError of exp
-exception ExpectedPath of exp
 exception ExpectedPi of value
 exception ExpectedESet of exp
 exception ExpectedSig of value
+exception ExpectedPath of value
 exception ExpectedVSet of value
 exception Parser of int * string
 exception UnknownOption of string
@@ -24,7 +24,7 @@ exception UnknownOptionValue of string * string
 let prettyPrintError : exn -> unit = function
   | ExpectedDir s -> Printf.printf "“%s” expected to be “%s” or “%s”" s !zeroPrim !onePrim
   | ExtractionError s -> Printf.printf "Error occured during extraction: %s\n" s
-  | ExpectedPath e -> Printf.printf "“%s” expected to be a path.\n" (showExp e)
+  | ExpectedPath e -> Printf.printf "“%s” expected to be a path.\n" (showValue e)
   | AlreadyDeclared p -> Printf.printf "“%s” is already declared.\n" p
   | TypeIneq (u, v) -> Printf.printf "Type mismatch:\n%s\n  =/=\n%s\n" (showValue u) (showValue v)
   | InferError e -> Printf.printf "Cannot infer type of\n  %s\n" (showExp e)

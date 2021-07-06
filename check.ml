@@ -14,13 +14,9 @@ let vsnd : value -> value = function
   | VPair (_, u) -> u
   | v            -> VSnd v
 
-let lookup (x : name) (ctx : ctx) = match Env.find_opt x ctx with
-  | Some (_, v, _) -> v
-  | None           -> raise (VariableNotFound x)
-
 let upVar p x ctx = match p with No -> ctx | _ -> Env.add p x ctx
-let upLocal (ctx : ctx) (p : name) t v : ctx = upVar p (Local, t, Value v) ctx
-let upGlobal (ctx : ctx) (p : name) t v : ctx = upVar p (Global, t, Value v) ctx
+let upLocal (ctx : ctx) (p : name) t v : ctx = upVar p (Local, Value t, Value v) ctx
+let upGlobal (ctx : ctx) (p : name) t v : ctx = upVar p (Global, Value t, Value v) ctx
 
 let ieq u v : bool = !girard || u = v
 
@@ -31,7 +27,7 @@ let rec eval (e : exp) (ctx : ctx) = traceEval e; match e with
   | ESig ((p, a), b)   -> VSig (eval a ctx, (p, b, ctx))
   | EFst e             -> vfst (eval e ctx)
   | ESnd e             -> vsnd (eval e ctx)
-  | EApp (f, x)        -> app ctx (eval f ctx, eval x ctx)
+  | EApp (f, x)        -> app (eval f ctx, eval x ctx)
   | EVar x             -> getRho ctx x
   | EPair (e1, e2)     -> VPair (eval e1 ctx, eval e2 ctx)
   | EHole              -> VHole
@@ -43,7 +39,7 @@ let rec eval (e : exp) (ctx : ctx) = traceEval e; match e with
   | ESystem x          -> VSystem (x, ctx)
   | EAppFormula (e, x) ->
     begin match eval e ctx with
-      | VPLam f -> app ctx (f, eval x ctx)
+      | VPLam f -> app (f, eval x ctx)
       | v       -> appFormulaNeut ctx v x
     end
   | ETransp (p, i)     -> transport ctx p i
@@ -60,17 +56,16 @@ and transport (ctx : ctx) (p : exp) (i : exp) = match eval i ctx with
   | VDir One -> let a = pat (name "a") in VLam (act p ezero ctx, (a, EVar a, ctx))
   | v -> VTransp (eval p ctx, v)
 
-and closByVal ctx1 t x v = let (p, e, ctx2) = x in traceClos e p v;
-  let ctx' = merge ctx2 ctx1 in eval e (upLocal ctx' p t v)
+and closByVal t x v = let (p, e, ctx) = x in traceClos e p v;
+  eval e (upLocal ctx p t v)
 
-and app ctx1 : value * value -> value = function
+and app : value * value -> value = function
   | VApp (VApp (VApp (VApp (VJ _, _), _), f), _), VRef v -> f
-  | VSystem (e, ctx2), VRef _ ->
-    let ctx' = merge ctx2 ctx1 in
+  | VSystem (e, ctx), VRef _ ->
     eval (snd (List.find (fun (x, _) ->
       Conjunction.for_all (fun (p, d) ->
-        conv ctx' (getRho ctx' p) (VDir d)) x) e)) ctx'
-  | VLam (t, f), v -> closByVal ctx1 t f v
+        conv ctx (getRho ctx p) (VDir d)) x) e)) ctx
+  | VLam (t, f), v -> closByVal t f v
   | f, x -> VApp (f, x)
 
 and getRho ctx x = match Env.find_opt x ctx with
@@ -78,17 +73,15 @@ and getRho ctx x = match Env.find_opt x ctx with
   | Some (_, _, Exp e)   -> eval e ctx
   | None                 -> raise (VariableNotFound x)
 
-and update ctx x = match getRho ctx x with Var y -> y | _ -> x
-
-and extPathP ctx e = match infer ctx e with
+and extPathP ctx v = match inferValue ctx v with
   | VApp (VApp (VPathP v, u0), u1) ->
     let i = pat (name "x") in let gen = EVar i in
-    let ctx' = upLocal ctx i VI (var i) in
-    (VLam (VI, (i, rbV ctx' (act (rbV ctx v) gen ctx'), ctx')), u0, u1)
-  | _ -> raise (ExpectedPath e)
+    let ctx' = upLocal ctx i VI (Var (i, VI)) in
+    (VLam (VI, (i, EAppFormula (rbV ctx v, gen), ctx')), u0, u1)
+  | _ -> raise (ExpectedPath v)
 
 and appFormulaNeut (ctx : ctx) (v : value) (e : exp) =
-  let (_, u0, u1) = extPathP ctx (rbV ctx v) in
+  let (_, u0, u1) = extPathP ctx v in
   begin match eval e ctx with
     | VDir Zero -> u0
     | VDir One  -> u1
@@ -103,7 +96,7 @@ and rbV ctx v : exp = traceRbV v; match v with
   | VSig (t, g)        -> rbVTele eSig ctx t g
   | VPre u             -> EPre u
   | VPLam f            -> EPLam (rbV ctx f)
-  | Var s              -> EVar s
+  | Var (x, _)         -> EVar x
   | VApp (f, x)        -> EApp (rbV ctx f, rbV ctx x)
   | VFst k             -> EFst (rbV ctx k)
   | VSnd k             -> ESnd (rbV ctx k)
@@ -111,8 +104,7 @@ and rbV ctx v : exp = traceRbV v; match v with
   | VAxiom (p, v)      -> EAxiom (p, rbV ctx v)
   | VPathP v           -> EPathP (rbV ctx v)
   | VPartial v         -> EPartial (rbV ctx v)
-  | VSystem (x, ctx')  -> ESystem (List.map (fun (y, v) ->
-    let ctx'' = merge ctx' ctx in (y, rbV ctx'' (eval v ctx''))) x)
+  | VSystem (x, ctx')  -> ESystem (List.map (fun (y, v) -> (y, rbV ctx' (eval v ctx'))) x)
   | VTransp (p, i)     -> ETransp (rbV ctx p, rbV ctx i)
   | VAppFormula (f, x) -> EAppFormula (rbV ctx f, rbV ctx x)
   | VId v              -> EId (rbV ctx v)
@@ -124,10 +116,15 @@ and rbV ctx v : exp = traceRbV v; match v with
   | VOr (u, v)         -> EOr (rbV ctx u, rbV ctx v)
   | VNeg u             -> ENeg (rbV ctx u)
 
+and lookup (x : name) (ctx : ctx) = match Env.find_opt x ctx with
+  | Some (_, Value v, _) -> v
+  | Some (_, Exp e, _)   -> eval e ctx
+  | None                 -> raise (VariableNotFound x)
+
 and rbVTele ctor ctx t g =
-  let (p, _, _) = g in let n = pat p in let gen = var n in
-  let ctx' = upLocal ctx n t gen in
-  ctor (n, rbV ctx t) (rbV ctx' (closByVal ctx' t g gen))
+  let (p, _, _) = g in let x = Var (p, t) in
+  let ctx' = upLocal ctx p t x in
+  ctor (p, rbV ctx t) (rbV ctx' (closByVal t g x))
 
 and prune ctx x =
   match Env.find_opt x ctx with
@@ -158,7 +155,8 @@ and weak (e : exp) ctx = traceWeak e; match e with
   | e                  -> e
 
 and weakTele ctor ctx p a b : exp =
-  let t = weak a ctx in ctor (p, t) (weak b (upLocal ctx p (eval t ctx) (var p)))
+  let t = weak a ctx in ctor (p, t)
+    (weak b (upVar p (Local, Exp t, Exp (EVar p)) ctx))
 
 and conv ctx v1 v2 : bool = traceConv v1 v2;
   v1 == v2 || begin match v1, v2 with
@@ -166,24 +164,25 @@ and conv ctx v1 v2 : bool = traceConv v1 v2;
     | VPair (a, b), VPair (c, d) -> conv ctx a c && conv ctx b d
     | VPair (a, b), v | v, VPair (a, b) -> conv ctx (vfst v) a && conv ctx (vsnd v) b
     | VPi (a, g), VPi (b, h) | VSig (a, g), VSig (b, h)
-    | VLam (a, g), VLam (b, h) -> let (p, e1, ctx1) = g in let (q, e2, ctx2) = h in
-      let n = pat p in let v = var n in let ctx' = upLocal ctx n a v in
+    | VLam (a, g), VLam (b, h) ->
+      let (p, e1, ctx1) = g in let (q, e2, ctx2) = h in
       conv ctx a b &&
-        (weak e1 (upLocal (merge ctx' ctx1) p a v) =
-         weak e2 (upLocal (merge ctx' ctx2) q a v) ||
-         conv ctx' (closByVal ctx' a g v) (closByVal ctx' a h v))
-    | VLam (a, (p, o, v)), b | b, VLam (a, (p, o, v)) ->
-      let n = pat p in let gen = var n in let ctx' = upLocal ctx n a gen in
-      conv ctx' (app ctx' (b, gen)) (closByVal ctx' a (p, o, v) gen)
+        (weak e1 (upLocal ctx1 p a (Var (p, a))) =
+         weak e2 (upLocal ctx2 q b (Var (q, b))) ||
+         let x = Var (p, a) in let ctx' = upLocal ctx p a x in
+          conv ctx' (closByVal a g x) (closByVal a h x))
+    | VLam (a, (p, e, v)), b | b, VLam (a, (p, e, v)) ->
+      let x = Var (p, a) in let ctx' = upLocal ctx p a x in
+      conv ctx' (app (b, x)) (closByVal a (p, e, v) x)
     | VPre u, VPre v -> ieq u v
     | VPLam f, VPLam g -> conv ctx f g
     | VPLam f, v | v, VPLam f -> let p = pat (name "x") in
-      let i = var p in let ctx' = upLocal ctx p VI i in
-      conv ctx' (eval (EAppFormula (rbV ctx' v, EVar p)) ctx') (app ctx' (f, i))
-    | Var u, Var v -> u = v
+      let i = Var (p, VI) in let ctx' = upLocal ctx p VI i in
+      conv ctx' (act (rbV ctx' v) (EVar p) ctx') (app (f, i))
+    | Var (u, _), Var (v, _) -> u = v
     | VApp (f, a), VApp (g, b) -> conv ctx f g && conv ctx a b
     | VFst x, VFst y | VSnd x, VSnd y -> conv ctx x y
-    | VAxiom (p, x), VAxiom (q, y) -> p = q && conv ctx x y
+    | VAxiom (p, x), VAxiom (q, y) -> p = q
     | VPathP a, VPathP b -> conv ctx a b
     | VPartial a, VPartial b -> conv ctx a b
     | VAppFormula (f, x), VAppFormula (g, y) -> conv ctx f g && conv ctx x y
@@ -200,7 +199,7 @@ and conv ctx v1 v2 : bool = traceConv v1 v2;
 
 and convId ctx v1 v2 =
   (* Id A a b is proof-irrelevant *)
-  match infer ctx (rbV ctx v1), infer ctx (rbV ctx v2) with
+  match inferValue ctx v1, inferValue ctx v2 with
   | VApp (VApp (VId t1, a1), b1), VApp (VApp (VId t2, a2), b2) ->
     conv ctx t1 t2 && conv ctx a1 a2 && conv ctx b1 b2
   | _, _ -> false
@@ -210,19 +209,18 @@ and eqNf ctx v1 v2 : unit = traceEqNF v1 v2;
 
 and check ctx (e0 : exp) (t0 : value) =
   traceCheck e0 t0; match e0, t0 with
-  | ELam ((p, a), e), VPi (t, g) -> eqNf ctx (eval a ctx) t;
-    let n = pat p in let gen = var n in
-    let ctx' = upLocal (upLocal ctx p t gen) n t gen in
-    check ctx' e (closByVal ctx' t g gen)
+  | ELam ((p, a), e), VPi (t, g) ->
+    eqNf ctx (eval a ctx) t;
+    let x = Var (p, t) in let ctx' = upLocal ctx p t x in
+    check ctx' e (closByVal t g x)
   | EPair (e1, e2), VSig (t, g) -> check ctx e1 t;
-    check ctx e2 (closByVal ctx t g (eval e1 ctx))
+    check ctx e2 (closByVal t g (eval e1 ctx))
   | EHole, v -> traceHole v ctx
-  | EAxiom (_, u), v -> eqNf ctx (eval u ctx) v
   | e, VApp (VApp (VPathP p, u0), u1) ->
     let v0 = act e ezero ctx in
     let v1 = act e eone  ctx in
     let i = pat (name "x") in let gen = EVar i in
-    let ctx' = upLocal ctx i VI (var i) in
+    let ctx' = upLocal ctx i VI (Var (i, VI)) in
     check ctx' (rbV ctx' (act e gen ctx')) (act (rbV ctx p) gen ctx');
     eqNf ctx v0 u0; eqNf ctx v1 u1
   | e, VPre u -> begin
@@ -245,17 +243,16 @@ and infer ctx e : value = traceInfer e; match e with
   | ESig (t, e) -> inferTele ctx imax t e
   | EPi (t, e) -> inferTele ctx univImpl t e
   | ELam ((p, a), e) ->
-    let n = pat p in let gen = var n in let t = eval a ctx in
-    let ctx' = upLocal (upLocal ctx p t gen) n t gen in
-    VPi (t, (n, rbV ctx' (infer ctx' e), ctx))
-  | EApp (f, x) -> let (t, g) = extPiG ctx (infer ctx f) in check ctx x t; closByVal ctx t g (eval x ctx)
+    let t = eval a ctx in let x = Var (p, t) in
+    let ctx' = upLocal ctx p t x in VPi (t, (p, rbV ctx' (infer ctx' e), ctx))
+  | EApp (f, x) -> let (t, g) = extPiG ctx (infer ctx f) in check ctx x t; closByVal t g (eval x ctx)
   | EFst e -> fst (extSigG (infer ctx e))
-  | ESnd e -> let (t, g) = extSigG (infer ctx e) in closByVal ctx t g (vfst (eval e ctx))
+  | ESnd e -> let (t, g) = extSigG (infer ctx e) in closByVal t g (vfst (eval e ctx))
   | EAxiom (_, e) -> eval e ctx
   | EPre u -> VPre (u + 1)
   | EPathP p -> inferPath ctx p
   | EPartial e -> let n = extSet (infer ctx e) in implv VI (EPre n) ctx
-  | EAppFormula (f, x) -> check ctx x VI; let (p, _, _) = extPathP ctx f in app ctx (p, eval x ctx)
+  | EAppFormula (f, x) -> check ctx x VI; let (p, _, _) = extPathP ctx (eval f ctx) in app (p, eval x ctx)
   | ETransp (p, i) -> inferTransport ctx p i
   | EI -> VPre 0 | EDir _ -> VI
   | ENeg e -> check ctx e VI; VI
@@ -269,11 +266,19 @@ and infer ctx e : value = traceInfer e; match e with
             (EPi ((y, e), EPi ((p, id), EApp (EApp (EApp (EVar pi, EVar x), EVar y), EVar p))))), ctx))
   | e -> raise (InferError e)
 
+and inferValue ctx = function
+  | Var (_, t)  -> t
+  | VFst e      -> fst (extSigG (inferValue ctx e))
+  | VSnd e      -> let (t, g) = extSigG (inferValue ctx e) in closByVal t g (VFst e)
+  | VApp (f, x) -> let (t, g) = extPiG ctx (inferValue ctx f) in closByVal t g x
+  | VAppFormula (f, x) -> let (p, _, _) = extPathP ctx f in app (p, x)
+  | v           -> infer ctx (rbV ctx v)
+
 and inferPath (ctx : ctx) (p : exp) =
   let v0 = act p ezero ctx in
   let v1 = act p eone  ctx in
-  let t0 = infer ctx (rbV ctx v0) in
-  let t1 = infer ctx (rbV ctx v1) in
+  let t0 = inferValue ctx v0 in
+  let t1 = inferValue ctx v1 in
   begin match t0, t1 with
     | VKan u, VKan v ->
       if ieq u v then implv v0 (impl (rbV ctx v1) (EKan u)) ctx
@@ -286,8 +291,8 @@ and inferTransport (ctx : ctx) (p : exp) (i : exp) =
   let u0 = act p ezero ctx in
   let u1 = act p eone  ctx in
   let x = pat (name "x") in let gen = EVar x in
-  let ctx' = upLocal ctx x VI (var x) in
-  begin match infer ctx' (rbV ctx' (act p gen ctx')) with
+  let ctx' = upLocal ctx x VI (Var (x, VI)) in
+  begin match inferValue ctx' (act p gen ctx') with
     | VKan _ -> ()
     | v      -> raise (ExpectedFibrant v)
   end;
@@ -298,8 +303,8 @@ and inferTransport (ctx : ctx) (p : exp) (i : exp) =
   implv u0 (rbV ctx u1) ctx
 
 and inferTele ctx binop (p, a) b =
-  let t = eval a ctx in let n = pat p in let gen = var n in
-  let ctx' = upLocal (upLocal ctx p t gen) n t gen in
+  let t = eval a ctx in let x = Var (p, t) in
+  let ctx' = upLocal ctx p t x in
   let v = infer ctx' b in binop (infer ctx a) v
 
 and act e i ctx = eval (EAppFormula (e, i)) ctx

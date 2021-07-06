@@ -7,11 +7,6 @@ module impredicative where
 option girard true
 import experiments/path
 
-def ⚬ (A B C: U) : U := (B -> C) -> (A -> B) -> (A -> C)
-def ∘ (A B C : U) : ⚬ A B C := \ (g: B -> C) (f: A -> B) (x: A), g (f x)
-def isSet (A : U) : U := Π (a b : A) (a0 b0 : PathP (<i> A) a b), PathP (<i> PathP (<i> A) a b) a0 b0
-def isProp (A : U) : U := Π (a b : A), PathP (<i> A) a b
-
 def naturality (X Y: U) (f : X -> Y) (a : X -> X) (b : Y -> Y) : U := Path (X -> Y) (∘ X X Y f a) (∘ X Y Y b f)
 def 𝟙' : U := Π (X : U), isSet X -> X -> X
 def is-𝟙 (one: 𝟙') : U := Π (X Y: U) (x: isSet X) (y: isSet Y) (f: X -> Y), naturality X Y f (one X x) (one Y y)

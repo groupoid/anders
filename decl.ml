@@ -28,10 +28,10 @@ let checkDecl ctx d : ctx =
   | Annotated (p, a, e) ->
     let set = infer ctx a in let t = eval a ctx in
     if not (isSet set) then raise (ExpectedVSet set) else ();
-    let v = name p in check (upGlobal ctx v t (var v)) e t;
-    Env.add (name p) (Global, t, getTerm e ctx) ctx
+    let v = name p in check (upGlobal ctx v t (Var (v, t))) e t;
+    Env.add (name p) (Global, Value t, getTerm e ctx) ctx
   | NotAnnotated (p, e) ->
-    Env.add (name p) (Global, infer ctx e, getTerm e ctx) ctx
+    Env.add (name p) (Global, Value (infer ctx e), getTerm e ctx) ctx
 
 let getBoolVal opt = function
   | "tt" | "true"  -> true
@@ -43,7 +43,7 @@ let rec checkLine st : line -> state =
   | Decl d ->
     let name = getDeclName d in
     Printf.printf "Checking: %s\n" name; flush_all ();
-    (checkDecl ctx d, checked)
+    (checkDecl ctx (freshDecl d), checked)
   | Option (opt, value) ->
     begin match opt with
       | "girard"   -> girard  := getBoolVal opt value

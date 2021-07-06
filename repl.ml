@@ -18,7 +18,7 @@ let checkAndEval ctx e : value * value =
   (Check.infer ctx e, Check.eval e ctx)
 
 let main ctx : command -> unit = function
-  | Eval e -> let (t, v) = checkAndEval ctx e in
+  | Eval e -> let (t, v) = checkAndEval ctx (freshExp e) in
     Printf.printf "TYPE: %s\nEVAL: %s\n" (showValue t) (showValue v)
   | Command ("n", e) -> let (t0, v0) = checkAndEval ctx e in
     let t = Check.rbV ctx t0 in let v = Check.rbV ctx v0 in
@@ -38,7 +38,7 @@ let repl () =
     print_string "> ";
     let line = read_line () in
     handleErrors (fun x ->
-      let exp = Lexparse.parseErr Parser.repl
+      let cmd = Lexparse.parseErr Parser.repl
                   (Lexing.from_string x) in
-      main ctx exp) line ()
+      main ctx cmd) line ()
   done with End_of_file -> ()

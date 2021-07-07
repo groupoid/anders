@@ -49,7 +49,12 @@ let rec eval (e : exp) (ctx : ctx) = traceEval e; match e with
 
 and appFormula (ctx : ctx) (e : exp) (x : exp) = match eval e ctx with
   | VPLam f -> app (f, eval x ctx)
-  | v       -> appFormulaNeut ctx v x
+  | v       -> let (_, u0, u1) = extPathP ctx v in
+    begin match eval x ctx with
+      | VDir Zero -> u0
+      | VDir One  -> u1
+      | u         -> VAppFormula (v, u)
+    end
 
 and transport (ctx : ctx) (p : exp) (i : exp) = match eval i ctx with
   | VDir One -> let a = pat (name "a") in VLam (act p ezero ctx, (a, EVar a, ctx))
@@ -78,14 +83,6 @@ and extPathP ctx v = match inferValue ctx v with
     let ctx' = upLocal ctx i VI (Var (i, VI)) in
     (VLam (VI, (i, EAppFormula (rbV ctx v, gen), ctx')), u0, u1)
   | _ -> raise (ExpectedPath v)
-
-and appFormulaNeut (ctx : ctx) (v : value) (e : exp) =
-  let (_, u0, u1) = extPathP ctx v in
-  begin match eval e ctx with
-    | VDir Zero -> u0
-    | VDir One  -> u1
-    | u         -> VAppFormula (v, u)
-  end
 
 and rbV ctx v : exp = traceRbV v; match v with
   | VLam (t, g)        -> rbVTele eLam ctx t g

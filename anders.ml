@@ -21,8 +21,10 @@ let help =
            | parse filename      | help
            | cubicaltt filename  | girard
            | prim primitive name | trace
+           | repl
  primitive = zero | one | interval"
 
+let repl = ref false
 let cmd : cmdline -> unit = function
   | Check     filename -> Repl.check filename
   | Lex       filename -> Lexparse.lex filename
@@ -35,13 +37,9 @@ let cmd : cmdline -> unit = function
     | _ -> raise (UnknownPrimitive prim)
   end
   | Help -> print_endline help
-  | Repl -> Repl.repl ()
+  | Repl -> repl := true
   | Trace -> Prefs.trace := true
   | Girard -> girard := true
-
-let needRepl : cmdline -> bool = function
-  | Check _ -> true
-  | _       -> false
 
 let rec parseArgs : string list -> cmdline list = function
   | [] -> []
@@ -50,20 +48,19 @@ let rec parseArgs : string list -> cmdline list = function
   | "lex"       :: filename :: rest -> Lex       filename :: parseArgs rest
   | "parse"     :: filename :: rest -> Parse     filename :: parseArgs rest
   | "cubicaltt" :: filename :: rest -> Cubicaltt filename :: parseArgs rest
-  | "help"      :: rest             -> Help :: parseArgs rest
-  | "trace"     :: rest             -> Trace :: parseArgs rest
+  | "help"      :: rest             -> Help   :: parseArgs rest
+  | "trace"     :: rest             -> Trace  :: parseArgs rest
   | "girard"    :: rest             -> Girard :: parseArgs rest
-  | x :: xs ->
-    Printf.printf "Unknown command “%s”\n" x;
-    parseArgs xs
+  | "repl"      :: rest             -> Repl   :: parseArgs rest
+  | x :: xs -> Printf.printf "Unknown command “%s”\n" x; parseArgs xs
 
-let defaults : cmdline list -> cmdline list = function
+let defaults = function
   | [] -> [Help]
-  | xs when List.exists needRepl xs -> xs @ [Repl]
   | xs -> xs
 
 let rec main () =
-  try Array.to_list Sys.argv |> List.tl |> parseArgs |> defaults |> List.iter cmd
+  try Array.to_list Sys.argv |> List.tl |> parseArgs |> defaults |> List.iter cmd;
+    if !repl then Repl.repl () else ()
   with Restart -> main ()
 
 let () = print_endline banner; main ()

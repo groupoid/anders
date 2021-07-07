@@ -267,12 +267,13 @@ and inferJ ctx e =
           (EPi ((y, e), EPi ((p, id), EApp (EApp (EApp (EVar pi, EVar x), EVar y), EVar p))))), ctx))
 
 and inferValue ctx = function
-  | Var (_, t)  -> t
-  | VFst e      -> fst (extSigG (inferValue ctx e))
-  | VSnd e      -> let (t, g) = extSigG (inferValue ctx e) in closByVal t g (VFst e)
-  | VApp (f, x) -> let (t, g) = extPiG ctx (inferValue ctx f) in closByVal t g x
+  | Var (_, t)         -> t
+  | VFst e             -> fst (extSigG (inferValue ctx e))
+  | VSnd e             -> let (t, g) = extSigG (inferValue ctx e) in closByVal t g (VFst e)
+  | VApp (f, x)        -> let (t, g) = extPiG ctx (inferValue ctx f) in closByVal t g x
   | VAppFormula (f, x) -> let (p, _, _) = extPathP ctx f in app (p, x)
-  | v           -> infer ctx (rbV ctx v)
+  | VRef v             -> VApp (VApp (VId (inferValue ctx v), v), v)
+  | v                  -> infer ctx (rbV ctx v)
 
 and inferPath (ctx : ctx) (p : exp) =
   let v0 = act p ezero ctx in

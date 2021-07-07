@@ -14,7 +14,7 @@ license: "ISC"
 depends: [
   "dune" {>= "2.0"}
   "ocaml" {>= "4.10"}
-  "menhir" {>= "20200123" & != "20210419"}
+  "menhir" {>= "20200123"}
 ]
 build: [
   ["dune" "build" "-p" name "-j" jobs]

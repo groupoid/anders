@@ -97,7 +97,9 @@ def φ-1 : PathP (<_> U₁) (φ 1 1=1) (U → U) := <_> U → U
 def ψ (i j : I) : Partial U₁ (-i ∨ i ∨ (i ∧ j)) :=
 [ (i = 1) → U, (i = 1) (j = 1) → U, (i = 0) → U → U ]
 
-def ε : Partial U 0 := []
+def ε (A : U) : Partial A 0 := []
+-- “0 = 1” implies that every type is inhabited
+def I-nontriv (p : Id I 0 1) (A : U) : A := ε A (rev I 0 1 p)
 
 def Partial-app (A : U) (i : I) (u : Partial A i) (p : one? i) : A := u p
 

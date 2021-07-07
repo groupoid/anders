@@ -41,8 +41,6 @@ let rec negFormula : value -> value = function
 let rec extAnd : value -> conjunction = function
   | Var (x, _)           -> Conjunction.singleton (x, One)
   | VNeg (Var (x, _))    -> Conjunction.singleton (x, Zero)
-  | VAxiom (x, _)        -> Conjunction.singleton (name x, One)
-  | VNeg (VAxiom (x, _)) -> Conjunction.singleton (name x, Zero)
   | VAnd (x, y)          -> Conjunction.union (extAnd x) (extAnd y)
   | v -> failwith (Printf.sprintf "“%s” expected to be conjunction (should never happen)" (showValue v))
 

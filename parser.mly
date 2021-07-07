@@ -77,4 +77,4 @@ exp3:
 declarations:
   | DEF IDENT params DEFEQ exp1 { NotAnnotated ($2, telescope eLam $5 $3) }
   | DEF IDENT params COLON exp1 DEFEQ exp1 { Annotated ($2, telescope ePi $5 $3, telescope eLam $7 $3) }
-  | AXIOM IDENT params COLON exp1 { Annotated ($2, telescope ePi $5 $3, EAxiom ($2, telescope ePi $5 $3)) }
+  | AXIOM IDENT params COLON exp1 { Axiom ($2, telescope ePi $5 $3) }

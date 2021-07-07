@@ -36,11 +36,11 @@ let rec extractExp : exp -> string = function
   | EApp (f, x) -> Printf.sprintf "(%s %s)" (extractExp f) (extractExp x)
   | EVar p -> showName p
   | EHole -> "?"
-  | EAxiom _ -> "undefined"
 and extractTele p x = Printf.sprintf "(%s : %s)" (showName p) (extractExp x)
 
 let extractDecl : decl -> string = function
   | Annotated (p, t, e) -> Printf.sprintf "%s : %s = %s" p (extractExp t) (extractExp e)
+  | Axiom (p, t) -> Printf.sprintf "%s : %s = undefined" p (extractExp t)
   | NotAnnotated _ -> fail "cubicaltt does not support automatic type inference of declaration"
 
 let extractLine : line -> string = function

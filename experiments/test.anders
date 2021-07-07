@@ -1,6 +1,9 @@
 module test where
 
 def id (A : U) (a : A) : A := a
+def idfun : Π (A′ : U), A′ → A′ :=
+λ (A : U) (a : A), a
+
 def sigmaIntro (A : U) (B : A -> U) (x : A) (u : B (id A x)) : Σ (x : A), B x := (x, u)
 def sigmaProj₂ : Π (A : U) (B : A -> U) (z : Σ (x : A), B x), B z.1 := λ (A : U) (B : A -> U) (z : Σ (x : A), B x), z.2
 def const (A : U) (B : U) (a : A) (b : B) : A := a

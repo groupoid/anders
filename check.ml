@@ -30,7 +30,6 @@ let rec eval (e : exp) (ctx : ctx) = traceEval e; match e with
   | EVar x             -> getRho ctx x
   | EPair (e1, e2)     -> VPair (eval e1 ctx, eval e2 ctx)
   | EHole              -> VHole
-  | EAxiom (p, e)      -> VAxiom (p, eval e ctx)
   | EPre u             -> VPre u
   | EPathP e           -> VPathP (eval e ctx)
   | EPLam e            -> VPLam (eval e ctx)
@@ -97,7 +96,6 @@ and rbV ctx v : exp = traceRbV v; match v with
   | VFst k             -> EFst (rbV ctx k)
   | VSnd k             -> ESnd (rbV ctx k)
   | VHole              -> EHole
-  | VAxiom (p, v)      -> EAxiom (p, rbV ctx v)
   | VPathP v           -> EPathP (rbV ctx v)
   | VPartial v         -> EPartial (rbV ctx v)
   | VSystem (x, ctx')  -> ESystem (List.map (fun (y, v) -> (y, rbV ctx' (eval v ctx'))) x)
@@ -136,7 +134,6 @@ and weak (e : exp) ctx = traceWeak e; match e with
   | ESnd e             -> ESnd (weak e ctx)
   | EApp (f, x)        -> EApp (weak f ctx, weak x ctx)
   | EPair (e1, e2)     -> EPair (weak e1 ctx, weak e2 ctx)
-  | EAxiom (p, e)      -> EAxiom (p, weak e ctx)
   | EPathP u           -> EPathP (weak u ctx)
   | EPLam u            -> EPLam (weak u ctx)
   | EPartial e         -> EPartial (weak e ctx)
@@ -177,7 +174,6 @@ and conv ctx v1 v2 : bool = traceConv v1 v2;
     | Var (u, _), Var (v, _) -> u = v
     | VApp (f, a), VApp (g, b) -> conv ctx f g && conv ctx a b
     | VFst x, VFst y | VSnd x, VSnd y -> conv ctx x y
-    | VAxiom (p, x), VAxiom (q, y) -> p = q
     | VPathP a, VPathP b -> conv ctx a b
     | VPartial a, VPartial b -> conv ctx a b
     | VAppFormula (f, x), VAppFormula (g, y) -> conv ctx f g && conv ctx x y
@@ -241,7 +237,6 @@ and infer ctx e : value = traceInfer e; match e with
   | EApp (f, x) -> let (t, g) = extPiG ctx (infer ctx f) in check ctx x t; closByVal t g (eval x ctx)
   | EFst e -> fst (extSigG (infer ctx e))
   | ESnd e -> let (t, g) = extSigG (infer ctx e) in closByVal t g (vfst (eval e ctx))
-  | EAxiom (_, e) -> eval e ctx
   | EPre u -> VPre (u + 1)
   | EPathP p -> inferPath ctx p
   | EPartial e -> let n = extSet (infer ctx e) in implv VI (EPre n) ctx

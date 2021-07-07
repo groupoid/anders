@@ -16,8 +16,7 @@ let rec listLast : 'a list -> 'a = function
   | x :: xs -> listLast xs
 
 let getDeclName : decl -> string = function
-  | Annotated (p, _, _)
-  | NotAnnotated (p, _) -> p
+  | Annotated (p, _, _) | Axiom (p, _) | NotAnnotated (p, _) -> p
 
 let getTerm e ctx = if !preeval then Value (eval e ctx) else Exp e
 
@@ -26,12 +25,15 @@ let checkDecl ctx d : ctx =
     raise (AlreadyDeclared x);
   match d with
   | Annotated (p, a, e) ->
-    let set = infer ctx a in let t = eval a ctx in
-    if not (isSet set) then raise (ExpectedVSet set) else ();
-    let v = name p in check (upGlobal ctx v t (Var (v, t))) e t;
+    ignore (extSet (infer ctx a));
+    let t = eval a ctx in let v = name p in
+    check (upGlobal ctx v t (Var (v, t))) e t;
     Env.add (name p) (Global, Value t, getTerm e ctx) ctx
   | NotAnnotated (p, e) ->
     Env.add (name p) (Global, Value (infer ctx e), getTerm e ctx) ctx
+  | Axiom (p, a) ->
+    ignore (extSet (infer ctx a)); let x = name p in
+    let t = eval a ctx in Env.add x (Global, Value t, Value (Var (x, t))) ctx
 
 let getBoolVal opt = function
   | "tt" | "true"  -> true

@@ -12,7 +12,6 @@ type exp =
   | ESnd   of exp
   | EApp   of exp * exp
   | EVar   of name
-  | EAxiom of string * exp
   | EHole
   (* cubical part *)
   | EPre        of int
@@ -37,6 +36,7 @@ type tele = name * exp
 type decl =
   | NotAnnotated of string * exp
   | Annotated of string * exp * exp
+  | Axiom of string * exp
 
 type line =
   | Import of string
@@ -57,7 +57,6 @@ type value =
   | VSnd   of value
   | VApp   of value * value
   | Var    of name * value
-  | VAxiom of string * value
   | VHole
   (* cubical part *)
   | VPre        of int
@@ -121,7 +120,6 @@ let rec salt (ns : name Env.t) : exp -> exp = function
   | ESnd e              -> ESnd (salt ns e)
   | EApp (f, x)         -> EApp (salt ns f, salt ns x)
   | EVar x              -> EVar (fresh ns x)
-  | EAxiom (p, e)       -> EAxiom (p, salt ns e)
   | EHole               -> EHole
   | EPre n              -> EPre n
   | EId e               -> EId (salt ns e)
@@ -145,6 +143,7 @@ let freshExp = salt Env.empty
 let freshDecl : decl -> decl = function
   | Annotated (p, exp1, exp2) -> Annotated (p, freshExp exp1, freshExp exp2)
   | NotAnnotated (p, exp) -> NotAnnotated (p, freshExp exp)
+  | Axiom (p, exp) -> Axiom (p, freshExp exp)
 
 let rec showLevel x =
   if x < 0 then failwith "showLevel: expected positive integer"
@@ -171,7 +170,6 @@ let rec showExp : exp -> string = function
   | EApp (f, x) -> Printf.sprintf "(%s %s)" (showExp f) (showExp x)
   | EVar p -> showName p
   | EHole -> "?"
-  | EAxiom (p, _) -> p
   | EPre n -> "V" ^ showLevel n
   | EPathP e -> "PathP " ^ showExp e
   | EId e -> Printf.sprintf "Id %s" (showExp e)
@@ -203,7 +201,6 @@ let rec showValue : value -> string = function
   | VApp (f, x) -> Printf.sprintf "(%s %s)" (showValue f) (showValue x)
   | Var (p, _) -> showName p
   | VHole -> "?"
-  | VAxiom (p, _) -> p
   | VPre n -> "V" ^ showLevel n
   | VPathP v -> "PathP " ^ showValue v
   | VId v -> Printf.sprintf "Id %s" (showValue v)
@@ -249,6 +246,7 @@ type command =
 let showDecl : decl -> string = function
   | Annotated (p, exp1, exp2) -> Printf.sprintf "def %s : %s := %s" p (showExp exp1) (showExp exp2)
   | NotAnnotated (p, exp) -> Printf.sprintf "def %s := %s" p (showExp exp)
+  | Axiom (p, exp) -> Printf.sprintf "axiom %s : %s" p (showExp exp)
 
 let showLine : line -> string = function
   | Import p -> Printf.sprintf "import %s" p

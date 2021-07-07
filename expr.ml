@@ -83,22 +83,29 @@ and ctx = record Env.t
 let eLam x y = ELam (x, y)
 let ePi  x y = EPi  (x, y)
 let eSig x y = ESig (x, y)
+
 let ezero = EDir Zero
 let eone  = EDir One
 let vzero = VDir Zero
 let vone  = VDir One
+
 let name x = Name (x, 0)
 let decl x = EVar (name x)
-let isGlobal : record -> bool = function | Global, _, _ -> false | Local,  _, _ -> true
-let fresh ns n = match Env.find_opt n ns with | Some x -> x | None -> n
+
+let isGlobal : record -> bool = function Global, _, _ -> false | Local, _, _ -> true
+
+let fresh ns n = match Env.find_opt n ns with Some x -> x | None -> n
 let freshConj ns = Conjunction.map (fun (p, d) -> (fresh ns p, d))
-let rec telescope (f : tele -> exp -> exp) (e : exp) : tele list -> exp = function | [] -> e | x :: xs -> f x (telescope f e xs)
-let impl a b = EPi ((No, a), b)
-let rec pLam e : name list -> exp = function | [] -> e | x :: xs -> EPLam (ELam ((x, EI), pLam e xs))
+
+let telescope (f : tele -> exp -> exp) (e : exp) (xs : tele list) : exp = List.fold_right f xs e
+let rec pLam e : name list -> exp = function [] -> e | x :: xs -> EPLam (ELam ((x, EI), pLam e xs))
+
 let getDigit x = Char.chr (x + 0x80) |> Printf.sprintf "\xE2\x82%c"
 let getVar x =
   let xs = [(!zeroPrim, EDir Zero); (!onePrim, EDir One); (!intervalPrim, EI)] in
-  match List.assoc_opt x xs with | Some e -> e | None -> decl x
+  match List.assoc_opt x xs with Some e -> e | None -> decl x
+
+let impl a b = EPi ((No, a), b)
 
 let rec salt (ns : name Env.t) : exp -> exp = function
   | ELam ((p, a), b)    -> let x = pat p in ELam ((x, salt ns a), salt (Env.add p x ns) b)
@@ -128,6 +135,11 @@ let rec salt (ns : name Env.t) : exp -> exp = function
   | EOr (a, b)          -> EOr (salt ns a, salt ns b)
   | ENeg e              -> ENeg (salt ns e)
 
+let freshExp = salt Env.empty
+let freshDecl : decl -> decl = function
+  | Annotated (p, exp1, exp2) -> Annotated (p, freshExp exp1, freshExp exp2)
+  | NotAnnotated (p, exp) -> NotAnnotated (p, freshExp exp)
+
 let rec showLevel x =
   if x < 0 then failwith "showLevel: expected positive integer"
   else if x = 0 then "" else showLevel (x / 10) ^ getDigit (x mod 10)
@@ -135,7 +147,6 @@ let rec showLevel x =
 let showDir : dir -> string = function | Zero -> !zeroPrim | One -> !onePrim
 let showAtom (p, d) = Printf.sprintf "(%s = %s)" (showName p) (showDir d)
 let showConjunction xs = Conjunction.elements xs |> List.map showAtom |> String.concat " "
-let freshExp = salt Env.empty
 let showSystem xs show =
   List.map (fun (x, e) -> Printf.sprintf "%s -> %s" (showConjunction x) (show e)) xs
   |> String.concat ", " |> fun x -> "[" ^ x ^ "]"
@@ -230,10 +241,6 @@ type command =
   | Eval    of exp
   | Action  of string
   | Command of string * exp
-
-let freshDecl : decl -> decl = function
-  | Annotated (p, exp1, exp2) -> Annotated (p, freshExp exp1, freshExp exp2)
-  | NotAnnotated (p, exp) -> NotAnnotated (p, freshExp exp)
 
 let showDecl : decl -> string = function
   | Annotated (p, exp1, exp2) -> Printf.sprintf "def %s : %s := %s" p (showExp exp1) (showExp exp2)

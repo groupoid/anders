@@ -21,9 +21,9 @@ let ieq u v : bool = !girard || u = v
 
 let rec eval (e : exp) (ctx : ctx) = traceEval e; match e with
   | EKan u             -> VKan u
-  | ELam ((p, a), b)   -> VLam (eval a ctx, (p, b, ctx))
-  | EPi  ((p, a), b)   -> VPi  (eval a ctx, (p, b, ctx))
-  | ESig ((p, a), b)   -> VSig (eval a ctx, (p, b, ctx))
+  | ELam (a, (p, b))   -> VLam (eval a ctx, (p, b, ctx))
+  | EPi  (a, (p, b))   -> VPi  (eval a ctx, (p, b, ctx))
+  | ESig (a, (p, b))   -> VSig (eval a ctx, (p, b, ctx))
   | EFst e             -> vfst (eval e ctx)
   | ESnd e             -> vsnd (eval e ctx)
   | EApp (f, x)        -> app (eval f ctx, eval x ctx)
@@ -120,7 +120,7 @@ and lookup (x : name) (ctx : ctx) = match Env.find_opt x ctx with
 and rbVTele ctor ctx t g =
   let (p, _, _) = g in let x = Var (p, t) in
   let ctx' = upLocal ctx p t x in
-  ctor (p, rbV ctx t) (rbV ctx' (closByVal t g x))
+  ctor p (rbV ctx t) (rbV ctx' (closByVal t g x))
 
 and prune ctx x = match Env.find_opt x ctx with
   | Some (_, _, Exp e)   -> e
@@ -129,9 +129,9 @@ and prune ctx x = match Env.find_opt x ctx with
 
 and weak (e : exp) ctx = traceWeak e; match e with
   | EVar x             -> prune ctx x
-  | ELam ((p, a), b)   -> weakTele eLam ctx p a b
-  | EPi  ((p, a), b)   -> weakTele ePi  ctx p a b
-  | ESig ((p, a), b)   -> weakTele eSig ctx p a b
+  | ELam (a, (p, b))   -> weakTele eLam ctx p a b
+  | EPi  (a, (p, b))   -> weakTele ePi  ctx p a b
+  | ESig (a, (p, b))   -> weakTele eSig ctx p a b
   | EFst e             -> EFst (weak e ctx)
   | ESnd e             -> ESnd (weak e ctx)
   | EApp (f, x)        -> EApp (weak f ctx, weak x ctx)
@@ -150,8 +150,8 @@ and weak (e : exp) ctx = traceWeak e; match e with
   | e                  -> e
 
 and weakTele ctor ctx p a b : exp =
-  let t = weak a ctx in ctor (p, t)
-    (weak b (upVar p (Local, Exp t, Exp (EVar p)) ctx))
+  let t = weak a ctx in
+    ctor p t (weak b (upVar p (Local, Exp t, Exp (EVar p)) ctx))
 
 and conv ctx v1 v2 : bool = traceConv v1 v2;
   v1 == v2 || begin match v1, v2 with
@@ -204,10 +204,10 @@ and eqNf ctx v1 v2 : unit = traceEqNF v1 v2;
 
 and check ctx (e0 : exp) (t0 : value) =
   traceCheck e0 t0; match e0, t0 with
-  | ELam ((p, a), e), VPi (t, g) ->
+  | ELam (a, (p, b)), VPi (t, g) ->
     eqNf ctx (eval a ctx) t;
     let x = Var (p, t) in let ctx' = upLocal ctx p t x in
-    check ctx' e (closByVal t g x)
+    check ctx' b (closByVal t g x)
   | EPair (e1, e2), VSig (t, g) -> check ctx e1 t;
     check ctx e2 (closByVal t g (eval e1 ctx))
   | EHole, v -> traceHole v ctx
@@ -235,9 +235,9 @@ and check ctx (e0 : exp) (t0 : value) =
 and infer ctx e : value = traceInfer e; match e with
   | EVar x -> lookup x ctx
   | EKan u -> VKan (u + 1)
-  | ESig (t, e) -> inferTele ctx imax t e
-  | EPi (t, e) -> inferTele ctx univImpl t e
-  | ELam ((p, a), e) -> inferLam ctx p a e
+  | ESig (a, (p, b)) -> inferTele ctx imax p a b
+  | EPi (a, (p, b)) -> inferTele ctx univImpl p a b
+  | ELam (a, (p, b)) -> inferLam ctx p a e
   | EApp (f, x) -> let (t, g) = extPiG ctx (infer ctx f) in check ctx x t; closByVal t g (eval x ctx)
   | EFst e -> fst (extSigG (infer ctx e))
   | ESnd e -> let (t, g) = extSigG (infer ctx e) in closByVal t g (vfst (eval e ctx))
@@ -262,9 +262,9 @@ and inferLam ctx p a e =
 and inferJ ctx e =
   let n = extSet (infer ctx e) in let x = name "x" in let y = name "y" in
   let pi = name "P" in let p = name "p" in let id = EApp (EApp (EId e, EVar x), EVar y) in
-  VPi (eval (EPi ((x, e), EPi ((y, e), impl id (EPre n)))) ctx,
-        (pi, EPi ((x, e), impl (EApp (EApp (EApp (EVar pi, EVar x), EVar x), ERef (EVar x)))
-          (EPi ((y, e), EPi ((p, id), EApp (EApp (EApp (EVar pi, EVar x), EVar y), EVar p))))), ctx))
+  VPi (eval (EPi (e, (x, EPi (e, (y, impl id (EPre n)))))) ctx,
+        (pi, EPi (e, (x, impl (EApp (EApp (EApp (EVar pi, EVar x), EVar x), ERef (EVar x)))
+          (EPi (e, (y, EPi (id, (p, EApp (EApp (EApp (EVar pi, EVar x), EVar y), EVar p)))))))), ctx))
 
 and inferValue ctx = function
   | Var (_, t)         -> t
@@ -303,7 +303,7 @@ and inferTransport (ctx : ctx) (p : exp) (i : exp) =
     (solve (eval i ctx) One);
   implv u0 (rbV ctx u1) ctx
 
-and inferTele ctx binop (p, a) b =
+and inferTele ctx binop p a b =
   let t = eval a ctx in let x = Var (p, t) in
   let ctx' = upLocal ctx p t x in
   let v = infer ctx' b in binop (infer ctx a) v

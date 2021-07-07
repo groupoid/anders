@@ -51,7 +51,7 @@ exp1:
   | SIGMA telescope COMMA exp1 { telescope eSig $4 $2 }
   | LSQ separated_list(COMMA, partial) RSQ { ESystem $2 }
   | exp2 ARROW exp1 { impl $1 $3 }
-  | exp2 PROD exp1 { ESig ((No, $1), $3) }
+  | exp2 PROD exp1  { prod $1 $3 }
   | LT vars GT exp1 { pLam $4 $2 }
   | exp2 { $1 }
 

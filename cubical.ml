@@ -19,7 +19,7 @@ let rec extractExp : exp -> string = function
     Printf.sprintf "PathP %s %s %s" (extractExp p) (extractExp a) (extractExp b)
   | EApp (EPathP _, _) | EPathP _ ->
     fail "cubicaltt does not support (partial) currying of PathP"
-  | EPLam (ELam ((p, EI), e)) ->
+  | EPLam (ELam (EI, (p, e))) ->
     Printf.sprintf "(<%s> %s)" (showName p) (extractExp e)
   | EPLam _ -> fail "invalid path lambda (should never happen)"
   | EAppFormula (f, x) -> Printf.sprintf "(%s @ %s)" (extractExp f) (extractExp x)
@@ -27,9 +27,9 @@ let rec extractExp : exp -> string = function
   | EAnd (a, b) -> Printf.sprintf "(%s /\\ %s)" (extractExp a) (extractExp b)
   | EOr (a, b) -> Printf.sprintf "(%s \\/ %s)" (extractExp a) (extractExp b)
   | ENeg a -> Printf.sprintf "-%s" (extractExp a)
-  | ELam (p, x) -> Printf.sprintf "\\(%s -> %s)" (extractTele p) (extractExp x)
-  | EPi (p, x) -> Printf.sprintf "(%s -> %s)" (extractTele p) (extractExp x)
-  | ESig (p, x) -> Printf.sprintf "(%s * %s)" (extractTele p) (extractExp x)
+  | ELam (a, (p, b)) -> Printf.sprintf "\\(%s -> %s)" (extractTele p a) (extractExp b)
+  | EPi (a, (p, b)) -> Printf.sprintf "(%s -> %s)" (extractTele p a) (extractExp b)
+  | ESig (a, (p, b)) -> Printf.sprintf "(%s * %s)" (extractTele p a) (extractExp b)
   | EPair (fst, snd) -> Printf.sprintf "(%s, %s)" (extractExp fst) (extractExp snd)
   | EFst exp -> extractExp exp ^ ".1"
   | ESnd exp -> extractExp exp ^ ".2"
@@ -37,8 +37,7 @@ let rec extractExp : exp -> string = function
   | EVar p -> showName p
   | EHole -> "?"
   | EAxiom _ -> "undefined"
-and extractTele : tele -> string =
-  fun (p, x) -> Printf.sprintf "(%s : %s)" (showName p) (extractExp x)
+and extractTele p x = Printf.sprintf "(%s : %s)" (showName p) (extractExp x)
 
 let extractDecl : decl -> string = function
   | Annotated (p, t, e) -> Printf.sprintf "%s : %s = %s" p (extractExp t) (extractExp e)

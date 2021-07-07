@@ -3,10 +3,10 @@ open Ident
 (* Interface *)
 
 type exp =
-  | ELam   of tele * exp
+  | ELam   of exp * (name * exp)
   | EKan   of int
-  | EPi    of tele * exp
-  | ESig   of tele * exp
+  | EPi    of exp * (name * exp)
+  | ESig   of exp * (name * exp)
   | EPair  of exp * exp
   | EFst   of exp
   | ESnd   of exp
@@ -30,8 +30,9 @@ type exp =
   | EAnd of exp * exp
   | EOr  of exp * exp
   | ENeg of exp
-and tele = name * exp
 and system = (conjunction * exp) list
+
+type tele = name * exp
 
 type decl =
   | NotAnnotated of string * exp
@@ -80,9 +81,9 @@ and ctx = record Env.t
 
 (* Implementation *)
 
-let eLam x y = ELam (x, y)
-let ePi  x y = EPi  (x, y)
-let eSig x y = ESig (x, y)
+let eLam p a b = ELam (a, (p, b))
+let ePi  p a b = EPi  (a, (p, b))
+let eSig p a b = ESig (a, (p, b))
 
 let ezero = EDir Zero
 let eone  = EDir One
@@ -97,21 +98,24 @@ let isGlobal : record -> bool = function Global, _, _ -> false | Local, _, _ -> 
 let fresh ns n = match Env.find_opt n ns with Some x -> x | None -> n
 let freshConj ns = Conjunction.map (fun (p, d) -> (fresh ns p, d))
 
-let telescope (f : tele -> exp -> exp) (e : exp) (xs : tele list) : exp = List.fold_right f xs e
-let rec pLam e : name list -> exp = function [] -> e | x :: xs -> EPLam (ELam ((x, EI), pLam e xs))
+let rec telescope (ctor : name -> exp -> exp -> exp) (e : exp) : tele list -> exp = function
+  | (p, a) :: xs -> ctor p a (telescope ctor e xs)
+  | [] -> e
+let rec pLam e : name list -> exp = function [] -> e | x :: xs -> EPLam (ELam (EI, (x, pLam e xs)))
 
 let getDigit x = Char.chr (x + 0x80) |> Printf.sprintf "\xE2\x82%c"
 let getVar x =
   let xs = [(!zeroPrim, EDir Zero); (!onePrim, EDir One); (!intervalPrim, EI)] in
   match List.assoc_opt x xs with Some e -> e | None -> decl x
 
-let impl a b = EPi ((No, a), b)
+let impl a b = EPi (a, (No, b))
+let prod a b = ESig (a, (No, b))
 
 let rec salt (ns : name Env.t) : exp -> exp = function
-  | ELam ((p, a), b)    -> let x = pat p in ELam ((x, salt ns a), salt (Env.add p x ns) b)
+  | ELam (a, (p, b))    -> saltTele eLam ns p a b
   | EKan n              -> EKan n
-  | EPi ((p, a), b)     -> let x = pat p in EPi ((x, salt ns a), salt (Env.add p x ns) b)
-  | ESig ((p, a), b)    -> let x = pat p in ESig ((x, salt ns a), salt (Env.add p x ns) b)
+  | EPi (a, (p, b))     -> saltTele ePi ns p a b
+  | ESig (a, (p, b))    -> saltTele eSig ns p a b
   | EPair (a, b)        -> EPair (salt ns a, salt ns b)
   | EFst e              -> EFst (salt ns e)
   | ESnd e              -> ESnd (salt ns e)
@@ -134,6 +138,8 @@ let rec salt (ns : name Env.t) : exp -> exp = function
   | EAnd (a, b)         -> EAnd (salt ns a, salt ns b)
   | EOr (a, b)          -> EOr (salt ns a, salt ns b)
   | ENeg e              -> ENeg (salt ns e)
+and saltTele ctor ns p a b =
+  let x = pat p in ctor x (salt ns a) (salt (Env.add p x ns) b)
 
 let freshExp = salt Env.empty
 let freshDecl : decl -> decl = function
@@ -153,12 +159,12 @@ let showSystem xs show =
 
 let rec showExp : exp -> string = function
   | EKan n -> "U" ^ showLevel n
-  | ELam (p, x) -> Printf.sprintf "λ %s, %s" (showTele p) (showExp x)
-  | EPi (p, x) -> let (var, dom) = p in begin match var with
-    | No -> Printf.sprintf "(%s → %s)" (showExp dom) (showExp x)
-    | _  -> Printf.sprintf "Π %s, %s" (showTele p) (showExp x)
+  | ELam (a, (p, b)) -> Printf.sprintf "λ %s, %s" (showTele p a) (showExp b)
+  | EPi (a, (p, b)) -> begin match p with
+    | No -> Printf.sprintf "(%s → %s)" (showExp a) (showExp b)
+    | _  -> Printf.sprintf "Π %s, %s" (showTele p a) (showExp b)
   end
-  | ESig (p, x) -> Printf.sprintf "Σ %s, %s" (showTele p) (showExp x)
+  | ESig (a, (p, b)) -> Printf.sprintf "Σ %s, %s" (showTele p a) (showExp b)
   | EPair (fst, snd) -> Printf.sprintf "(%s, %s)" (showExp fst) (showExp snd)
   | EFst exp -> showExp exp ^ ".1"
   | ESnd exp -> showExp exp ^ ".2"
@@ -172,7 +178,7 @@ let rec showExp : exp -> string = function
   | ERef e -> Printf.sprintf "ref %s" (showExp e)
   | EJ e -> Printf.sprintf "idJ %s" (showExp e)
   | ETransp (p, i) -> Printf.sprintf "transp %s %s" (showExp p) (showExp i)
-  | EPLam (ELam ((i, _), e)) -> Printf.sprintf "(<%s> %s)" (showName i) (showExp e)
+  | EPLam (ELam (_, (i, e))) -> Printf.sprintf "(<%s> %s)" (showName i) (showExp e)
   | EPLam _ -> failwith "showExp: unreachable code was reached"
   | EAppFormula (f, x) -> Printf.sprintf "(%s @ %s)" (showExp f) (showExp x)
   | EPartial e -> Printf.sprintf "Partial %s" (showExp e)
@@ -181,9 +187,7 @@ let rec showExp : exp -> string = function
   | EAnd (a, b) -> Printf.sprintf "(%s /\\ %s)" (showExp a) (showExp b)
   | EOr (a, b) -> Printf.sprintf "(%s \\/ %s)" (showExp a) (showExp b)
   | ENeg a -> Printf.sprintf "-%s" (showExp a)
-
-and showTele : tele -> string =
-  fun (p, x) -> Printf.sprintf "(%s : %s)" (showName p) (showExp x)
+and showTele p x = Printf.sprintf "(%s : %s)" (showName p) (showExp x)
 
 let rec showValue : value -> string = function
   | VKan n -> "U" ^ showLevel n

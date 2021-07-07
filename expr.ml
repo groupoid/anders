@@ -34,8 +34,7 @@ and system = (conjunction * exp) list
 type tele = name * exp
 
 type decl =
-  | NotAnnotated of string * exp
-  | Annotated of string * exp * exp
+  | Def of string * exp option * exp
   | Axiom of string * exp
 
 type line =
@@ -141,8 +140,8 @@ and saltTele ctor ns p a b =
 
 let freshExp = salt Env.empty
 let freshDecl : decl -> decl = function
-  | Annotated (p, exp1, exp2) -> Annotated (p, freshExp exp1, freshExp exp2)
-  | NotAnnotated (p, exp) -> NotAnnotated (p, freshExp exp)
+  | Def (p, Some exp1, exp2) -> Def (p, Some (freshExp exp1), freshExp exp2)
+  | Def (p, None, exp) -> Def (p, None, freshExp exp)
   | Axiom (p, exp) -> Axiom (p, freshExp exp)
 
 let rec showLevel x =
@@ -227,7 +226,7 @@ and showRho ctx : string = Env.bindings ctx |> List.filter_map showTermBind |> S
 and showTele p x rho : string =
   if isRhoVisible rho then Printf.sprintf "(%s : %s, %s)" (showName p) (showValue x) (showRho rho)
   else Printf.sprintf "(%s : %s)" (showName p) (showValue x)
-and showTerm : term -> string = function | Exp e -> showExp e | Value v -> showValue v
+and showTerm : term -> string = function Exp e -> showExp e | Value v -> showValue v
 
 let showGamma (ctx : ctx) : string =
   Env.bindings ctx
@@ -244,8 +243,8 @@ type command =
   | Command of string * exp
 
 let showDecl : decl -> string = function
-  | Annotated (p, exp1, exp2) -> Printf.sprintf "def %s : %s := %s" p (showExp exp1) (showExp exp2)
-  | NotAnnotated (p, exp) -> Printf.sprintf "def %s := %s" p (showExp exp)
+  | Def (p, Some exp1, exp2) -> Printf.sprintf "def %s : %s := %s" p (showExp exp1) (showExp exp2)
+  | Def (p, None, exp) -> Printf.sprintf "def %s := %s" p (showExp exp)
   | Axiom (p, exp) -> Printf.sprintf "axiom %s : %s" p (showExp exp)
 
 let showLine : line -> string = function

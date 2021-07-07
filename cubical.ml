@@ -39,9 +39,9 @@ let rec extractExp : exp -> string = function
 and extractTele p x = Printf.sprintf "(%s : %s)" (showName p) (extractExp x)
 
 let extractDecl : decl -> string = function
-  | Annotated (p, t, e) -> Printf.sprintf "%s : %s = %s" p (extractExp t) (extractExp e)
+  | Def (p, Some t, e) -> Printf.sprintf "%s : %s = %s" p (extractExp t) (extractExp e)
+  | Def (_, None, _) -> fail "cubicaltt does not support automatic type inference of declaration"
   | Axiom (p, t) -> Printf.sprintf "%s : %s = undefined" p (extractExp t)
-  | NotAnnotated _ -> fail "cubicaltt does not support automatic type inference of declaration"
 
 let extractLine : line -> string = function
   | Import p -> Printf.sprintf "import %s" p

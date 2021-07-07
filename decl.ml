@@ -15,21 +15,19 @@ let rec listLast : 'a list -> 'a = function
   | [x]     -> x
   | x :: xs -> listLast xs
 
-let getDeclName : decl -> string = function
-  | Annotated (p, _, _) | Axiom (p, _) | NotAnnotated (p, _) -> p
-
+let getDeclName : decl -> string = function Def (p, _, _) | Axiom (p, _) -> p
 let getTerm e ctx = if !preeval then Value (eval e ctx) else Exp e
 
 let checkDecl ctx d : ctx =
   let x = getDeclName d in if Env.mem (name x) ctx then
     raise (AlreadyDeclared x);
   match d with
-  | Annotated (p, a, e) ->
+  | Def (p, Some a, e) ->
     ignore (extSet (infer ctx a));
     let t = eval a ctx in let v = name p in
     check (upGlobal ctx v t (Var (v, t))) e t;
     Env.add (name p) (Global, Value t, getTerm e ctx) ctx
-  | NotAnnotated (p, e) ->
+  | Def (p, None, e) ->
     Env.add (name p) (Global, Value (infer ctx e), getTerm e ctx) ctx
   | Axiom (p, a) ->
     ignore (extSet (infer ctx a)); let x = name p in

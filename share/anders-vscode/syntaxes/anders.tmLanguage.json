@@ -18,11 +18,11 @@
             "name": "keyword.other.anders"
         },
         {
-            "match": "(?<=^|[\\s()])(λ|Σ|Π|Id|ref|idJ|forall|sigma|Partial|PathP|hcomp|transp|Glue|glue|unglue)(?=$|[\\s()])",
+            "match": "(?<=^|[\\s(),])(λ|Σ|Π|Id|ref|idJ|forall|sigma|Partial|PathP|hcomp|transp|Glue|glue|unglue)(?=$|[\\s(),])",
             "name": "keyword.control.anders"
         },
         {
-            "match": "(?<=^|[\\s()])([UV][₀₁₂₃₄₅₆₇₈₉]*)(?=$|[\\s()])",
+            "match": "(?<=^|[\\s(),])([UV][₀₁₂₃₄₅₆₇₈₉]*)(?=$|[\\s(),])",
             "name": "keyword.other.anders"
         },
         {

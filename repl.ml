@@ -1,6 +1,5 @@
 open Module
 open Error
-open Ident
 open Decl
 open Elab
 open Expr

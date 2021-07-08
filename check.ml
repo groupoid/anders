@@ -66,7 +66,7 @@ and closByVal t x v = let (p, e, ctx) = x in traceClos e p v;
   eval e (upLocal ctx p t v)
 
 and app : value * value -> value = function
-  | VApp (VApp (VApp (VApp (VJ _, _), _), f), _), VRef v -> f
+  | VApp (VApp (VApp (VApp (VJ _, _), _), f), _), VRef _ -> f
   | VSystem (e, ctx), VRef _ -> eval (reduceSystem ctx e) ctx
   | VLam (t, f), v -> closByVal t f v
   | f, x -> VApp (f, x)
@@ -88,7 +88,7 @@ and inferV v = traceInferV v; match v with
   | Var (_, t)               -> t
   | VFst e                   -> fst (extSigG (inferV e))
   | VSnd e                   -> let (t, g) = extSigG (inferV e) in closByVal t g (VFst e)
-  | VApp (VTransp (p, i), _) -> appFormula p vone
+  | VApp (VTransp (p, _), _) -> appFormula p vone
   | VApp (f, x)              -> begin match inferV f with
     | VApp (VPartial t, _) -> t
     | VPi (t, g) -> closByVal t g x

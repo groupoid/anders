@@ -77,9 +77,9 @@ let andEq f g = Conjunction.equal (extAnd f) (extAnd g)
 type face = dir Env.t
 
 let meet phi psi : face =
-  Env.merge (fun k x y ->
+  Env.merge (fun _ x y ->
     match x, y with
-    | Some u, Some v -> raise IncompatibleFaces
+    | Some _, Some _ -> raise IncompatibleFaces
     | Some u, None   -> Some u
     | None,   Some v -> Some v
     | None,   None   -> None) phi psi

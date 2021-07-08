@@ -11,11 +11,6 @@ let ext x = x ^ ".anders"
 type state = ctx * Files.t
 let empty : state = (Env.empty, Files.empty)
 
-let rec listLast : 'a list -> 'a = function
-  | []      -> raise (Failure "listLast")
-  | [x]     -> x
-  | x :: xs -> listLast xs
-
 let getDeclName : decl -> string = function Def (p, _, _) | Axiom (p, _) -> p
 let getTerm e ctx = if !preeval then Value (eval e ctx) else Exp e
 

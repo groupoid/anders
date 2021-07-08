@@ -1,5 +1,4 @@
 open Prelude
-open Ident
 open Elab
 open Expr
 

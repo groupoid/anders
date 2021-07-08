@@ -11,7 +11,7 @@ let rec extractExp : exp -> string = function
   | EId _ | ERef _ | EJ _ -> fail "cubicaltt does not support strict equality"
   | EPartial _ -> fail "cubicaltt does not support explicit partial"
   | EI -> fail "cubicaltt does not support explicit interval"
-  | EKan u -> fail "cubicaltt does not support universe hierarchy"
+  | EKan _ -> fail "cubicaltt does not support universe hierarchy"
   | EPre _ -> fail "cubicaltt does not support explicit pretypes"
   | ESystem e -> showSystem e extractExp
   | EApp (ETransp (p, i), a) -> Printf.sprintf "transGen %s %s %s" (extractExp p) (extractExp i) (extractExp a)

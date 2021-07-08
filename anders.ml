@@ -1,8 +1,6 @@
 open Prefs
-open Check
 open Error
 open Ident
-open Expr
 
 type cmdline =
   | Check     of string

@@ -21,6 +21,7 @@ let upLocal (ctx : ctx) (p : name) t v : ctx = upVar p (Local, Value t, Value v)
 let upGlobal (ctx : ctx) (p : name) t v : ctx = upVar p (Global, Value t, Value v) ctx
 let ieq u v : bool = !girard || u = v
 
+(* Evaluator *)
 let rec eval (e : exp) (ctx : ctx) = traceEval e; match e with
   | EKan u             -> VKan u
   | ELam (a, (p, b))   -> VLam (eval a ctx, (p, b, ctx))
@@ -80,11 +81,30 @@ and getRho ctx x = match Env.find_opt x ctx with
   | Some (_, _, Exp e)   -> eval e ctx
   | None                 -> raise (VariableNotFound x)
 
-and lookup (x : name) (ctx : ctx) = match Env.find_opt x ctx with
-  | Some (_, Value v, _) -> v
-  | Some (_, Exp e, _)   -> eval e ctx
-  | None                 -> raise (VariableNotFound x)
+and act e i ctx = eval (EAppFormula (e, i)) ctx
 
+(* This is part of evaluator, not type checker *)
+and inferV v = traceInferV v; match v with
+  | Var (_, t)               -> t
+  | VFst e                   -> fst (extSigG (inferV e))
+  | VSnd e                   -> let (t, g) = extSigG (inferV e) in closByVal t g (VFst e)
+  | VApp (VTransp (p, i), _) -> appFormula p vone
+  | VApp (f, x)              -> begin match inferV f with
+    | VApp (VPartial t, _) -> t
+    | VPi (t, g) -> closByVal t g x
+    | v -> raise (ExpectedPi v)
+  end
+  | VAppFormula (f, x)       -> let (p, _, _) = extPathP (inferV f) in appFormula p x
+  | VRef v                   -> VApp (VApp (VId (inferV v), v), v)
+  | VPre n                   -> VPre (n + 1)
+  | VKan n                   -> VKan (n + 1)
+  | VI                       -> VPre 0
+  | VDir _ | VOr _ | VAnd _  -> VI
+  | VSig (a, (p, e, rho))    -> imax (inferV a) (infer (upLocal rho p a (Var (p, a))) e)
+  | VPi  (a, (p, e, rho))    -> univImpl (inferV a) (infer (upLocal rho p a (Var (p, a))) e)
+  | v                        -> raise (ExpectedNeutral v)
+
+(* Readback *)
 and rbV v : exp = traceRbV v; match v with
   | VLam (t, g)        -> rbVTele eLam t g
   | VPair (u, v)       -> EPair (rbV u, rbV v)
@@ -121,6 +141,7 @@ and prune ctx x = match Env.find_opt x ctx with
   | Some (_, _, Value v) -> rbV v
   | None                 -> raise (VariableNotFound x)
 
+(* Weak *)
 and weak (e : exp) ctx = traceWeak e; match e with
   | EVar x             -> prune ctx x
   | ELam (a, (p, b))   -> weakTele eLam ctx p a b
@@ -146,6 +167,7 @@ and weakTele ctor ctx p a b : exp =
   let t = weak a ctx in
     ctor p t (weak b (upVar p (Local, Exp t, Exp (EVar p)) ctx))
 
+(* Convertibility *)
 and conv v1 v2 : bool = traceConv v1 v2;
   v1 == v2 || begin match v1, v2 with
     | VKan u, VKan v -> ieq u v
@@ -210,6 +232,12 @@ and convId v1 v2 =
 
 and eqNf v1 v2 : unit = traceEqNF v1 v2;
   if conv v1 v2 then () else raise (TypeIneq (v1, v2))
+
+(* Type checker itself *)
+and lookup (x : name) (ctx : ctx) = match Env.find_opt x ctx with
+  | Some (_, Value v, _) -> v
+  | Some (_, Exp e, _)   -> eval e ctx
+  | None                 -> raise (VariableNotFound x)
 
 and check ctx (e0 : exp) (t0 : value) =
   traceCheck e0 t0; match e0, t0 with
@@ -302,25 +330,3 @@ and inferTele ctx binop p a b =
   let t = eval a ctx in let x = Var (p, t) in
   let ctx' = upLocal ctx p t x in
   let v = infer ctx' b in binop (infer ctx a) v
-
-and inferV v = traceInferV v; match v with
-  | Var (_, t)               -> t
-  | VFst e                   -> fst (extSigG (inferV e))
-  | VSnd e                   -> let (t, g) = extSigG (inferV e) in closByVal t g (VFst e)
-  | VApp (VTransp (p, i), _) -> appFormula p vone
-  | VApp (f, x)              -> begin match inferV f with
-    | VApp (VPartial t, _) -> t
-    | VPi (t, g) -> closByVal t g x
-    | v -> raise (ExpectedPi v)
-  end
-  | VAppFormula (f, x)       -> let (p, _, _) = extPathP (inferV f) in appFormula p x
-  | VRef v                   -> VApp (VApp (VId (inferV v), v), v)
-  | VPre n                   -> VPre (n + 1)
-  | VKan n                   -> VKan (n + 1)
-  | VI                       -> VPre 0
-  | VDir _ | VOr _ | VAnd _  -> VI
-  | VSig (a, (p, e, rho))    -> imax (inferV a) (infer (upLocal rho p a (Var (p, a))) e)
-  | VPi  (a, (p, e, rho))    -> univImpl (inferV a) (infer (upLocal rho p a (Var (p, a))) e)
-  | v                        -> raise (ExpectedNeutral v)
-
-and act e i ctx = eval (EAppFormula (e, i)) ctx

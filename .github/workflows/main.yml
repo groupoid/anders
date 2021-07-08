@@ -26,13 +26,22 @@ jobs:
 
       - name: Use OCaml ${{ matrix.ocaml-version }}
         uses: avsm/setup-ocaml@v1
-        with:
-          ocaml-version: ${{ matrix.ocaml-version }}
+        with: ocaml-version: ${{ matrix.ocaml-version }}
 
       - run: opam depext anders --yes
       - run: opam install . --deps-only
       - run: opam exec -- dune build
       - run: opam install .
-      - run: tree -L 5 .
-      - run: ls ~/.opam/default/bin/and*
-      - run: for i in lib/*.anders ; do anders check $i ; done
+      - run: dune exec anders lib/mltt.anders
+      - run: dune exec anders lib/buddhism.anders
+      - run: dune exec anders lib/cat.anders
+      - run: dune exec anders lib/church.anders
+      - run: dune exec anders lib/fun.anders
+      - run: dune exec anders lib/impredicative.anders
+      - run: dune exec anders lib/kraus.anders
+      - run: dune exec anders lib/leibniz.anders
+      - run: dune exec anders lib/list.anders
+      - run: dune exec anders lib/mltt.anders
+      - run: dune exec anders lib/path.anders
+      - run: dune exec anders lib/pi.anders
+      - run: dune exec anders lib/topos.anders

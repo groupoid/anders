@@ -34,3 +34,7 @@ jobs:
       - run: opam install . --deps-only
 
       - run: opam exec -- dune build
+
+      - run: opam install .
+
+      - run: for i in $(ls lib/*.anders) ; do anders check $i ; done

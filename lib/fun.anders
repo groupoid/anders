@@ -10,7 +10,7 @@
    Copyright (c) Groupoid Infinity, 2014-2021. -}
 
 module fun where
-import experiments/cat
+import lib/cat
 
 def catfunctor (A B: precategory): U := Σ
     (ob: carrier A -> carrier B)

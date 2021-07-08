@@ -9,7 +9,7 @@
    Copyright (c) Groupoid Infinity, 2014-2021. -}
 
 module cat where
-import experiments/path
+import lib/path
 
 def cat : U₁ := Σ (A: U), A -> A -> U
 def isPrecategory (C: cat) : U := Σ

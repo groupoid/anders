@@ -9,9 +9,9 @@
    Copyright (c) Groupoid Infinity, 2014-2021. -}
 
 module topos where
-import experiments/cat
-import experiments/fun
-import experiments/pi
+import lib/cat
+import lib/fun
+import lib/pi
 
 def epi (P: precategory) (X Y: carrier P) (f: hom P X Y): U := Π (Z: carrier P) (g1 g2: hom P Y Z),
     Path (hom P X Z) (compose P X Y Z f g1) (compose P X Y Z f g2) -> Path (hom P Y Z) g1 g2

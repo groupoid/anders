@@ -1,5 +1,5 @@
 module 3-mult where
-import experiments/church
+import lib/church
 
 definition N1 : N := succ N0
 definition N2 : N := succ N1

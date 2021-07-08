@@ -1,5 +1,5 @@
 module vec where
-import experiments/church
+import lib/church
 
 def vec (α : U) (n : N) : U₁
  := Π (μ : N → U), μ N0 → (Π (n : N), α → μ n → μ (succ n)) → μ n

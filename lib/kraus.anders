@@ -1,5 +1,5 @@
 module kraus where
-import experiments/path
+import lib/path
 
 -- http://www.cs.nott.ac.uk/~psztxa/publ/tt-in-tt.pdf
 -- https://arxiv.org/ftp/arxiv/papers/1907/1907.07562.pdf

@@ -5,7 +5,7 @@
 module impredicative where
 -- option impredicative true
 option girard true
-import experiments/path
+import lib/path
 
 def naturality (X Y: U) (f : X -> Y) (a : X -> X) (b : Y -> Y) : U := Path (X -> Y) (∘ X X Y f a) (∘ X Y Y b f)
 def 𝟙' : U := Π (X : U), isSet X -> X -> X

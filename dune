@@ -2,16 +2,9 @@
 (ocamllex lexer)
 (menhir (modules parser))
 (executable (name anders) (package anders) (public_name anders))
-(install (files experiments/buddhism.anders
-                experiments/cat.anders
-                experiments/church.anders
-                experiments/fun.anders
-                experiments/impredicative.anders
-                experiments/kraus.anders
-                experiments/leibniz.anders
-                experiments/list.anders
-                experiments/mltt.anders
-                experiments/path.anders
-                experiments/pi.anders
-                experiments/test.anders
-                experiments/topos.anders) (section share) (package anders))
+(install (files lib/buddhism.anders       lib/cat.anders
+                lib/church.anders         lib/fun.anders
+                lib/impredicative.anders  lib/kraus.anders
+                lib/leibniz.anders        lib/list.anders
+                lib/mltt.anders           lib/path.anders
+                lib/pi.anders             lib/topos.anders) (section share) (package anders))

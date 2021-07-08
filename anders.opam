@@ -9,7 +9,7 @@ authors: [
 homepage: "https://groupoid.space/homotopy/"
 bug-reports: "https://github.com/groupoid/anders/issues"
 dev-repo: "git+https://github.com/groupoid/anders"
-synopsis: "CCHM homotopy system type checker based on Mini-TT for OCaml"
+synopsis: "CCHM homotopy system type checker"
 license: "ISC"
 depends: [
   "dune" {>= "2.0"}

@@ -7,11 +7,14 @@ let traceHole v gma =
 let trace x =
   if !Prefs.trace then begin print_string x; flush_all () end else ()
 
-let traceCheck (e0 : exp) (t0 : value) : unit =
-  trace (Printf.sprintf "CHECK: %s : %s\n" (showExp e0) (showValue t0))
+let traceCheck (e : exp) (t : value) : unit =
+  trace (Printf.sprintf "CHECK: %s : %s\n" (showExp e) (showValue t))
 
-let traceInfer (e0 : exp) : unit =
-  trace (Printf.sprintf "INFER: %s\n" (showExp e0))
+let traceInfer (e : exp) : unit =
+  trace (Printf.sprintf "INFER: %s\n" (showExp e))
+
+let traceInferV (v : value) : unit =
+  trace (Printf.sprintf "INFERV: %s\n" (showValue v))
 
 let traceEval (e : exp) : unit = if !Prefs.trace then
   trace (Printf.sprintf "EVAL: %s\n" (showExp e))

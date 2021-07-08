@@ -11,6 +11,7 @@ exception ExpectedPath of value
 exception ExpectedVSet of value
 exception Parser of int * string
 exception UnknownOption of string
+exception ExpectedNeutral of value
 exception ExpectedFibrant of value
 exception UnknownCommand of string
 exception VariableNotFound of name
@@ -35,6 +36,7 @@ let prettyPrintError : exn -> unit = function
   | ExpectedFibrant x -> Printf.printf "  %s\nexpected to be fibrant universe\n" (showValue x)
   | ExpectedPi x -> Printf.printf "  %s\nexpected to be Pi-type\n" (showValue x)
   | ExpectedSig x -> Printf.printf "  %s\nexpected to be Sigma-type\n" (showValue x)
+  | ExpectedNeutral x -> Printf.printf "  %s\nexpected to be neutral\n" (showValue x)
   | UnknownCommand s -> Printf.printf "Unknown command “%s”\n" s
   | UnknownOption opt -> Printf.printf "Unknown option “%s”\n" opt
   | UnknownOptionValue (opt, value) -> Printf.printf "Unknown value “%s” of option “%s”\n" value opt

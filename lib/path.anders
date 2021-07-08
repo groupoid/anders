@@ -94,6 +94,11 @@ def φ (i : I) : Partial U₁ (i ∨ -i) :=
 def φ-0 : PathP (<_> U₁) (φ 0 1=1) U := <_> U
 def φ-1 : PathP (<_> U₁) (φ 1 1=1) (U → U) := <_> U → U
 
+def φ′ (i : I) : Partial U₁ (i ∨ -i) :=
+[ (i = 1) → U → U, (i = 0) → U ]
+
+def φ-eq-φ′ (i : I) : Id (Partial U₁ (i ∨ -i)) (φ i) (φ′ i) := ref (φ′ i)
+
 def ψ (i j : I) : Partial U₁ (-i ∨ i ∨ (i ∧ j)) :=
 [ (i = 1) → U, (i = 1) (j = 1) → U, (i = 0) → U → U ]
 

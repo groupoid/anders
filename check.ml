@@ -245,7 +245,7 @@ and infer ctx e : value = traceInfer e; match e with
   | EKan u -> VKan (u + 1)
   | ESig (a, (p, b)) -> inferTele ctx imax p a b
   | EPi (a, (p, b)) -> inferTele ctx univImpl p a b
-  | ELam (a, (p, b)) -> inferLam ctx p a e
+  | ELam (a, (p, b)) -> inferLam ctx p a b
   | EApp (f, x) -> begin match infer ctx f with
     | VApp (VPartial t, i) -> check ctx x (VApp (VApp (VId VI, VDir One), i)); t
     | VPi (t, g) -> check ctx x t; closByVal t g (eval x ctx)
@@ -291,7 +291,7 @@ and inferTransport (ctx : ctx) (p : exp) (i : exp) =
 
   let x = pat (name "x") in let gen = EVar x in
   let ctx' = upLocal ctx x VI (Var (x, VI)) in
-  let _ = extKan (inferV (act p gen ctx')) in
+  let _ = extKan (infer ctx' (rbV (act p gen ctx'))) in
 
   (* Check that p is constant at i = 1 *)
   List.iter (fun phi -> eqNf u0 (act p gen (faceEnv phi ctx')))

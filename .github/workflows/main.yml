@@ -33,16 +33,16 @@ jobs:
       - run: opam install . --deps-only
       - run: opam exec -- dune build
       - run: opam install .
-      - run: dune exec anders lib/mltt.anders
-      - run: dune exec anders lib/buddhism.anders
-      - run: dune exec anders lib/cat.anders
-      - run: dune exec anders lib/church.anders
-      - run: dune exec anders lib/fun.anders
-      - run: dune exec anders lib/impredicative.anders
-      - run: dune exec anders lib/kraus.anders
-      - run: dune exec anders lib/leibniz.anders
-      - run: dune exec anders lib/list.anders
-      - run: dune exec anders lib/mltt.anders
-      - run: dune exec anders lib/path.anders
-      - run: dune exec anders lib/pi.anders
-      - run: dune exec anders lib/topos.anders
+      - run: dune exec anders check lib/mltt.anders
+      - run: dune exec anders check lib/buddhism.anders
+      - run: dune exec anders check lib/cat.anders
+      - run: dune exec anders check lib/church.anders
+      - run: dune exec anders check lib/fun.anders
+      - run: dune exec anders check lib/impredicative.anders
+      - run: dune exec anders check lib/kraus.anders
+      - run: dune exec anders check lib/leibniz.anders
+      - run: dune exec anders check lib/list.anders
+      - run: dune exec anders check lib/mltt.anders
+      - run: dune exec anders check lib/path.anders
+      - run: dune exec anders check lib/pi.anders
+      - run: dune exec anders check lib/topos.anders

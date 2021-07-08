@@ -50,7 +50,7 @@ let rec eval (e : exp) (ctx : ctx) = traceEval e; match e with
 
 and appFormula v x = match v with
   | VPLam f -> app (f, x)
-  | _       -> let (_, u0, u1) = extPathP v in
+  | _       -> let (_, u0, u1) = extPathP (inferV v) in
     begin match x with
       | VDir Zero -> u0
       | VDir One  -> u1
@@ -256,7 +256,8 @@ and infer ctx e : value = traceInfer e; match e with
   | EPre u -> VPre (u + 1)
   | EPathP p -> inferPath ctx p
   | EPartial e -> let n = extSet (infer ctx e) in implv VI (EPre n) ctx
-  | EAppFormula (f, x) -> check ctx x VI; let (p, _, _) = extPathP (eval f ctx) in appFormula p (eval x ctx)
+  | EAppFormula (f, x) -> check ctx x VI; let (p, _, _) = extPathP (infer ctx (rbV (eval f ctx))) in
+    appFormula p (eval x ctx)
   | ETransp (p, i) -> inferTransport ctx p i
   | EI -> VPre 0 | EDir _ -> VI
   | ENeg e -> check ctx e VI; VI
@@ -312,7 +313,7 @@ and inferV v = traceInferV v; match v with
     | VPi (t, g) -> closByVal t g x
     | v -> raise (ExpectedPi v)
   end
-  | VAppFormula (f, x)       -> let (p, _, _) = extPathP f in appFormula p x
+  | VAppFormula (f, x)       -> let (p, _, _) = extPathP (inferV f) in appFormula p x
   | VRef v                   -> VApp (VApp (VId (inferV v), v), v)
   | VPre n                   -> VPre (n + 1)
   | VKan n                   -> VKan (n + 1)
@@ -321,9 +322,5 @@ and inferV v = traceInferV v; match v with
   | VSig (a, (p, e, rho))    -> imax (inferV a) (infer (upLocal rho p a (Var (p, a))) e)
   | VPi  (a, (p, e, rho))    -> univImpl (inferV a) (infer (upLocal rho p a (Var (p, a))) e)
   | v                        -> raise (ExpectedNeutral v)
-
-and extPathP v = match inferV v with
-  | VApp (VApp (VPathP v, u0), u1) -> (v, u0, u1)
-  | _                              -> raise (ExpectedPath v)
 
 and act e i ctx = eval (EAppFormula (e, i)) ctx

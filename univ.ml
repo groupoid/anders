@@ -14,6 +14,10 @@ let extKan : value -> int = function
   | VKan n -> n
   | v      -> raise (ExpectedFibrant v)
 
+let extPathP = function
+  | VApp (VApp (VPathP v, u0), u1) -> (v, u0, u1)
+  | v                              -> raise (ExpectedPath v)
+
 let imax a b = match a, b with
   | VKan u, VKan v -> VKan (max u v)
   | VPre u, VPre v | VPre u, VKan v | VKan u, VPre v -> VPre (max u v)

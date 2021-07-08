@@ -37,4 +37,4 @@ jobs:
 
       - run: opam install .
 
-      - run: for i in $(ls lib/*.anders) ; do anders check $i ; done
+      - run: for i in lib/*.anders ; do anders check $i ; done

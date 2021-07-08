@@ -93,8 +93,8 @@ let decl x = EVar (name x)
 
 let isGlobal : record -> bool = function Global, _, _ -> false | Local, _, _ -> true
 
-let fresh ns n = match Env.find_opt n ns with Some x -> x | None -> n
-let freshConj ns = Conjunction.map (fun (p, d) -> (fresh ns p, d))
+let freshVar ns n = match Env.find_opt n ns with Some x -> x | None -> n
+let freshConj ns = Conjunction.map (fun (p, d) -> (freshVar ns p, d))
 
 let rec telescope (ctor : name -> exp -> exp -> exp) (e : exp) : tele list -> exp = function
   | (p, a) :: xs -> ctor p a (telescope ctor e xs)
@@ -106,8 +106,8 @@ let getVar x =
   let xs = [(!zeroPrim, EDir Zero); (!onePrim, EDir One); (!intervalPrim, EI)] in
   match List.assoc_opt x xs with Some e -> e | None -> decl x
 
-let impl a b = EPi (a, (No, b))
-let prod a b = ESig (a, (No, b))
+let impl a b = EPi (a, (Irrefutable, b))
+let prod a b = ESig (a, (Irrefutable, b))
 
 let rec salt (ns : name Env.t) : exp -> exp = function
   | ELam (a, (p, b))    -> saltTele eLam ns p a b
@@ -118,7 +118,7 @@ let rec salt (ns : name Env.t) : exp -> exp = function
   | EFst e              -> EFst (salt ns e)
   | ESnd e              -> ESnd (salt ns e)
   | EApp (f, x)         -> EApp (salt ns f, salt ns x)
-  | EVar x              -> EVar (fresh ns x)
+  | EVar x              -> EVar (freshVar ns x)
   | EHole               -> EHole
   | EPre n              -> EPre n
   | EId e               -> EId (salt ns e)
@@ -136,7 +136,7 @@ let rec salt (ns : name Env.t) : exp -> exp = function
   | EOr (a, b)          -> EOr (salt ns a, salt ns b)
   | ENeg e              -> ENeg (salt ns e)
 and saltTele ctor ns p a b =
-  let x = pat p in ctor x (salt ns a) (salt (Env.add p x ns) b)
+  let x = fresh p in ctor x (salt ns a) (salt (Env.add p x ns) b)
 
 let freshExp = salt Env.empty
 let freshDecl : decl -> decl = function
@@ -159,8 +159,8 @@ let rec showExp : exp -> string = function
   | EKan n -> "U" ^ showLevel n
   | ELam (a, (p, b)) -> Printf.sprintf "λ %s, %s" (showTele p a) (showExp b)
   | EPi (a, (p, b)) -> begin match p with
-    | No -> Printf.sprintf "(%s → %s)" (showExp a) (showExp b)
-    | _  -> Printf.sprintf "Π %s, %s" (showTele p a) (showExp b)
+    | Irrefutable -> Printf.sprintf "(%s → %s)" (showExp a) (showExp b)
+    | _           -> Printf.sprintf "Π %s, %s" (showTele p a) (showExp b)
   end
   | ESig (a, (p, b)) -> Printf.sprintf "Σ %s, %s" (showTele p a) (showExp b)
   | EPair (fst, snd) -> Printf.sprintf "(%s, %s)" (showExp fst) (showExp snd)
@@ -190,8 +190,8 @@ let rec showValue : value -> string = function
   | VKan n -> "U" ^ showLevel n
   | VLam (x, (p, e, rho)) -> Printf.sprintf "λ %s, %s" (showTele p x rho) (showExp e)
   | VPi (x, (p, e, rho)) -> begin match p with
-    | No -> Printf.sprintf "(%s → %s)" (showValue x) (showExp e)
-    | _  -> Printf.sprintf "Π %s, %s" (showTele p x rho) (showExp e)
+    | Irrefutable -> Printf.sprintf "(%s → %s)" (showValue x) (showExp e)
+    | _           -> Printf.sprintf "Π %s, %s" (showTele p x rho) (showExp e)
   end
   | VSig (x, (p, e, rho)) -> Printf.sprintf "Σ %s, %s" (showTele p x rho) (showExp e)
   | VPair (fst, snd) -> Printf.sprintf "(%s, %s)" (showValue fst) (showValue snd)

@@ -26,4 +26,4 @@ let univImpl a b = match a, b with
   | VKan _, _      | VPre _, _      -> raise (ExpectedVSet b)
   | _, _ -> raise (ExpectedVSet a)
 
-let implv a b ctx = VPi (a, (No, b, ctx))
+let implv a b ctx = VPi (a, (Irrefutable, b, ctx))

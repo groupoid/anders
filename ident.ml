@@ -1,18 +1,18 @@
 type name =
-  | No
+  | Irrefutable
   | Name of string * int
 
 let showName : name -> string = function
-  | No          -> "_"
+  | Irrefutable -> "_"
   | Name (p, n) -> if !Prefs.trace then p ^ "#" ^ string_of_int n else p
 
 module Name = struct
   type t = name
   let compare x y =
     match (x, y) with
-    | No, No -> 0
-    | No, Name _ -> -1
-    | Name _, No -> 1
+    | Irrefutable, Irrefutable -> 0
+    | Irrefutable, Name _ -> -1
+    | Name _, Irrefutable -> 1
     | Name (p, a), Name (q, b) ->
       if p = q then compare a b
       else compare p q
@@ -24,8 +24,8 @@ module Files = Set.Make(String)
 let inc : int ref = ref 0
 let gen () = inc := !inc + 1; !inc
 
-let pat : name -> name = function
-  | No -> No | Name (p, _) -> Name (p, gen ())
+let fresh : name -> name = function
+  | Irrefutable -> Irrefutable | Name (p, _) -> Name (p, gen ())
 
 type dir = Zero | One
 

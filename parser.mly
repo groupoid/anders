@@ -25,7 +25,7 @@
 
 %%
 
-ident : NO { No } | IDENT { Name ($1, 0) }
+ident : NO { Irrefutable } | IDENT { Name ($1, 0) }
 vars : ident+ { $1 }
 lense : LPARENS vars COLON exp1 RPARENS { List.map (fun x -> (x, $4)) $2 }
 telescope : lense telescope { List.append $1 $2 } | lense { $1 }
@@ -72,7 +72,6 @@ exp3:
   | PARTIAL exp3 { EPartial $2 }
   | LPARENS exp0 RPARENS { $2 }
   | IDENT { getVar $1 }
-  | NO { EVar No }
 
 declarations:
   | DEF IDENT params COLON exp1 DEFEQ exp1 { Def ($2, Some (telescope ePi $5 $3), telescope eLam $7 $3) }

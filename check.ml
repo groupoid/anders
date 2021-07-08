@@ -6,6 +6,8 @@ open Prefs
 open Expr
 open Univ
 
+let freshDim () = let i = fresh (name "ι") in (i, EVar i, Var (i, VI))
+
 let vfst : value -> value = function
   | VPair (u, _) -> u
   | v            -> VFst v
@@ -14,7 +16,7 @@ let vsnd : value -> value = function
   | VPair (_, u) -> u
   | v            -> VSnd v
 
-let upVar p x ctx = match p with No -> ctx | _ -> Env.add p x ctx
+let upVar p x ctx = match p with Irrefutable -> ctx | _ -> Env.add p x ctx
 let upLocal (ctx : ctx) (p : name) t v : ctx = upVar p (Local, Value t, Value v) ctx
 let upGlobal (ctx : ctx) (p : name) t v : ctx = upVar p (Global, Value t, Value v) ctx
 let ieq u v : bool = !girard || u = v
@@ -56,7 +58,7 @@ and appFormula v x = match v with
     end
 
 and transport (ctx : ctx) (p : exp) (i : exp) = match eval i ctx with
-  | VDir One -> let a = pat (name "a") in VLam (act p ezero ctx, (a, EVar a, ctx))
+  | VDir One -> let a = fresh (name "a") in VLam (act p ezero ctx, (a, EVar a, ctx))
   | v        -> VTransp (eval p ctx, v)
 
 and closByVal t x v = let (p, e, ctx) = x in traceClos e p v;
@@ -98,7 +100,7 @@ and rbV v : exp = traceRbV v; match v with
   | VHole              -> EHole
   | VPathP v           -> EPathP (rbV v)
   | VPartial v         -> EPartial (rbV v)
-  | VSystem (x, ctx)  -> ESystem (List.map (fun (y, v) -> (y, rbV (eval v ctx))) x)
+  | VSystem (x, ctx)   -> ESystem (List.map (fun (y, v) -> (y, rbV (eval v ctx))) x)
   | VTransp (p, i)     -> ETransp (rbV p, rbV i)
   | VAppFormula (f, x) -> EAppFormula (rbV f, rbV x)
   | VId v              -> EId (rbV v)
@@ -160,8 +162,7 @@ and conv v1 v2 : bool = traceConv v1 v2;
       let x = Var (p, a) in conv (app (b, x)) (closByVal a (p, e, v) x)
     | VPre u, VPre v -> ieq u v
     | VPLam f, VPLam g -> conv f g
-    | VPLam f, v | v, VPLam f -> let p = pat (name "x") in
-      let i = Var (p, VI) in conv (appFormula v i) (app (f, i))
+    | VPLam f, v | v, VPLam f -> let (_, _, i) = freshDim () in conv (appFormula v i) (app (f, i))
     | Var (u, _), Var (v, _) -> u = v
     | VApp (f, a), VApp (g, b) -> conv f g && conv a b
     | VFst x, VFst y | VSnd x, VSnd y -> conv x y
@@ -222,9 +223,8 @@ and check ctx (e0 : exp) (t0 : value) =
   | e, VApp (VApp (VPathP p, u0), u1) ->
     let v0 = act e ezero ctx in
     let v1 = act e eone  ctx in
-    let i = pat (name "x") in let gen = EVar i in
-    let ctx' = upLocal ctx i VI (Var (i, VI)) in
-    check ctx' (rbV (act e gen ctx')) (appFormula p (Var (i, VI)));
+    let (i, x, v) = freshDim () in let ctx' = upLocal ctx i VI v in
+    check ctx' (rbV (act e x ctx')) (appFormula p v);
     eqNf v0 u0; eqNf v1 u1
   | e, VPre u -> begin
     match infer ctx e with
@@ -278,8 +278,8 @@ and inferJ ctx e =
           (EPi (e, (y, EPi (id, (p, EApp (EApp (EApp (EVar pi, EVar x), EVar y), EVar p)))))))), ctx))
 
 and inferPath (ctx : ctx) (p : exp) =
-  let i = pat (name "x") in let ctx' = upLocal ctx i VI (Var (i, VI)) in
-  let n = extKan (infer ctx' (rbV (act p (EVar i) ctx'))) in
+  let (i, x, v) = freshDim () in let ctx' = upLocal ctx i VI v in
+  let n = extKan (infer ctx' (rbV (act p x ctx'))) in
 
   let v0 = act p ezero ctx in let v1 = act p eone ctx in
   implv v0 (impl (rbV v1) (EKan n)) ctx
@@ -289,12 +289,11 @@ and inferTransport (ctx : ctx) (p : exp) (i : exp) =
   let u0 = act p ezero ctx in
   let u1 = act p eone  ctx in
 
-  let x = pat (name "x") in let gen = EVar x in
-  let ctx' = upLocal ctx x VI (Var (x, VI)) in
-  let _ = extKan (infer ctx' (rbV (act p gen ctx'))) in
+  let (j, x, v) = freshDim () in let ctx' = upLocal ctx j VI v in
+  let _ = extKan (infer ctx' (rbV (act p x ctx'))) in
 
   (* Check that p is constant at i = 1 *)
-  List.iter (fun phi -> eqNf u0 (act p gen (faceEnv phi ctx')))
+  List.iter (fun phi -> eqNf u0 (act p x (faceEnv phi ctx')))
     (solve (eval i ctx) One);
   implv u0 (rbV u1) ctx
 

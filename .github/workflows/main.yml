@@ -26,7 +26,8 @@ jobs:
 
       - name: Use OCaml ${{ matrix.ocaml-version }}
         uses: avsm/setup-ocaml@v1
-        with: ocaml-version: ${{ matrix.ocaml-version }}
+        with:
+          ocaml-version: ${{ matrix.ocaml-version }}
 
       - run: opam depext anders --yes
       - run: opam install . --deps-only

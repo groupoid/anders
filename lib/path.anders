@@ -76,7 +76,13 @@ def ¬-of-∨ (i j : I) : Id I -(i ∨ j) (-i ∧ -j) := ref -(i ∨ j)
 def isProp (A : U) : U := Π (a b : A), Path A a b
 def isSet (A : U) : U := Π (a b : A) (a0 b0 : Path A a b), Path (Path A a b) a0 b0
 def isGroupoid (A : U) : U := Π (a b : A) (a0 b0 : Path A a b) (a1 b1 : Path (Path A a b) a0 b0), Path (Path (Path A a b) a0 b0) a1 b1
-def trans (A B: U) (p: PathP (<_> U) A B) (a: A): B := transp p 0 a
+
+def trans (A B : U) (p : PathP (<_> U) A B) : A → B := transp p 0
+def trans⁻¹ (A B : U) (p : PathP (<_> U) A B) : B → A := transp (<i> p @ -i) 0
+
+def trans-trans⁻¹ (A B : U) (p : PathP (<_> U) A B) (a : A) : Path A a (trans⁻¹ A B p (trans A B p a)) :=
+<i> transp (<j> p @ i ∧ -j) -i (transp (<j> p @ i ∧ j) -i a)
+
 def subst (A: U) (P: A → U) (a b: A) (p: Path A a b) (e: P a): P b := transp (<i> P (p @ i)) 0 e
 def coerce (A B: U) (p: PathP (<_> U) A B): A → B := λ (x : A), trans A B p x
 def pcomp (A: U) (a b c: A) (p: Path A a b) (q: Path A b c): Path A a c := subst A (Path A a) b c q p

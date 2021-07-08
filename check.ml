@@ -322,7 +322,9 @@ and inferTransport (ctx : ctx) (p : exp) (i : exp) =
   let _ = extKan (infer ctx' (rbV (act p x ctx'))) in
 
   (* Check that p is constant at i = 1 *)
-  List.iter (fun phi -> eqNf u0 (act p x (faceEnv phi ctx')))
+  List.iter (fun phi ->
+    let rho = faceEnv phi ctx' in
+    eqNf (act p ezero rho) (act p x rho))
     (solve (eval i ctx) One);
   implv u0 (rbV u1) ctx
 

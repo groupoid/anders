@@ -23,5 +23,5 @@ let parse filename =
     (fun chan ->
       let lexbuf = Lexing.from_channel chan in
       let file = parseErr Parser.file lexbuf in
-      print_endline (Expr.showFile file))
+      print_endline (Module.showFile file))
     chan ()

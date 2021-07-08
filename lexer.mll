@@ -23,7 +23,7 @@
     done; !res
 }
 
-let lat1   = [^ '\t' ' ' '\r' '\n' '(' ')' '[' ']' ':' '.' ',' '/' '<' '>']
+let lat1   = [^ '\t' ' ' '\r' '\n' '(' ')' '[' ']' ':' '.' ',' '<' '>']
 let beg    = lat1 # '-'
 let bytes2 = ['\192'-'\223']['\128'-'\191']
 let bytes3 = ['\224'-'\239']['\128'-'\191']['\128'-'\191']
@@ -65,9 +65,8 @@ rule main = parse
 | ','             { COMMA }            | '_'             { NO }
 | '('             { LPARENS }          | ')'             { RPARENS }
 | '['             { LSQ }              | ']'             { RSQ }
-| '/'             { DIRSEP }           | ".1"            { FST }
-| ".2"            { SND }              | pi              { PI }
-| sigma           { SIGMA }            | "?"             { HOLE }
+| ".1"            { FST }              | ".2"            { SND }
+| pi              { PI }               | sigma           { SIGMA }
 | "<"             { LT }               | ">"             { GT }
 | negFormula      { NEGATE }           | andFormula      { AND }
 | orFormula       { OR }               | "@"             { APPFORMULA }
@@ -77,5 +76,5 @@ rule main = parse
 | "PathP"         { PATHP }            | "transp"        { TRANSP }
 | "Id"            { ID }               | "ref"           { REF }
 | "idJ"           { IDJ }              | pre as s        { PRE (getLevel s) }
-| "Partial"       { PARTIAL }          | ident as s      { IDENT s }
-| eof             { EOF }
+| "?"             { HOLE }             | "Partial"       { PARTIAL }
+| ident as s      { IDENT s }          | eof             { EOF }

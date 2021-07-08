@@ -30,22 +30,9 @@ type exp =
   | EOr  of exp * exp
   | ENeg of exp
 and system = (conjunction * exp) list
-
 type tele = name * exp
 
-type decl =
-  | Def of string * exp option * exp
-  | Axiom of string * exp
-
-type line =
-  | Import of string
-  | Option of string * string
-  | Decl of decl
-
-type content = line list
-type file = string * content
 type scope = Local | Global
-
 type value =
   | VLam   of value * clos
   | VKan   of int
@@ -105,44 +92,6 @@ let getDigit x = Char.chr (x + 0x80) |> Printf.sprintf "\xE2\x82%c"
 let getVar x =
   let xs = [(!zeroPrim, EDir Zero); (!onePrim, EDir One); (!intervalPrim, EI)] in
   match List.assoc_opt x xs with Some e -> e | None -> decl x
-
-let impl a b = EPi (a, (Irrefutable, b))
-let prod a b = ESig (a, (Irrefutable, b))
-
-let rec salt (ns : name Env.t) : exp -> exp = function
-  | ELam (a, (p, b))    -> saltTele eLam ns p a b
-  | EKan n              -> EKan n
-  | EPi (a, (p, b))     -> saltTele ePi ns p a b
-  | ESig (a, (p, b))    -> saltTele eSig ns p a b
-  | EPair (a, b)        -> EPair (salt ns a, salt ns b)
-  | EFst e              -> EFst (salt ns e)
-  | ESnd e              -> ESnd (salt ns e)
-  | EApp (f, x)         -> EApp (salt ns f, salt ns x)
-  | EVar x              -> EVar (freshVar ns x)
-  | EHole               -> EHole
-  | EPre n              -> EPre n
-  | EId e               -> EId (salt ns e)
-  | ERef e              -> ERef (salt ns e)
-  | EJ e                -> EJ (salt ns e)
-  | EPathP e            -> EPathP (salt ns e)
-  | ETransp (p, i)      -> ETransp (salt ns p, salt ns i)
-  | EPLam e             -> EPLam (salt ns e)
-  | EAppFormula (p, i)  -> EAppFormula (salt ns p, salt ns i)
-  | EPartial e          -> EPartial (salt ns e)
-  | ESystem x           -> ESystem (List.map (fun (phi, e) -> (freshConj ns phi, salt ns e)) x)
-  | EI                  -> EI
-  | EDir d              -> EDir d
-  | EAnd (a, b)         -> EAnd (salt ns a, salt ns b)
-  | EOr (a, b)          -> EOr (salt ns a, salt ns b)
-  | ENeg e              -> ENeg (salt ns e)
-and saltTele ctor ns p a b =
-  let x = fresh p in ctor x (salt ns a) (salt (Env.add p x ns) b)
-
-let freshExp = salt Env.empty
-let freshDecl : decl -> decl = function
-  | Def (p, Some exp1, exp2) -> Def (p, Some (freshExp exp1), freshExp exp2)
-  | Def (p, None, exp) -> Def (p, None, freshExp exp)
-  | Axiom (p, exp) -> Axiom (p, freshExp exp)
 
 let rec showLevel x =
   if x < 0 then failwith "showLevel: expected positive integer"
@@ -235,22 +184,3 @@ let showGamma (ctx : ctx) : string =
         | Local, t, _ -> Some (Printf.sprintf "%s : %s" (showName p) (showTerm t))
         | _, _, _ -> None)
   |> String.concat "\n"
-
-type command =
-  | Nope
-  | Eval    of exp
-  | Action  of string
-  | Command of string * exp
-
-let showDecl : decl -> string = function
-  | Def (p, Some exp1, exp2) -> Printf.sprintf "def %s : %s := %s" p (showExp exp1) (showExp exp2)
-  | Def (p, None, exp) -> Printf.sprintf "def %s := %s" p (showExp exp)
-  | Axiom (p, exp) -> Printf.sprintf "axiom %s : %s" p (showExp exp)
-
-let showLine : line -> string = function
-  | Import p -> Printf.sprintf "import %s" p
-  | Option (opt, value) -> Printf.sprintf "option %s %s" opt value
-  | Decl d -> showDecl d
-
-let showContent x = String.concat "\n" (List.map showLine x)
-let showFile : file -> string = function | (p, x) -> Printf.sprintf "module %s where\n%s" p (showContent x)

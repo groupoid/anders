@@ -3,8 +3,8 @@ open Error
 open Trace
 open Ident
 open Prefs
+open Elab
 open Expr
-open Univ
 
 let freshDim () = let i = fresh (name "ι") in (i, EVar i, Var (i, VI))
 

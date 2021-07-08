@@ -1,4 +1,5 @@
-open Lexparse
+open Reader
+open Module
 open Ident
 open Error
 open Expr
@@ -27,7 +28,7 @@ let rec extractExp : exp -> string = function
   | EAnd (a, b) -> Printf.sprintf "(%s /\\ %s)" (extractExp a) (extractExp b)
   | EOr (a, b) -> Printf.sprintf "(%s \\/ %s)" (extractExp a) (extractExp b)
   | ENeg a -> Printf.sprintf "-%s" (extractExp a)
-  | ELam (a, (p, b)) -> Printf.sprintf "\\(%s -> %s)" (extractTele p a) (extractExp b)
+  | ELam (a, (p, b)) -> Printf.sprintf "(\\%s -> %s)" (extractTele p a) (extractExp b)
   | EPi (a, (p, b)) -> Printf.sprintf "(%s -> %s)" (extractTele p a) (extractExp b)
   | ESig (a, (p, b)) -> Printf.sprintf "(%s * %s)" (extractTele p a) (extractExp b)
   | EPair (fst, snd) -> Printf.sprintf "(%s, %s)" (extractExp fst) (extractExp snd)
@@ -44,9 +45,9 @@ let extractDecl : decl -> string = function
   | Axiom (p, t) -> Printf.sprintf "%s : %s = undefined" p (extractExp t)
 
 let extractLine : line -> string = function
-  | Import p -> Printf.sprintf "import %s" p
-  | Option _ -> fail "cubicaltt obviously does not support Anders-specific options"
-  | Decl d   -> extractDecl d
+  | Import xs -> String.concat "\n" (List.map (Printf.sprintf "import %s") xs)
+  | Option _  -> fail "cubicaltt obviously does not support Anders-specific options"
+  | Decl d    -> extractDecl d
 
 let extractContent x = String.concat "\n" (List.map extractLine x)
 let extractFile : file -> string =

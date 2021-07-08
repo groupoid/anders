@@ -1,9 +1,10 @@
+open Module
 open Check
 open Error
 open Ident
 open Prefs
 open Expr
-open Univ
+open Elab
 
 let ext x = x ^ ".anders"
 
@@ -50,12 +51,13 @@ let rec checkLine st : line -> state =
       | "pre-eval" -> preeval := getBoolVal opt value
       | _          -> raise (UnknownOption opt)
     end; st
-  | Import x -> let path = ext x in if Files.mem path checked then st else checkFile st path
+  | Import xs -> List.fold_left (fun st x -> let path = ext x in
+    if Files.mem path checked then st else checkFile st path) st xs
 and checkFile p path =
   let (ctx, checked) = p in
   let filename = Filename.basename path in
   let chan = open_in path in
-  let (name, con) = Lexparse.parseErr Parser.file (Lexing.from_channel chan) in
+  let (name, con) = Reader.parseErr Parser.file (Lexing.from_channel chan) in
   close_in chan; Printf.printf "Parsed “%s” successfully.\n" filename; flush_all ();
   if ext name = filename then ()
   else raise (InvalidModuleName (name, filename));

@@ -1,6 +1,8 @@
+open Module
 open Error
 open Ident
 open Decl
+open Elab
 open Expr
 
 let help =
@@ -38,7 +40,7 @@ let repl () =
     print_string "> ";
     let line = read_line () in
     handleErrors (fun x ->
-      let cmd = Lexparse.parseErr Parser.repl
+      let cmd = Reader.parseErr Parser.repl
                   (Lexing.from_string x) in
       main ctx cmd) line ()
   done with End_of_file -> ()

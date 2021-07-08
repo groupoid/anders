@@ -27,8 +27,8 @@ let help =
 let repl = ref false
 let cmd : cmdline -> unit = function
   | Check     filename -> Repl.check filename
-  | Lex       filename -> Lexparse.lex filename
-  | Parse     filename -> Lexparse.parse filename
+  | Lex       filename -> Reader.lex filename
+  | Parse     filename -> Reader.parse filename
   | Cubicaltt filename -> Cubical.extract filename
   | Prim (prim, value) -> begin match prim with
     | "zero"     -> zeroPrim     := value

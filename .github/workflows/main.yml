@@ -33,6 +33,4 @@ jobs:
       - run: opam install . --deps-only
       - run: opam exec -- dune build
       - run: opam install .
-      - run: tree -L 5 .
-      - run: ls ~/.opam/default/bin/and*
-      - run: for i in lib/*.anders ; do anders check $i ; done
+      - run: for i in lib/*.anders ; do _build/default/anders.exe check $i ; done

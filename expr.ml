@@ -105,8 +105,8 @@ let rec showExp : exp -> string = function
   | ESystem x -> Printf.sprintf "[%s]" (showSystem showExp x)
   | ESub (a, i, u) -> Printf.sprintf "%s[%s ↦ %s]" (showExp a) (showExp i) (showExp u)
   | EI -> !intervalPrim | EDir d -> showDir d
-  | EAnd (a, b) -> Printf.sprintf "(%s /\\ %s)" (showExp a) (showExp b)
-  | EOr (a, b) -> Printf.sprintf "(%s \\/ %s)" (showExp a) (showExp b)
+  | EAnd (a, b) -> Printf.sprintf "(%s ∧ %s)" (showExp a) (showExp b)
+  | EOr (a, b) -> Printf.sprintf "(%s ∨ %s)" (showExp a) (showExp b)
   | ENeg a -> Printf.sprintf "-%s" (showExp a)
 and showTele p x = Printf.sprintf "(%s : %s)" (showName p) (showExp x)
 
@@ -143,8 +143,8 @@ let rec showValue : value -> string = function
     else Printf.sprintf "[%s]" (showSystem showExp x)
   | VSub (a, i, u) -> Printf.sprintf "%s[%s ↦ %s]" (showValue a) (showValue i) (showValue u)
   | VI -> !intervalPrim | VDir d -> showDir d
-  | VAnd (a, b) -> Printf.sprintf "(%s /\\ %s)" (showValue a) (showValue b)
-  | VOr (a, b) -> Printf.sprintf "(%s \\/ %s)" (showValue a) (showValue b)
+  | VAnd (a, b) -> Printf.sprintf "(%s ∧ %s)" (showValue a) (showValue b)
+  | VOr (a, b) -> Printf.sprintf "(%s ∨ %s)" (showValue a) (showValue b)
   | VNeg a -> Printf.sprintf "-%s" (showValue a)
 and showTermBind : name * record -> string option = function
   | p, (Local, _, t) -> Some (Printf.sprintf "%s := %s" (showName p) (showTerm t))

@@ -98,8 +98,8 @@ and inferV v = traceInferV v; match v with
   | VSnd e                   -> let (t, g) = extSigG (inferV e) in closByVal t g (VFst e)
   | VApp (VTransp (p, _), _) -> appFormula p vone
   | VApp (f, x)              -> begin match inferV f with
-    | VApp (VPartial t, _) -> t
-    | VPi (t, g) -> closByVal t g x
+    | VSub (VApp (VPartial t, _), _, _) | VApp (VPartial t, _) -> t
+    | VSub (VPi (t, g), _, _) | VPi (t, g) -> closByVal t g x
     | v -> raise (ExpectedPi v)
   end
   | VAppFormula (f, x)       -> let (p, _, _) = extPathP (inferV f) in appFormula p x
@@ -304,8 +304,8 @@ and infer ctx e : value = traceInfer e; match e with
   | EPi (a, (p, b)) -> inferTele ctx univImpl p a b
   | ELam (a, (p, b)) -> inferLam ctx p a b
   | EApp (f, x) -> begin match infer ctx f with
-    | VApp (VPartial t, i) -> check ctx x (VApp (VApp (VId VI, VDir One), i)); t
-    | VPi (t, g) -> check ctx x t; closByVal t g (eval x ctx)
+    | VSub (VApp (VPartial t, i), _, _) | VApp (VPartial t, i) -> check ctx x (VApp (VApp (VId VI, VDir One), i)); t
+    | VSub (VPi (t, g), _, _) | VPi (t, g) -> check ctx x t; closByVal t g (eval x ctx)
     | v -> raise (ExpectedPi v)
   end
   | EFst e -> fst (extSigG (infer ctx e))

@@ -3,8 +3,8 @@ open Error
 open Expr
 
 let extSigG : value -> value * clos = function
-  | VSig (t, g) -> (t, g)
-  | u           -> raise (ExpectedSig u)
+  | VSub (VSig (t, g), _, _) | VSig (t, g) -> (t, g)
+  | u -> raise (ExpectedSig u)
 
 let extSet : value -> int = function
   | VPre n | VKan n -> n

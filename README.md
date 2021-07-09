@@ -9,21 +9,21 @@ CCHM homotopy system type checker based on Mini-TT for OCaml.
 Features
 --------
 
+* Homepage: https://groupoid.space/homotopy
 * Fibrant MLTT-style ΠΣ primitives with Leibniz equality in 500 LOC
 * Cofibrant CHM-style I primitives with pretypes hierarchy Vₙ in 500 LOC
 * Parser in 50 LOC
 * Lexer in 50 LOC
-* Full Agda-style UTF-8 support including universe levels
-* Lean comma-syntax for ΠΣ
+* UTF-8 support including universe levels
+* Lean syntax for ΠΣ
 * 1D syntax with top-level declarations
 * Groupoid Infinity CCHM base library: https://groupoid.space/math
 * Best suited for academic papers
-* Homepage: https://groupoid.space/homotopy
 
 Prerequisites
 -------------
 
-Here is example for Ubuntu:
+Here is the setup for Ubuntu:
 
 ```shell
 $ apt install ocaml ocamlbuild menhir
@@ -84,6 +84,17 @@ Anders was built by strictly following these publications:
 * <a href="https://staff.math.su.se/anders.mortberg/papers/cubicalagda.pdf">Cubical Agda: A Dependently Typed PL with Univalence and HITs</a> [Vezzosi, Mörtberg, Abel]
 * <a href="http://www.cse.chalmers.se/~simonhu/misc/hcomp.pdf">A Cubical Type Theory for Higher Inductive Types</a> [Huber]
 * <a href="http://www.cse.chalmers.se/~simonhu/papers/p.pdf">Gluing for type theory</a> [Kaposi, Huber, Sattler]
+
+We tried to bring in as little of ourselves as possible. 
+
+HTS
+---
+
+Type system with two identities.
+
+* <a href="https://www.math.ias.edu/vladimir/sites/math.ias.edu.vladimir/files/HTS.pdf">A simple type system with two identity types</a> [Voevodsky]
+* <a href="https://arxiv.org/pdf/1705.03307.pdf">Two-level type theory and applications/a> [Annenkov, Capriotti, Kraus, Sattler]
+* <a href="https://types21.liacs.nl/download/syntax-for-two-level-type-theory/">Syntax for two-level type theory</a> [Bonacina, Ahrens]
 
 Acknowledgements
 ----------------

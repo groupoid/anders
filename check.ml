@@ -50,11 +50,16 @@ let rec eval (e : exp) (ctx : ctx) = traceEval e; match e with
   | ESystem (Split xs) -> evalSystem ctx xs
   | ESystem (Const x)  -> VSystem (Const x, ctx)
   | ESub (a, i, u)     -> VSub (eval a ctx, eval i ctx, eval u ctx)
-  | EOuc e             -> let v = eval e ctx in begin match eval (rbV (inferV v)) ctx with
-    | VSub (_, VDir One, VSystem (Const e', ctx')) -> eval e' ctx'
-    | _ -> VOuc v
+  | EInc e             -> begin match eval e ctx with VOuc v -> v | v -> VInc v end
+  | EOuc e             -> begin match eval e ctx with
+    | VInc x -> x | v -> begin match inferV v with
+      | VSub (_, i, VSystem (Const e', ctx')) -> begin match eval (rbV i) ctx with
+        | VDir One -> eval e' ctx'
+        | _ -> VOuc v
+      end
+      | _ -> VOuc v
+    end
   end
-  | EInc e             -> begin match eval e ctx with VOuc v | v -> VOuc v end
 
 and appFormula v x = match v with
   | VPLam f -> app (f, x)

@@ -23,31 +23,31 @@ let ieq u v : bool = !girard || u = v
 
 (* Evaluator *)
 let rec eval (e : exp) (ctx : ctx) = traceEval e; match e with
+  | EPre u             -> VPre u
   | EKan u             -> VKan u
+  | EVar x             -> getRho ctx x
+  | EHole              -> VHole
+  | EPi  (a, (p, b))   -> VPi (eval a ctx, (p, b, ctx))
   | ELam (a, (p, b))   -> VLam (eval a ctx, (p, b, ctx))
-  | EPi  (a, (p, b))   -> VPi  (eval a ctx, (p, b, ctx))
+  | EApp (f, x)        -> app (eval f ctx, eval x ctx)
   | ESig (a, (p, b))   -> VSig (eval a ctx, (p, b, ctx))
+  | EPair (e1, e2)     -> VPair (eval e1 ctx, eval e2 ctx)
   | EFst e             -> vfst (eval e ctx)
   | ESnd e             -> vsnd (eval e ctx)
-  | EApp (f, x)        -> app (eval f ctx, eval x ctx)
-  | EVar x             -> getRho ctx x
-  | EPair (e1, e2)     -> VPair (eval e1 ctx, eval e2 ctx)
-  | EHole              -> VHole
-  | EPre u             -> VPre u
-  | EPathP e           -> VPathP (eval e ctx)
-  | EPLam e            -> VPLam (eval e ctx)
-  | EPartial e         -> VPartial (eval e ctx)
-  | ESystem x          -> VSystem (x, ctx)
-  | EAppFormula (e, x) -> appFormula (eval e ctx) (eval x ctx)
-  | ETransp (p, i)     -> transport ctx p i
   | EId e              -> VId (eval e ctx)
   | ERef e             -> VRef (eval e ctx)
   | EJ e               -> VJ (eval e ctx)
+  | EPathP e           -> VPathP (eval e ctx)
+  | EPLam e            -> VPLam (eval e ctx)
+  | EAppFormula (e, x) -> appFormula (eval e ctx) (eval x ctx)
   | EI                 -> VI
   | EDir d             -> VDir d
   | EAnd (e1, e2)      -> andFormula (eval e1 ctx, eval e2 ctx)
-  | EOr (e1, e2)       -> orFormula  (eval e1 ctx, eval e2 ctx)
+  | EOr (e1, e2)       -> orFormula (eval e1 ctx, eval e2 ctx)
   | ENeg e             -> negFormula (eval e ctx)
+  | ETransp (p, i)     -> transport ctx p i
+  | EPartial e         -> VPartial (eval e ctx)
+  | ESystem x          -> VSystem (x, ctx)
 
 and appFormula v x = match v with
   | VPLam f -> app (f, x)

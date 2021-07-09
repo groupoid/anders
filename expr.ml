@@ -1,64 +1,35 @@
 open Ident
 
-(* Interface *)
+(* Language Expressions *)
 
 type exp =
-  | ELam   of exp * (name * exp)
-  | EKan   of int
-  | EPi    of exp * (name * exp)
-  | ESig   of exp * (name * exp)
-  | EPair  of exp * exp
-  | EFst   of exp
-  | ESnd   of exp
-  | EApp   of exp * exp
-  | EVar   of name
-  | EHole
-  (* cubical part *)
-  | EPre        of int
-  | EId         of exp
-  | ERef        of exp
-  | EJ          of exp
-  | EPathP      of exp
-  | ETransp     of exp * exp
-  | EPLam       of exp
-  | EAppFormula of exp * exp
-  | EPartial    of exp
-  | ESystem     of system
-  | EI
-  | EDir of dir
-  | EAnd of exp * exp
-  | EOr  of exp * exp
-  | ENeg of exp
+  | EPre of int | EKan of int                                                   (* cosmos *)
+  | EVar of name | EHole                                                     (* variables *)
+  | EPi of exp * (name * exp) | ELam of exp * (name * exp) | EApp of exp * exp      (* pi *)
+  | ESig of exp * (name * exp) | EPair  of exp * exp | EFst of exp | ESnd of exp (* sigma *)
+  | EId of exp | ERef of exp | EJ of exp                               (* strict equality *)
+  | EPathP of exp | EPLam of exp | EAppFormula of exp * exp              (* CCHM equality *)
+  | EI | EDir of dir | EAnd of exp * exp | EOr of exp * exp | ENeg of exp
+  | ETransp of exp * exp | EPartial of exp | ESystem of system
+
 and system = (conjunction * exp) list
+
 type tele = name * exp
 
 type scope = Local | Global
+
+(* Intermediate type checker values *)
+
 type value =
-  | VLam   of value * clos
-  | VKan   of int
-  | VPi    of value * clos
-  | VSig   of value * clos
-  | VPair  of value * value
-  | VFst   of value
-  | VSnd   of value
-  | VApp   of value * value
-  | Var    of name * value
-  | VHole
-  (* cubical part *)
-  | VPre        of int
-  | VId         of value
-  | VRef        of value
-  | VPLam       of value
-  | VJ          of value
-  | VPathP      of value
-  | VTransp     of value * value
-  | VAppFormula of value * value
-  | VPartial    of value
-  | VSystem     of system * ctx
-  | VI | VDir of dir
-  | VAnd of value * value
-  | VOr  of value * value
-  | VNeg of value
+  | VKan of int | VPre of int
+  | Var of name * value | VHole
+  | VPi of value * clos | VLam of value * clos | VApp   of value * value
+  | VSig of value * clos | VPair  of value * value | VFst of value | VSnd of value
+  | VId of value | VRef of value | VJ of value
+  | VPathP of value | VPLam of value | VAppFormula of value * value
+  | VI | VDir of dir | VAnd of value * value | VOr of value * value | VNeg of value
+  | VTransp of value * value | VPartial of value | VSystem of system * ctx
+
 and clos = name * exp * ctx
 and term = Exp of exp | Value of value
 and record = scope * term * term

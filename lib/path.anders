@@ -113,6 +113,8 @@ def ε (A : U) : Partial A 0 := []
 def I-nontriv (p : Id I 0 1) (A : U) : A := ε A (rev I 0 1 p)
 
 def seg : PathP (<_> I) 0 1 := <i> i
+def Id-path (A : U) (a b : A) : Id A a b → Path A a b :=
+idJ A (λ (a b : A) (_ : Id A a b), Path A a b) a (<_> a) b
 
 def Partial-app (A : U) (i : I) (u : Partial A i) (p : one? i) : A := u p
 

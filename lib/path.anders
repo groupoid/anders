@@ -131,6 +131,7 @@ def ouc (A : U) (i : I) (u : Partial A i) (a : A[i ↦ u]) : A := a
 
 def Path′ (A : U) (a b : A) := Π (i : I), A[i ∨ -i ↦ [(i = 0) → a, (i = 1) → b]]
 def Path-Path′ (A : U) (a b : A) (p : Path A a b) : Path′ A a b := λ (i : I), p @ i
+def Path′-Path (A : U) (a b : A) (p : Path′ A a b) : Path A a b := <i> p i
 
 {-
 

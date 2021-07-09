@@ -47,7 +47,8 @@ let rec eval (e : exp) (ctx : ctx) = traceEval e; match e with
   | ENeg e             -> negFormula (eval e ctx)
   | ETransp (p, i)     -> transport ctx p i
   | EPartial e         -> VPartial (eval e ctx)
-  | ESystem x          -> VSystem (x, ctx)
+  | ESystem (Split xs) -> evalSystem ctx xs
+  | ESystem (Const x)  -> VSystem (Const x, ctx)
   | ESub (a, i, u)     -> VSub (eval a ctx, eval i ctx, eval u ctx)
 
 and appFormula v x = match v with
@@ -68,10 +69,15 @@ and closByVal t x v = let (p, e, ctx) = x in traceClos e p v;
 
 and app : value * value -> value = function
   | VApp (VApp (VApp (VApp (VJ _, _), _), f), _), VRef _ -> f
-  | VSystem (Split xs, ctx), _ -> eval (reduceSystem ctx xs) ctx
   | VSystem (Const x, ctx), _ -> eval x ctx
   | VLam (t, f), v -> closByVal t f v
   | f, x -> VApp (f, x)
+
+and evalSystem ctx xs =
+  let holds = Env.for_all (fun p d -> conv (getRho ctx p) (VDir d)) in
+  match List.find_opt (fun (x, _) -> holds x) xs with
+  | Some (_, e) -> VSystem (Const e, ctx)
+  | _           -> VSystem (Split xs, ctx)
 
 and reduceSystem ctx xs =
   snd (List.find (fun (x, _) ->
@@ -214,7 +220,7 @@ and conv v1 v2 : bool = traceConv v1 v2;
     | VId u, VId v -> conv u v
     | VJ u, VJ v -> conv u v
     | _, _ -> false
-  end || convId v1 v2
+  end || convId v1 v2 || convSubtype v1 v2 || convSubtype v2 v1
 
 and faceSubset phi ctx1 psi ctx2 =
   Env.for_all (fun p x -> let v = getRho ctx1 p in
@@ -234,6 +240,12 @@ and convId v1 v2 =
     | VApp (VApp (VId t1, a1), b1), VApp (VApp (VId t2, a2), b2) ->
       conv t1 t2 && conv a1 a2 && conv b1 b2
     | _, _ -> false
+  with ExpectedNeutral _ -> false
+
+and convSubtype v1 v2 =
+  try match inferV v1 with
+    | VSub (_, VDir One, VSystem (Const e, ctx)) -> conv (eval e ctx) v2
+    | _ -> false
   with ExpectedNeutral _ -> false
 
 and eqNf v1 v2 : unit = traceEqNF v1 v2;

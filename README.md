@@ -93,7 +93,7 @@ HTS
 Type system with two identities.
 
 * <a href="https://www.math.ias.edu/vladimir/sites/math.ias.edu.vladimir/files/HTS.pdf">A simple type system with two identity types</a> [Voevodsky]
-* <a href="https://arxiv.org/pdf/1705.03307.pdf">Two-level type theory and applications/a> [Annenkov, Capriotti, Kraus, Sattler]
+* <a href="https://arxiv.org/pdf/1705.03307.pdf">Two-level type theory and applications</a> [Annenkov, Capriotti, Kraus, Sattler]
 * <a href="https://types21.liacs.nl/download/syntax-for-two-level-type-theory/">Syntax for two-level type theory</a> [Bonacina, Ahrens]
 
 Acknowledgements

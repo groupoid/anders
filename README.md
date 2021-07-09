@@ -20,19 +20,17 @@ Features
 * Groupoid Infinity CCHM base library: https://groupoid.space/math
 * Best suited for academic papers
 
-Prerequisites
+Setup
 -------------
 
-Here is the setup for Ubuntu:
-
 ```shell
-$ apt install ocaml ocamlbuild menhir
+$ opam install anders
 ```
 
 Samples
 -------
 
-You can find some examples in the `experiments` directory.
+You can find some examples in the `share` directory of the Anders package.
 For instance reality checking by internalizing MLTT can be performed by the following usage:
 
 ```Lean
@@ -65,8 +63,7 @@ def instance (A : U) : MLTT A :=
 ```
 
 ```shell
-$ ocamlbuild -use-menhir -yaccflag "--explain" anders.native
-$ ./anders.native girard check experiments/mltt.anders
+$ anders girard check mltt.anders
 ```
 
 Papers

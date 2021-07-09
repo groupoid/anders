@@ -10,9 +10,9 @@ type exp =
   | EId of exp | ERef of exp | EJ of exp                               (* strict equality *)
   | EPathP of exp | EPLam of exp | EAppFormula of exp * exp              (* CCHM equality *)
   | EI | EDir of dir | EAnd of exp * exp | EOr of exp * exp | ENeg of exp
-  | ETransp of exp * exp | EPartial of exp | ESystem of system
+  | ETransp of exp * exp | EPartial of exp | ESystem of system | ESub of exp * exp * exp
 
-and system = (conjunction * exp) list
+and system = Const of exp | Split of (conjunction * exp) list
 
 type tele = name * exp
 
@@ -28,7 +28,7 @@ type value =
   | VId of value | VRef of value | VJ of value
   | VPathP of value | VPLam of value | VAppFormula of value * value
   | VI | VDir of dir | VAnd of value * value | VOr of value * value | VNeg of value
-  | VTransp of value * value | VPartial of value | VSystem of system * ctx
+  | VTransp of value * value | VPartial of value | VSystem of system * ctx | VSub of value * value * value
 
 and clos = name * exp * ctx
 and term = Exp of exp | Value of value
@@ -71,9 +71,10 @@ let rec showLevel x =
 let showDir : dir -> string = function | Zero -> !zeroPrim | One -> !onePrim
 let showAtom (p, d) = Printf.sprintf "(%s = %s)" (showName p) (showDir d)
 let showConjunction xs = Conjunction.elements xs |> List.map showAtom |> String.concat " "
-let showSystem xs show =
-  List.map (fun (x, e) -> Printf.sprintf "%s -> %s" (showConjunction x) (show e)) xs
-  |> String.concat ", "
+let showSystem show = function
+  | Split xs -> List.map (fun (x, e) -> Printf.sprintf "%s → %s" (showConjunction x) (show e)) xs
+                |> String.concat ", "
+  | Const x -> Printf.sprintf "_ → %s" (show x)
 
 let rec showExp : exp -> string = function
   | EKan n -> "U" ^ showLevel n
@@ -99,7 +100,8 @@ let rec showExp : exp -> string = function
   | EPLam _ -> failwith "showExp: unreachable code was reached"
   | EAppFormula (f, x) -> Printf.sprintf "(%s @ %s)" (showExp f) (showExp x)
   | EPartial e -> Printf.sprintf "Partial %s" (showExp e)
-  | ESystem x -> Printf.sprintf "[%s]" (showSystem x showExp)
+  | ESystem x -> Printf.sprintf "[%s]" (showSystem showExp x)
+  | ESub (a, i, u) -> Printf.sprintf "%s[%s ↦ %s]" (showExp a) (showExp i) (showExp u)
   | EI -> !intervalPrim | EDir d -> showDir d
   | EAnd (a, b) -> Printf.sprintf "(%s /\\ %s)" (showExp a) (showExp b)
   | EOr (a, b) -> Printf.sprintf "(%s \\/ %s)" (showExp a) (showExp b)
@@ -135,8 +137,9 @@ let rec showValue : value -> string = function
   | VPartial v -> Printf.sprintf "Partial %s" (showValue v)
   | VSystem (x, rho) ->
     if isRhoVisible rho then
-      Printf.sprintf "[%s, %s]" (showSystem x showExp) (showRho rho)
-    else Printf.sprintf "[%s]" (showSystem x showExp)
+      Printf.sprintf "[%s, %s]" (showSystem showExp x) (showRho rho)
+    else Printf.sprintf "[%s]" (showSystem showExp x)
+  | VSub (a, i, u) -> Printf.sprintf "%s[%s ↦ %s]" (showValue a) (showValue i) (showValue u)
   | VI -> !intervalPrim | VDir d -> showDir d
   | VAnd (a, b) -> Printf.sprintf "(%s /\\ %s)" (showValue a) (showValue b)
   | VOr (a, b) -> Printf.sprintf "(%s \\/ %s)" (showValue a) (showValue b)

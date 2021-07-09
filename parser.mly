@@ -8,11 +8,11 @@
 %token <int> KAN
 %token <int> PRE
 %token LPARENS RPARENS LSQ RSQ
-%token COMMA COLON NO EOF HOLE
+%token COMMA COLON IRREF EOF HOLE
 %token DEFEQ PROD ARROW FST SND LAM DEF
 %token MODULE WHERE IMPORT AXIOM
 %token SIGMA PI OPTION LT GT
-%token APPFORMULA PATHP TRANSP PARTIAL
+%token APPFORMULA PATHP TRANSP PARTIAL MAP
 %token AND OR NEGATE
 %token ID REF IDJ
 
@@ -27,7 +27,7 @@
 
 %%
 
-ident : NO { Irrefutable } | IDENT { Name ($1, 0) }
+ident : IRREF { Irrefutable } | IDENT { Name ($1, 0) }
 vars : ident+ { $1 }
 lense : LPARENS vars COLON exp1 RPARENS { List.map (fun x -> (x, $4)) $2 }
 telescope : lense telescope { List.append $1 $2 } | lense { $1 }
@@ -51,7 +51,8 @@ exp1:
   | LAM telescope COMMA exp1 { telescope eLam $4 $2 }
   | PI telescope COMMA exp1 { telescope ePi $4 $2 }
   | SIGMA telescope COMMA exp1 { telescope eSig $4 $2 }
-  | LSQ separated_list(COMMA, partial) RSQ { ESystem $2 }
+  | LSQ IRREF ARROW exp1 RSQ { ESystem (Const $4) }
+  | LSQ separated_list(COMMA, partial) RSQ { ESystem (Split $2) }
   | exp2 ARROW exp1 { impl $1 $3 }
   | exp2 PROD exp1  { prod $1 $3 }
   | LT vars GT exp1 { pLam $4 $2 }
@@ -72,6 +73,8 @@ exp3:
   | PATHP exp3 { EPathP $2 }
   | TRANSP exp3 exp3 { ETransp ($2, $3) }
   | PARTIAL exp3 { EPartial $2 }
+  | IDENT LSQ exp0 MAP exp0 RSQ { ESub (decl $1, $3, $5) }
+  | LPARENS exp0 RPARENS LSQ exp0 MAP exp0 RSQ { ESub ($2, $5, $7) }
   | LPARENS exp0 RPARENS { $2 }
   | IDENT { getVar $1 }
 

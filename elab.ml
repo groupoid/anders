@@ -55,7 +55,9 @@ let rec salt (ns : name Env.t) : exp -> exp = function
   | EPLam e             -> EPLam (salt ns e)
   | EAppFormula (p, i)  -> EAppFormula (salt ns p, salt ns i)
   | EPartial e          -> EPartial (salt ns e)
-  | ESystem x           -> ESystem (List.map (fun (phi, e) -> (freshConj ns phi, salt ns e)) x)
+  | ESub (a, i, u)      -> ESub (salt ns a, salt ns i, salt ns u)
+  | ESystem (Split xs)  -> ESystem (Split (List.map (fun (phi, e) -> (freshConj ns phi, salt ns e)) xs))
+  | ESystem (Const x)   -> ESystem (Const (salt ns x))
   | EI                  -> EI
   | EDir d              -> EDir d
   | EAnd (a, b)         -> EAnd (salt ns a, salt ns b)

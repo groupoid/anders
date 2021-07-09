@@ -6,11 +6,8 @@ let getSign p : dir -> exp = function
   | Zero -> ENeg (EVar p)
   | One  -> EVar p
 
-let mergeConj xs =
-  Conjunction.fold (fun (p, d) v -> EAnd (getSign p d, v)) xs (EDir One)
-
-let getFormula : system -> exp =
-  List.fold_left (fun v (x, _) -> EOr (mergeConj x, v)) (EDir Zero)
+let mergeConj xs  = Conjunction.fold (fun (p, d) v -> EAnd (getSign p d, v)) xs (EDir One)
+let getFormula xs = List.fold_left (fun v (x, _) -> EOr (mergeConj x, v)) (EDir Zero) xs
 
 (* Arbitrary formula φ after calling andFormula/orFormula/negFormula
    will have form (α₁ ∧ ... ∧ αₙ) ∨ ... ∨ (β₁ ∧ ... ∧ βₘ),

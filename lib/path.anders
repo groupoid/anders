@@ -108,6 +108,14 @@ def φ-eq-φ′ (i : I) : Id (Partial U₁ (i ∨ -i)) (φ i) (φ′ i) := ref (
 def ψ (i j : I) : Partial U₁ (-i ∨ i ∨ (i ∧ j)) :=
 [ (i = 1) → U, (i = 1) (j = 1) → U, (i = 0) → U → U ]
 
+def ρ (i : I) : Partial U₁ (-i ∨ i) :=
+[ (i = 0) → U, (i = 1) → U ]
+
+def ρ′ (i : I) : Partial U₁ (-i ∨ i) :=
+[ _ → U ]
+
+def ρ-eq-ρ′ (i : I) : Id (Partial U₁ (i ∨ -i)) (ρ i) (ρ′ i) := ref (ρ′ i)
+
 def ε (A : U) : Partial A 0 := []
 -- “0 = 1” implies that every type is inhabited
 def I-nontriv (p : Id I 0 1) (A : U) : A := ε A (rev I 0 1 p)
@@ -117,6 +125,8 @@ def Id-path (A : U) (a b : A) : Id A a b → Path A a b :=
 idJ A (λ (a b : A) (_ : Id A a b), Path A a b) a (<_> a) b
 
 def Partial-app (A : U) (i : I) (u : Partial A i) (p : one? i) : A := u p
+
+def inc (A : U) (a : A) (i : I) : A[i ↦ [_ → a]] := a
 
 {-
 

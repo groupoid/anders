@@ -44,6 +44,7 @@ let prod    = "*"      | "\xC3\x97"     (* × *)
 let lam     = "\\"     | "\xCE\xBB"     (* λ *)
 let pi      = "forall" | "\xCE\xA0"     (* Π *)
 let sigma   = "sigma"  | "\xCE\xA3"     (* Σ *)
+let map     = "|->"    | "\xE2\x86\xA6" (* ↦ *)
 let def     = "definition" | "def" | "theorem" | "lemma" | "corollary" | "proposition"
 let axiom   = "axiom"|"postulate"
 
@@ -62,7 +63,7 @@ rule main = parse
 | "module"        { MODULE }           | "where"         { WHERE }
 | "import"        { IMPORT }           | "option"        { OPTION }
 | def             { DEF }              | colon           { COLON }
-| ','             { COMMA }            | '_'             { NO }
+| ','             { COMMA }            | '_'             { IRREF }
 | '('             { LPARENS }          | ')'             { RPARENS }
 | '['             { LSQ }              | ']'             { RSQ }
 | ".1"            { FST }              | ".2"            { SND }
@@ -77,4 +78,5 @@ rule main = parse
 | "Id"            { ID }               | "ref"           { REF }
 | "idJ"           { IDJ }              | pre as s        { PRE (getLevel s) }
 | "?"             { HOLE }             | "Partial"       { PARTIAL }
-| ident as s      { IDENT s }          | eof             { EOF }
+| map             { MAP }              | ident as s      { IDENT s }
+| eof             { EOF }

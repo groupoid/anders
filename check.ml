@@ -48,6 +48,7 @@ let rec eval (e : exp) (ctx : ctx) = traceEval e; match e with
   | ETransp (p, i)     -> transport ctx p i
   | EPartial e         -> VPartial (eval e ctx)
   | ESystem x          -> VSystem (x, ctx)
+  | ESub (a, i, u)     -> VSub (eval a ctx, eval i ctx, eval u ctx)
 
 and appFormula v x = match v with
   | VPLam f -> app (f, x)
@@ -67,7 +68,8 @@ and closByVal t x v = let (p, e, ctx) = x in traceClos e p v;
 
 and app : value * value -> value = function
   | VApp (VApp (VApp (VApp (VJ _, _), _), f), _), VRef _ -> f
-  | VSystem (e, ctx), VRef _ -> eval (reduceSystem ctx e) ctx
+  | VSystem (Split xs, ctx), _ -> eval (reduceSystem ctx xs) ctx
+  | VSystem (Const x, ctx), _ -> eval x ctx
   | VLam (t, f), v -> closByVal t f v
   | f, x -> VApp (f, x)
 
@@ -106,31 +108,33 @@ and inferV v = traceInferV v; match v with
 
 (* Readback *)
 and rbV v : exp = traceRbV v; match v with
-  | VLam (t, g)        -> rbVTele eLam t g
-  | VPair (u, v)       -> EPair (rbV u, rbV v)
-  | VKan u             -> EKan u
-  | VPi (t, g)         -> rbVTele ePi t g
-  | VSig (t, g)        -> rbVTele eSig t g
-  | VPre u             -> EPre u
-  | VPLam f            -> EPLam (rbV f)
-  | Var (x, _)         -> EVar x
-  | VApp (f, x)        -> EApp (rbV f, rbV x)
-  | VFst k             -> EFst (rbV k)
-  | VSnd k             -> ESnd (rbV k)
-  | VHole              -> EHole
-  | VPathP v           -> EPathP (rbV v)
-  | VPartial v         -> EPartial (rbV v)
-  | VSystem (x, ctx)   -> ESystem (List.map (fun (y, v) -> (y, rbV (eval v ctx))) x)
-  | VTransp (p, i)     -> ETransp (rbV p, rbV i)
-  | VAppFormula (f, x) -> EAppFormula (rbV f, rbV x)
-  | VId v              -> EId (rbV v)
-  | VRef v             -> ERef (rbV v)
-  | VJ v               -> EJ (rbV v)
-  | VI                 -> EI
-  | VDir d             -> EDir d
-  | VAnd (u, v)        -> EAnd (rbV u, rbV v)
-  | VOr (u, v)         -> EOr (rbV u, rbV v)
-  | VNeg u             -> ENeg (rbV u)
+  | VLam (t, g)             -> rbVTele eLam t g
+  | VPair (u, v)            -> EPair (rbV u, rbV v)
+  | VKan u                  -> EKan u
+  | VPi (t, g)              -> rbVTele ePi t g
+  | VSig (t, g)             -> rbVTele eSig t g
+  | VPre u                  -> EPre u
+  | VPLam f                 -> EPLam (rbV f)
+  | Var (x, _)              -> EVar x
+  | VApp (f, x)             -> EApp (rbV f, rbV x)
+  | VFst k                  -> EFst (rbV k)
+  | VSnd k                  -> ESnd (rbV k)
+  | VHole                   -> EHole
+  | VPathP v                -> EPathP (rbV v)
+  | VPartial v              -> EPartial (rbV v)
+  | VSystem (Split xs, ctx) -> ESystem (Split (List.map (fun (y, v) -> (y, rbV (eval v ctx))) xs))
+  | VSystem (Const x, ctx)  -> ESystem (Const (rbV (eval x ctx)))
+  | VSub (a, i, u)          -> ESub (rbV a, rbV i, rbV u)
+  | VTransp (p, i)          -> ETransp (rbV p, rbV i)
+  | VAppFormula (f, x)      -> EAppFormula (rbV f, rbV x)
+  | VId v                   -> EId (rbV v)
+  | VRef v                  -> ERef (rbV v)
+  | VJ v                    -> EJ (rbV v)
+  | VI                      -> EI
+  | VDir d                  -> EDir d
+  | VAnd (u, v)             -> EAnd (rbV u, rbV v)
+  | VOr (u, v)              -> EOr (rbV u, rbV v)
+  | VNeg u                  -> ENeg (rbV u)
 
 and rbVTele ctor t g =
   let (p, _, _) = g in let x = Var (p, t) in
@@ -191,10 +195,15 @@ and conv v1 v2 : bool = traceConv v1 v2;
     | VPathP a, VPathP b -> conv a b
     | VPartial a, VPartial b -> conv a b
     | VAppFormula (f, x), VAppFormula (g, y) -> conv f g && conv x y
-    | VSystem (xs, ctx1), VSystem (ys, ctx2) ->
+    | VSystem (Split xs, ctx1), VSystem (Split ys, ctx2) ->
       let xs' = List.map (fun (p, e) -> (p, eval e ctx1)) xs in
       let ys' = List.map (fun (p, e) -> (p, eval e ctx2)) ys in
       systemSubset xs' ctx1 ys' ctx2 && systemSubset ys' ctx2 xs' ctx1
+    | VSystem (Const x, ctx1), VSystem (Const y, ctx2) ->
+      conv (eval x ctx1) (eval y ctx2)
+    | VSystem (Const x, ctx), VSystem (Split xs, ctx')
+    | VSystem (Split xs, ctx'), VSystem (Const x, ctx) ->
+      let v = eval x ctx in List.for_all (fun (_, y) -> conv (eval y ctx') v) xs
     | VTransp (p, i), VTransp (q, j) -> conv p q && conv i j
     | VOr _, VOr _ -> orEq v1 v2
     | VAnd _, VAnd _ -> andEq v1 v2
@@ -258,14 +267,15 @@ and check ctx (e0 : exp) (t0 : value) =
     match infer ctx e with
     | VKan v | VPre v -> if ieq u v then () else raise (TypeIneq (VPre u, VPre v))
     | t -> raise (TypeIneq (VPre u, t)) end
-  | ESystem x, VApp (VPartial v, i) ->
-    eqNf (eval (getFormula x) ctx) i;
-    List.iter (fun (_, e) -> check ctx e v) x;
+  | ESystem (Split xs), VApp (VPartial t, i) ->
+    eqNf (eval (getFormula xs) ctx) i;
+    List.iter (fun (_, e) -> check ctx e t) xs;
     (* check overlapping cases *)
     List.iter (fun (x1, e1) ->
       List.iter (fun (x2, e2) ->
         if not (Conjunction.disjoint x1 x2) then
-          eqNf (eval e1 ctx) (eval e2 ctx)) x) x
+          eqNf (eval e1 ctx) (eval e2 ctx)) xs) xs
+  | ESystem (Const x), VApp (VPartial t, _) -> check ctx x t
   | e, t -> eqNf (infer ctx e) t
 
 and infer ctx e : value = traceInfer e; match e with

@@ -112,6 +112,8 @@ def ε (A : U) : Partial A 0 := []
 -- “0 = 1” implies that every type is inhabited
 def I-nontriv (p : Id I 0 1) (A : U) : A := ε A (rev I 0 1 p)
 
+def seg : PathP (<_> I) 0 1 := <i> i
+
 def Partial-app (A : U) (i : I) (u : Partial A i) (p : one? i) : A := u p
 
 {-

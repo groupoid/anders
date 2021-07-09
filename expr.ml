@@ -73,7 +73,7 @@ let showAtom (p, d) = Printf.sprintf "(%s = %s)" (showName p) (showDir d)
 let showConjunction xs = Conjunction.elements xs |> List.map showAtom |> String.concat " "
 let showSystem xs show =
   List.map (fun (x, e) -> Printf.sprintf "%s -> %s" (showConjunction x) (show e)) xs
-  |> String.concat ", " |> fun x -> "[" ^ x ^ "]"
+  |> String.concat ", "
 
 let rec showExp : exp -> string = function
   | EKan n -> "U" ^ showLevel n
@@ -99,7 +99,7 @@ let rec showExp : exp -> string = function
   | EPLam _ -> failwith "showExp: unreachable code was reached"
   | EAppFormula (f, x) -> Printf.sprintf "(%s @ %s)" (showExp f) (showExp x)
   | EPartial e -> Printf.sprintf "Partial %s" (showExp e)
-  | ESystem x -> showSystem x showExp
+  | ESystem x -> Printf.sprintf "[%s]" (showSystem x showExp)
   | EI -> !intervalPrim | EDir d -> showDir d
   | EAnd (a, b) -> Printf.sprintf "(%s /\\ %s)" (showExp a) (showExp b)
   | EOr (a, b) -> Printf.sprintf "(%s \\/ %s)" (showExp a) (showExp b)
@@ -133,7 +133,10 @@ let rec showValue : value -> string = function
   | VPLam _ -> failwith "showExp: unreachable code was reached"
   | VAppFormula (f, x) -> Printf.sprintf "(%s @ %s)" (showValue f) (showValue x)
   | VPartial v -> Printf.sprintf "Partial %s" (showValue v)
-  | VSystem (x, _) -> showSystem x showExp
+  | VSystem (x, rho) ->
+    if isRhoVisible rho then
+      Printf.sprintf "[%s, %s]" (showSystem x showExp) (showRho rho)
+    else Printf.sprintf "[%s]" (showSystem x showExp)
   | VI -> !intervalPrim | VDir d -> showDir d
   | VAnd (a, b) -> Printf.sprintf "(%s /\\ %s)" (showValue a) (showValue b)
   | VOr (a, b) -> Printf.sprintf "(%s \\/ %s)" (showValue a) (showValue b)

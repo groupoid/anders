@@ -308,10 +308,10 @@ and inferJ ctx e =
 
 and inferPath (ctx : ctx) (p : exp) =
   let (i, x, v) = freshDim () in let ctx' = upLocal ctx i VI v in
-  let n = extKan (infer ctx' (rbV (act p x ctx'))) in
+  let t = infer ctx' (rbV (act p x ctx')) in ignore (extSet t);
 
   let v0 = act p ezero ctx in let v1 = act p eone ctx in
-  implv v0 (impl (rbV v1) (EKan n)) ctx
+  implv v0 (impl (rbV v1) (rbV t)) ctx
 
 and inferTransport (ctx : ctx) (p : exp) (i : exp) =
   check ctx i VI;
@@ -319,7 +319,7 @@ and inferTransport (ctx : ctx) (p : exp) (i : exp) =
   let u1 = act p eone  ctx in
 
   let (j, x, v) = freshDim () in let ctx' = upLocal ctx j VI v in
-  let _ = extKan (infer ctx' (rbV (act p x ctx'))) in
+  ignore (extKan (infer ctx' (rbV (act p x ctx'))));
 
   (* Check that p is constant at i = 1 *)
   List.iter (fun phi ->

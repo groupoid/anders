@@ -50,6 +50,11 @@ let rec eval (e : exp) (ctx : ctx) = traceEval e; match e with
   | ESystem (Split xs) -> evalSystem ctx xs
   | ESystem (Const x)  -> VSystem (Const x, ctx)
   | ESub (a, i, u)     -> VSub (eval a ctx, eval i ctx, eval u ctx)
+  | EOuc e             -> let v = eval e ctx in begin match eval (rbV (inferV v)) ctx with
+    | VSub (_, VDir One, VSystem (Const e', ctx')) -> eval e' ctx'
+    | _ -> VOuc v
+  end
+  | EInc e             -> begin match eval e ctx with VOuc v | v -> VOuc v end
 
 and appFormula v x = match v with
   | VPLam f -> app (f, x)
@@ -98,8 +103,8 @@ and inferV v = traceInferV v; match v with
   | VSnd e                   -> let (t, g) = extSigG (inferV e) in closByVal t g (VFst e)
   | VApp (VTransp (p, _), _) -> appFormula p vone
   | VApp (f, x)              -> begin match inferV f with
-    | VSub (VApp (VPartial t, _), _, _) | VApp (VPartial t, _) -> t
-    | VSub (VPi (t, g), _, _) | VPi (t, g) -> closByVal t g x
+    | VApp (VPartial t, _) -> t
+    | VPi (t, g) -> closByVal t g x
     | v -> raise (ExpectedPi v)
   end
   | VAppFormula (f, x)       -> let (p, _, _) = extPathP (inferV f) in appFormula p x
@@ -110,6 +115,10 @@ and inferV v = traceInferV v; match v with
   | VDir _ | VOr _ | VAnd _  -> VI
   | VSig (a, (p, e, rho))    -> imax (inferV a) (infer (upLocal rho p a (Var (p, a))) e)
   | VPi  (a, (p, e, rho))    -> univImpl (inferV a) (infer (upLocal rho p a (Var (p, a))) e)
+  | VOuc v                   -> begin match inferV v with
+    | VSub (t, _, _) -> t
+    | _ -> raise (ExpectedSubtype (rbV v))
+  end
   | v                        -> raise (ExpectedNeutral v)
 
 (* Readback *)
@@ -141,6 +150,8 @@ and rbV v : exp = traceRbV v; match v with
   | VAnd (u, v)             -> EAnd (rbV u, rbV v)
   | VOr (u, v)              -> EOr (rbV u, rbV v)
   | VNeg u                  -> ENeg (rbV u)
+  | VInc v                  -> EInc (rbV v)
+  | VOuc v                  -> EOuc (rbV v)
 
 and rbVTele ctor t g =
   let (p, _, _) = g in let x = Var (p, t) in
@@ -217,10 +228,10 @@ and conv v1 v2 : bool = traceConv v1 v2;
     | VNeg x, VNeg y -> conv x y
     | VI, VI -> true
     | VDir u, VDir v -> u = v
-    | VId u, VId v -> conv u v
-    | VJ u, VJ v -> conv u v
+    | VId u, VId v | VJ u, VJ v -> conv u v
+    | VInc u, VInc v | VOuc u, VOuc v -> conv u v
     | _, _ -> false
-  end || convId v1 v2 || convSubtype v1 v2 || convSubtype v2 v1
+  end || convId v1 v2
 
 and faceSubset phi ctx1 psi ctx2 =
   Env.for_all (fun p x -> let v = getRho ctx1 p in
@@ -240,12 +251,6 @@ and convId v1 v2 =
     | VApp (VApp (VId t1, a1), b1), VApp (VApp (VId t2, a2), b2) ->
       conv t1 t2 && conv a1 a2 && conv b1 b2
     | _, _ -> false
-  with ExpectedNeutral _ -> false
-
-and convSubtype v1 v2 =
-  try match inferV v1 with
-    | VSub (_, VDir One, VSystem (Const e, ctx)) -> conv (eval e ctx) v2
-    | _ -> false
   with ExpectedNeutral _ -> false
 
 and eqNf v1 v2 : unit = traceEqNF v1 v2;
@@ -285,17 +290,11 @@ and check ctx (e0 : exp) (t0 : value) =
         if Env.exists (fun p d -> Env.mem p x2 && Env.find p x2 = d) x1 then
           eqNf (eval e1 ctx) (eval e2 ctx)) xs) xs
   | ESystem (Const x), VApp (VPartial t, _) -> check ctx x t
-  | e, VSub (t, _, u) -> check ctx e t; begin match eval (rbV u) ctx with
-    | VSystem (Const e', ctx') -> eqNf (eval e ctx) (eval e' ctx')
-    | VSystem (Split xs, ctx') -> List.iter (fun (phi, e') ->
-      eqNf (eval e (faceEnv phi ctx)) (eval e' (faceEnv phi ctx'))) xs
-    | _ -> raise (ExpectedSystem u)
-  end
-  | e, t -> let t' = infer ctx e in
-    if begin match t' with
-      | VSub (t', _, _) -> conv t t'
-      | _               -> false
-    end then () else eqNf t' t
+  | EInc e, VSub (t, i, u) -> check ctx e t;
+    let n = fresh (name "υ") in
+      List.iter (fun phi -> let ctx' = faceEnv phi ctx in
+        eqNf (eval e ctx') (app (eval (rbV u) ctx', Var (n, isOne i)))) (solve i One)
+  | e, t -> eqNf (infer ctx e) t
 
 and infer ctx e : value = traceInfer e; match e with
   | EVar x -> lookup x ctx
@@ -304,8 +303,8 @@ and infer ctx e : value = traceInfer e; match e with
   | EPi (a, (p, b)) -> inferTele ctx univImpl p a b
   | ELam (a, (p, b)) -> inferLam ctx p a b
   | EApp (f, x) -> begin match infer ctx f with
-    | VSub (VApp (VPartial t, i), _, _) | VApp (VPartial t, i) -> check ctx x (VApp (VApp (VId VI, VDir One), i)); t
-    | VSub (VPi (t, g), _, _) | VPi (t, g) -> check ctx x t; closByVal t g (eval x ctx)
+    | VApp (VPartial t, i) -> check ctx x (isOne i); t
+    | VPi (t, g) -> check ctx x t; closByVal t g (eval x ctx)
     | v -> raise (ExpectedPi v)
   end
   | EFst e -> fst (extSigG (infer ctx e))
@@ -324,10 +323,14 @@ and infer ctx e : value = traceInfer e; match e with
   | EId e -> let v = eval e ctx in let n = extSet (infer ctx e) in implv v (impl e (EPre n)) ctx
   | ERef e -> let v = eval e ctx in let t = infer ctx e in VApp (VApp (VId t, v), v)
   | EJ e -> inferJ ctx e
+  | EOuc e -> begin match infer ctx e with
+    | VSub (t, _, _) -> t
+    | _ -> raise (ExpectedSubtype e)
+  end
   | e -> raise (InferError e)
 
 and inferLam ctx p a e =
-  let t = eval a ctx in let x = Var (p, t) in
+  ignore (extSet (infer ctx a)); let t = eval a ctx in let x = Var (p, t) in
   let ctx' = upLocal ctx p t x in VPi (t, (p, rbV (infer ctx' e), ctx))
 
 and inferJ ctx e =

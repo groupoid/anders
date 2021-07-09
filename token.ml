@@ -22,3 +22,4 @@ let tokenToString : token -> string = function
   | ID         -> "ID"          | REF        -> "REF"
   | IDJ        -> "IDJ"         | PARTIAL    -> "PARTIAL"
   | MAP        -> "MAP"         | IMPORT     -> "IMPORT"
+  | INC        -> "INC"         | OUC        -> "OUC"

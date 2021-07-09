@@ -9,8 +9,9 @@ type exp =
   | ESig of exp * (name * exp) | EPair  of exp * exp | EFst of exp | ESnd of exp (* sigma *)
   | EId of exp | ERef of exp | EJ of exp                               (* strict equality *)
   | EPathP of exp | EPLam of exp | EAppFormula of exp * exp              (* CCHM equality *)
-  | EI | EDir of dir | EAnd of exp * exp | EOr of exp * exp | ENeg of exp
-  | ETransp of exp * exp | EPartial of exp | ESystem of system | ESub of exp * exp * exp
+  | EI | EDir of dir | EAnd of exp * exp | EOr of exp * exp | ENeg of exp     (* Interval *)
+  | ETransp of exp * exp | EPartial of exp | ESystem of system          (* Kan operations *)
+  | ESub of exp * exp * exp | EInc of exp | EOuc of exp               (* Cubical subtypes *)
 
 and system = Const of exp | Split of (face * exp) list
 
@@ -28,7 +29,8 @@ type value =
   | VId of value | VRef of value | VJ of value
   | VPathP of value | VPLam of value | VAppFormula of value * value
   | VI | VDir of dir | VAnd of value * value | VOr of value * value | VNeg of value
-  | VTransp of value * value | VPartial of value | VSystem of system * ctx | VSub of value * value * value
+  | VTransp of value * value | VPartial of value | VSystem of system * ctx
+  | VSub of value * value * value | VInc of value | VOuc of value
 
 and clos = name * exp * ctx
 and term = Exp of exp | Value of value
@@ -108,6 +110,8 @@ let rec showExp : exp -> string = function
   | EAnd (a, b) -> Printf.sprintf "(%s ∧ %s)" (showExp a) (showExp b)
   | EOr (a, b) -> Printf.sprintf "(%s ∨ %s)" (showExp a) (showExp b)
   | ENeg a -> Printf.sprintf "-%s" (showExp a)
+  | EInc e -> Printf.sprintf "(inc %s)" (showExp e)
+  | EOuc e -> Printf.sprintf "(ouc %s)" (showExp e)
 and showTele p x = Printf.sprintf "(%s : %s)" (showName p) (showExp x)
 
 let rec showValue : value -> string = function
@@ -142,6 +146,8 @@ let rec showValue : value -> string = function
       Printf.sprintf "[%s, %s]" (showSystem showExp x) (showRho rho)
     else Printf.sprintf "[%s]" (showSystem showExp x)
   | VSub (a, i, u) -> Printf.sprintf "%s[%s ↦ %s]" (showValue a) (showValue i) (showValue u)
+  | VInc v -> Printf.sprintf "(inc %s)" (showValue v)
+  | VOuc v -> Printf.sprintf "(ouc %s)" (showValue v)
   | VI -> !intervalPrim | VDir d -> showDir d
   | VAnd (a, b) -> Printf.sprintf "(%s ∧ %s)" (showValue a) (showValue b)
   | VOr (a, b) -> Printf.sprintf "(%s ∨ %s)" (showValue a) (showValue b)

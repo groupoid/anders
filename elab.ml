@@ -3,7 +3,7 @@ open Error
 open Expr
 
 let extSigG : value -> value * clos = function
-  | VSub (VSig (t, g), _, _) | VSig (t, g) -> (t, g)
+  | VSig (t, g) -> (t, g)
   | u -> raise (ExpectedSig u)
 
 let extSet : value -> int = function
@@ -36,6 +36,7 @@ let univImpl a b = match a, b with
   | _, _ -> raise (ExpectedVSet a)
 
 let implv a b ctx = VPi (a, (Irrefutable, b, ctx))
+let isOne i = VApp (VApp (VId VI, VDir One), i)
 
 let impl a b = EPi (a, (Irrefutable, b))
 let prod a b = ESig (a, (Irrefutable, b))
@@ -63,6 +64,8 @@ let rec salt (ns : name Env.t) : exp -> exp = function
   | ESub (a, i, u)      -> ESub (salt ns a, salt ns i, salt ns u)
   | ESystem (Split xs)  -> ESystem (Split (List.map (fun (phi, e) -> (freshFace ns phi, salt ns e)) xs))
   | ESystem (Const x)   -> ESystem (Const (salt ns x))
+  | EInc e              -> EInc (salt ns e)
+  | EOuc e              -> EOuc (salt ns e)
   | EI                  -> EI
   | EDir d              -> EDir d
   | EAnd (a, b)         -> EAnd (salt ns a, salt ns b)

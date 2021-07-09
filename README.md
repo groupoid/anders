@@ -66,8 +66,8 @@ def instance (A : U) : MLTT A :=
 $ anders girard check mltt.anders
 ```
 
-Papers
-------
+CCHM
+----
 
 Anders was built by strictly following these publications:
 

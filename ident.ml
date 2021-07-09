@@ -18,16 +18,9 @@ module Name = struct
       else compare p q
 end
 
-module Env   = Map.Make(Name)
-module Files = Set.Make(String)
-
-let inc : int ref = ref 0
-let gen () = inc := !inc + 1; !inc
-
-let fresh : name -> name = function
-  | Irrefutable -> Irrefutable | Name (p, _) -> Name (p, gen ())
-
-type dir = Zero | One
+module Env = Map.Make(Name)
+type dir   = Zero | One
+type face  = dir Env.t
 
 let negDir : dir -> dir = function
   | Zero -> One | One -> Zero
@@ -40,6 +33,14 @@ module Dir = struct
     | Zero, One -> -1
     | _, _      -> 0
 end
+
+module Files = Set.Make(String)
+
+let inc : int ref = ref 0
+let gen () = inc := !inc + 1; !inc
+
+let fresh : name -> name = function
+  | Irrefutable -> Irrefutable | Name (p, _) -> Name (p, gen ())
 
 module Atom = struct
   type t = name * dir

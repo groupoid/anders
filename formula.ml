@@ -6,7 +6,7 @@ let getSign p : dir -> exp = function
   | Zero -> ENeg (EVar p)
   | One  -> EVar p
 
-let mergeConj xs  = Conjunction.fold (fun (p, d) v -> EAnd (getSign p d, v)) xs (EDir One)
+let mergeConj xs  = Env.fold (fun p d v -> EAnd (getSign p d, v)) xs (EDir One)
 let getFormula xs = List.fold_left (fun v (x, _) -> EOr (mergeConj x, v)) (EDir Zero) xs
 
 (* Arbitrary formula φ after calling andFormula/orFormula/negFormula
@@ -70,8 +70,6 @@ let orEq f g =
 (* andEq check equivalence of two formulas
    of the form (α₁ ∧ ... ∧ αₙ) *)
 let andEq f g = Conjunction.equal (extAnd f) (extAnd g)
-
-type face = dir Env.t
 
 let meet phi psi : face =
   Env.merge (fun _ x y ->

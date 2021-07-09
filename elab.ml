@@ -18,6 +18,11 @@ let extPathP = function
   | VApp (VApp (VPathP v, u0), u1) -> (v, u0, u1)
   | v                              -> raise (ExpectedPath v)
 
+let extVar ctx x = match Env.find_opt x ctx with
+  | Some (_, _, Value (Var (y, _))) -> y
+  | Some (_, _, Exp (EVar y)) -> y
+  | _ -> x
+
 let imax a b = match a, b with
   | VKan u, VKan v -> VKan (max u v)
   | VPre u, VPre v | VPre u, VKan v | VKan u, VPre v -> VPre (max u v)
@@ -56,7 +61,7 @@ let rec salt (ns : name Env.t) : exp -> exp = function
   | EAppFormula (p, i)  -> EAppFormula (salt ns p, salt ns i)
   | EPartial e          -> EPartial (salt ns e)
   | ESub (a, i, u)      -> ESub (salt ns a, salt ns i, salt ns u)
-  | ESystem (Split xs)  -> ESystem (Split (List.map (fun (phi, e) -> (freshConj ns phi, salt ns e)) xs))
+  | ESystem (Split xs)  -> ESystem (Split (List.map (fun (phi, e) -> (freshFace ns phi, salt ns e)) xs))
   | ESystem (Const x)   -> ESystem (Const (salt ns x))
   | EI                  -> EI
   | EDir d              -> EDir d

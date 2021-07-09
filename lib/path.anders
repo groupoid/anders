@@ -127,6 +127,10 @@ idJ A (λ (a b : A) (_ : Id A a b), Path A a b) a (<_> a) b
 def Partial-app (A : U) (i : I) (u : Partial A i) (p : one? i) : A := u p
 
 def inc (A : U) (a : A) (i : I) : A[i ↦ [_ → a]] := a
+def ouc (A : U) (i : I) (u : Partial A i) (a : A[i ↦ u]) : A := a
+
+def Path′ (A : U) (a b : A) := Π (i : I), A[i ∨ -i ↦ [(i = 0) → a, (i = 1) → b]]
+def Path-Path′ (A : U) (a b : A) (p : Path A a b) : Path′ A a b := λ (i : I), p @ i
 
 {-
 

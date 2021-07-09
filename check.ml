@@ -75,7 +75,7 @@ and app : value * value -> value = function
 
 and reduceSystem ctx xs =
   snd (List.find (fun (x, _) ->
-    Conjunction.for_all (fun (p, d) ->
+    Env.for_all (fun p d ->
       conv (getRho ctx p) (VDir d)) x) xs)
 
 and getRho ctx x = match Env.find_opt x ctx with
@@ -122,7 +122,7 @@ and rbV v : exp = traceRbV v; match v with
   | VHole                   -> EHole
   | VPathP v                -> EPathP (rbV v)
   | VPartial v              -> EPartial (rbV v)
-  | VSystem (Split xs, ctx) -> ESystem (Split (List.map (fun (y, v) -> (y, rbV (eval v ctx))) xs))
+  | VSystem (Split xs, ctx) -> ESystem (Split (List.map (fun (y, v) -> (mapFace (extVar ctx) y, rbV (eval v ctx))) xs))
   | VSystem (Const x, ctx)  -> ESystem (Const (rbV (eval x ctx)))
   | VSub (a, i, u)          -> ESub (rbV a, rbV i, rbV u)
   | VTransp (p, i)          -> ETransp (rbV p, rbV i)
@@ -205,6 +205,7 @@ and conv v1 v2 : bool = traceConv v1 v2;
     | VSystem (Split xs, ctx'), VSystem (Const x, ctx) ->
       let v = eval x ctx in List.for_all (fun (_, y) -> conv (eval y ctx') v) xs
     | VTransp (p, i), VTransp (q, j) -> conv p q && conv i j
+    | VSub (a, i, u), VSub (b, j, v) -> conv a b && conv i j && conv u v
     | VOr _, VOr _ -> orEq v1 v2
     | VAnd _, VAnd _ -> andEq v1 v2
     | VNeg x, VNeg y -> conv x y
@@ -216,12 +217,8 @@ and conv v1 v2 : bool = traceConv v1 v2;
   end || convId v1 v2
 
 and faceSubset phi ctx1 psi ctx2 =
-  let xs = Conjunction.elements phi in
-  let ys = Conjunction.elements psi in
-  List.for_all (fun (p, x) ->
-    let v = getRho ctx1 p in
-    List.exists (fun (q, y) ->
-      x = y && conv v (getRho ctx2 q)) ys) xs
+  Env.for_all (fun p x -> let v = getRho ctx1 p in
+    Env.exists (fun q y -> x = y && conv v (getRho ctx2 q)) psi) phi
 
 and faceConv phi ctx1 psi ctx2 =
   faceSubset phi ctx1 psi ctx2 && faceSubset psi ctx2 phi ctx1
@@ -273,10 +270,20 @@ and check ctx (e0 : exp) (t0 : value) =
     (* check overlapping cases *)
     List.iter (fun (x1, e1) ->
       List.iter (fun (x2, e2) ->
-        if not (Conjunction.disjoint x1 x2) then
+        if Env.exists (fun p d -> Env.mem p x2 && Env.find p x2 = d) x1 then
           eqNf (eval e1 ctx) (eval e2 ctx)) xs) xs
   | ESystem (Const x), VApp (VPartial t, _) -> check ctx x t
-  | e, t -> eqNf (infer ctx e) t
+  | e, VSub (t, _, u) -> check ctx e t; begin match eval (rbV u) ctx with
+    | VSystem (Const e', ctx') -> eqNf (eval e ctx) (eval e' ctx')
+    | VSystem (Split xs, ctx') -> List.iter (fun (phi, e') ->
+      eqNf (eval e (faceEnv phi ctx)) (eval e' (faceEnv phi ctx'))) xs
+    | _ -> raise (ExpectedSystem u)
+  end
+  | e, t -> let t' = infer ctx e in
+    if begin match t' with
+      | VSub (t', _, _) -> conv t t'
+      | _               -> false
+    end then () else eqNf t' t
 
 and infer ctx e : value = traceInfer e; match e with
   | EVar x -> lookup x ctx
@@ -297,6 +304,8 @@ and infer ctx e : value = traceInfer e; match e with
   | EAppFormula (f, x) -> check ctx x VI; let (p, _, _) = extPathP (infer ctx (rbV (eval f ctx))) in
     appFormula p (eval x ctx)
   | ETransp (p, i) -> inferTransport ctx p i
+  | ESub (a, i, u) -> let n = extSet (infer ctx a) in check ctx i VI;
+    check ctx u (VApp (VPartial (eval a ctx), eval i ctx)); VPre n
   | EI -> VPre 0 | EDir _ -> VI
   | ENeg e -> check ctx e VI; VI
   | EOr (e1, e2) | EAnd (e1, e2) -> check ctx e1 VI; check ctx e2 VI; VI

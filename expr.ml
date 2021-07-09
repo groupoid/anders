@@ -12,7 +12,7 @@ type exp =
   | EI | EDir of dir | EAnd of exp * exp | EOr of exp * exp | ENeg of exp
   | ETransp of exp * exp | EPartial of exp | ESystem of system | ESub of exp * exp * exp
 
-and system = Const of exp | Split of (conjunction * exp) list
+and system = Const of exp | Split of (face * exp) list
 
 type tele = name * exp
 
@@ -52,7 +52,9 @@ let decl x = EVar (name x)
 let isGlobal : record -> bool = function Global, _, _ -> false | Local, _, _ -> true
 
 let freshVar ns n = match Env.find_opt n ns with Some x -> x | None -> n
-let freshConj ns = Conjunction.map (fun (p, d) -> (freshVar ns p, d))
+
+let mapFace fn phi = Env.fold (fun p d -> Env.add (fn p) d) phi Env.empty
+let freshFace ns = mapFace (freshVar ns)
 
 let rec telescope (ctor : name -> exp -> exp -> exp) (e : exp) : tele list -> exp = function
   | (p, a) :: xs -> ctor p a (telescope ctor e xs)
@@ -70,9 +72,9 @@ let rec showLevel x =
 
 let showDir : dir -> string = function | Zero -> !zeroPrim | One -> !onePrim
 let showAtom (p, d) = Printf.sprintf "(%s = %s)" (showName p) (showDir d)
-let showConjunction xs = Conjunction.elements xs |> List.map showAtom |> String.concat " "
+let showFace xs = Env.bindings xs |> List.map showAtom |> String.concat " "
 let showSystem show = function
-  | Split xs -> List.map (fun (x, e) -> Printf.sprintf "%s → %s" (showConjunction x) (show e)) xs
+  | Split xs -> List.map (fun (x, e) -> Printf.sprintf "%s → %s" (showFace x) (show e)) xs
                 |> String.concat ", "
   | Const x -> Printf.sprintf "_ → %s" (show x)
 

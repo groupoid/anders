@@ -4,7 +4,7 @@ Anders
 [![OPAM](https://img.shields.io/github/v/release/groupoid/anders.svg)](https://opam.ocaml.org/packages/anders/)
 [![Actions](https://github.com/groupoid/anders/workflows/OCaml/badge.svg)](https://github.com/groupoid/anders/actions)
 
-CCHM homotopy system type checker based on Mini-TT for OCaml.
+CCHM homotopy system type checker with strict equality.
 
 Features
 --------
@@ -71,7 +71,6 @@ CCHM
 
 Anders was built by strictly following these publications:
 
-* <a href="http://www.cse.chalmers.se/~bengt/papers/GKminiTT.pdf">A simple type-theoretic language: Mini-TT</a> [Coquand, Kinoshita, Nordström, Takeyama]
 * <a href="https://arxiv.org/pdf/1611.02108.pdf">Cubical Type Theory: a constructive interpretation of the univalence axiom</a> [Cohen, Coquand, Huber, Mörtberg]
 * <a href="https://arxiv.org/pdf/1802.01170.pdf">On Higher Inductive Types in Cubical Type Theory</a> [Coquand, Huber, Mörtberg]
 * <a href="https://arxiv.org/pdf/1607.04156.pdf">Canonicity for Cubical Type Theory</a> [Huber]

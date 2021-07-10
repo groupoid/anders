@@ -58,6 +58,7 @@ let rec salt (ns : name Env.t) : exp -> exp = function
   | EJ e                -> EJ (salt ns e)
   | EPathP e            -> EPathP (salt ns e)
   | ETransp (p, i)      -> ETransp (salt ns p, salt ns i)
+  | EHComp e            -> EHComp (salt ns e)
   | EPLam e             -> EPLam (salt ns e)
   | EAppFormula (p, i)  -> EAppFormula (salt ns p, salt ns i)
   | EPartial e          -> EPartial (salt ns e)

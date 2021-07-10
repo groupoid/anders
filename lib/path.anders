@@ -116,14 +116,15 @@ def Partial-app (A : U) (i : I) (u : Partial A i) (p : one? i) : A := u p
 def inc′ (A : U) (i : I) (a : A) : A [i ↦ [_ → a]] := inc a
 def ouc′ (A : U) (i : I) (u : Partial A i) (a : A [i ↦ u]) : A := ouc a
 
--- tests
+-- homogeneous composition
 
-def Path′ (A : U) (a b : A) := Π (i : I), A [i ∨ -i ↦ [(i = 0) → a, (i = 1) → b]]
-def Path-Path′ (A : U) (a b : A) (p : Path A a b) : Path′ A a b := λ (i : I), inc (p @ i)
-def Path′-Path (A : U) (a b : A) (p : Path′ A a b) : Path A a b := <i> ouc (p i)
-def Path-Path′-Path (A : U) (a b : A) (p : Path A a b) : Path (Path A a b) (Path′-Path A a b (Path-Path′ A a b p)) p := <_> p
-def Path′-Path-Path′ (A : U) (a b : A) (p : Path′ A a b) : PathP (<_> Path′ A a b) (Path-Path′ A a b (Path′-Path A a b p)) p := <_> p
-def transp′ (A : U) (j : I) (p : (I → U) [j ↦ [_ → λ (_ : I), A]]) := transp (<i> (ouc p) i) j
+{- hcomp A 1 φ x ≡ φ 1 1=1 -}
+
+def comp-Path (A : U) (a b c : A) (p : Path A a b) (q : Path A b c) : Path A a c :=
+    <i> hcomp A (i ∨ -i) (λ (j : I), [ (i = 0) → a, (i = 1) → q @ j ]) (inc (p @ i))
+
+def kan (A : U) (a b c d : A) (p : Path A a c) (q : Path A b d) (r : Path A a b) : Path A c d :=
+    <i> hcomp A (i ∨ -i) (λ (j : I), [ (i = 0) → p @ j, (i = 1) → q @ j ]) (inc (r @ i))
 
 {-
 
@@ -151,3 +152,11 @@ hfillⁱ A [φ ↦ u] u₀ = hcompʲ A [φ ↦ u(i/i∧j), (i=0) ↦ u₀] u₀ 
 
 -}
 
+-- tests
+
+def Path′ (A : U) (a b : A) := Π (i : I), A [i ∨ -i ↦ [(i = 0) → a, (i = 1) → b]]
+def Path-Path′ (A : U) (a b : A) (p : Path A a b) : Path′ A a b := λ (i : I), inc (p @ i)
+def Path′-Path (A : U) (a b : A) (p : Path′ A a b) : Path A a b := <i> ouc (p i)
+def Path-Path′-Path (A : U) (a b : A) (p : Path A a b) : Path (Path A a b) (Path′-Path A a b (Path-Path′ A a b p)) p := <_> p
+def Path′-Path-Path′ (A : U) (a b : A) (p : Path′ A a b) : PathP (<_> Path′ A a b) (Path-Path′ A a b (Path′-Path A a b p)) p := <_> p
+def transp′ (A : U) (j : I) (p : (I → U) [j ↦ [_ → λ (_ : I), A]]) := transp (<i> (ouc p) i) j

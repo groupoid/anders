@@ -79,5 +79,5 @@ rule main = parse
 | "idJ"           { IDJ }              | pre as s        { PRE (getLevel s) }
 | "?"             { HOLE }             | "Partial"       { PARTIAL }
 | "inc"           { INC }              | "ouc"           { OUC }
-| map             { MAP }              | ident as s      { IDENT s }
-| eof             { EOF }
+| "hcomp"         { HCOMP }            | map             { MAP }
+| ident as s      { IDENT s }          | eof             { EOF }

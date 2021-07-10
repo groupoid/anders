@@ -3,15 +3,15 @@ open Ident
 (* Language Expressions *)
 
 type exp =
-  | EPre of int | EKan of int                                                   (* cosmos *)
-  | EVar of name | EHole                                                     (* variables *)
-  | EPi of exp * (name * exp) | ELam of exp * (name * exp) | EApp of exp * exp      (* pi *)
-  | ESig of exp * (name * exp) | EPair  of exp * exp | EFst of exp | ESnd of exp (* sigma *)
-  | EId of exp | ERef of exp | EJ of exp                               (* strict equality *)
-  | EPathP of exp | EPLam of exp | EAppFormula of exp * exp              (* CCHM equality *)
-  | EI | EDir of dir | EAnd of exp * exp | EOr of exp * exp | ENeg of exp     (* Interval *)
-  | ETransp of exp * exp | EPartial of exp | ESystem of system          (* Kan operations *)
-  | ESub of exp * exp * exp | EInc of exp | EOuc of exp               (* Cubical subtypes *)
+  | EPre of int | EKan of int                                                          (* cosmos *)
+  | EVar of name | EHole                                                            (* variables *)
+  | EPi of exp * (name * exp) | ELam of exp * (name * exp) | EApp of exp * exp             (* pi *)
+  | ESig of exp * (name * exp) | EPair  of exp * exp | EFst of exp | ESnd of exp        (* sigma *)
+  | EId of exp | ERef of exp | EJ of exp                                      (* strict equality *)
+  | EPathP of exp | EPLam of exp | EAppFormula of exp * exp                     (* CCHM equality *)
+  | EI | EDir of dir | EAnd of exp * exp | EOr of exp * exp | ENeg of exp            (* Interval *)
+  | ETransp of exp * exp | EHComp of exp | EPartial of exp | ESystem of system (* Kan operations *)
+  | ESub of exp * exp * exp | EInc of exp | EOuc of exp                      (* Cubical subtypes *)
 
 and system = Const of exp | Split of (face * exp) list
 
@@ -29,7 +29,7 @@ type value =
   | VId of value | VRef of value | VJ of value
   | VPathP of value | VPLam of value | VAppFormula of value * value
   | VI | VDir of dir | VAnd of value * value | VOr of value * value | VNeg of value
-  | VTransp of value * value | VPartial of value | VSystem of system * ctx
+  | VTransp of value * value | VHComp of value | VPartial of value | VSystem of system * ctx
   | VSub of value * value * value | VInc of value | VOuc of value
 
 and clos = name * exp * ctx
@@ -100,6 +100,7 @@ let rec showExp : exp -> string = function
   | ERef e -> Printf.sprintf "ref %s" (showExp e)
   | EJ e -> Printf.sprintf "idJ %s" (showExp e)
   | ETransp (p, i) -> Printf.sprintf "transp %s %s" (showExp p) (showExp i)
+  | EHComp e -> Printf.sprintf "hcomp %s" (showExp e)
   | EPLam (ELam (_, (i, e))) -> Printf.sprintf "(<%s> %s)" (showName i) (showExp e)
   | EPLam _ -> failwith "showExp: unreachable code was reached"
   | EAppFormula (f, x) -> Printf.sprintf "(%s @ %s)" (showExp f) (showExp x)
@@ -134,6 +135,7 @@ let rec showValue : value -> string = function
   | VRef v -> Printf.sprintf "ref %s" (showValue v)
   | VJ v -> Printf.sprintf "idJ %s" (showValue v)
   | VTransp (p, i) -> Printf.sprintf "transp %s %s" (showValue p) (showValue i)
+  | VHComp v -> Printf.sprintf "hcomp %s" (showValue v)
   | VPLam (VLam (_, (p, e, rho))) ->
     if isRhoVisible rho then
       Printf.sprintf "(<%s, %s> %s)" (showName p) (showRho rho) (showExp e)

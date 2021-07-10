@@ -51,15 +51,7 @@ let rec eval (e : exp) (ctx : ctx) = traceEval e; match e with
   | ESystem (Const x)  -> VSystem (Const x, ctx)
   | ESub (a, i, u)     -> VSub (eval a ctx, eval i ctx, eval u ctx)
   | EInc e             -> begin match eval e ctx with VOuc v -> v | v -> VInc v end
-  | EOuc e             -> begin match eval e ctx with
-    | VInc x -> x | v -> begin match inferV v with
-      | VSub (_, i, VSystem (Const e', ctx')) -> begin match eval (rbV i) ctx with
-        | VDir One -> eval e' ctx'
-        | _ -> VOuc v
-      end
-      | _ -> VOuc v
-    end
-  end
+  | EOuc e             -> begin match eval e ctx with VInc x -> x | v -> evalOuc ctx v end
 
 and appFormula v x = match v with
   | VPLam f -> app (f, x)
@@ -89,10 +81,12 @@ and evalSystem ctx xs =
   | Some (_, e) -> VSystem (Const e, ctx)
   | _           -> VSystem (Split xs, ctx)
 
-and reduceSystem ctx xs =
-  snd (List.find (fun (x, _) ->
-    Env.for_all (fun p d ->
-      conv (getRho ctx p) (VDir d)) x) xs)
+and evalOuc ctx v = match inferV v with
+  | VSub (_, i, VSystem (Const e', ctx')) ->
+    begin match eval (rbV i) ctx with
+      | VDir One -> eval e' ctx' | _ -> VOuc v
+    end
+  | _ -> VOuc v
 
 and getRho ctx x = match Env.find_opt x ctx with
   | Some (_, _, Value v) -> v

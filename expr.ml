@@ -58,6 +58,10 @@ let freshVar ns n = match Env.find_opt n ns with Some x -> x | None -> n
 let mapFace fn phi = Env.fold (fun p d -> Env.add (fn p) d) phi Env.empty
 let freshFace ns = mapFace (freshVar ns)
 
+let face i n d = match i with
+  | "=" -> (name n, getDir d)
+  | _   -> failwith "invalid face"
+
 let rec telescope (ctor : name -> exp -> exp -> exp) (e : exp) : tele list -> exp = function
   | (p, a) :: xs -> ctor p a (telescope ctor e xs)
   | [] -> e

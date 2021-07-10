@@ -19,6 +19,7 @@
 
 %left OR
 %left AND
+
 %nonassoc PATHP TRANSP HCOMP PARTIAL ID REF IDJ INC OUC
 %nonassoc NEGATE
 %nonassoc FST SND
@@ -40,12 +41,7 @@ path : IDENT { getPath $1 }
 file : MODULE IDENT WHERE line* EOF { ($2, $4) }
 line : IMPORT path+ { Import $2 } | OPTION IDENT IDENT { Option ($2, $3) } | declarations { Decl $1 }
 repl : COLON IDENT exp1 EOF { Command ($2, $3) } | COLON IDENT EOF { Action $2 } | exp0 EOF { Eval $1 } | EOF { Nope }
-
-face : LPARENS IDENT IDENT IDENT RPARENS {
-  match $3 with
-  | "=" -> (name $2, getDir $4)
-  | _   -> failwith "invalid face"
-}
+face : LPARENS IDENT IDENT IDENT RPARENS { face $3 $2 $4 }
 partial : face+ ARROW exp1 { (Env.of_seq (List.to_seq $1), $3) }
 
 exp1:

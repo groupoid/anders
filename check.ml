@@ -84,7 +84,8 @@ and evalSystem ctx xs =
 and evalOuc ctx v = match inferV v with
   | VSub (_, i, VSystem (Const e', ctx')) ->
     begin match eval (rbV i) ctx with
-      | VDir One -> eval e' ctx' | _ -> VOuc v
+      | VDir One -> eval e' ctx'
+      | _        -> VOuc v
     end
   | _ -> VOuc v
 

@@ -146,6 +146,9 @@ def transp′ (A : U) (j : I) (p : (I → U)[j ↦ [_ → λ (_ : I), A]]) := tr
 def comp-Path (A : U) (a b c : A) (p : Path A a b) (q : Path A b c) : Path A a c :=
 <i> hcomp A (i ∨ -i) (λ (j : I), [ (i = 0) → a, (i = 1) → q @ j ]) (inc (p @ i))
 
+def kan (A : U) (a b c d : A) (p : Path A a c) (q : Path A b d) (r : Path A a b) : Path A c d :=
+<i> hcomp A (i ∨ -i) (λ (j : I), [ (i = 0) → p @ j, (i = 1) → q @ j ]) (inc (r @ i))
+
 {-
 
    Simon Huber notes: http://www.cse.chalmers.se/~simonhu/misc/hcomp.pdf

@@ -10,10 +10,11 @@ Features
 --------
 
 * Homepage: https://groupoid.space/homotopy
-* Fibrant MLTT-style ΠΣ primitives with Leibniz equality in 500 LOC
+* Fibrant MLTT-style ΠΣ primitives with strict equality in 500 LOC
 * Cofibrant CHM-style I primitives with pretypes hierarchy Vₙ in 500 LOC
-* Parser in 50 LOC
-* Lexer in 50 LOC
+* Generalized Transport and Homogeneous Composition core Kan operations
+* Parser in 80 LOC
+* Lexer in 80 LOC
 * UTF-8 support including universe levels
 * Lean syntax for ΠΣ
 * 1D syntax with top-level declarations

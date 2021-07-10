@@ -1,3 +1,20 @@
+{- Path Type:
+   - Reflexivity, Symmetry, Composition, Kan;
+   - De Morgan laws;
+   - Connections;
+   - Congruence and Respect;
+   - Contractability of Singletons;
+   - Substitution, Transport, J.
+
+   HoTT 1.12 Identity types
+   HoTT 1.12.1 Path induction
+   HoTT 2.1 Types are higher groupoids
+   HoTT 2.11 Identity type
+   HoTT 3.11 Contractibility
+   HoTT 6.2 Induction principles and dependent paths.
+
+   Copyright (c) Groupoid Infinity, 2014-2021. -}
+
 module path where
 
 -- proto
@@ -146,20 +163,3 @@ def Path′-Path (A : U) (a b : A) (p : Path′ A a b) : Path A a b := <i> ouc (
 def Path-Path′-Path (A : U) (a b : A) (p : Path A a b) : Path (Path A a b) (Path′-Path A a b (Path-Path′ A a b p)) p := <_> p
 def Path′-Path-Path′ (A : U) (a b : A) (p : Path′ A a b) : PathP (<_> Path′ A a b) (Path-Path′ A a b (Path′-Path A a b p)) p := <_> p
 def transp′ (A : U) (j : I) (p : (I → U) [j ↦ [_ → λ (_ : I), A]]) := transp (<i> (ouc p) i) j
-
-{- Path Type:
-   - Reflexivity, Symmetry, Composition, Kan;
-   - De Morgan laws;
-   - Connections;
-   - Congruence and Respect;
-   - Contractability of Singletons;
-   - Substitution, Transport, J.
-
-   HoTT 1.12 Identity types
-   HoTT 1.12.1 Path induction
-   HoTT 2.1 Types are higher groupoids
-   HoTT 2.11 Identity type
-   HoTT 3.11 Contractibility
-   HoTT 6.2 Induction principles and dependent paths.
-
-   Copyright (c) Groupoid Infinity, 2014-2021. -}

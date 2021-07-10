@@ -6,7 +6,6 @@
 context default
     keyword whole Pi brightmagenta
     keyword whole Equ brightmagenta
-    keyword whole = brightmagenta
     keyword whole lam brightmagenta
     keyword whole apply brightmagenta
     keyword whole app brightmagenta
@@ -28,9 +27,6 @@ context default
     keyword whole funext brightmagenta
     keyword whole happly brightmagenta
     keyword whole Path brightmagenta
-    keyword whole LineP brightmagenta
-    keyword whole PartialP brightmagenta
-    keyword whole J brightmagenta
     keyword whole idp brightmagenta
     keyword whole sym brightmagenta
     keyword whole trans brightmagenta
@@ -49,15 +45,14 @@ context default
     keyword whole unit brightmagenta
     keyword whole comp brightmagenta
     keyword whole fill brightmagenta
-    keyword whole Σ brightmagenta
-    keyword whole Π brightmagenta
+    keyword whole LineP brightmagenta
+    keyword whole Σ cyan
+    keyword whole Π cyan
     keyword whole module cyan
     keyword whole def cyan
     keyword whole ctor cyan
     keyword whole elim cyan
     keyword whole form cyan
-    keyword whole hcomp cyan
-    keyword whole transp cyan
     keyword whole definition cyan
     keyword whole axiom cyan
     keyword whole theorem cyan
@@ -70,13 +65,21 @@ context default
     keyword whole false cyan
     keyword whole module cyan
     keyword whole where cyan
-    keyword whole is-one? cyan
+    keyword whole one? cyan
+    keyword whole Id cyan
+    keyword whole idJ cyan
+    keyword whole ref cyan
     keyword whole PathP cyan
+    keyword whole Partial cyan
+    keyword whole Sub cyan
+    keyword whole inc cyan
+    keyword whole ouc cyan
+    keyword whole hcomp cyan
+    keyword whole transp cyan
     keyword whole λ cyan
+    keyword = cyan
     keyword .1 cyan
     keyword .2 cyan
-    keyword whole comp cyan
-    keyword whole fill cyan
     keyword > cyan
     keyword < cyan
     keyword * cyan

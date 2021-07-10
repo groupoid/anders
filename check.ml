@@ -46,6 +46,7 @@ let rec eval (e : exp) (ctx : ctx) = traceEval e; match e with
   | EOr (e1, e2)       -> orFormula (eval e1 ctx, eval e2 ctx)
   | ENeg e             -> negFormula (eval e ctx)
   | ETransp (p, i)     -> transport ctx p i
+  | EHComp e           -> VHComp (eval e ctx)
   | EPartial e         -> VPartial (eval e ctx)
   | ESystem (Split xs) -> evalSystem ctx xs
   | ESystem (Const x)  -> VSystem (Const x, ctx)
@@ -71,6 +72,8 @@ and closByVal t x v = let (p, e, ctx) = x in traceClos e p v;
 
 and app : value * value -> value = function
   | VApp (VApp (VApp (VApp (VJ _, _), _), f), _), VRef _ -> f
+  | VApp (VApp (VHComp _, VDir One), VLam (_, f)), _ ->
+    app (closByVal VI f (VDir One), VRef (VDir One))
   | VSystem (Const x, ctx), _ -> eval x ctx
   | VLam (t, f), v -> closByVal t f v
   | f, x -> VApp (f, x)
@@ -102,6 +105,7 @@ and inferV v = traceInferV v; match v with
   | VFst e                   -> fst (extSigG (inferV e))
   | VSnd e                   -> let (t, g) = extSigG (inferV e) in closByVal t g (VFst e)
   | VApp (VTransp (p, _), _) -> appFormula p vone
+  | VApp (VApp (VApp (VHComp t, _), _), _) -> t
   | VApp (f, x)              -> begin match inferV f with
     | VApp (VPartial t, _) -> t
     | VPi (t, g) -> closByVal t g x
@@ -141,6 +145,7 @@ and rbV v : exp = traceRbV v; match v with
   | VSystem (Const x, ctx)  -> ESystem (Const (rbV (eval x ctx)))
   | VSub (a, i, u)          -> ESub (rbV a, rbV i, rbV u)
   | VTransp (p, i)          -> ETransp (rbV p, rbV i)
+  | VHComp v                -> EHComp (rbV v)
   | VAppFormula (f, x)      -> EAppFormula (rbV f, rbV x)
   | VId v                   -> EId (rbV v)
   | VRef v                  -> ERef (rbV v)
@@ -222,6 +227,7 @@ and conv v1 v2 : bool = traceConv v1 v2;
     | VSystem (Split xs, ctx'), VSystem (Const x, ctx) ->
       let v = eval x ctx in List.for_all (fun (_, y) -> conv (eval y ctx') v) xs
     | VTransp (p, i), VTransp (q, j) -> conv p q && conv i j
+    | VHComp a, VHComp b -> conv a b
     | VSub (a, i, u), VSub (b, j, v) -> conv a b && conv i j && conv u v
     | VOr _, VOr _ -> orEq v1 v2
     | VAnd _, VAnd _ -> andEq v1 v2
@@ -315,6 +321,7 @@ and infer ctx e : value = traceInfer e; match e with
   | EAppFormula (f, x) -> check ctx x VI; let (p, _, _) = extPathP (infer ctx (rbV (eval f ctx))) in
     appFormula p (eval x ctx)
   | ETransp (p, i) -> inferTransport ctx p i
+  | EHComp e -> inferHComp ctx e
   | ESub (a, i, u) -> let n = extSet (infer ctx a) in check ctx i VI;
     check ctx u (VApp (VPartial (eval a ctx), eval i ctx)); VPre n
   | EI -> VPre 0 | EDir _ -> VI
@@ -329,13 +336,18 @@ and infer ctx e : value = traceInfer e; match e with
   end
   | e -> raise (InferError e)
 
+and inferTele ctx binop p a b =
+  let t = eval a ctx in let x = Var (p, t) in
+  let ctx' = upLocal ctx p t x in
+  let v = infer ctx' b in binop (infer ctx a) v
+
 and inferLam ctx p a e =
   ignore (extSet (infer ctx a)); let t = eval a ctx in let x = Var (p, t) in
   let ctx' = upLocal ctx p t x in VPi (t, (p, rbV (infer ctx' e), ctx))
 
 and inferJ ctx e =
-  let n = extSet (infer ctx e) in let x = name "x" in let y = name "y" in
-  let pi = name "P" in let p = name "p" in let id = EApp (EApp (EId e, EVar x), EVar y) in
+  let n = extSet (infer ctx e) in let x = fresh (name "x") in let y = fresh (name "y") in
+  let pi = fresh (name "P") in let p = fresh (name "p") in let id = EApp (EApp (EId e, EVar x), EVar y) in
   VPi (eval (EPi (e, (x, EPi (e, (y, impl id (EPre n)))))) ctx,
         (pi, EPi (e, (x, impl (EApp (EApp (EApp (EVar pi, EVar x), EVar x), ERef (EVar x)))
           (EPi (e, (y, EPi (id, (p, EApp (EApp (EApp (EVar pi, EVar x), EVar y), EVar p)))))))), ctx))
@@ -362,7 +374,8 @@ and inferTransport (ctx : ctx) (p : exp) (i : exp) =
     (solve (eval i ctx) One);
   implv u0 (rbV u1) ctx
 
-and inferTele ctx binop p a b =
-  let t = eval a ctx in let x = Var (p, t) in
-  let ctx' = upLocal ctx p t x in
-  let v = infer ctx' b in binop (infer ctx a) v
+and inferHComp ctx e =
+  ignore (extKan (infer ctx e));
+  let r = fresh (name "r") in let u = fresh (name "u") in
+  let u0 = ESub (e, EVar r, EApp (EVar u, EDir Zero)) in
+  VPi (VI, (r, EPi (impl EI (EApp (EPartial e, EVar r)), (u, impl u0 e)), ctx))

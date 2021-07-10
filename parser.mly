@@ -12,14 +12,14 @@
 %token DEFEQ PROD ARROW FST SND LAM DEF
 %token MODULE WHERE IMPORT AXIOM
 %token SIGMA PI OPTION LT GT
-%token APPFORMULA PATHP TRANSP
+%token APPFORMULA PATHP TRANSP HCOMP
 %token PARTIAL MAP INC OUC
 %token AND OR NEGATE
 %token ID REF IDJ
 
 %left OR
 %left AND
-%nonassoc PATHP TRANSP PARTIAL ID REF IDJ INC OUC
+%nonassoc PATHP TRANSP HCOMP PARTIAL ID REF IDJ INC OUC
 %nonassoc NEGATE
 %nonassoc FST SND
 
@@ -75,6 +75,7 @@ exp3:
   | OUC exp3 { EOuc $2 }
   | PATHP exp3 { EPathP $2 }
   | TRANSP exp3 exp3 { ETransp ($2, $3) }
+  | HCOMP exp3 { EHComp $2 }
   | PARTIAL exp3 { EPartial $2 }
   | IDENT LSQ exp0 MAP exp0 RSQ { ESub (decl $1, $3, $5) }
   | LPARENS exp0 RPARENS LSQ exp0 MAP exp0 RSQ { ESub ($2, $5, $7) }

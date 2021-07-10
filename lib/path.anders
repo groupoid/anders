@@ -34,7 +34,7 @@ def J-β (A : V) (B : Π (a b : A), Id A a b -> V) (a : A) (d : B a a (ref a)) :
    Id (B a a (ref a)) (J A B a a d (ref a)) d := ref d
 def rev (A : V) (a b : A) (p : Id A a b) : Id A b a :=
 idJ A (λ (a b : A) (_ : Id A a b), Id A b a) a (ref a) b p
-def comp (A : V) (a b c : A) (p : Id A a b) (q : Id A b c) : Id A a c :=
+def comp-Id (A : V) (a b c : A) (p : Id A a b) (q : Id A b c) : Id A a c :=
 idJ A (λ (b c : A) (_ : Id A b c), Id A a c) b p c q
 
 def Path (A : U) (x y : A) : U := PathP (<_> A) x y
@@ -142,6 +142,9 @@ def Path′-Path-Path′ (A : U) (a b : A) (p : Path′ A a b) :
 <_> p
 
 def transp′ (A : U) (j : I) (p : (I → U)[j ↦ [_ → λ (_ : I), A]]) := transp (<i> (ouc p) i) j
+
+def comp-Path (A : U) (a b c : A) (p : Path A a b) (q : Path A b c) : Path A a c :=
+<i> hcomp A (i ∨ -i) (λ (j : I), [ (i = 0) → a, (i = 1) → q @ j ]) (inc (p @ i))
 
 {-
 

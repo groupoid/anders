@@ -14,7 +14,7 @@ Version 0.7.2 Kan Operations:
 Version 0.7.1 Binary Distribution:
 
 * Minor optimizations
-* Binary file distribution
+* OPAM package
 * Homepage: https://groupoid.space/homotopy
 
 Version 0.7 MLTT Internalization:

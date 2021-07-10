@@ -43,16 +43,12 @@ context default
     keyword whole conjugate brightmagenta
     keyword whole empty brightmagenta
     keyword whole unit brightmagenta
-    keyword whole comp brightmagenta
     keyword whole fill brightmagenta
     keyword whole LineP brightmagenta
     keyword whole Σ cyan
     keyword whole Π cyan
     keyword whole module cyan
     keyword whole def cyan
-    keyword whole ctor cyan
-    keyword whole elim cyan
-    keyword whole form cyan
     keyword whole definition cyan
     keyword whole axiom cyan
     keyword whole theorem cyan

@@ -1,0 +1,26 @@
+Changelog
+=========
+
+Version 0.7.2 Kan Operations:
+
+* Strict Equality (Id, ref, idJ)
+* Cubical Subtypes (Sub, inc, ouc)
+* Partials, Systems (Partial, [φ ↦ u])
+* Kan Operations (hcomp, transp)
+* Eliminate neutral elements (Mini-TT)
+* Fast type checking
+* Fast compilation
+
+Version 0.7.1 Binary Distribution:
+
+* Minor optimizations
+* Binary file distribution
+* Homepage: https://groupoid.space/homotopy
+
+Version 0.7 MLTT Internalization:
+
+* Fibrant MLTT-style ΠΣ primitives with Leibniz equality in 500 LOC
+* Cofibrant CHM-style I primitives with pretypes hierarchy Vₙ in 500 LOC
+* Generalized Transport
+* Parser in 80 LOC
+* Lexer in 80 LOC

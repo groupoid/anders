@@ -17,25 +17,16 @@
 
 module path where
 
+-- proto
+
 def ∘ᵀ (α β γ: U) : U := (β → γ) → (α → β) → (α → γ)
 def ∘ (α β γ : U) : ∘ᵀ α β γ := λ (g: β → γ) (f: α → β) (x: α), g (f x)
 def idᵀ (α: U): U := α → α
 def id (α : U) (a : α) : α := a
 def const (α β : U) : α → β → α := λ (a : α) (b : β), a
-
 def LineP (A : I → U) : U := Π (i : I), A i
 
--- Like in https://git.abby.how/abby/cubical/src/branch/master/intro.tt#L141
-def one? : I -> V := Id I 1
-def 1=1 : one? 1 := ref 1
-def UIP (A : V) (a b : A) (p q : Id A a b) : Id (Id A a b) p q := ref p
-def J (A : V) (B : Π (a b : A), Id A a b -> V) (a b : A) (d : B a a (ref a)) (p : Id A a b) : B a b p := idJ A B a d b p
-def J-β (A : V) (B : Π (a b : A), Id A a b -> V) (a : A) (d : B a a (ref a)) :
-   Id (B a a (ref a)) (J A B a a d (ref a)) d := ref d
-def rev (A : V) (a b : A) (p : Id A a b) : Id A b a :=
-idJ A (λ (a b : A) (_ : Id A a b), Id A b a) a (ref a) b p
-def comp (A : V) (a b c : A) (p : Id A a b) (q : Id A b c) : Id A a c :=
-idJ A (λ (b c : A) (_ : Id A b c), Id A a c) b p c q
+-- path equality
 
 def Path (A : U) (x y : A) : U := PathP (<_> A) x y
 def idp (A : U) (x : A) : Path A x x := <_> x
@@ -56,12 +47,17 @@ def plam (A : U) (f : I → A) : Path A (f 0) (f 1) := <i> f i
 def elim (A : U) (a b : A) (p : Path A a b) : I → A := λ (i : I), p @ i
 def plam-elim (A : U) (f : I → A) : Path (I → A) (elim A (f 0) (f 1) (plam A f)) f := <_> f
 def elim-plam (A : U) (a b : A) (p : Path A a b) : Path (Path A a b) (plam A (elim A a b p)) p := <_> p
+def isProp (A : U) : U := Π (a b : A), Path A a b
+def isSet (A : U) : U := Π (a b : A) (a0 b0 : Path A a b), Path (Path A a b) a0 b0
+def isGroupoid (A : U) : U := Π (a b : A) (a0 b0 : Path A a b) (a1 b1 : Path (Path A a b) a0 b0), Path (Path (Path A a b) a0 b0) a1 b1
 
 -- (<i j> p @ i /\ j) @ 0 ≡ <j> p @ 0 /\ j ≡ <j> p @ 0 ≡ <_> a,
 -- (<i j> p @ i /\ j) @ 1 ≡ <j> p @ 1 /\ j ≡ <j> p @ j ≡ p,
 -- but it doesn’t check since <j> p @ i /\ j : Path A (p @ i /\ 0) (p @ i /\ 1) ≡ Path A a (p @ i),
 -- which is “Path A a a” only propositionally
 --def K (A : U) (a : A) (p : Path A a a) : Path (Path A a a) (<_> a) p := <i j> p @ i /\ j
+
+-- pre-DNF solver
 
 def ⊕ (i j : I) : I := (i ∧ -j) ∨ (-i ∧ j)
 def ⊕-comm (i j : I) : Id I (⊕ i j) (⊕ j i) := ref (⊕ i j)
@@ -73,15 +69,12 @@ def ∨-distrib-∧ (i j k : I) : Id I ((i ∧ j) ∨ k) ((i ∨ k) ∧ (j ∨ k
 def ¬-of-∧ (i j : I) : Id I -(i ∧ j) (-i ∨ -j) := ref -(i ∧ j)
 def ¬-of-∨ (i j : I) : Id I -(i ∨ j) (-i ∧ -j) := ref -(i ∨ j)
 
-def isProp (A : U) : U := Π (a b : A), Path A a b
-def isSet (A : U) : U := Π (a b : A) (a0 b0 : Path A a b), Path (Path A a b) a0 b0
-def isGroupoid (A : U) : U := Π (a b : A) (a0 b0 : Path A a b) (a1 b1 : Path (Path A a b) a0 b0), Path (Path (Path A a b) a0 b0) a1 b1
+-- transport
 
 def trans (A B : U) (p : PathP (<_> U) A B) : A → B := transp p 0
 def trans⁻¹ (A B : U) (p : PathP (<_> U) A B) : B → A := transp (<i> p @ -i) 0
-
-def trans-trans⁻¹ (A B : U) (p : PathP (<_> U) A B) (a : A) : Path A a (trans⁻¹ A B p (trans A B p a)) :=
-<i> transp (<j> p @ i ∧ -j) -i (transp (<j> p @ i ∧ j) -i a)
+def trans-trans⁻¹ (A B : U) (p : PathP (<_> U) A B) (a : A) : Path A a (trans⁻¹ A B p (trans A B p a))
+ := <i> transp (<j> p @ i ∧ -j) -i (transp (<j> p @ i ∧ j) -i a)
 
 def subst (A: U) (P: A → U) (a b: A) (p: Path A a b) (e: P a): P b := transp (<i> P (p @ i)) 0 e
 def coerce (A B: U) (p: PathP (<_> U) A B): A → B := λ (x : A), trans A B p x
@@ -94,54 +87,43 @@ def trans-Π (A : I -> U) (B : Π (i : I), A i -> U) (f : Π (x : A 0), B 0 x) :
 def trans-Σ (A : I -> U) (B : Π (i : I), A i -> U) (z : Σ (x : A 0), B 0 x) : Σ (x : A 1), B 1 x
  := (transp (<i> A i) 0 z.1, transp (<j> B j (transp (<i> A (i ∧ j)) -j z.1)) 0 z.2)
 
-def φ (i : I) : Partial U₁ (i ∨ -i) :=
-[ (i = 0) → U, (i = 1) → U → U ]
+-- strict equality on partial and interval pretypes
 
+def one? : I -> V := Id I 1
+def 1=1 : one? 1 := ref 1
+def UIP (A : V) (a b : A) (p q : Id A a b) : Id (Id A a b) p q := ref p
+def J (A : V) (B : Π (a b : A), Id A a b -> V) (a b : A) (d : B a a (ref a)) (p : Id A a b) : B a b p := idJ A B a d b p
+def J-β (A : V) (B : Π (a b : A), Id A a b -> V) (a : A) (d : B a a (ref a)) : Id (B a a (ref a)) (J A B a a d (ref a)) d := ref d
+def rev (A : V) (a b : A) (p : Id A a b) : Id A b a := idJ A (λ (a b : A) (_ : Id A a b), Id A b a) a (ref a) b p
+def comp (A : V) (a b c : A) (p : Id A a b) (q : Id A b c) : Id A a c := idJ A (λ (b c : A) (_ : Id A b c), Id A a c) b p c q
+def φ (i : I) : Partial U₁ (i ∨ -i) := [ (i = 0) → U, (i = 1) → U → U ]
 def φ-0 : PathP (<_> U₁) (φ 0 1=1) U := <_> U
 def φ-1 : PathP (<_> U₁) (φ 1 1=1) (U → U) := <_> U → U
-
-def φ′ (i : I) : Partial U₁ (i ∨ -i) :=
-[ (i = 1) → U → U, (i = 0) → U ]
-
+def φ′ (i : I) : Partial U₁ (i ∨ -i) := [ (i = 1) → U → U, (i = 0) → U ]
 def φ-eq-φ′ (i : I) : Id (Partial U₁ (i ∨ -i)) (φ i) (φ′ i) := ref (φ′ i)
-
-def ψ (i j : I) : Partial U₁ (-i ∨ i ∨ (i ∧ j)) :=
-[ (i = 1) → U, (i = 1) (j = 1) → U, (i = 0) → U → U ]
-
-def ρ (i : I) : Partial U₁ (-i ∨ i) :=
-[ (i = 0) → U, (i = 1) → U ]
-
-def ρ′ (i : I) : Partial U₁ (-i ∨ i) :=
-[ _ → U ]
-
+def ψ (i j : I) : Partial U₁ (-i ∨ i ∨ (i ∧ j)) := [ (i = 1) → U, (i = 1) (j = 1) → U, (i = 0) → U → U ]
+def ρ (i : I) : Partial U₁ (-i ∨ i) := [ (i = 0) → U, (i = 1) → U ]
+def ρ′ (i : I) : Partial U₁ (-i ∨ i) := [ _ → U ]
 def ρ-eq-ρ′ (i : I) : Id (Partial U₁ (i ∨ -i)) (ρ i) (ρ′ i) := ref (ρ′ i)
-
 def ε (A : U) : Partial A 0 := []
--- “0 = 1” implies that every type is inhabited
 def I-nontriv (p : Id I 0 1) (A : U) : A := ε A (rev I 0 1 p)
 
+-- cubical subtypes
+
 def seg : PathP (<_> I) 0 1 := <i> i
-def Id-path (A : U) (a b : A) : Id A a b → Path A a b :=
-idJ A (λ (a b : A) (_ : Id A a b), Path A a b) a (<_> a) b
-
+def Id-path (A : U) (a b : A) : Id A a b → Path A a b := idJ A (λ (a b : A) (_ : Id A a b), Path A a b) a (<_> a) b
 def Partial-app (A : U) (i : I) (u : Partial A i) (p : one? i) : A := u p
+def inc′ (A : U) (i : I) (a : A) : A [i ↦ [_ → a]] := inc a
+def ouc′ (A : U) (i : I) (u : Partial A i) (a : A [i ↦ u]) : A := ouc a
 
-def inc′ (A : U) (i : I) (a : A) : A[i ↦ [_ → a]] := inc a
-def ouc′ (A : U) (i : I) (u : Partial A i) (a : A[i ↦ u]) : A := ouc a
+-- tests
 
-def Path′ (A : U) (a b : A) := Π (i : I), A[i ∨ -i ↦ [(i = 0) → a, (i = 1) → b]]
+def Path′ (A : U) (a b : A) := Π (i : I), A [i ∨ -i ↦ [(i = 0) → a, (i = 1) → b]]
 def Path-Path′ (A : U) (a b : A) (p : Path A a b) : Path′ A a b := λ (i : I), inc (p @ i)
 def Path′-Path (A : U) (a b : A) (p : Path′ A a b) : Path A a b := <i> ouc (p i)
-
-def Path-Path′-Path (A : U) (a b : A) (p : Path A a b) :
-   Path (Path A a b) (Path′-Path A a b (Path-Path′ A a b p)) p :=
-<_> p
-
-def Path′-Path-Path′ (A : U) (a b : A) (p : Path′ A a b) :
-   PathP (<_> Path′ A a b) (Path-Path′ A a b (Path′-Path A a b p)) p :=
-<_> p
-
-def transp′ (A : U) (j : I) (p : (I → U)[j ↦ [_ → λ (_ : I), A]]) := transp (<i> (ouc p) i) j
+def Path-Path′-Path (A : U) (a b : A) (p : Path A a b) : Path (Path A a b) (Path′-Path A a b (Path-Path′ A a b p)) p := <_> p
+def Path′-Path-Path′ (A : U) (a b : A) (p : Path′ A a b) : PathP (<_> Path′ A a b) (Path-Path′ A a b (Path′-Path A a b p)) p := <_> p
+def transp′ (A : U) (j : I) (p : (I → U) [j ↦ [_ → λ (_ : I), A]]) := transp (<i> (ouc p) i) j
 
 {-
 

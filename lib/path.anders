@@ -143,6 +143,7 @@ def Path′-Path-Path′ (A : U) (a b : A) (p : Path′ A a b) :
 
 def transp′ (A : U) (j : I) (p : (I → U)[j ↦ [_ → λ (_ : I), A]]) := transp (<i> (ouc p) i) j
 
+-- hcomp A 1 φ x ≡ φ 1 1=1
 def comp-Path (A : U) (a b c : A) (p : Path A a b) (q : Path A b c) : Path A a c :=
 <i> hcomp A (i ∨ -i) (λ (j : I), [ (i = 0) → a, (i = 1) → q @ j ]) (inc (p @ i))
 

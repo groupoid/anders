@@ -72,8 +72,7 @@ and closByVal t x v = let (p, e, ctx) = x in traceClos e p v;
 
 and app : value * value -> value = function
   | VApp (VApp (VApp (VApp (VJ _, _), _), f), _), VRef _ -> f
-  | VApp (VApp (VHComp _, VDir One), VLam (_, f)), _ ->
-    app (closByVal VI f (VDir One), VRef (VDir One))
+  | VApp (VApp (VHComp _, VDir One), f), _ -> app (app (f, VDir One), VRef (VDir One))
   | VSystem (Const x, ctx), _ -> eval x ctx
   | VLam (t, f), v -> closByVal t f v
   | f, x -> VApp (f, x)

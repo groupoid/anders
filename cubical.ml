@@ -18,12 +18,9 @@ let rec extractExp : exp -> string = function
   | EHComp _ -> fail "not implemented yet"
   | EApp (ETransp (p, i), a) -> Printf.sprintf "transGen %s %s %s" (extractExp p) (extractExp i) (extractExp a)
   | ETransp _ -> fail "cubicaltt does not support currying of generalized transport"
-  | EApp (EApp (EPathP p, a), b) ->
-    Printf.sprintf "PathP %s %s %s" (extractExp p) (extractExp a) (extractExp b)
-  | EApp (EPathP _, _) | EPathP _ ->
-    fail "cubicaltt does not support (partial) currying of PathP"
-  | EPLam (ELam (EI, (p, e))) ->
-    Printf.sprintf "(<%s> %s)" (showName p) (extractExp e)
+  | EApp (EApp (EPathP p, a), b) -> Printf.sprintf "PathP %s %s %s" (extractExp p) (extractExp a) (extractExp b)
+  | EApp (EPathP _, _) | EPathP _ -> fail "cubicaltt does not support (partial) currying of PathP"
+  | EPLam (ELam (EI, (p, e))) -> Printf.sprintf "(<%s> %s)" (showName p) (extractExp e)
   | EPLam _ -> fail "invalid path lambda (should never happen)"
   | EAppFormula (f, x) -> Printf.sprintf "(%s @ %s)" (extractExp f) (extractExp x)
   | EDir d -> showDir d

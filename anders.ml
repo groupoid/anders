@@ -1,4 +1,3 @@
-open Prefs
 open Error
 open Ident
 
@@ -36,7 +35,7 @@ let cmd : cmdline -> unit = function
   end
   | Help -> print_endline help
   | Repl -> repl := true
-  | Trace -> Prefs.trace := true
+  | Trace -> Ident.trace := true
   | Girard -> girard := true
 
 let rec parseArgs : string list -> cmdline list = function

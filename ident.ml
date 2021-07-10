@@ -1,10 +1,14 @@
+let trace   : bool ref = ref false
+let preeval : bool ref = ref true
+let girard  : bool ref = ref false
+
 type name =
   | Irrefutable
   | Name of string * int
 
 let showName : name -> string = function
   | Irrefutable -> "_"
-  | Name (p, n) -> if !Prefs.trace then p ^ "#" ^ string_of_int n else p
+  | Name (p, n) -> if !trace then p ^ "#" ^ string_of_int n else p
 
 module Name = struct
   type t = name

@@ -94,6 +94,23 @@ Type system with two identities.
 * <a href="https://arxiv.org/pdf/1705.03307.pdf">Two-level type theory and applications</a> [Annenkov, Capriotti, Kraus, Sattler]
 * <a href="https://types21.liacs.nl/download/syntax-for-two-level-type-theory/">Syntax for two-level type theory</a> [Bonacina, Ahrens]
 
+Benchmarks
+----------
+
+```
+$ time make
+real    0m2.028s
+user    0m1.484s
+sys     0m0.249s
+```
+
+```
+$ time for i in lib/* ; do ./anders.native check $i ; done
+real    0m1.333s
+user    0m1.217s
+sys     0m0.067s
+```
+
 Acknowledgements
 ----------------
 

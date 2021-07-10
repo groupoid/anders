@@ -2,7 +2,6 @@ open Module
 open Check
 open Error
 open Ident
-open Prefs
 open Expr
 open Elab
 

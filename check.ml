@@ -2,7 +2,6 @@ open Formula
 open Error
 open Trace
 open Ident
-open Prefs
 open Elab
 open Expr
 

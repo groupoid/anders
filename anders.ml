@@ -11,15 +11,15 @@ type cmdline =
   | Trace | Girard  | Verbose
 
 let help =
-"    invoke = anders | anders list
-       list = [] | command list
-  primitive = zero | one | interval
+"  invocation = anders | anders list
+        list = [] | command list
+   primitive = zero | one | interval | ...
 
-    command = check filename      | lex filename
-            | parse filename      | help
-            | cubicaltt filename  | girard
-            | prim primitive name | trace
-            | repl                | verbose "
+     command = check <filename>      | lex <filename>
+             | parse <filename>      | prim primitive <name>
+             | cubicaltt <filename>  | girard
+             | trace                 | verbose
+             | repl                  | help "
 
 let repl = ref false
 let cmd : cmdline -> unit = function

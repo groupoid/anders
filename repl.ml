@@ -33,7 +33,7 @@ let main ctx : command -> unit = function
 let check filename =
   st := handleErrors (checkFile !st) filename !st
 
-let banner = "Anders theorem prover [MLTT][CCHM][HTS]."
+let banner = "Anders theorem prover [MLTT][CCHM][HTS] version 0.7.2"
 
 let repl () =
   print_endline banner ;
@@ -42,7 +42,5 @@ let repl () =
     print_string "> ";
     let line = read_line () in
     handleErrors (fun x ->
-      let cmd = Reader.parseErr Parser.repl
-                  (Lexing.from_string x) in
-      main ctx cmd) line ()
+      let cmd = Reader.parseErr Parser.repl (Lexing.from_string x) in main ctx cmd) line ()
   done with End_of_file -> ()

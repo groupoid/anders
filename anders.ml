@@ -11,7 +11,7 @@ type cmdline =
   | Trace | Girard  | Verbose
 
 let help =
-"  invocation = anders | anders list
+"\n  invocation = anders | anders list
         list = [] | command list
    primitive = zero | one | interval | ...
 
@@ -33,7 +33,7 @@ let cmd : cmdline -> unit = function
     | "interval" -> intervalPrim := value
     | _ -> raise (UnknownPrimitive prim)
   end
-  | Help -> print_endline (Repl.banner ^ "\n"); print_endline help
+  | Help -> print_endline Repl.banner ; print_endline help
   | Repl -> repl := true
   | Verbose -> Ident.verbose := true
   | Trace -> Ident.trace := true

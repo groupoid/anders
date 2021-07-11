@@ -18,7 +18,7 @@ let vsnd : value -> value = function
 let upVar p x ctx = match p with Irrefutable -> ctx | _ -> Env.add p x ctx
 let upLocal (ctx : ctx) (p : name) t v : ctx = upVar p (Local, Value t, Value v) ctx
 let upGlobal (ctx : ctx) (p : name) t v : ctx = upVar p (Global, Value t, Value v) ctx
-let ieq u v : bool = !girard || u = v
+let ieq u v : bool = !Prefs.girard || u = v
 
 (* Evaluator *)
 let rec eval (e : exp) (ctx : ctx) = traceEval e; match e with

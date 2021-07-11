@@ -7,18 +7,17 @@ type cmdline =
   | Parse     of string
   | Cubicaltt of string
   | Prim      of string * string
-  | Repl  | Help
-  | Trace | Girard  | Verbose
+  | Repl | Help | Trace | Girard | Silent
 
 let help =
 "\n  invocation = anders | anders list
         list = [] | command list
-   primitive = zero | one | interval | ...
+   primitive = zero | one | interval
 
      command = check <filename>      | lex <filename>
              | parse <filename>      | prim primitive <name>
              | cubicaltt <filename>  | girard
-             | trace                 | verbose
+             | trace                 | silent
              | repl                  | help "
 
 let repl = ref false
@@ -35,9 +34,9 @@ let cmd : cmdline -> unit = function
   end
   | Help -> print_endline Repl.banner ; print_endline help
   | Repl -> repl := true
-  | Verbose -> Ident.verbose := true
-  | Trace -> Ident.trace := true
-  | Girard -> girard := true
+  | Silent -> Prefs.verbose := false
+  | Trace -> Prefs.trace := true
+  | Girard -> Prefs.girard := true
 
 let rec parseArgs : string list -> cmdline list = function
   | [] -> []
@@ -46,11 +45,11 @@ let rec parseArgs : string list -> cmdline list = function
   | "lex"       :: filename :: rest -> Lex       filename :: parseArgs rest
   | "parse"     :: filename :: rest -> Parse     filename :: parseArgs rest
   | "cubicaltt" :: filename :: rest -> Cubicaltt filename :: parseArgs rest
-  | "help"      :: rest             -> Help    :: parseArgs rest
-  | "trace"     :: rest             -> Trace   :: parseArgs rest
-  | "verbose"   :: rest             -> Verbose :: parseArgs rest
-  | "girard"    :: rest             -> Girard  :: parseArgs rest
-  | "repl"      :: rest             -> Repl    :: parseArgs rest
+  | "help"      :: rest             -> Help   :: parseArgs rest
+  | "trace"     :: rest             -> Trace  :: parseArgs rest
+  | "silent"    :: rest             -> Silent :: parseArgs rest
+  | "girard"    :: rest             -> Girard :: parseArgs rest
+  | "repl"      :: rest             -> Repl   :: parseArgs rest
   | x :: xs -> Printf.printf "Unknown command “%s”\n" x; parseArgs xs
 
 let defaults = function

@@ -11,7 +11,7 @@ type state = ctx * Files.t
 let empty : state = (Env.empty, Files.empty)
 
 let getDeclName : decl -> string = function Def (p, _, _) | Axiom (p, _) -> p
-let getTerm e ctx = if !preeval then Value (eval e ctx) else Exp e
+let getTerm e ctx = if !Prefs.preeval then Value (eval e ctx) else Exp e
 
 let checkDecl ctx d : ctx =
   let x = getDeclName d in if Env.mem (name x) ctx then
@@ -36,13 +36,14 @@ let getBoolVal opt = function
 let rec checkLine st : line -> state =
   let (ctx, checked) = st in function
   | Decl d ->
-    if !Ident.verbose then Printf.printf "Checking: %s\n" (getDeclName d); flush_all ();
-    (checkDecl ctx (freshDecl d), checked)
+    if !Prefs.verbose then begin
+      Printf.printf "Checking: %s\n" (getDeclName d); flush_all ()
+    end; (checkDecl ctx (freshDecl d), checked)
   | Option (opt, value) ->
     begin match opt with
-      | "girard"   -> girard  := getBoolVal opt value
-      | "verbose"  -> verbose := getBoolVal opt value
-      | "pre-eval" -> preeval := getBoolVal opt value
+      | "girard"   -> Prefs.girard  := getBoolVal opt value
+      | "verbose"  -> Prefs.verbose := getBoolVal opt value
+      | "pre-eval" -> Prefs.preeval := getBoolVal opt value
       | _          -> raise (UnknownOption opt)
     end; st
   | Import xs -> List.fold_left (fun st x -> let path = ext x in
@@ -50,11 +51,16 @@ let rec checkLine st : line -> state =
 and checkFile p path =
   let (ctx, checked) = p in
   let filename = Filename.basename path in
+
   let chan = open_in path in
   let (name, con) = Reader.parseErr Parser.file (Lexing.from_channel chan) in
-  close_in chan; if !Ident.verbose then Printf.printf "Parsed “%s” successfully.\n" filename; flush_all ();
+  close_in chan; if !Prefs.verbose then begin
+    Printf.printf "Parsed “%s” successfully.\n" filename; flush_all ()
+  end;
+
   if ext name = filename then ()
   else raise (InvalidModuleName (name, filename));
+
   let res = checkContent (ctx, Files.add path checked) con in
-  print_endline ("File “" ^ filename ^ "” is CORRECT."); res
+  print_endline ("File “" ^ filename ^ "” checked."); res
 and checkContent st xs = List.fold_left checkLine st xs

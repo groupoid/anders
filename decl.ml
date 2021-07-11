@@ -56,5 +56,5 @@ and checkFile p path =
   if ext name = filename then ()
   else raise (InvalidModuleName (name, filename));
   let res = checkContent (ctx, Files.add path checked) con in
-  if !Ident.verbose then Printf.printf "File loaded.\n"; res
+  print_endline ("File “" ^ filename ^ "” is CORRECT."); res
 and checkContent st xs = List.fold_left checkLine st xs

@@ -32,39 +32,21 @@ Samples
 -------
 
 You can find some examples in the `share` directory of the Anders package.
-For instance reality checking by internalizing MLTT can be performed by the following usage:
 
 ```Lean
-def MLTT (A: U) : U := Σ
-    (Π-form  : Π (B : A → U), U) -- Pi Type
-    (Π-ctor₁ : Π (B : A → U), Pi A B → Pi A B)
-    (Π-elim₁ : Π (B : A → U), Pi A B → Pi A B)
-    (Π-comp₁ : Π (B : A → U) (a : A) (f : Pi A B), Equ (B a) (Π-elim₁ B (Π-ctor₁ B f) a) (f a))
-    (Π-comp₂ : Π (B : A → U) (a : A) (f : Pi A B), Equ (Pi A B) f (λ (x : A), f x))
-    (Σ-form  : Π (B : A → U), U) -- Sigma Type
-    (Σ-ctor₁ : Π (B : A → U) (a : A) (b : B a), Sigma A B)
-    (Σ-elim₁ : Π (B : A → U) (_ : Sigma A B), A)
-    (Σ-elim₂ : Π (B : A → U) (x : Sigma A B), B (pr₁ A B x))
-    (Σ-comp₁ : Π (B : A → U) (a : A) (b: B a), Equ A a (Σ-elim₁ B (Σ-ctor₁ B a b)))
-    (Σ-comp₂ : Π (B : A → U) (a : A) (b: B a), Equ (B a) b (Σ-elim₂ B (a, b)))
-    (Σ-comp₃ : Π (B : A → U) (p : Sigma A B), Equ (Sigma A B) p (pr₁ A B p, pr₂ A B p))
-    (=-form  : Π (a : A), A → U) -- Identity Type
-    (=-ctor₁ : Π (a : A), Equ A a a)
-    (=-elim₁ : Π (a : A) (C: D A) (d: C a a (=-ctor₁ a)) (y: A) (p: Equ A a y), C a y p)
-    (=-comp₁ : Π (a : A) (C: D A) (d: C a a (=-ctor₁ a)),
-       Equ (C a a (=-ctor₁ a)) d (=-elim₁ a C d a (=-ctor₁ a))),
-    U
-```
+def comp-Path⁻¹ (A : U) (a b : A) (p : Path A a b) : Path (Path A a a) (comp-Path A a b a p (<i> p @ -i)) (<_> a)
+ := <k j> hcomp A (-j ∨ j ∨ k) (λ (i : I), [(j = 0) → a, (j = 1) → p @ -i ∧ -k, (k = 1) → a]) (inc (p @ j ∧ -k))
 
-```Lean
-def instance (A : U) : MLTT A :=
-    (Pi A, lambda A, app A, comp₁ A, comp₂ A,
-     Sigma A, pair A, pr₁ A, pr₂ A, comp₃ A, comp₄ A, comp₅ A,
-     Equ A, refl A, J A, comp₆ A, A)
+def kan (A : U) (a b c d : A) (p : Path A a c) (q : Path A b d) (r : Path A a b) : Path A c d
+ := <i> hcomp A (i ∨ -i) (λ (j : I), [(i = 0) → p @ j, (i = 1) → q @ j]) (inc (r @ i))
+
+def comp (A : I → U) (r : I) (u : Π (i : I), Partial (A i) r) (u₀ : (A 0)[r ↦ u 0]) : A 1
+ := hcomp (A 1) r (λ (i : I), [(φ : r = 1) → transp (<j> A (i ∨ j)) i (u i φ)])
+                  (inc (transp (<i> A i) 0 (ouc u₀)))
 ```
 
 ```shell
-$ anders verbose check mltt.anders
+$ anders check path.anders
 ```
 
 CCHM

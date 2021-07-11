@@ -33,7 +33,10 @@ let main ctx : command -> unit = function
 let check filename =
   st := handleErrors (checkFile !st) filename !st
 
+let banner = "Anders theorem prover [MLTT]."
+
 let repl () =
+  print_endline banner ;
   let (ctx, _) = !st in
   try while true do
     print_string "> ";

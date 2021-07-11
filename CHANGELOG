@@ -10,11 +10,13 @@ Changelog
 * Eliminate neutral elements (Mini-TT)
 * Fast type checking
 * Fast compilation
+* Initial Base Library (OPAM share folder)
 
 6 JUL 2021 Version 0.7.1 Binary Distribution:
 
 * Minor optimizations
 * OPAM package
+* ISC license
 * Homepage: https://groupoid.space/homotopy
 
 5 JUL 2021 Version 0.7 MLTT Internalization:

@@ -10,17 +10,16 @@ type cmdline =
   | Repl  | Help
   | Trace | Girard  | Verbose
 
-
-let banner = "Anders theorem prover [MLTT].\n"
 let help =
 "    invoke = anders | anders list
-      list = [] | command list
-   command = check filename      | lex filename
-           | parse filename      | help
-           | cubicaltt filename  | girard
-           | prim primitive name | trace
-           | repl
- primitive = zero | one | interval"
+       list = [] | command list
+  primitive = zero | one | interval
+
+    command = check filename      | lex filename
+            | parse filename      | help
+            | cubicaltt filename  | girard
+            | prim primitive name | trace
+            | repl                | verbose "
 
 let repl = ref false
 let cmd : cmdline -> unit = function
@@ -34,7 +33,7 @@ let cmd : cmdline -> unit = function
     | "interval" -> intervalPrim := value
     | _ -> raise (UnknownPrimitive prim)
   end
-  | Help -> print_endline help
+  | Help -> print_endline (Repl.banner ^ "\n"); print_endline help
   | Repl -> repl := true
   | Verbose -> Ident.verbose := true
   | Trace -> Ident.trace := true
@@ -63,4 +62,4 @@ let rec main () =
     if !repl then Repl.repl () else ()
   with Restart -> main ()
 
-let () = if !Ident.verbose then print_endline banner; main ()
+let () = main ()

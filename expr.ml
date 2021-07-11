@@ -1,19 +1,20 @@
+open Prelude
 open Ident
 
 (* Language Expressions *)
 
 type exp =
-  | EPre of int | EKan of int                                                          (* cosmos *)
-  | EVar of name | EHole                                                            (* variables *)
-  | EPi of exp * (name * exp) | ELam of exp * (name * exp) | EApp of exp * exp             (* pi *)
-  | ESig of exp * (name * exp) | EPair  of exp * exp | EFst of exp | ESnd of exp        (* sigma *)
-  | EId of exp | ERef of exp | EJ of exp                                      (* strict equality *)
-  | EPathP of exp | EPLam of exp | EAppFormula of exp * exp                     (* path equality *)
-  | EI | EDir of dir | EAnd of exp * exp | EOr of exp * exp | ENeg of exp       (* CCHM interval *)
-  | ETransp of exp * exp | EHComp of exp | EPartial of exp | ESystem of system (* Kan operations *)
-  | ESub of exp * exp * exp | EInc of exp | EOuc of exp                      (* cubical subtypes *)
+  | EPre of int | EKan of int                                                              (* cosmos *)
+  | EVar of name | EHole                                                                (* variables *)
+  | EPi of exp * (name * exp) | ELam of exp * (name * exp) | EApp of exp * exp                 (* pi *)
+  | ESig of exp * (name * exp) | EPair  of exp * exp | EFst of exp | ESnd of exp            (* sigma *)
+  | EId of exp | ERef of exp | EJ of exp                                          (* strict equality *)
+  | EPathP of exp | EPLam of exp | EAppFormula of exp * exp                         (* path equality *)
+  | EI | EDir of dir | EAnd of exp * exp | EOr of exp * exp | ENeg of exp           (* CCHM interval *)
+  | ETransp of exp * exp | EHComp of exp | EPartial of exp | ESystem of exp system (* Kan operations *)
+  | ESub of exp * exp * exp | EInc of exp | EOuc of exp                          (* cubical subtypes *)
 
-and system = Const of exp | Split of (face * exp) list
+and 'a system = ((name * 'a) list * exp) list
 
 type tele = name * exp
 
@@ -29,7 +30,7 @@ type value =
   | VId of value | VRef of value | VJ of value
   | VPathP of value | VPLam of value | VAppFormula of value * value
   | VI | VDir of dir | VAnd of value * value | VOr of value * value | VNeg of value
-  | VTransp of value * value | VHComp of value | VPartial of value | VSystem of system * ctx
+  | VTransp of value * value | VHComp of value | VPartial of value | VSystem of value system * ctx
   | VSub of value * value * value | VInc of value | VOuc of value
 
 and clos = name * exp * ctx
@@ -59,10 +60,6 @@ let freshVar ns n = match Env.find_opt n ns with Some x -> x | None -> n
 let mapFace fn phi = Env.fold (fun p d -> Env.add (fn p) d) phi Env.empty
 let freshFace ns = mapFace (freshVar ns)
 
-let face i n d = match i with
-  | "=" -> (name n, getDir d)
-  | _   -> failwith "invalid face"
-
 let rec telescope (ctor : name -> exp -> exp -> exp) (e : exp) : tele list -> exp = function
   | (p, a) :: xs -> ctor p a (telescope ctor e xs)
   | [] -> e
@@ -79,11 +76,15 @@ let rec showLevel x =
   else if x = 0 then "" else showLevel (x / 10) ^ getDigit (x mod 10)
 
 let showDir : dir -> string = function | Zero -> !zeroPrim | One -> !onePrim
-let showAtom (p, d) = Printf.sprintf "(%s = %s)" (showName p) (showDir d)
-let showFace xs = Env.bindings xs |> List.map showAtom |> String.concat " "
-let showSystem show = function
-  | Split xs -> List.map (fun (x, e) -> Printf.sprintf "%s → %s" (showFace x) (show e)) xs |> String.concat ", "
-  | Const x -> Printf.sprintf "_ → %s" (show x)
+
+let showAtom show = function
+  | Irrefutable, t -> Printf.sprintf "(%s = 1)" (show t)
+  | x,           t -> Printf.sprintf "(%s : %s = 1)" (showName x) (show t)
+let showFace show = List.map (showAtom show) >> String.concat " "
+
+let showSystem showVar showTerm xs =
+  List.map (fun (x, e) -> Printf.sprintf "%s → %s" (showFace showVar x) (showTerm e)) xs
+  |> String.concat ", "
 
 let rec showExp : exp -> string = function
   | EKan n -> "U" ^ showLevel n
@@ -107,7 +108,7 @@ let rec showExp : exp -> string = function
   | EPLam _ -> failwith "showExp: unreachable code was reached"
   | EAppFormula (f, x) -> Printf.sprintf "(%s @ %s)" (showExp f) (showExp x)
   | EPartial e -> Printf.sprintf "Partial %s" (showExp e)
-  | ESystem x -> Printf.sprintf "[%s]" (showSystem showExp x)
+  | ESystem x -> Printf.sprintf "[%s]" (showSystem showExp showExp x)
   | ESub (a, i, u) -> Printf.sprintf "%s[%s ↦ %s]" (showExp a) (showExp i) (showExp u)
   | EI -> !intervalPrim | EDir d -> showDir d
   | EAnd (a, b) -> Printf.sprintf "(%s ∧ %s)" (showExp a) (showExp b)
@@ -162,8 +163,8 @@ and showLam p e rho =
   else Printf.sprintf "(<%s> %s)" (showName p) (showExp e)
 
 and showSystemV x rho =
-  if isRhoVisible rho then Printf.sprintf "[%s, %s]" (showSystem showExp x) (showRho rho)
-  else Printf.sprintf "[%s]" (showSystem showExp x)
+  if isRhoVisible rho then Printf.sprintf "[%s, %s]" (showSystem showValue showExp x) (showRho rho)
+  else Printf.sprintf "[%s]" (showSystem showValue showExp x)
 
 and showTermBind : name * record -> string option = function
   | p, (Local, _, t) -> Some (Printf.sprintf "%s := %s" (showName p) (showTerm t))

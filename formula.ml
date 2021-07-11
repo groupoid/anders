@@ -2,12 +2,8 @@ open Ident
 open Error
 open Expr
 
-let getSign p : dir -> exp = function
-  | Zero -> ENeg (EVar p)
-  | One  -> EVar p
-
-let mergeConj xs  = Env.fold (fun p d v -> EAnd (getSign p d, v)) xs (EDir One)
-let getFormula xs = List.fold_left (fun v (x, _) -> EOr (mergeConj x, v)) (EDir Zero) xs
+let mergeConj  xs = List.fold_left (fun e (_, e') -> EAnd (e', e)) (EDir One) xs
+let getFormula xs = List.fold_left (fun e (x, _) -> EOr (mergeConj x, e)) (EDir Zero) xs
 
 (* Arbitrary formula φ after calling andFormula/orFormula/negFormula
    will have form (α₁ ∧ ... ∧ αₙ) ∨ ... ∨ (β₁ ∧ ... ∧ βₘ),

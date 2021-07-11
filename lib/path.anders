@@ -95,16 +95,16 @@ def UIP (A : V) (a b : A) (p q : Id A a b) : Id (Id A a b) p q := ref p
 def J (A : V) (B : Π (a b : A), Id A a b -> V) (a b : A) (d : B a a (ref a)) (p : Id A a b) : B a b p := idJ A B a d b p
 def J-β (A : V) (B : Π (a b : A), Id A a b -> V) (a : A) (d : B a a (ref a)) : Id (B a a (ref a)) (J A B a a d (ref a)) d := ref d
 def rev (A : V) (a b : A) (p : Id A a b) : Id A b a := idJ A (λ (a b : A) (_ : Id A a b), Id A b a) a (ref a) b p
-def comp (A : V) (a b c : A) (p : Id A a b) (q : Id A b c) : Id A a c := idJ A (λ (b c : A) (_ : Id A b c), Id A a c) b p c q
-def φ (i : I) : Partial U₁ (i ∨ -i) := [ (i = 0) → U, (i = 1) → U → U ]
+def comp-Id (A : V) (a b c : A) (p : Id A a b) (q : Id A b c) : Id A a c := idJ A (λ (b c : A) (_ : Id A b c), Id A a c) b p c q
+def φ (i : I) : Partial U₁ (i ∨ -i) := [(i = 0) → U, (i = 1) → U → U]
+
 def φ-0 : PathP (<_> U₁) (φ 0 1=1) U := <_> U
 def φ-1 : PathP (<_> U₁) (φ 1 1=1) (U → U) := <_> U → U
-def φ′ (i : I) : Partial U₁ (i ∨ -i) := [ (i = 1) → U → U, (i = 0) → U ]
+def φ′ (i : I) : Partial U₁ (i ∨ -i) := [(i = 1) → U → U, (i = 0) → U]
 def φ-eq-φ′ (i : I) : Id (Partial U₁ (i ∨ -i)) (φ i) (φ′ i) := ref (φ′ i)
-def ψ (i j : I) : Partial U₁ (-i ∨ i ∨ (i ∧ j)) := [ (i = 1) → U, (i = 1) (j = 1) → U, (i = 0) → U → U ]
-def ρ (i : I) : Partial U₁ (-i ∨ i) := [ (i = 0) → U, (i = 1) → U ]
-def ρ′ (i : I) : Partial U₁ (-i ∨ i) := [ _ → U ]
-def ρ-eq-ρ′ (i : I) : Id (Partial U₁ (i ∨ -i)) (ρ i) (ρ′ i) := ref (ρ′ i)
+def ψ (i j : I) : Partial U₁ (-i ∨ i ∨ (i ∧ j)) := [(i = 1) → U, (i = 1) (j = 1) → U, (i = 0) → U → U]
+def ρ (i : I) : Partial U₁ (-i ∨ i) := [(i = 0) → U, (i = 1) → U]
+
 def ε (A : U) : Partial A 0 := []
 def I-nontriv (p : Id I 0 1) (A : U) : A := ε A (rev I 0 1 p)
 
@@ -113,21 +113,23 @@ def I-nontriv (p : Id I 0 1) (A : U) : A := ε A (rev I 0 1 p)
 def seg : PathP (<_> I) 0 1 := <i> i
 def Id-path (A : U) (a b : A) : Id A a b → Path A a b := idJ A (λ (a b : A) (_ : Id A a b), Path A a b) a (<_> a) b
 def Partial-app (A : U) (i : I) (u : Partial A i) (p : one? i) : A := u p
-def inc′ (A : U) (i : I) (a : A) : A [i ↦ [_ → a]] := inc a
+def inc′ (A : U) (i : I) (a : A) : A [i ↦ [(i = 1) → a]] := inc a
 def ouc′ (A : U) (i : I) (u : Partial A i) (a : A [i ↦ u]) : A := ouc a
 
 -- homogeneous composition
 
+-- hcomp A 1 φ x ≡ φ 1 1=1
 def comp-Path (A : U) (a b c : A) (p : Path A a b) (q : Path A b c) : Path A a c :=
-    <i> hcomp A (i ∨ -i) (λ (j : I), [ (i = 0) → a, (i = 1) → q @ j ]) (inc (p @ i))
+<i> hcomp A (i ∨ -i) (λ (j : I), [(i = 0) → a, (i = 1) → q @ j]) (inc (p @ i))
 
--- def comp-Path⁻¹ (A : U) (a b : A) (p : Path A a b) : Path (Path A a a) (comp-Path A a b a p (<i> p @ -i)) (<_> a) :=
---     <k j> hcomp A (j ∨ k ∨ -k) (λ (i : I), [ (j = 0) → a, (j = 1) → p @ -i ∧ -k, (k = 1) → a ]) (inc (p @ j ∧ -k))
+def comp-Path⁻¹ (A : U) (a b : A) (p : Path A a b) : Path (Path A a a) (comp-Path A a b a p (<i> p @ -i)) (<_> a) :=
+<k j> hcomp A (-j ∨ j ∨ k) (λ (i : I), [(j = 0) → a, (j = 1) → p @ -i ∧ -k, (k = 1) → a]) (inc (p @ j ∧ -k))
 
 def kan (A : U) (a b c d : A) (p : Path A a c) (q : Path A b d) (r : Path A a b) : Path A c d :=
-    <i> hcomp A (i ∨ -i) (λ (j : I), [ (i = 0) → p @ j, (i = 1) → q @ j ]) (inc (r @ i))
+<i> hcomp A (i ∨ -i) (λ (j : I), [(i = 0) → p @ j, (i = 1) → q @ j]) (inc (r @ i))
 
-{- hcomp A 1 φ x ≡ φ 1 1=1 -}
+def comp (A : I → U) (r : I) (u : Π (i : I), Partial (A i) r) (u₀ : (A 0)[r ↦ u 0]) : A 1 :=
+hcomp (A 1) r (λ (i : I), [(φ : r = 1) → transp (<j> A (i ∨ j)) i (u i φ)]) (inc (transp (<i> A i) 0 (ouc u₀)))
 
 {-
 
@@ -161,5 +163,5 @@ def Path′ (A : U) (a b : A) := Π (i : I), A [i ∨ -i ↦ [(i = 0) → a, (i 
 def Path-Path′ (A : U) (a b : A) (p : Path A a b) : Path′ A a b := λ (i : I), inc (p @ i)
 def Path′-Path (A : U) (a b : A) (p : Path′ A a b) : Path A a b := <i> ouc (p i)
 def Path-Path′-Path (A : U) (a b : A) (p : Path A a b) : Path (Path A a b) (Path′-Path A a b (Path-Path′ A a b p)) p := <_> p
-def Path′-Path-Path′ (A : U) (a b : A) (p : Path′ A a b) : PathP (<_> Path′ A a b) (Path-Path′ A a b (Path′-Path A a b p)) p := <_> p
-def transp′ (A : U) (j : I) (p : (I → U) [j ↦ [_ → λ (_ : I), A]]) := transp (<i> (ouc p) i) j
+--def Path′-Path-Path′ (A : U) (a b : A) (p : Path′ A a b) : PathP (<_> Path′ A a b) (Path-Path′ A a b (Path′-Path A a b p)) p := <_> p
+--def transp′ (A : U) (j : I) (p : (I → U) [j ↦ [(j = 1) → λ (_ : I), A]]) := transp (<i> (ouc p) i) j

@@ -42,38 +42,43 @@ let impl a b = EPi (a, (Irrefutable, b))
 let prod a b = ESig (a, (Irrefutable, b))
 
 let rec salt (ns : name Env.t) : exp -> exp = function
-  | ELam (a, (p, b))    -> saltTele eLam ns p a b
-  | EKan n              -> EKan n
-  | EPi (a, (p, b))     -> saltTele ePi ns p a b
-  | ESig (a, (p, b))    -> saltTele eSig ns p a b
-  | EPair (a, b)        -> EPair (salt ns a, salt ns b)
-  | EFst e              -> EFst (salt ns e)
-  | ESnd e              -> ESnd (salt ns e)
-  | EApp (f, x)         -> EApp (salt ns f, salt ns x)
-  | EVar x              -> EVar (freshVar ns x)
-  | EHole               -> EHole
-  | EPre n              -> EPre n
-  | EId e               -> EId (salt ns e)
-  | ERef e              -> ERef (salt ns e)
-  | EJ e                -> EJ (salt ns e)
-  | EPathP e            -> EPathP (salt ns e)
-  | ETransp (p, i)      -> ETransp (salt ns p, salt ns i)
-  | EHComp e            -> EHComp (salt ns e)
-  | EPLam e             -> EPLam (salt ns e)
-  | EAppFormula (p, i)  -> EAppFormula (salt ns p, salt ns i)
-  | EPartial e          -> EPartial (salt ns e)
-  | ESub (a, i, u)      -> ESub (salt ns a, salt ns i, salt ns u)
-  | ESystem (Split xs)  -> ESystem (Split (List.map (fun (phi, e) -> (freshFace ns phi, salt ns e)) xs))
-  | ESystem (Const x)   -> ESystem (Const (salt ns x))
-  | EInc e              -> EInc (salt ns e)
-  | EOuc e              -> EOuc (salt ns e)
-  | EI                  -> EI
-  | EDir d              -> EDir d
-  | EAnd (a, b)         -> EAnd (salt ns a, salt ns b)
-  | EOr (a, b)          -> EOr (salt ns a, salt ns b)
-  | ENeg e              -> ENeg (salt ns e)
+  | ELam (a, (p, b))   -> saltTele eLam ns p a b
+  | EKan n             -> EKan n
+  | EPi (a, (p, b))    -> saltTele ePi ns p a b
+  | ESig (a, (p, b))   -> saltTele eSig ns p a b
+  | EPair (a, b)       -> EPair (salt ns a, salt ns b)
+  | EFst e             -> EFst (salt ns e)
+  | ESnd e             -> ESnd (salt ns e)
+  | EApp (f, x)        -> EApp (salt ns f, salt ns x)
+  | EVar x             -> EVar (freshVar ns x)
+  | EHole              -> EHole
+  | EPre n             -> EPre n
+  | EId e              -> EId (salt ns e)
+  | ERef e             -> ERef (salt ns e)
+  | EJ e               -> EJ (salt ns e)
+  | EPathP e           -> EPathP (salt ns e)
+  | ETransp (p, i)     -> ETransp (salt ns p, salt ns i)
+  | EHComp e           -> EHComp (salt ns e)
+  | EPLam e            -> EPLam (salt ns e)
+  | EAppFormula (p, i) -> EAppFormula (salt ns p, salt ns i)
+  | EPartial e         -> EPartial (salt ns e)
+  | ESub (a, i, u)     -> ESub (salt ns a, salt ns i, salt ns u)
+  | ESystem xs         -> ESystem (List.map (fun (phi, e) ->
+    let (phi', ns') = saltFace ns phi in (phi', salt ns' e)) xs)
+  | EInc e             -> EInc (salt ns e)
+  | EOuc e             -> EOuc (salt ns e)
+  | EI                 -> EI
+  | EDir d             -> EDir d
+  | EAnd (a, b)        -> EAnd (salt ns a, salt ns b)
+  | EOr (a, b)         -> EOr (salt ns a, salt ns b)
+  | ENeg e             -> ENeg (salt ns e)
 
 and saltTele ctor ns p a b =
   let x = fresh p in ctor x (salt ns a) (salt (Env.add p x ns) b)
+
+and saltFace ns xs =
+  let ns' = ref ns in let exp = List.map (fun (x, e) ->
+    let y = fresh x in ns' := Env.add x y !ns'; (y, salt ns e)) xs in
+  (exp, !ns')
 
 let freshExp = salt Env.empty

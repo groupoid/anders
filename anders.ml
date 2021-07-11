@@ -8,7 +8,8 @@ type cmdline =
   | Cubicaltt of string
   | Prim      of string * string
   | Repl  | Help
-  | Trace | Girard
+  | Trace | Girard  | Verbose
+
 
 let banner = "Anders theorem prover [MLTT].\n"
 let help =
@@ -35,6 +36,7 @@ let cmd : cmdline -> unit = function
   end
   | Help -> print_endline help
   | Repl -> repl := true
+  | Verbose -> Ident.verbose := true
   | Trace -> Ident.trace := true
   | Girard -> girard := true
 
@@ -45,10 +47,11 @@ let rec parseArgs : string list -> cmdline list = function
   | "lex"       :: filename :: rest -> Lex       filename :: parseArgs rest
   | "parse"     :: filename :: rest -> Parse     filename :: parseArgs rest
   | "cubicaltt" :: filename :: rest -> Cubicaltt filename :: parseArgs rest
-  | "help"      :: rest             -> Help   :: parseArgs rest
-  | "trace"     :: rest             -> Trace  :: parseArgs rest
-  | "girard"    :: rest             -> Girard :: parseArgs rest
-  | "repl"      :: rest             -> Repl   :: parseArgs rest
+  | "help"      :: rest             -> Help    :: parseArgs rest
+  | "trace"     :: rest             -> Trace   :: parseArgs rest
+  | "verbose"   :: rest             -> Verbose :: parseArgs rest
+  | "girard"    :: rest             -> Girard  :: parseArgs rest
+  | "repl"      :: rest             -> Repl    :: parseArgs rest
   | x :: xs -> Printf.printf "Unknown command “%s”\n" x; parseArgs xs
 
 let defaults = function
@@ -60,4 +63,4 @@ let rec main () =
     if !repl then Repl.repl () else ()
   with Restart -> main ()
 
-let () = print_endline banner; main ()
+let () = if !Ident.verbose then print_endline banner; main ()

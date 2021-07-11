@@ -36,12 +36,12 @@ let getBoolVal opt = function
 let rec checkLine st : line -> state =
   let (ctx, checked) = st in function
   | Decl d ->
-    let name = getDeclName d in
-    Printf.printf "Checking: %s\n" name; flush_all ();
+    if !Ident.verbose then Printf.printf "Checking: %s\n" (getDeclName d); flush_all ();
     (checkDecl ctx (freshDecl d), checked)
   | Option (opt, value) ->
     begin match opt with
       | "girard"   -> girard  := getBoolVal opt value
+      | "verbose"  -> verbose := getBoolVal opt value
       | "pre-eval" -> preeval := getBoolVal opt value
       | _          -> raise (UnknownOption opt)
     end; st
@@ -52,9 +52,9 @@ and checkFile p path =
   let filename = Filename.basename path in
   let chan = open_in path in
   let (name, con) = Reader.parseErr Parser.file (Lexing.from_channel chan) in
-  close_in chan; Printf.printf "Parsed “%s” successfully.\n" filename; flush_all ();
+  close_in chan; if !Ident.verbose then Printf.printf "Parsed “%s” successfully.\n" filename; flush_all ();
   if ext name = filename then ()
   else raise (InvalidModuleName (name, filename));
   let res = checkContent (ctx, Files.add path checked) con in
-  Printf.printf "File loaded.\n"; res
+  if !Ident.verbose then Printf.printf "File loaded.\n"; res
 and checkContent st xs = List.fold_left checkLine st xs

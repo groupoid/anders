@@ -8,10 +8,10 @@ type exp =
   | EPi of exp * (name * exp) | ELam of exp * (name * exp) | EApp of exp * exp             (* pi *)
   | ESig of exp * (name * exp) | EPair  of exp * exp | EFst of exp | ESnd of exp        (* sigma *)
   | EId of exp | ERef of exp | EJ of exp                                      (* strict equality *)
-  | EPathP of exp | EPLam of exp | EAppFormula of exp * exp                     (* CCHM equality *)
-  | EI | EDir of dir | EAnd of exp * exp | EOr of exp * exp | ENeg of exp            (* Interval *)
+  | EPathP of exp | EPLam of exp | EAppFormula of exp * exp                     (* path equality *)
+  | EI | EDir of dir | EAnd of exp * exp | EOr of exp * exp | ENeg of exp       (* CCHM interval *)
   | ETransp of exp * exp | EHComp of exp | EPartial of exp | ESystem of system (* Kan operations *)
-  | ESub of exp * exp * exp | EInc of exp | EOuc of exp                      (* Cubical subtypes *)
+  | ESub of exp * exp * exp | EInc of exp | EOuc of exp                      (* cubical subtypes *)
 
 and system = Const of exp | Split of (face * exp) list
 

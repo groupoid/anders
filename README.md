@@ -34,8 +34,13 @@ Samples
 You can find some examples in the `share` directory of the Anders package.
 
 ```Lean
-def comp-Path⁻¹ (A : U) (a b : A) (p : Path A a b) : Path (Path A a a) (comp-Path A a b a p (<i> p @ -i)) (<_> a)
- := <k j> hcomp A (-j ∨ j ∨ k) (λ (i : I), [(j = 0) → a, (j = 1) → p @ -i ∧ -k, (k = 1) → a]) (inc (p @ j ∧ -k))
+def comp-Path⁻¹ (A : U) (a b : A) (p : Path A a b)
+  : Path (Path A a a) (comp-Path A a b a p (<i> p @ -i)) (<_> a)
+ := <k j> hcomp A (-j ∨ j ∨ k)
+          (λ (i : I), [(j = 0) → a,
+                       (j = 1) → p @ -i ∧ -k,
+                       (k = 1) → a])
+          (inc (p @ j ∧ -k))
 
 def kan (A : U) (a b c d : A) (p : Path A a c) (q : Path A b d) (r : Path A a b) : Path A c d
  := <i> hcomp A (i ∨ -i) (λ (j : I), [(i = 0) → p @ j, (i = 1) → q @ j]) (inc (r @ i))

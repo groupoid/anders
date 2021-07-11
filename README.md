@@ -64,7 +64,7 @@ def instance (A : U) : MLTT A :=
 ```
 
 ```shell
-$ anders girard check mltt.anders
+$ anders verbose check mltt.anders
 ```
 
 CCHM

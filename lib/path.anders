@@ -122,6 +122,9 @@ def ouc′ (A : U) (i : I) (u : Partial A i) (a : A [i ↦ u]) : A := ouc a
 def comp-Path (A : U) (a b c : A) (p : Path A a b) (q : Path A b c) : Path A a c :=
 <i> hcomp A (i ∨ -i) (λ (j : I), [(i = 0) → a, (i = 1) → q @ j]) (inc (p @ i))
 
+def comp-Path′ (A : U) (a b c : A) (p : Path A a b) (q : Path A b c) : Path A a c :=
+transp (<i> Path A a (q @ i)) 0 p
+
 def comp-Path⁻¹ (A : U) (a b : A) (p : Path A a b) : Path (Path A a a) (comp-Path A a b a p (<i> p @ -i)) (<_> a) :=
 <k j> hcomp A (-j ∨ j ∨ k) (λ (i : I), [(j = 0) → a, (j = 1) → p @ -i ∧ -k, (k = 1) → a]) (inc (p @ j ∧ -k))
 

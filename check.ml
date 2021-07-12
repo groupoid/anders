@@ -68,7 +68,12 @@ and transport (ctx : ctx) (p : exp) (i : exp) = match eval i ctx with
   | v        -> VTransp (eval p ctx, v)
 
 and closByVal t x v = let (p, e, ctx) = x in traceClos e p v;
-  eval e (upLocal ctx p t v)
+  (* dirty hack to handle free variables introduced by type checker,
+     for example, while checking terms like p : Path P a b *)
+  let ctx' = match v with
+  | Var (x, t) -> if Env.mem x ctx then ctx else upLocal ctx x t v
+  | _          -> ctx in
+  eval e (upLocal ctx' p t v)
 
 and app : value * value -> value = function
   | VApp (VApp (VApp (VApp (VJ _, _), _), f), _), VRef _ -> f
@@ -93,7 +98,7 @@ and evalSystem ctx xs v =
 and evalOuc ctx v = match inferV v with
   | VSub (_, i, f) ->
     begin match eval (rbV i) ctx with
-      | VDir One -> app (f, VRef vone)
+      | VDir One -> app (eval (rbV f) ctx, VRef vone)
       | _        -> VOuc v
     end
   | _ -> VOuc v

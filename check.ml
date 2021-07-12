@@ -16,10 +16,6 @@ let vsnd : value -> value = function
   | VPair (_, u) -> u
   | v            -> VSnd v
 
-let upVar p x ctx = match p with Irrefutable -> ctx | _ -> Env.add p x ctx
-let upLocal (ctx : ctx) (p : name) t v : ctx = upVar p (Local, Value t, Value v) ctx
-let upGlobal (ctx : ctx) (p : name) t v : ctx = upVar p (Global, Value t, Value v) ctx
-
 let isOneCtx ctx0 xs = List.fold_left (fun ctx (p, v) -> upLocal ctx p (isOne v) (Var (p, isOne v))) ctx0 xs
 
 (* Evaluator *)
@@ -228,8 +224,8 @@ and conv v1 v2 : bool = traceConv v1 v2;
     | VPartial a, VPartial b -> conv a b
     | VAppFormula (f, x), VAppFormula (g, y) -> conv f g && conv x y
     | VSystem (xs, ctx1), VSystem (ys, ctx2) ->
-      let xs' = List.map (fun (p, e) -> (p, eval e (isOneCtx ctx1 p))) xs in
-      let ys' = List.map (fun (p, e) -> (p, eval e (isOneCtx ctx2 p))) ys in
+      let evalMap ctx = List.map (fun (p, e) -> (p, eval e (isOneCtx ctx p))) in
+      let xs' = evalMap ctx1 xs in let ys' = evalMap ctx2 ys in
       systemSubset xs' ys' && systemSubset ys' xs'
     | VTransp (p, i), VTransp (q, j) -> conv p q && conv i j
     | VHComp a, VHComp b -> conv a b
@@ -250,7 +246,7 @@ and faceSubset phi psi =
 and faceConv phi psi = faceSubset phi psi && faceSubset psi phi
 
 and systemSubset xs ys =
-  List.for_all (fun (p, x) -> List.exists (fun (q, y) -> conv x y && faceConv p q) ys) xs
+  List.for_all (fun (p, x) -> List.exists (fun (q, y) -> faceConv p q && conv x y) ys) xs
 
 and convId v1 v2 =
   (* Id A a b is proof-irrelevant *)

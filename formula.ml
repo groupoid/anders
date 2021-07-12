@@ -2,8 +2,8 @@ open Ident
 open Error
 open Expr
 
-let mergeConj  xs = List.fold_left (fun e (_, e') -> EAnd (e', e)) (EDir One) xs
-let getFormula xs = List.fold_left (fun e (x, _) -> EOr (mergeConj x, e)) (EDir Zero) xs
+let mergeConjunction xs = List.fold_left (fun e (_, e') -> EAnd (e', e)) (EDir One) xs
+let getFormula       xs = List.fold_left (fun e (x, _) -> EOr (mergeConjunction x, e)) (EDir Zero) xs
 
 (* Arbitrary formula φ after calling andFormula/orFormula/negFormula
    will have form (α₁ ∧ ... ∧ αₙ) ∨ ... ∨ (β₁ ∧ ... ∧ βₘ),
@@ -35,7 +35,6 @@ let rec extAnd : value -> conjunction = function
   | Var (x, _)        -> Conjunction.singleton (x, One)
   | VNeg (Var (x, _)) -> Conjunction.singleton (x, Zero)
   | VAnd (x, y)       -> Conjunction.union (extAnd x) (extAnd y)
-  | VDir Zero         -> Conjunction.empty
   | v -> raise (ExpectedConjunction v)
 
 (* extOr converts (α₁ ∧ ... ∧ αₙ) ∨ ... ∨ (β₁ ∧ ... ∧ βₘ)

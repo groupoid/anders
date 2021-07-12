@@ -55,6 +55,10 @@ let vone  = VDir One
 let name x = Name (x, 0)
 let decl x = EVar (name x)
 
+let upVar p x ctx = match p with Irrefutable -> ctx | _ -> Env.add p x ctx
+let upLocal (ctx : ctx) (p : name) t v : ctx = upVar p (Local, Value t, Value v) ctx
+let upGlobal (ctx : ctx) (p : name) t v : ctx = upVar p (Global, Value t, Value v) ctx
+
 let isGlobal : record -> bool = function Global, _, _ -> false | Local, _, _ -> true
 let freshVar ns n = match Env.find_opt n ns with Some x -> x | None -> n
 let mapFace fn phi = Env.fold (fun p d -> Env.add (fn p) d) phi Env.empty
@@ -67,6 +71,7 @@ let rec telescope (ctor : name -> exp -> exp -> exp) (e : exp) : tele list -> ex
 let rec pLam e : name list -> exp = function [] -> e | x :: xs -> EPLam (ELam (EI, (x, pLam e xs)))
 
 let getDigit x = Char.chr (x + 0x80) |> Printf.sprintf "\xE2\x82%c"
+
 let getVar x =
   let xs = [(!zeroPrim, EDir Zero); (!onePrim, EDir One); (!intervalPrim, EI)] in
   match List.assoc_opt x xs with Some e -> e | None -> decl x

@@ -47,8 +47,8 @@ file : MODULE IDENT WHERE line* EOF { ($2, $4) }
 line : IMPORT path+ { Import $2 } | OPTION IDENT IDENT { Option ($2, $3) } | declarations { Decl $1 }
 repl : COLON IDENT exp1 EOF { Command ($2, $3) } | COLON IDENT EOF { Action $2 } | exp0 EOF { Eval $1 } | EOF { Nope }
 face :
-  | LPARENS exp3 IDENT IDENT RPARENS { face Irrefutable $2 $3 $4 }
-  | LPARENS IDENT COLON exp3 IDENT IDENT RPARENS { face (name $2) $4 $5 $6 }
+  | LPARENS IDENT IDENT IDENT RPARENS { face Irrefutable (getVar $2) $3 $4 }
+  | LPARENS IDENT COLON IDENT IDENT IDENT RPARENS { face (name $2) (getVar $4) $5 $6 }
 partial : face+ ARROW exp1 { ($1, $3) }
 
 exp1:

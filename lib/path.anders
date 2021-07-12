@@ -152,6 +152,9 @@ comp-Id I (i ∧ k) (i ∧ j) i
 def asymm (i j : I) (p : ≤ i j) (q : ≤ j i) : Id I i j :=
 comp-Id I i (i ∧ j) j (rev I (i ∧ j) i p) q
 
+def 0-is-min (i : I) : ≤ 0 i := ref 0
+def 1-is-max (i : I) : ≤ i 1 := ref i
+
 def lem-edge (i : I) : Partial (1= (i ∨ -i)) (i ∨ -i) :=
 [(φ : i = 0) → ∨-right i -i φ, (ψ : i = 1) → ∨-left i -i ψ]
 

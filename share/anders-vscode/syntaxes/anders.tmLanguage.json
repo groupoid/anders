@@ -14,23 +14,23 @@
             "name": "comment.line.double-dash.anders"
         },
         {
-            "match": "(?<=^|[\\s()])(option|axiom|postulate|def|definition|theorem|lemma|corollary|proposition|import|with|module|where)(?=$|[\\s()])",
+            "match": "(?<=^|[\\s()\\[\\]])(option|axiom|postulate|def|definition|theorem|lemma|corollary|proposition|import|with|module|where)(?=$|[\\s()\\[\\]])",
             "name": "keyword.other.anders"
         },
         {
-            "match": "(?<=^|[\\s(),])(λ|Σ|Π|Id|ref|idJ|forall|sigma|Partial|inc|ouc|PathP|hcomp|transp|Glue|glue|unglue)(?=$|[\\s(),])",
+            "match": "(?<=^|[\\s(),\\[\\]])(λ|Σ|Π|Id|ref|idJ|forall|sigma|Partial|inc|ouc|PathP|hcomp|transp|Glue|glue|unglue)(?=$|[\\s(),\\[\\]])",
             "name": "keyword.control.anders"
         },
         {
-            "match": "(?<=^|[\\s(),])([UV][₀₁₂₃₄₅₆₇₈₉]*)(?=$|[\\s(),])",
+            "match": "(?<=^|[\\s()\\[\\],])([UV][₀₁₂₃₄₅₆₇₈₉]*)(?=$|[\\s()\\[\\],])",
             "name": "keyword.other.anders"
         },
         {
-            "match": "(?<=^|[\\s()])(->|→|↦|\\|->|:=|≔|≜|≝|:|\\*|\\\\/|/\\\\|∧|∨|@)(?=$|[\\s()])",
+            "match": "(?<=^|[\\s()\\[\\]])(->|→|↦|\\|->|:=|≔|≜|≝|:|\\*|\\\\/|/\\\\|∧|∨|@)(?=$|[\\s()\\[\\]])",
             "name": "keyword.other.anders"
         },
         {
-            "match": "(?<=^|[\\s()])(-)",
+            "match": "(?<=^|[\\s()\\[\\]])(-)",
             "name": "keyword.other.anders"
         },
         {

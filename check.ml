@@ -234,7 +234,9 @@ and conv v1 v2 : bool = traceConv v1 v2;
     | VTransp (p, i), VTransp (q, j) -> conv p q && conv i j
     | VHComp a, VHComp b -> conv a b
     | VSub (a, i, u), VSub (b, j, v) -> conv a b && conv i j && conv u v
-    | VOr _, _ | _, VOr _ -> orEq v1 v2
+    | VOr (v1, v2), VDir One | VDir One, VOr (v1, v2) -> conv v1 vone || conv v2 vone
+    | VOr _, VAnd _ -> false
+    | VOr _,  _ | _, VOr _  -> orEq v1 v2
     | VAnd _, _ | _, VAnd _ -> andEq v1 v2
     | VNeg x, VNeg y -> conv x y
     | VI, VI -> true

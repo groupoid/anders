@@ -32,10 +32,11 @@ let rec negFormula : value -> value = function
 
 (* extAnd converts (α₁ ∧ ... ∧ αₙ) into set of names equipped with sign. *)
 let rec extAnd : value -> conjunction = function
-  | Var (x, _)           -> Conjunction.singleton (x, One)
-  | VNeg (Var (x, _))    -> Conjunction.singleton (x, Zero)
-  | VAnd (x, y)          -> Conjunction.union (extAnd x) (extAnd y)
-  | v -> failwith (Printf.sprintf "“%s” expected to be conjunction (should never happen)" (showValue v))
+  | Var (x, _)        -> Conjunction.singleton (x, One)
+  | VNeg (Var (x, _)) -> Conjunction.singleton (x, Zero)
+  | VAnd (x, y)       -> Conjunction.union (extAnd x) (extAnd y)
+  | VDir Zero         -> Conjunction.empty
+  | v -> raise (ExpectedConjunction v)
 
 (* extOr converts (α₁ ∧ ... ∧ αₙ) ∨ ... ∨ (β₁ ∧ ... ∧ βₘ)
    into list of extAnd results. *)

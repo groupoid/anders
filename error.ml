@@ -21,10 +21,12 @@ exception ExtractionError of string
 exception TypeIneq of value * value
 exception AlreadyDeclared of string
 exception UnknownPrimitive of string
+exception ExpectedConjunction of value
 exception InvalidModuleName of string * string
 exception UnknownOptionValue of string * string
 
 let prettyPrintError : exn -> unit = function
+  | ExpectedConjunction v -> Printf.printf "“%s” expected to be conjunction\n" (showValue v)
   | ExpectedDir s -> Printf.printf "“%s” expected to be “%s” or “%s”" s !zeroPrim !onePrim
   | ExtractionError s -> Printf.printf "Error occured during extraction: %s\n" s
   | ExpectedPath e -> Printf.printf "“%s” expected to be a path.\n" (showValue e)

@@ -89,8 +89,8 @@ def trans-Σ (A : I -> U) (B : Π (i : I), A i -> U) (z : Σ (x : A 0), B 0 x) :
 
 -- strict equality on partial and interval pretypes
 
-def one? : I -> V := Id I 1
-def 1=1 : one? 1 := ref 1
+def 1= : I -> V := Id I 1
+def 1=1 : 1= 1 := ref 1
 def UIP (A : V) (a b : A) (p q : Id A a b) : Id (Id A a b) p q := ref p
 def J (A : V) (B : Π (a b : A), Id A a b -> V) (a b : A) (d : B a a (ref a)) (p : Id A a b) : B a b p := idJ A B a d b p
 def J-β (A : V) (B : Π (a b : A), Id A a b -> V) (a : A) (d : B a a (ref a)) : Id (B a a (ref a)) (J A B a a d (ref a)) d := ref d
@@ -103,7 +103,16 @@ def φ-1 : PathP (<_> U₁) (φ 1 1=1) (U → U) := <_> U → U
 def φ′ (i : I) : Partial U₁ (i ∨ -i) := [(i = 1) → U → U, (i = 0) → U]
 def φ-eq-φ′ (i : I) : Id (Partial U₁ (i ∨ -i)) (φ i) (φ′ i) := ref (φ′ i)
 def ψ (i j : I) : Partial U₁ (-i ∨ i ∨ (i ∧ j)) := [(i = 1) → U, (i = 1) (j = 1) → U, (i = 0) → U → U]
-def ρ (i : I) : Partial U₁ (-i ∨ i) := [(i = 0) → U, (i = 1) → U]
+def ρ (i j : I) : Partial U₁ (-i ∨ (i ∧ j)) := [(i = 0) → U, (i ∧ j = 1) → U]
+
+def ∨-left (i j : I) (p : 1= i) : 1= (i ∨ j) :=
+idJ I (λ (i i′ : I) (_ : Id I i i′), Id I 1 (i′ ∨ j)) 1 1=1 i p
+
+-- works due to commutativity of ∨
+def ∨-right (i j : I) (p : 1= j) : 1= (i ∨ j) := ∨-left j i p
+
+def lem-edge (i : I) : Partial (1= (i ∨ -i)) (i ∨ -i) :=
+[(φ : i = 0) → ∨-right i -i φ, (ψ : i = 1) → ∨-left i -i ψ]
 
 def ε (A : U) : Partial A 0 := []
 def I-nontriv (p : Id I 0 1) (A : U) : A := ε A (rev I 0 1 p)
@@ -112,7 +121,7 @@ def I-nontriv (p : Id I 0 1) (A : U) : A := ε A (rev I 0 1 p)
 
 def seg : PathP (<_> I) 0 1 := <i> i
 def Id-path (A : U) (a b : A) : Id A a b → Path A a b := idJ A (λ (a b : A) (_ : Id A a b), Path A a b) a (<_> a) b
-def Partial-app (A : U) (i : I) (u : Partial A i) (p : one? i) : A := u p
+def Partial-app (A : U) (i : I) (u : Partial A i) (p : 1= i) : A := u p
 
 def Partial′ (A : U) (i : I) := Partial A i
 def sub (A : U) (i : I) (u : Partial A i) : V := A [i ↦ u ]
@@ -136,6 +145,8 @@ def kan (A : U) (a b c d : A) (p : Path A a c) (q : Path A b d) (r : Path A a b)
 def comp (A : I → U) (r : I) (u : Π (i : I), Partial (A i) r) (u₀ : (A 0)[r ↦ u 0]) : A 1
  := hcomp (A 1) r (λ (i : I), [(φ : r = 1) → transp (<j> A (i ∨ j)) i (u i φ)])
                   (inc (transp (<i> A i) 0 (ouc u₀)))
+
+def hcompε (A : U) (a : A) := hcomp A 0 (\(i : I), []) (inc a)
 
 {-
 

@@ -112,6 +112,12 @@ idJ I (λ (i i′ : I) (_ : Id I i i′), Id I 1 (i′ ∨ j)) 1 1=1 i p
 -- works due to commutativity of ∨
 def ∨-right (i j : I) (p : 1= j) : 1= (i ∨ j) := ∨-left j i p
 
+def ∧-split (i j : I) : Partial (1= i) (i ∧ j) :=
+[(φ : i = 1) (ψ : j = 1) → φ]
+
+def ∧-1 (i j : I) (p : 1= (i ∧ j)) : 1= i :=
+∧-split i j p
+
 def lem-edge (i : I) : Partial (1= (i ∨ -i)) (i ∨ -i) :=
 [(φ : i = 0) → ∨-right i -i φ, (ψ : i = 1) → ∨-left i -i ψ]
 

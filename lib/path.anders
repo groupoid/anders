@@ -92,10 +92,16 @@ def trans-Σ (A : I -> U) (B : Π (i : I), A i -> U) (z : Σ (x : A 0), B 0 x) :
 def 1= : I -> V := Id I 1
 def 1=1 : 1= 1 := ref 1
 def UIP (A : V) (a b : A) (p q : Id A a b) : Id (Id A a b) p q := ref p
+
 def J (A : V) (B : Π (a b : A), Id A a b -> V) (a b : A) (d : B a a (ref a)) (p : Id A a b) : B a b p := idJ A B a d b p
 def J-β (A : V) (B : Π (a b : A), Id A a b -> V) (a : A) (d : B a a (ref a)) : Id (B a a (ref a)) (J A B a a d (ref a)) d := ref d
+
 def rev (A : V) (a b : A) (p : Id A a b) : Id A b a := idJ A (λ (a b : A) (_ : Id A a b), Id A b a) a (ref a) b p
 def comp-Id (A : V) (a b c : A) (p : Id A a b) (q : Id A b c) : Id A a c := idJ A (λ (b c : A) (_ : Id A b c), Id A a c) b p c q
+
+def cong-Id (A B : V) (f : A -> B) (a b : A) (p : Id A a b) : Id B (f a) (f b) :=
+idJ A (λ (a b : A) (_ : Id A a b), Id B (f a) (f b)) a (ref (f a)) b p
+
 def φ (i : I) : Partial U₁ (i ∨ -i) := [(i = 0) → U, (i = 1) → U → U]
 
 def φ-0 : PathP (<_> U₁) (φ 0 1=1) U := <_> U
@@ -117,6 +123,34 @@ def ∧-split (i j : I) : Partial (1= i) (i ∧ j) :=
 
 def ∧-1 (i j : I) (p : 1= (i ∧ j)) : 1= i :=
 ∧-split i j p
+
+def ∧-1′ (i j : I) (p : 1= (i ∧ j)) : 1= i :=
+cong-Id I I (λ (k : I), k ∨ i) 1 (i ∧ j) p
+
+def ≤ (i j : I) := Id I (i ∧ j) i
+
+def ∧-to-∨ (i j : I) (p : Id I (i ∧ j) i) : Id I (i ∨ j) j :=
+rev I j (i ∨ j) (cong-Id I I (λ (k : I), k ∨ j) (i ∧ j) i p)
+
+def ∧-min-left  (i j : I) : ≤ (i ∧ j) i := ref (i ∧ j)
+def ∧-min-right (i j : I) : ≤ (i ∧ j) j := ref (i ∧ j)
+
+def ∨-max-left  (i j : I) : ≤ i (i ∨ j) := ref i
+def ∨-max-right (i j : I) : ≤ j (i ∨ j) := ref j
+
+def ≤-refl (i : I) : ≤ i i := ref i
+
+def min (i j : I) := i ∧ j
+def max (i j : I) := i ∨ j
+
+def ≤-trans (i j k : I) (p : ≤ i j) (q : ≤ j k) : ≤ i k :=
+comp-Id I (i ∧ k) (i ∧ j) i
+   (comp-Id I (i ∧ k) (i ∧ j ∧ k) (i ∧ j)
+      (rev I (i ∧ j ∧ k) (i ∧ k) (cong-Id I I (min k) (i ∧ j) i p))
+      (cong-Id I I (min i) (j ∧ k) j q)) p
+
+def asymm (i j : I) (p : ≤ i j) (q : ≤ j i) : Id I i j :=
+comp-Id I i (i ∧ j) j (rev I (i ∧ j) i p) q
 
 def lem-edge (i : I) : Partial (1= (i ∨ -i)) (i ∨ -i) :=
 [(φ : i = 0) → ∨-right i -i φ, (ψ : i = 1) → ∨-left i -i ψ]

@@ -69,6 +69,13 @@ def ∨-distrib-∧ (i j k : I) : Id I ((i ∧ j) ∨ k) ((i ∨ k) ∧ (j ∨ k
 def ¬-of-∧ (i j : I) : Id I -(i ∧ j) (-i ∨ -j) := ref -(i ∧ j)
 def ¬-of-∨ (i j : I) : Id I -(i ∨ j) (-i ∧ -j) := ref -(i ∨ j)
 
+def min (i j : I) := i ∧ j
+def max (i j : I) := i ∨ j
+
+-- like boundary notation in cooltt
+-- https://redprl.org/cooltt/cooltt/Cubical/Cof/index.html
+def ∂ (i : I) := i ∨ -i
+
 -- generalized transport
 
 def trans (A B : U) (p : PathP (<_> U) A B) : A → B := transp p 0
@@ -141,9 +148,6 @@ def ∨-max-right (i j : I) : ≤ j (i ∨ j) := ref j
 
 def ≤-refl (i : I) : ≤ i i := ref i
 
-def min (i j : I) := i ∧ j
-def max (i j : I) := i ∨ j
-
 def ≤-trans (i j k : I) (p : ≤ i j) (q : ≤ j k) : ≤ i k :=
 comp-Id I (i ∧ k) (i ∧ j) i
    (comp-Id I (i ∧ k) (i ∧ j ∧ k) (i ∧ j)
@@ -194,16 +198,16 @@ def ouc′ (A : U) (i : I) (u : Partial A i) (a : A [i ↦ u ]) : A := ouc a
 -- homogeneous composition
 
 def comp-Path (A : U) (a b c : A) (p : Path A a b) (q : Path A b c) : Path A a c
- := <i> hcomp A (i ∨ -i) (λ (j : I), [(i = 0) → a, (i = 1) → q @ j]) (inc (p @ i))
+ := <i> hcomp A (∂ i) (λ (j : I), [(i = 0) → a, (i = 1) → q @ j]) (inc (p @ i))
 
 def comp-Path′ (A : U) (a b c : A) (p : Path A a b) (q : Path A b c) : Path A a c
  := transp (<i> Path A a (q @ i)) 0 p
 
 def comp-Path⁻¹ (A : U) (a b : A) (p : Path A a b) : Path (Path A a a) (comp-Path A a b a p (<i> p @ -i)) (<_> a)
- := <k j> hcomp A (-j ∨ j ∨ k) (λ (i : I), [(j = 0) → a, (j = 1) → p @ -i ∧ -k, (k = 1) → a]) (inc (p @ j ∧ -k))
+ := <k j> hcomp A ((∂ j) ∨ k) (λ (i : I), [(j = 0) → a, (j = 1) → p @ -i ∧ -k, (k = 1) → a]) (inc (p @ j ∧ -k))
 
 def kan (A : U) (a b c d : A) (p : Path A a c) (q : Path A b d) (r : Path A a b) : Path A c d
- := <i> hcomp A (i ∨ -i) (λ (j : I), [(i = 0) → p @ j, (i = 1) → q @ j]) (inc (r @ i))
+ := <i> hcomp A (∂ i) (λ (j : I), [(i = 0) → p @ j, (i = 1) → q @ j]) (inc (r @ i))
 
 def comp (A : I → U) (r : I) (u : Π (i : I), Partial (A i) r) (u₀ : (A 0)[r ↦ u 0]) : A 1
  := hcomp (A 1) r (λ (i : I), [(φ : r = 1) → transp (<j> A (i ∨ j)) i (u i φ)])
@@ -239,7 +243,7 @@ hfillⁱ A [φ ↦ u] u₀ = hcompʲ A [φ ↦ u(i/i∧j), (i=0) ↦ u₀] u₀ 
 
 -- tests
 
-def Path′ (A : U) (a b : A) := Π (i : I), A [i ∨ -i ↦ [(i = 0) → a, (i = 1) → b]]
+def Path′ (A : U) (a b : A) := Π (i : I), A [∂ i ↦ [(i = 0) → a, (i = 1) → b]]
 def Path-Path′ (A : U) (a b : A) (p : Path A a b) : Path′ A a b := λ (i : I), inc (p @ i)
 def Path′-Path (A : U) (a b : A) (p : Path′ A a b) : Path A a b := <i> ouc (p i)
 def Path-Path′-Path (A : U) (a b : A) (p : Path A a b) : Path (Path A a b) (Path′-Path A a b (Path-Path′ A a b p)) p := <_> p

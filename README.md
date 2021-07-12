@@ -22,7 +22,7 @@ Features
 * Lean syntax for ΠΣ
 * 1D syntax with top-level declarations
 * Groupoid Infinity CCHM base library: https://groupoid.space/math
-* Best suited for academic papers
+* Best suited for academic papers and fast type checking
 
 Setup
 -------------

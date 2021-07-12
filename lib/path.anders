@@ -118,6 +118,9 @@ def lem-edge (i : I) : Partial (1= (i ∨ -i)) (i ∨ -i) :=
 def ε (A : U) : Partial A 0 := []
 def I-nontriv (p : Id I 0 1) (A : U) : A := ε A (rev I 0 1 p)
 
+def ε′ (A : U) (a : A) : Partial A 0 := [(0 = 1) → a]
+def ε-eq-ε′ (A : U) (a : A) : Id (Partial A 0) (ε A) (ε′ A a) := ref (ε A)
+
 -- cubical subtypes
 
 def seg : PathP (<_> I) 0 1 := <i> i

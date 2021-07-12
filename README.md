@@ -13,6 +13,9 @@ Features
 * Fibrant MLTT-style ΠΣ primitives with strict equality in 500 LOC
 * Cofibrant CHM-style I primitives with pretypes hierarchy Vₙ in 500 LOC
 * Generalized Transport and Homogeneous Composition core Kan operations
+* Partial Elements
+* Cubical Subtypes
+* Strict Equality on pretypes
 * Parser in 80 LOC
 * Lexer in 80 LOC
 * UTF-8 support including universe levels

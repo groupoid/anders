@@ -149,7 +149,7 @@ comp-Id I (i ∧ k) (i ∧ j) i
       (rev I (i ∧ j ∧ k) (i ∧ k) (cong-Id I I (min k) (i ∧ j) i p))
       (cong-Id I I (min i) (j ∧ k) j q)) p
 
-def asymm (i j : I) (p : ≤ i j) (q : ≤ j i) : Id I i j :=
+def ≤-asymm (i j : I) (p : ≤ i j) (q : ≤ j i) : Id I i j :=
 comp-Id I i (i ∧ j) j (rev I (i ∧ j) i p) q
 
 def 0-is-min (i : I) : ≤ 0 i := ref 0

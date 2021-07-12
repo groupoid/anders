@@ -128,6 +128,7 @@ def ∧-1′ (i j : I) (p : 1= (i ∧ j)) : 1= i :=
 cong-Id I I (λ (k : I), k ∨ i) 1 (i ∧ j) p
 
 def ≤ (i j : I) := Id I (i ∧ j) i
+def ≥ (i j : I) := ≤ j i
 
 def ∧-to-∨ (i j : I) (p : Id I (i ∧ j) i) : Id I (i ∨ j) j :=
 rev I j (i ∨ j) (cong-Id I I (λ (k : I), k ∨ j) (i ∧ j) i p)
@@ -170,7 +171,11 @@ def lem-edge (i : I) : Partial (1= (i ∨ -i)) (i ∨ -i) :=
 [(φ : i = 0) → ∨-right i -i φ, (ψ : i = 1) → ∨-left i -i ψ]
 
 def ε (A : U) : Partial A 0 := []
-def I-nontriv (p : Id I 0 1) (A : U) : A := ε A (rev I 0 1 p)
+
+def ⊥ := Π (A : U), A
+
+def I-nontriv (p : Id I 0 1) : ⊥ := λ (A : U), ε A (rev I 0 1 p)
+def 0≥1-impl-absurd : (≥ 0 1) → ⊥ := I-nontriv
 
 def ε′ (A : U) (a : A) : Partial A 0 := [(0 = 1) → a]
 def ε-eq-ε′ (A : U) (a : A) : Id (Partial A 0) (ε A) (ε′ A a) := ref (ε A)

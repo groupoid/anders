@@ -2,10 +2,10 @@
    - Path Equality;
    - Computational properties;
    - Interval and De Morgan laws;
-   - Generalized transport;
+   - Generalized Transport;
    - Strict equality on partial and interval pretypes;
    - Cubical subtypes;
-   - Homogeneous composition;
+   - Generalized Homogeneous Composition;
 
    HoTT 1.12 Identity types
    HoTT 1.12.1 Path induction

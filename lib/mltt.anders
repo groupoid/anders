@@ -15,8 +15,6 @@ def Wind (A : U) (B : A → U) (P : W A B → U) (alg : Π (a : A) (f : B a → 
 
 option pre-eval true
 
--- types U
-
 def Pi (A: U) (B: A → U): U ≔ Π (x: A), B x
 def lambda (A: U) (B:A → U) (b: Pi A B): Pi A B ≔ λ (x: A), b x
 def app (A: U) (B: A → U) (f: Pi A B) (a: A): B a ≔ f a
@@ -25,8 +23,6 @@ def Sigma (A: U) (B: A → U) : U ≔ Σ (x: A), B x
 def pair (A: U) (B: A → U) (a: A) (b: B a) : Sigma A B ≔ (a, b)
 def pr₁ (A: U) (B: A → U) (x: Sigma A B) : A ≔ x.1
 def pr₂ (A: U) (B: A → U) (x: Sigma A B) : B (pr₁ A B x) ≔ x.2
-
--- pretypes V
 
 def Equ (A : U) (x y : A) : U := PathP (<_> A) x y
 def refl (A : U) (x : A) : Equ A x x := <_> x

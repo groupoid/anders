@@ -1,0 +1,8 @@
+module equiv where
+import lib/path
+
+def fiber (A B : U) (f: A -> B) (y : B): U := Σ (x : A), Path B y (f x)
+def isSingleton (X : U) : U := Σ (c : X), Π (x : X), Path X c x
+def isEquiv (A B : U) (f: A -> B) : U := Σ (y : B), isContr (fiber A B f y)
+def equiv (A B : U) : U := Σ (f : A -> B), isEquiv A B f
+

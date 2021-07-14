@@ -11,6 +11,7 @@ Changelog
 * Fast type checking
 * Fast compilation
 * Initial Base Library (OPAM share folder)
+* New options `silent` and `indices`
 
 6 JUL 2021 Version 0.7.1 Binary Distribution:
 

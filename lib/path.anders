@@ -75,6 +75,7 @@ def J-β (A : U) (a : A) (C : D A) (d: C a a (idp A a)) : Path (C a a (idp A a))
 -- pre-DNF solver
 
 def ∂ (i : I) := i ∨ -i
+def ∂-eq-neg-∂ (i : I) : Id I (∂ i) (∂ -i) := ref (∂ i)
 
 def min (i j : I) := i ∧ j
 def max (i j : I) := i ∨ j

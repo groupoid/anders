@@ -124,7 +124,7 @@ let rec ppExp paren e = let x = match e with
   | EInc e -> Printf.sprintf "inc %s" (ppExp true e)
   | EOuc e -> Printf.sprintf "ouc %s" (ppExp true e)
   in match e with
-  | EVar _ | EFst _ | ESnd _ | EI | EPre _
+  | EVar _ | EFst _ | ESnd _ | EI | EPre _ | ESystem _
   | EKan _ | EHole | EDir _ | EPair _ | ENeg _ -> x
   | _ -> parens paren x
 
@@ -132,7 +132,7 @@ and showExp e = ppExp false e
 and showTele p x = Printf.sprintf "(%s : %s)" (showName p) (showExp x)
 
 and showPiExp a p b = match p with
-  | Irrefutable -> Printf.sprintf "(%s → %s)" (showExp a) (showExp b)
+  | Irrefutable -> Printf.sprintf "%s → %s" (ppExp true a) (showExp b)
   | _           -> Printf.sprintf "Π %s, %s" (showTele p a) (showExp b)
 
 let rec ppValue paren v = let x = match v with
@@ -166,7 +166,7 @@ let rec ppValue paren v = let x = match v with
   | VInc v -> Printf.sprintf "inc %s" (ppValue true v)
   | VOuc v -> Printf.sprintf "ouc %s" (ppValue true v)
   in match v with
-  | Var _ | VFst _ | VSnd _ | VI | VPre _
+  | Var _ | VFst _ | VSnd _ | VI | VPre _ | VSystem _
   | VKan _ | VHole | VDir _ | VPair _ | VNeg _ -> x
   | _ -> parens paren x
 
@@ -177,8 +177,8 @@ and showTele p x rho : string =
   else Printf.sprintf "(%s : %s)" (showName p) (showValue x)
 
 and showLam p e rho =
-  if isRhoVisible rho then Printf.sprintf "(<%s, %s> %s)" (showName p) (showRho rho) (showExp e)
-  else Printf.sprintf "(<%s> %s)" (showName p) (showExp e)
+  if isRhoVisible rho then Printf.sprintf "<%s, %s> %s" (showName p) (showRho rho) (showExp e)
+  else Printf.sprintf "<%s> %s" (showName p) (showExp e)
 
 and showSystemV x rho =
   if isRhoVisible rho then Printf.sprintf "[%s, %s]" (showSystem showValue showExp x) (showRho rho)
@@ -189,7 +189,9 @@ and showTermBind : name * record -> string option = function
   | _, _             -> None
 
 and showPi x p e rho = match p with
-  | Irrefutable -> Printf.sprintf "(%s → %s)" (showValue x) (showExp e)
+  | Irrefutable ->
+    if isRhoVisible rho then Printf.sprintf "(%s, %s) → %s" (showValue x) (showRho rho) (showExp e)
+    else Printf.sprintf "%s → %s" (ppValue true x) (showExp e)
   | _           -> Printf.sprintf "Π %s, %s" (showTele p x rho) (showExp e)
 
 and isRhoVisible = Env.exists (fun _ -> isGlobal)

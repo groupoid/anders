@@ -7,4 +7,5 @@
                 lib/impredicative.anders  lib/kraus.anders
                 lib/leibniz.anders        lib/list.anders
                 lib/mltt.anders           lib/path.anders
+                lib/equiv.anders          lib/constcubes.anders
                 lib/pi.anders             lib/topos.anders) (section share) (package anders))

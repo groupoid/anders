@@ -220,8 +220,8 @@ def kan (A : U) (a b c d : A) (p : Path A a c) (q : Path A b d) (r : Path A a b)
 def comp (A : I → U) (r : I) (u : Π (i : I), Partial (A i) r) (u₀ : (A 0)[r ↦ u 0]) : A 1
  := hcomp (A 1) r (λ (i : I), [(φ : r = 1) → transp (<j> A (i ∨ j)) i (u i φ)]) (inc (transp (<i> A i) 0 (ouc u₀)))
 
-def ghcomp (A : I → U) (r : I) (u : Π (i : I), Partial (A i) r) (u₀ : (A 0) [r ↦ u 0]) : A 1
- := hcomp (A 1) r (λ (j : I), [(φ : r = 1) → u j 1=1, (r = 0) → ouc u₀ ]) (inc (ouc u₀))
+-- def ghcomp (A : I → U) (r : I) (u : Π (i : I), Partial (A i) r) (u₀ : (A 0) [r ↦ u 0]) : A 1
+-- := hcomp (A 1) r (λ (j : I), [(φ : r = 1) → u j 1=1, (r = 0) → ouc u₀ ]) (inc (ouc u₀))
 
 {-
 

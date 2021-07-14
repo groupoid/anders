@@ -18,8 +18,8 @@ def 𝟙-ind (P: 𝟙 -> U) (a: 𝟙): P 𝟙-★ -> P a := subst 𝟙 P 𝟙-�
 def 𝟙-β (C: U) (s: isSet C) (c: C): Path C (𝟙-rec C s c 𝟙-★) c := idp C c
 
 theorem 𝟙-condition (n: 𝟙'): isProp (is-𝟙 n) :=
-    \ (f g: is-𝟙 n), <h> \ (x y: U) (X: isSet x) (Y: isSet y) (F: x -> y), <i> \ (R: x),
-    Y (F (n x X R)) (n y Y (F R)) (<j> f x y X Y F @ j R) (<j> g x y X Y F @ j R) @ h @ i
+    \ (f g: is-𝟙 n), <k> \ (x y: U) (X: isSet x) (Y: isSet y) (F: x -> y), <i> \ (R: x),
+    Y (F (n x X R)) (n y Y (F R)) (<j> (f x y X Y F @ j) R) (<j> (g x y X Y F @ j) R) @ k @ i
 
 {-
    Literature:

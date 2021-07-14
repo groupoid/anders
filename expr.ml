@@ -109,7 +109,7 @@ let rec ppExp paren e = let x = match e with
   | EPLam _ -> failwith "showExp: unreachable code was reached"
   | EAppFormula (f, x) -> Printf.sprintf "%s @ %s" (ppExp true f) (ppExp true x)
   | ESystem x -> Printf.sprintf "[%s]" (showSystem showExp showExp x)
-  | ESub (a, i, u) -> Printf.sprintf "%s[%s ↦ %s]" (showExp a) (showExp i) (showExp u)
+  | ESub (a, i, u) -> Printf.sprintf "%s[%s ↦ %s]" (ppExp true a) (showExp i) (showExp u)
   | EI -> !intervalPrim | EDir d -> showDir d
   | EAnd (a, b) -> Printf.sprintf "%s ∧ %s" (ppExp true a) (ppExp true b)
   | EOr (a, b) -> Printf.sprintf "%s ∨ %s" (ppExp true a) (ppExp true b)
@@ -152,7 +152,7 @@ let rec ppValue paren v = let x = match v with
   | VPLam _ -> failwith "showExp: unreachable code was reached"
   | VAppFormula (f, x) -> Printf.sprintf "%s @ %s" (ppValue true f) (ppValue true x)
   | VSystem (x, rho) -> showSystemV x rho
-  | VSub (a, i, u) -> Printf.sprintf "%s[%s ↦ %s]" (showValue a) (showValue i) (showValue u)
+  | VSub (a, i, u) -> Printf.sprintf "%s[%s ↦ %s]" (ppValue true a) (showValue i) (showValue u)
   | VI -> !intervalPrim | VDir d -> showDir d
   | VAnd (a, b) -> Printf.sprintf "%s ∧ %s" (ppValue true a) (ppValue true b)
   | VOr (a, b) -> Printf.sprintf "%s ∨ %s" (ppValue true a) (ppValue true b)

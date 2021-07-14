@@ -257,7 +257,7 @@ and convId v1 v2 =
   with ExpectedNeutral _ -> false
 
 and eqNf v1 v2 : unit = traceEqNF v1 v2;
-  if conv v1 v2 then () else raise (TypeIneq (v1, v2))
+  if conv v1 v2 then () else raise (Ineq (v1, v2))
 
 (* Type checker itself *)
 and lookup (x : name) (ctx : ctx) = match Env.find_opt x ctx with
@@ -266,7 +266,7 @@ and lookup (x : name) (ctx : ctx) = match Env.find_opt x ctx with
   | None                 -> raise (VariableNotFound x)
 
 and check ctx (e0 : exp) (t0 : value) =
-  traceCheck e0 t0; match e0, t0 with
+  traceCheck e0 t0; try match e0, t0 with
   | ELam (a, (p, b)), VPi (t, g) ->
     ignore (extSet (infer ctx a)); eqNf (eval a ctx) t;
     let x = Var (p, t) in let ctx' = upLocal ctx p t x in
@@ -283,8 +283,9 @@ and check ctx (e0 : exp) (t0 : value) =
     eqNf v0 u0; eqNf v1 u1
   | e, VPre u -> begin
     match infer ctx e with
-    | VKan v | VPre v -> if ieq u v then () else raise (TypeIneq (VPre u, VPre v))
-    | t -> raise (TypeIneq (VPre u, t)) end
+    | VKan v | VPre v -> if ieq u v then () else raise (Ineq (VPre u, VPre v))
+    | t -> raise (Ineq (VPre u, t))
+  end
   | ESystem xs, VApp (VPartial t, i) ->
     eqNf (eval (getFormula xs) ctx) i;
 
@@ -300,6 +301,7 @@ and check ctx (e0 : exp) (t0 : value) =
       List.iter (fun phi -> let ctx' = faceEnv phi ctx in
         eqNf (eval e ctx') (app (eval (rbV u) ctx', Var (n, isOne i)))) (solve i One)
   | e, t -> eqNf (infer ctx e) t
+  with ex -> Printf.printf "When trying to typecheck\n  %s\nAgainst type\n  %s\n" (showExp e0) (showValue t0); raise ex
 
 and infer ctx e : value = traceInfer e; match e with
   | EVar x -> lookup x ctx

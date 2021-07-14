@@ -9,6 +9,7 @@ exception ExpectedESet of exp
 exception ExpectedSig of value
 exception ExpectedPath of value
 exception ExpectedVSet of value
+exception Ineq of value * value
 exception ExpectedSubtype of exp
 exception Parser of int * string
 exception ExpectedSystem of value
@@ -18,7 +19,6 @@ exception ExpectedFibrant of value
 exception UnknownCommand of string
 exception VariableNotFound of name
 exception ExtractionError of string
-exception TypeIneq of value * value
 exception AlreadyDeclared of string
 exception UnknownPrimitive of string
 exception ExpectedConjunction of value
@@ -26,12 +26,12 @@ exception InvalidModuleName of string * string
 exception UnknownOptionValue of string * string
 
 let prettyPrintError : exn -> unit = function
+  | Ineq (u, v) -> Printf.printf "Type mismatch:\n  %s\nis not equal to\n  %s\n" (showValue u) (showValue v)
   | ExpectedConjunction v -> Printf.printf "“%s” expected to be conjunction\n" (showValue v)
   | ExpectedDir s -> Printf.printf "“%s” expected to be “%s” or “%s”" s !zeroPrim !onePrim
   | ExtractionError s -> Printf.printf "Error occured during extraction: %s\n" s
   | ExpectedPath e -> Printf.printf "“%s” expected to be a path.\n" (showValue e)
   | AlreadyDeclared p -> Printf.printf "“%s” is already declared.\n" p
-  | TypeIneq (u, v) -> Printf.printf "Type mismatch:\n%s\n  =/=\n%s\n" (showValue u) (showValue v)
   | InferError e -> Printf.printf "Cannot infer type of\n  %s\n" (showExp e)
   | VariableNotFound p -> Printf.printf "Variable %s was not found\n" (showName p)
   | InvalidModuleName (name, filename) -> Printf.printf "Module “%s” does not match name of its file: %s\n" name filename

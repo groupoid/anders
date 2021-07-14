@@ -36,6 +36,7 @@ def eta (A: U) (a: A): singl A a := (a, idp A a)
 def sym (A: U) (a b : A) (p : Path A a b) : Path A b a := <i> p @ -i
 def contr (A : U) (a b : A) (p : Path A a b) : Path (singl A a) (eta A a) (b, p) := <i> (p @ i, <j> p @ i /\ j)
 def isContr (A: U) : U := Σ (x: A), Π (y: A), Path A x y
+def isContrSingl (A : U) (a : A) : isContr (singl A a) := ((a,idp A a),(\ (z:singl A a), contr A a z.1 z.2))
 def cong (A B : U) (f : A → B) (a b : A) (p : Path A a b) : Path B (f a) (f b) := <i> f (p @ i)
 def ap (A: U) (a x: A) (B: A → U) (f: A → B a) (b: B a) (p: Path A a x): Path (B a) (f a) (f x) := <i> f (p @ i)
 def inv (A: U) (a b: A) (p: Path A a b): Path A b a := <i> p @ -i

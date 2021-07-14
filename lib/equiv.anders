@@ -1,8 +1,35 @@
+{- Equivalence:
+   - Fibers;
+   - Contractability of Fibers and Singletons;
+   - Equivalence.
+   - Surjective, Injective, Embedding, Hae;
+   - Theorems, Gluening;
+   - Theorem of univalence.
+   Copyright (c) Groupoid Infinity, 2014-2021.
+
+   HoTT 4.6 Surjections and Embedding -}
+
 module equiv where
 import lib/path
 
 def fiber (A B : U) (f: A -> B) (y : B): U := Σ (x : A), Path B y (f x)
 def isContr' (A: U) : U := Σ (x: A), Π (y: A), Path A x y
-def isEquiv (A B : U) (f: A -> B) : U := Σ (y : B), isContr (fiber A B f y)
+def isEquiv (A B : U) (f : A -> B) : U := Π (y : B), isContr (fiber A B f y)
 def equiv (A B : U) : U := Σ (f : A -> B), isEquiv A B f
+def idEquiv (A : U) : equiv A A := (id A, isContrSingl A)
+def isInjective (A B : U) (f : A -> B) : U := Π (x y : A), Path B (f x) (f y) -> Path A x y
+def isInjective' (A B : U) (f : A -> B): U := Π (b : B), isProp (fiber A B f b)
+def injective (A B : U) : U := Σ (f : A -> B), isInjective A B f
+def isEmbedding (A B : U) (f : A -> B) : U := Π (x y : A), isEquiv (Path A x y) (Path B (f x) (f y)) (cong A B f x y)
+def embedding (A B : U) : U := Σ (f : A -> B), isEmbedding A B f
+def isHae (A B : U) (f : A -> B): U := Σ (g : B -> A)
+    (eta_: Path (idᵀ A) (∘ A B A g f) (id A)) (eps_: Path (idᵀ B) (∘ B A B f g) (id B)),
+    Π (x : A), Path B (f ((eta_ @ 0) x)) ((eps_ @ 0) (f x))
+def hae (A B : U) : U := Σ (f : A -> B), isHae A B f
 
+-- Univalence (Formation, Intro, Elim, Computation)
+
+-- def univ_Formation (A B : U) : U := equiv A B -> Path U A B
+-- axiom equivToPath (A B : U) : univ_Formation A B -- := λ (p: equiv A B), <i> Glue B [(i=0) -> (A,p), (i=1) -> (B, subst U (equiv B) B B (<_>B) (idEquiv B)) ]
+-- def pathToEquiv (A B : U) (p : Path U A B) : equiv A B := subst U (equiv A) A B p (idEquiv A)
+-- axiom uniqueness (A B : U) (w : equiv A B) : Path (A -> B) w.1 (pathToEquiv A B (equivToPath A B w)).1

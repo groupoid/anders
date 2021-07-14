@@ -42,6 +42,14 @@ let gen () = inc := !inc + 1; !inc
 let fresh : name -> name = function
   | Irrefutable -> Irrefutable | Name (p, _) -> Name (p, gen ())
 
+let getDigit x = Char.chr (x + 0x80) |> Printf.sprintf "\xE2\x82%c"
+
+let rec showSubscript x =
+  if x < 0 then failwith "showSubscript: expected positive integer"
+  else if x = 0 then "" else showSubscript (x / 10) ^ getDigit (x mod 10)
+
+let freshName x = let n = gen () in Name (x ^ showSubscript n, n)
+
 module Atom = struct
   type t = name * dir
   let compare (a, x) (b, y) =

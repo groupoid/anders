@@ -70,15 +70,9 @@ let rec telescope (ctor : name -> exp -> exp -> exp) (e : exp) : tele list -> ex
 
 let rec pLam e : name list -> exp = function [] -> e | x :: xs -> EPLam (ELam (EI, (x, pLam e xs)))
 
-let getDigit x = Char.chr (x + 0x80) |> Printf.sprintf "\xE2\x82%c"
-
 let getVar x =
   let xs = [(!zeroPrim, EDir Zero); (!onePrim, EDir One); (!intervalPrim, EI)] in
   match List.assoc_opt x xs with Some e -> e | None -> decl x
-
-let rec showLevel x =
-  if x < 0 then failwith "showLevel: expected positive integer"
-  else if x = 0 then "" else showLevel (x / 10) ^ getDigit (x mod 10)
 
 let showDir : dir -> string = function | Zero -> !zeroPrim | One -> !onePrim
 
@@ -94,7 +88,7 @@ let showSystem showVar showTerm xs =
 let parens b x = if b then "(" ^ x ^ ")" else x
 
 let rec ppExp paren e = let x = match e with
-  | EKan n -> "U" ^ showLevel n
+  | EKan n -> "U" ^ showSubscript n
   | ELam (a, (p, b)) -> Printf.sprintf "λ %s, %s" (showTele p a) (showExp b)
   | EPi (a, (p, b)) -> showPiExp a p b
   | ESig (a, (p, b)) -> Printf.sprintf "Σ %s, %s" (showTele p a) (showExp b)
@@ -104,7 +98,7 @@ let rec ppExp paren e = let x = match e with
   | EApp (f, x) -> Printf.sprintf "%s %s" (showExp f) (ppExp true x)
   | EVar p -> showName p
   | EHole -> "?"
-  | EPre n -> "V" ^ showLevel n
+  | EPre n -> "V" ^ showSubscript n
   | EPLam (ELam (_, (i, e))) -> Printf.sprintf "<%s> %s" (showName i) (showExp e)
   | EPLam _ -> failwith "showExp: unreachable code was reached"
   | EAppFormula (f, x) -> Printf.sprintf "%s @ %s" (ppExp true f) (ppExp true x)
@@ -136,7 +130,7 @@ and showPiExp a p b = match p with
   | _           -> Printf.sprintf "Π %s, %s" (showTele p a) (showExp b)
 
 let rec ppValue paren v = let x = match v with
-  | VKan n -> "U" ^ showLevel n
+  | VKan n -> "U" ^ showSubscript n
   | VLam (x, (p, e, rho)) -> Printf.sprintf "λ %s, %s" (showTele p x rho) (showExp e)
   | VPi (x, (p, e, rho)) -> showPi x p e rho
   | VSig (x, (p, e, rho)) -> Printf.sprintf "Σ %s, %s" (showTele p x rho) (showExp e)
@@ -146,7 +140,7 @@ let rec ppValue paren v = let x = match v with
   | VApp (f, x) -> Printf.sprintf "%s %s" (showValue f) (ppValue true x)
   | Var (p, _) -> showName p
   | VHole -> "?"
-  | VPre n -> "V" ^ showLevel n
+  | VPre n -> "V" ^ showSubscript n
   | VTransp (p, i) -> Printf.sprintf "transp %s %s" (ppValue true p) (ppValue true i)
   | VPLam (VLam (_, (p, e, rho))) -> showLam p e rho
   | VPLam _ -> failwith "showExp: unreachable code was reached"

@@ -5,7 +5,7 @@ open Ident
 open Elab
 open Expr
 
-let freshDim () = let i = fresh (name "ι") in (i, EVar i, Var (i, VI))
+let freshDim () = let i = freshName "ι" in (i, EVar i, Var (i, VI))
 
 let ieq u v : bool = !Prefs.girard || u = v
 let vfst : value -> value = function
@@ -297,7 +297,7 @@ and check ctx (e0 : exp) (t0 : value) =
         if List.exists (fun (_, i1) -> List.exists (fun (_, i2) -> conv i1 i2) x2) x1 then
           eqNf (eval e1 (isOneCtx ctx x1)) (eval e2 (isOneCtx ctx x2))) xs') xs'
   | EInc e, VSub (t, i, u) -> check ctx e t;
-    let n = fresh (name "υ") in
+    let n = freshName "υ" in
       List.iter (fun phi -> let ctx' = faceEnv phi ctx in
         eqNf (eval e ctx') (app (eval (rbV u) ctx', Var (n, isOne i)))) (solve i One)
   | e, t -> eqNf (infer ctx e) t

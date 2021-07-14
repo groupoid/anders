@@ -91,44 +91,51 @@ let showSystem showVar showTerm xs =
   List.map (fun (x, e) -> Printf.sprintf "%s → %s" (showFace showVar x) (showTerm e)) xs
   |> String.concat ", "
 
-let rec showExp : exp -> string = function
+let parens b x = if b then "(" ^ x ^ ")" else x
+
+let rec ppExp paren e = let x = match e with
   | EKan n -> "U" ^ showLevel n
   | ELam (a, (p, b)) -> Printf.sprintf "λ %s, %s" (showTele p a) (showExp b)
   | EPi (a, (p, b)) -> showPiExp a p b
   | ESig (a, (p, b)) -> Printf.sprintf "Σ %s, %s" (showTele p a) (showExp b)
   | EPair (fst, snd) -> Printf.sprintf "(%s, %s)" (showExp fst) (showExp snd)
-  | EFst exp -> showExp exp ^ ".1"
-  | ESnd exp -> showExp exp ^ ".2"
-  | EApp (f, x) -> Printf.sprintf "(%s %s)" (showExp f) (showExp x)
+  | EFst exp -> ppExp paren exp ^ ".1"
+  | ESnd exp -> ppExp paren exp ^ ".2"
+  | EApp (f, x) -> Printf.sprintf "%s %s" (showExp f) (ppExp true x)
   | EVar p -> showName p
   | EHole -> "?"
   | EPre n -> "V" ^ showLevel n
-  | EPathP e -> "PathP " ^ showExp e
-  | EId e -> Printf.sprintf "Id %s" (showExp e)
-  | ERef e -> Printf.sprintf "ref %s" (showExp e)
-  | EJ e -> Printf.sprintf "idJ %s" (showExp e)
-  | ETransp (p, i) -> Printf.sprintf "transp %s %s" (showExp p) (showExp i)
-  | EHComp e -> Printf.sprintf "hcomp %s" (showExp e)
-  | EPLam (ELam (_, (i, e))) -> Printf.sprintf "(<%s> %s)" (showName i) (showExp e)
+  | EPLam (ELam (_, (i, e))) -> Printf.sprintf "<%s> %s" (showName i) (showExp e)
   | EPLam _ -> failwith "showExp: unreachable code was reached"
-  | EAppFormula (f, x) -> Printf.sprintf "(%s @ %s)" (showExp f) (showExp x)
-  | EPartial e -> Printf.sprintf "Partial %s" (showExp e)
+  | EAppFormula (f, x) -> Printf.sprintf "%s @ %s" (ppExp true f) (ppExp true x)
   | ESystem x -> Printf.sprintf "[%s]" (showSystem showExp showExp x)
   | ESub (a, i, u) -> Printf.sprintf "%s[%s ↦ %s]" (showExp a) (showExp i) (showExp u)
   | EI -> !intervalPrim | EDir d -> showDir d
-  | EAnd (a, b) -> Printf.sprintf "(%s ∧ %s)" (showExp a) (showExp b)
-  | EOr (a, b) -> Printf.sprintf "(%s ∨ %s)" (showExp a) (showExp b)
-  | ENeg a -> Printf.sprintf "-%s" (showExp a)
-  | EInc e -> Printf.sprintf "(inc %s)" (showExp e)
-  | EOuc e -> Printf.sprintf "(ouc %s)" (showExp e)
+  | EAnd (a, b) -> Printf.sprintf "%s ∧ %s" (ppExp true a) (ppExp true b)
+  | EOr (a, b) -> Printf.sprintf "%s ∨ %s" (ppExp true a) (ppExp true b)
+  | ENeg a -> Printf.sprintf "-%s" (ppExp paren a)
+  | ETransp (p, i) -> Printf.sprintf "transp %s %s" (ppExp true p) (ppExp true i)
+  | EPathP e -> "PathP " ^ ppExp true e
+  | EId e -> Printf.sprintf "Id %s" (ppExp true e)
+  | ERef e -> Printf.sprintf "ref %s" (ppExp true e)
+  | EJ e -> Printf.sprintf "idJ %s" (ppExp true e)
+  | EHComp e -> Printf.sprintf "hcomp %s" (ppExp true e)
+  | EPartial e -> Printf.sprintf "Partial %s" (ppExp true e)
+  | EInc e -> Printf.sprintf "inc %s" (ppExp true e)
+  | EOuc e -> Printf.sprintf "ouc %s" (ppExp true e)
+  in match e with
+  | EVar _ | EFst _ | ESnd _ | EI | EPre _
+  | EKan _ | EHole | EDir _ | EPair _ | ENeg _ -> x
+  | _ -> parens paren x
 
+and showExp e = ppExp false e
 and showTele p x = Printf.sprintf "(%s : %s)" (showName p) (showExp x)
 
 and showPiExp a p b = match p with
   | Irrefutable -> Printf.sprintf "(%s → %s)" (showExp a) (showExp b)
   | _           -> Printf.sprintf "Π %s, %s" (showTele p a) (showExp b)
 
-let rec showValue : value -> string = function
+let rec ppValue paren v = let x = match v with
   | VKan n -> "U" ^ showLevel n
   | VLam (x, (p, e, rho)) -> Printf.sprintf "λ %s, %s" (showTele p x rho) (showExp e)
   | VPi (x, (p, e, rho)) -> showPi x p e rho
@@ -136,28 +143,34 @@ let rec showValue : value -> string = function
   | VPair (fst, snd) -> Printf.sprintf "(%s, %s)" (showValue fst) (showValue snd)
   | VFst v -> showValue v ^ ".1"
   | VSnd v -> showValue v ^ ".2"
-  | VApp (f, x) -> Printf.sprintf "(%s %s)" (showValue f) (showValue x)
+  | VApp (f, x) -> Printf.sprintf "%s %s" (showValue f) (ppValue true x)
   | Var (p, _) -> showName p
   | VHole -> "?"
   | VPre n -> "V" ^ showLevel n
-  | VPathP v -> "PathP " ^ showValue v
-  | VId v -> Printf.sprintf "Id %s" (showValue v)
-  | VRef v -> Printf.sprintf "ref %s" (showValue v)
-  | VJ v -> Printf.sprintf "idJ %s" (showValue v)
-  | VTransp (p, i) -> Printf.sprintf "transp %s %s" (showValue p) (showValue i)
-  | VHComp v -> Printf.sprintf "hcomp %s" (showValue v)
+  | VTransp (p, i) -> Printf.sprintf "transp %s %s" (ppValue true p) (ppValue true i)
   | VPLam (VLam (_, (p, e, rho))) -> showLam p e rho
   | VPLam _ -> failwith "showExp: unreachable code was reached"
-  | VAppFormula (f, x) -> Printf.sprintf "(%s @ %s)" (showValue f) (showValue x)
-  | VPartial v -> Printf.sprintf "Partial %s" (showValue v)
+  | VAppFormula (f, x) -> Printf.sprintf "%s @ %s" (ppValue true f) (ppValue true x)
   | VSystem (x, rho) -> showSystemV x rho
   | VSub (a, i, u) -> Printf.sprintf "%s[%s ↦ %s]" (showValue a) (showValue i) (showValue u)
-  | VInc v -> Printf.sprintf "(inc %s)" (showValue v)
-  | VOuc v -> Printf.sprintf "(ouc %s)" (showValue v)
   | VI -> !intervalPrim | VDir d -> showDir d
-  | VAnd (a, b) -> Printf.sprintf "(%s ∧ %s)" (showValue a) (showValue b)
-  | VOr (a, b) -> Printf.sprintf "(%s ∨ %s)" (showValue a) (showValue b)
-  | VNeg a -> Printf.sprintf "-%s" (showValue a)
+  | VAnd (a, b) -> Printf.sprintf "%s ∧ %s" (ppValue true a) (ppValue true b)
+  | VOr (a, b) -> Printf.sprintf "%s ∨ %s" (ppValue true a) (ppValue true b)
+  | VNeg a -> Printf.sprintf "-%s" (ppValue paren a)
+  | VPathP v -> "PathP " ^ ppValue true v
+  | VId v -> Printf.sprintf "Id %s" (ppValue true v)
+  | VRef v -> Printf.sprintf "ref %s" (ppValue true v)
+  | VJ v -> Printf.sprintf "idJ %s" (ppValue true v)
+  | VPartial v -> Printf.sprintf "Partial %s" (ppValue true v)
+  | VHComp v -> Printf.sprintf "hcomp %s" (ppValue true v)
+  | VInc v -> Printf.sprintf "inc %s" (ppValue true v)
+  | VOuc v -> Printf.sprintf "ouc %s" (ppValue true v)
+  in match v with
+  | Var _ | VFst _ | VSnd _ | VI | VPre _
+  | VKan _ | VHole | VDir _ | VPair _ | VNeg _ -> x
+  | _ -> parens paren x
+
+and showValue e = ppValue false e
 
 and showTele p x rho : string =
   if isRhoVisible rho then Printf.sprintf "(%s : %s, %s)" (showName p) (showValue x) (showRho rho)

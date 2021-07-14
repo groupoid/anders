@@ -1,0 +1,23 @@
+module constcubes where
+import lib/path
+
+def Square (A : U) (a₀ a₁ b₀ b₁ : A) (u : Path A a₀ a₁) (v : Path A b₀ b₁)
+           (r₀ : Path A a₀ b₀) (r₁ : Path A a₁ b₁) : U :=
+PathP (<i> (Path A (r₀ @ i) (r₁ @ i))) u v
+
+def sb (A : U) (a : A) (p : Path A a a) : Square A a a a a p (<_> a) p (<_> a) :=
+<j i> p @ i \/ j
+
+def s₀ (A : U) (a : A) (p : Path A a a) : Square A a a a a p p (<_> a) (<_> a) :=
+<_> p
+
+def s₁ (A : U) (a : A) (p : Path A a a) : Square A a a a a (<_> a) p (<_> a) p :=
+<j i> p @ i /\ j
+
+def cs (A : U) (a : A) (p : Path A a a) : Square A a a a a p p p p :=
+<j i> hcomp A (∂ i ∨ ∂ j) (λ (k : I),
+  [(i = 0) → s₀ A a p @ k @ j,
+   (i = 1) → s₁ A a p @ k @ j,
+   (j = 0) → s₀ A a p @ k @ i,
+   (j = 1) → s₁ A a p @ k @ i])
+  (inc (sb A a p @ i @ j))

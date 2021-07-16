@@ -30,7 +30,6 @@ def cs (A : U) (a : A) (p : Path A a a)
                         (j = 0) -> s₀ A a p @ k @ i,
                         (j = 1) -> s₁ A a p @ k @ i ]) (inc (sb A a p @ i @ j))
 
-
 def c₀ (A : U) (a : A) (p : Path A a a)
   : Cube A a a a a a a a a p p p p p p p p (cs A a p) (cs A a p)
     (<_> a) (<_> a) (<_> a) (<_> a) (s₀ A a p) (s₀ A a p) (s₀ A a p) (s₀ A a p)

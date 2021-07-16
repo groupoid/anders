@@ -48,13 +48,12 @@ def Fd (A : U) (a b c : A) (p : Path A a b) (q : Path A b c) : Square A a b b c 
                         (j = 0) -> p @ i,
                         (j = 1) -> q @ k /\ i ]) (inc (p @ i \/ j))
 
-axiom B (A : U) (a b c d : A) (p : Path A a b) (q : Path A b c) (r : Path A c d)
+def B (A : U) (a b c d : A) (p : Path A a b) (q : Path A b c) (r : Path A c d)
   : Cube A b b b b b c c d (<_> b) (<_> b) (<_> b) (<_> b) q r q r (<_> <_> b)
     (Fd A b c d q r) (<_> b) q q (<i> (Fd A b c d q r @ i @ i))
     (<i j> q @ i /\ j) (<i j> ((Fd A b c d q r) @ i @ j /\ i))
     (<i j> q @ i /\ j) (<i j> ((Fd A b c d q r) @ i @ j /\ i))
--- infinite loop found during B porting
--- := <k j i> (Fd A b c d q r) @ (∂ i /\ ∂ j /\ ∂ k) @ (∂ k /\ (∂ i \/ ∂ j))
+ := <k j i> (Fd A b c d q r) @ (i /\ j /\ k) @ (k /\ (i \/ j))
 
 def Tesseract (A : U)
     (a0 b0 c0 d0 a1 b1 c1 d1 a2 b2 c2 d2 a3 b3 c3 d3 : A)
@@ -118,4 +117,3 @@ axiom tb (A : U) (a : A) (p : Path A a a)
 -- := <l k j i> cc A a p @ (i \/ j \/ k \/ l)
 --            @ ((i \/ j \/ k) /\ (i \/ j \/ l) /\ (i \/ k \/ l) /\ (j \/ k \/ l))
 --            @ ((i \/ j) /\ (i \/ k) /\ (i \/ l) /\ (j \/ k) /\ (j \/ l) /\ (k \/ l))
-

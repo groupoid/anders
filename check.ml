@@ -19,7 +19,7 @@ let vsnd : value -> value = function
 let isOneCtx ctx0 xs = List.fold_left (fun ctx (p, v) -> upLocal ctx p (isOne v) (Var (p, isOne v))) ctx0 xs
 
 (* Evaluator *)
-let rec eval (e : exp) (ctx : ctx) = traceEval e; match e with
+let rec eval (e0 : exp) (ctx : ctx) = traceEval e0; match e0 with
   | EPre u             -> VPre u
   | EKan u             -> VKan u
   | EVar x             -> getRho ctx x
@@ -230,7 +230,8 @@ and conv v1 v2 : bool = traceConv v1 v2;
     | VTransp (p, i), VTransp (q, j) -> conv p q && conv i j
     | VHComp a, VHComp b -> conv a b
     | VSub (a, i, u), VSub (b, j, v) -> conv a b && conv i j && conv u v
-    | VOr _, VDir _ | VDir _, VOr _ | VAnd _, VDir _ | VDir _, VAnd _ | VOr _, VAnd _ -> false
+    | VOr (x, y), VDir Zero | VAnd (x, y), VDir One  -> conv x v2 && conv y v2
+    | VOr (x, y), VDir One  | VAnd (x, y), VDir Zero -> conv x v2 || conv y v2
     | VOr _,  _ | _, VOr _  -> orEq v1 v2
     | VAnd _, _ | _, VAnd _ -> andEq v1 v2
     | VNeg x, VNeg y -> conv x y

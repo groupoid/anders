@@ -95,6 +95,30 @@ let eps : face = Env.empty
 let singleton p x = Env.add p x Env.empty
 let faceEnv = Env.fold (fun p dir -> Env.add p (Local, Value VI, Value (VDir dir)))
 
+let contrAtom : name * dir -> value = function
+  | (x, Zero) -> VNeg (Var (x, VI))
+  | (x, One)  -> Var (x, VI)
+
+let contrAnd (xs : conjunction) : value =
+  match Conjunction.elements xs with
+  | y :: ys -> List.fold_left (fun e e' -> VAnd (contrAtom e', e)) (contrAtom y) ys
+  | []      -> VDir One
+
+let contrOr (xs : disjunction) : value =
+  match nubRev xs with
+  | y :: ys -> List.fold_left (fun e e' -> VOr (contrAnd e', e)) (contrAnd y) ys
+  | []      -> VDir Zero
+
+let evalAnd a b =
+  match andFormula (a, b) with
+  | VAnd (a, b) -> contrAnd (extAnd (VAnd (a, b)))
+  | v           -> v
+
+let evalOr a b =
+  match orFormula (a, b) with
+  | VOr (a, b) -> contrOr (uniq (extOr (VOr (a, b))))
+  | v          -> v
+
 let rec solve k x = match k, x with
   | VDir y, _ -> if x = y then [eps] else []
   | Var (p, _), _ -> [singleton p x]

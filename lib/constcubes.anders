@@ -1,30 +1,26 @@
 module constcubes where
 import lib/path
 
-def Square (A : U) (a₀ a₁ b₀ b₁ : A)
-                   (u  : Path A a₀ a₁) (v : Path A b₀ b₁)
-                   (r₀ : Path A a₀ b₀) (r₁ : Path A a₁ b₁) : U
+def Square (A : U)
+    (a₀ a₁ b₀ b₁ : A)
+    (u  : Path A a₀ a₁) (v : Path A b₀ b₁)
+    (r₀ : Path A a₀ b₀) (r₁ : Path A a₁ b₁) : U
  := PathP (<i> (Path A (r₀ @ i) (r₁ @ i))) u v
 
 def sb (A : U) (a : A) (p : Path A a a) : Square A a a a a p (<_> a) p (<_> a) := <j i> p @ i \/ j
 def s₀ (A : U) (a : A) (p : Path A a a) : Square A a a a a p p (<_> a) (<_> a) := <_> p
 def s₁ (A : U) (a : A) (p : Path A a a) : Square A a a a a (<_> a) p (<_> a) p := <j i> p @ i /\ j
 
-def Cube (A : U) (a0 b0 c0 d0 a1 b1 c1 d1 : A)
-                 (ab0 : Path A a0 b0) (cd0 : Path A c0 d0)
-                 (ac0 : Path A a0 c0) (bd0 : Path A b0 d0)
-                 (ab1 : Path A a1 b1) (cd1 : Path A c1 d1)
-                 (ac1 : Path A a1 c1) (bd1 : Path A b1 d1)
-                 (s0 : Square A a0 b0 c0 d0 ab0 cd0 ac0 bd0)
-                 (s1 : Square A a1 b1 c1 d1 ab1 cd1 ac1 bd1)
-                 (pa : Path A a0 a1) (pb : Path A b0 b1)
-                 (pc : Path A c0 c1) (pd : Path A d0 d1)
-                 (sab : Square A a0 b0 a1 b1 ab0 ab1 pa pb)
-                 (scd : Square A c0 d0 c1 d1 cd0 cd1 pc pd)
-                 (sac : Square A a0 c0 a1 c1 ac0 ac1 pa pc)
-                 (sbd : Square A b0 d0 b1 d1 bd0 bd1 pb pd) : U :=
-        PathP (<i> (Square A (pa @ i) (pb @ i) (pc @ i) (pd @ i)
-                             (sab @ i) (scd @ i) (sac @ i) (sbd @ i))) s0 s1
+def Cube (A : U)
+    (a0 b0 c0 d0 a1 b1 c1 d1 : A)
+    (ab0 : Path A a0 b0) (cd0 : Path A c0 d0) (ac0 : Path A a0 c0) (bd0 : Path A b0 d0)
+    (ab1 : Path A a1 b1) (cd1 : Path A c1 d1) (ac1 : Path A a1 c1) (bd1 : Path A b1 d1)
+    (s0 : Square A a0 b0 c0 d0 ab0 cd0 ac0 bd0) (s1 : Square A a1 b1 c1 d1 ab1 cd1 ac1 bd1)
+    (pa : Path A a0 a1) (pb : Path A b0 b1) (pc : Path A c0 c1) (pd : Path A d0 d1)
+    (sab : Square A a0 b0 a1 b1 ab0 ab1 pa pb) (scd : Square A c0 d0 c1 d1 cd0 cd1 pc pd)
+    (sac : Square A a0 c0 a1 c1 ac0 ac1 pa pc) (sbd : Square A b0 d0 b1 d1 bd0 bd1 pb pd) : U
+ := PathP (<i> (Square A (pa @ i) (pb @ i) (pc @ i) (pd @ i)
+                         (sab @ i) (scd @ i) (sac @ i) (sbd @ i))) s0 s1
 
 def Fd (A : U) (a b c : A) (p : Path A a b) (q : Path A b c) : Square A a b b c p q p q
  := <j i> hcomp A (∂ i ∨ ∂ j)
@@ -41,3 +37,38 @@ def Fd (A : U) (a b c : A) (p : Path A a b) (q : Path A b c) : Square A a b b c 
 --    (<i j> q @ i /\ j) (<i j> ((Fd A b c d q r) @ i @ j /\ i))
 --    (<i j> q @ i /\ j) (<i j> ((Fd A b c d q r) @ i @ j /\ i))
 -- := <k j i> (Fd A b c d q r) @ (∂ i /\ ∂ j /\ ∂ k) @ (∂ k /\ (∂ i \/ ∂ j))
+
+def Tesseract (A : U)
+    (a0 b0 c0 d0 a1 b1 c1 d1 a2 b2 c2 d2 a3 b3 c3 d3 : A)
+    (ab0 : Path A a0 b0) (cd0 : Path A c0 d0) (ac0 : Path A a0 c0) (bd0 : Path A b0 d0)
+    (ab1 : Path A a1 b1) (cd1 : Path A c1 d1) (ac1 : Path A a1 c1) (bd1 : Path A b1 d1)
+    (s0 : Square A a0 b0 c0 d0 ab0 cd0 ac0 bd0) (s1 : Square A a1 b1 c1 d1 ab1 cd1 ac1 bd1)
+    (a01 : Path A a0 a1) (b01 : Path A b0 b1) (c01 : Path A c0 c1) (d01 : Path A d0 d1)
+    (sab01 : Square A a0 b0 a1 b1 ab0 ab1 a01 b01) (scd01 : Square A c0 d0 c1 d1 cd0 cd1 c01 d01)
+    (sac01 : Square A a0 c0 a1 c1 ac0 ac1 a01 c01) (sbd01 : Square A b0 d0 b1 d1 bd0 bd1 b01 d01)
+    (cu01 : Cube A a0 b0 c0 d0 a1 b1 c1 d1 ab0 cd0 ac0 bd0 ab1 cd1 ac1 bd1 s0 s1 a01 b01 c01 d01 sab01 scd01 sac01 sbd01)
+    (ab2 : Path A a2 b2) (cd2 : Path A c2 d2) (ac2 : Path A a2 c2) (bd2 : Path A b2 d2)
+    (ab3 : Path A a3 b3) (cd3 : Path A c3 d3) (ac3 : Path A a3 c3) (bd3 : Path A b3 d3)
+    (s2 : Square A a2 b2 c2 d2 ab2 cd2 ac2 bd2) (s3 : Square A a3 b3 c3 d3 ab3 cd3 ac3 bd3)
+    (a23 : Path A a2 a3) (b23 : Path A b2 b3) (c23 : Path A c2 c3) (d23 : Path A d2 d3)
+    (sab23 : Square A a2 b2 a3 b3 ab2 ab3 a23 b23) (scd23 : Square A c2 d2 c3 d3 cd2 cd3 c23 d23)
+    (sac23 : Square A a2 c2 a3 c3 ac2 ac3 a23 c23) (sbd23 : Square A b2 d2 b3 d3 bd2 bd3 b23 d23)
+    (cu23 : Cube A a2 b2 c2 d2 a3 b3 c3 d3 ab2 cd2 ac2 bd2 ab3 cd3 ac3 bd3 s2 s3 a23 b23 c23 d23 sab23 scd23 sac23 sbd23)
+    (a02 : Path A a0 a2) (b02 : Path A b0 b2) (c02 : Path A c0 c2) (d02 : Path A d0 d2)
+    (a13 : Path A a1 a3) (b13 : Path A b1 b3) (c13 : Path A c1 c3) (d13 : Path A d1 d3)
+    (sab02 : Square A a0 b0 a2 b2 ab0 ab2 a02 b02) (scd02 : Square A c0 d0 c2 d2 cd0 cd2 c02 d02) 
+    (sac02 : Square A a0 c0 a2 c2 ac0 ac2 a02 c02) (sbd02 : Square A b0 d0 b2 d2 bd0 bd2 b02 d02) 
+    (sab13 : Square A a1 b1 a3 b3 ab1 ab3 a13 b13) (scd13 : Square A c1 d1 c3 d3 cd1 cd3 c13 d13) 
+    (sac13 : Square A a1 c1 a3 c3 ac1 ac3 a13 c13) (sbd13 : Square A b1 d1 b3 d3 bd1 bd3 b13 d13)
+    (sa : Square A a0 a1 a2 a3 a01 a23 a02 a13) (sb : Square A b0 b1 b2 b3 b01 b23 b02 b13)
+    (sc : Square A c0 c1 c2 c3 c01 c23 c02 c13) (sd : Square A d0 d1 d2 d3 d01 d23 d02 d13)
+    (cu02 : Cube A a0 b0 c0 d0 a2 b2 c2 d2 ab0 cd0 ac0 bd0 ab2 cd2 ac2 bd2 s0 s2 a02 b02 c02 d02 sab02 scd02 sac02 sbd02)
+    (cu13 : Cube A a1 b1 c1 d1 a3 b3 c3 d3 ab1 cd1 ac1 bd1 ab3 cd3 ac3 bd3 s1 s3 a13 b13 c13 d13 sab13 scd13 sac13 sbd13)
+    (cuab : Cube A a0 b0 a1 b1 a2 b2 a3 b3 ab0 ab1 a01 b01 ab2 ab3 a23 b23 sab01 sab23 a02 b02 a13 b13 sab02 sab13 sa sb)
+    (cucd : Cube A c0 d0 c1 d1 c2 d2 c3 d3 cd0 cd1 c01 d01 cd2 cd3 c23 d23 scd01 scd23 c02 d02 c13 d13 scd02 scd13 sc sd)
+    (cuac : Cube A a0 c0 a1 c1 a2 c2 a3 c3 ac0 ac1 a01 c01 ac2 ac3 a23 c23 sac01 sac23 a02 c02 a13 c13 sac02 sac13 sa sc)
+    (cubd : Cube A b0 d0 b1 d1 b2 d2 b3 d3 bd0 bd1 b01 d01 bd2 bd3 b23 d23 sbd01 sbd23 b02 d02 b13 d13 sbd02 sbd13 sb sd) : U
+ := PathP (<i> (Cube A (a02 @ i) (b02 @ i) (c02 @ i) (d02 @ i) (a13 @ i) (b13 @ i) (c13 @ i) (d13 @ i)
+               (sab02 @ i) (scd02 @ i) (sac02 @ i) (sbd02 @ i) (sab13 @ i) (scd13 @ i) (sac13 @ i) (sbd13 @ i)
+               (cu02 @ i) (cu13 @ i) (sa @ i) (sb @ i) (sc @ i) (sd @ i)
+               (cuab @ i) (cucd @ i) (cuac @ i) (cubd @ i))) cu01 cu23

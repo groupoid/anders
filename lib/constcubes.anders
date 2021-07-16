@@ -22,20 +22,38 @@ def Cube (A : U)
  := PathP (<i> (Square A (pa @ i) (pb @ i) (pc @ i) (pd @ i)
                          (sab @ i) (scd @ i) (sac @ i) (sbd @ i))) s0 s1
 
+def cs (A : U) (a : A) (p : Path A a a)
+  : Square A a a a a p p p p
+ := <j i> hcomp A (∂ i ∨ ∂ j)
+     	  (λ (k : I), [ (i = 0) -> s₀ A a p @ k @ j,
+                        (i = 1) -> s₁ A a p @ k @ j,
+                        (j = 0) -> s₀ A a p @ k @ i,
+                        (j = 1) -> s₁ A a p @ k @ i ]) (inc (sb A a p @ i @ j))
+
+
+def c₀ (A : U) (a : A) (p : Path A a a)
+  : Cube A a a a a a a a a p p p p p p p p (cs A a p) (cs A a p)
+    (<_> a) (<_> a) (<_> a) (<_> a) (s₀ A a p) (s₀ A a p) (s₀ A a p) (s₀ A a p)
+ := <_> cs A a p
+
+def c₁ (A : U) (a : A) (p : Path A a a)
+  : Cube A a a a a a a a a p (<_> a) p (<_> a) p p p p (sb A a p) (cs A a p)
+    (<_> a) (<_> a) (<_> a) p (s₀ A a p) (s₁ A a p) (s₀ A a p) (s₁ A a p)
+ := <k j i> cs A a p @ (i /\ j /\ k) @ (i \/ j)
+
 def Fd (A : U) (a b c : A) (p : Path A a b) (q : Path A b c) : Square A a b b c p q p q
  := <j i> hcomp A (∂ i ∨ ∂ j)
-          (λ (k : I),[ (i = 0) -> p @ j,
-                       (i = 1) -> q @ k /\ j,
-                       (j = 0) -> p @ i,
-                       (j = 1) -> q @ k /\ i ]) (inc (p @ i \/ j))
+          (λ (k : I), [ (i = 0) -> p @ j,
+                        (i = 1) -> q @ k /\ j,
+                        (j = 0) -> p @ i,
+                        (j = 1) -> q @ k /\ i ]) (inc (p @ i \/ j))
 
+axiom B (A : U) (a b c d : A) (p : Path A a b) (q : Path A b c) (r : Path A c d)
+  : Cube A b b b b b c c d (<_> b) (<_> b) (<_> b) (<_> b) q r q r (<_> <_> b)
+    (Fd A b c d q r) (<_> b) q q (<i> (Fd A b c d q r @ i @ i))
+    (<i j> q @ i /\ j) (<i j> ((Fd A b c d q r) @ i @ j /\ i))
+    (<i j> q @ i /\ j) (<i j> ((Fd A b c d q r) @ i @ j /\ i))
 -- infinite loop found during B porting
-
--- def B (A : U) (a b c d : A) (p : Path A a b) (q : Path A b c) (r : Path A c d)
---  : Cube A b b b b b c c d (<_> b) (<_> b) (<_> b) (<_> b) q r q r (<_> <_> b)
---    (Fd A b c d q r) (<_> b) q q (<i> (Fd A b c d q r @ i @ i))
---    (<i j> q @ i /\ j) (<i j> ((Fd A b c d q r) @ i @ j /\ i))
---    (<i j> q @ i /\ j) (<i j> ((Fd A b c d q r) @ i @ j /\ i))
 -- := <k j i> (Fd A b c d q r) @ (∂ i /\ ∂ j /\ ∂ k) @ (∂ k /\ (∂ i \/ ∂ j))
 
 def Tesseract (A : U)
@@ -72,3 +90,32 @@ def Tesseract (A : U)
                (sab02 @ i) (scd02 @ i) (sac02 @ i) (sbd02 @ i) (sab13 @ i) (scd13 @ i) (sac13 @ i) (sbd13 @ i)
                (cu02 @ i) (cu13 @ i) (sa @ i) (sb @ i) (sc @ i) (sd @ i)
                (cuab @ i) (cucd @ i) (cuac @ i) (cubd @ i))) cu01 cu23
+
+-- another loop
+axiom cb (A : U) (a : A) (p : Path A a a)
+  : Cube A a a a a a a a a p p p p p (<_> a) p (<_> a) (cs A a p) (sb A a p) p p p
+    (<_> a) (cs A a p) (sb A a p) (cs A a p) (sb A a p)
+-- := <k j i> cs A a p @ (i \/ j \/ k) @ ((i \/ j) /\ (i \/ k) /\ (j \/ k))
+
+axiom cc (A : U) (a : A) (p : Path A a a)
+  : Cube A a a a a a a a a p p p p p p p p (cs A a p) (cs A a p) p p p p (cs A a p) (cs A a p) (cs A a p) (cs A a p)
+-- typecheck ?
+-- := <k j i> hcomp A (∂ i \/ ∂ j \/ ∂ k)
+--            (λ (l : I), [ (i = 0) -> c₀ A a p @ l @ j @ k,
+--                          (i = 1) -> c₁ A a p @ l @ j @ k,
+--                          (j = 0) -> c₀ A a p @ l @ i @ k,
+--                          (j = 1) -> c₁ A a p @ l @ i @ k,
+--                          (k = 0) -> c₀ A a p @ l @ i @ j,
+--                          (k = 1) -> c₁ A a p @ l @ i @ j ]) (inc (cb A a p @ i @ j @ k))
+
+axiom tb (A : U) (a : A) (p : Path A a a)
+  : Tesseract A a a a a a a a a a a a a a a a a p p p p p p p p
+    (cs A a p) (cs A a p) p p p p (cs A a p) (cs A a p) (cs A a p) (cs A a p) (cc A a p) p p p p p (<_> a) p (<_> a)
+    (cs A a p) (sb A a p) p p p (<_> a) (cs A a p) (sb A a p) (cs A a p) (sb A a p) (cb A a p) p p p p p p p (<_> a)
+    (cs A a p) (cs A a p) (cs A a p) (cs A a p) (cs A a p) (sb A a p) (cs A a p) (sb A a p) (cs A a p)
+    (cs A a p) (cs A a p) (sb A a p) (cc A a p) (cb A a p) (cc A a p) (cb A a p) (cc A a p) (cb A a p)
+-- Uncaught exception: Stack overflow
+-- := <l k j i> cc A a p @ (i \/ j \/ k \/ l)
+--            @ ((i \/ j \/ k) /\ (i \/ j \/ l) /\ (i \/ k \/ l) /\ (j \/ k \/ l))
+--            @ ((i \/ j) /\ (i \/ k) /\ (i \/ l) /\ (j \/ k) /\ (j \/ l) /\ (k \/ l))
+

@@ -1,15 +1,43 @@
 module constcubes where
 import lib/path
 
-def Square (A : U) (a₀ a₁ b₀ b₁ : A) (u : Path A a₀ a₁) (v : Path A b₀ b₁) (r₀ : Path A a₀ b₀) (r₁ : Path A a₁ b₁) : U
+def Square (A : U) (a₀ a₁ b₀ b₁ : A)
+                   (u  : Path A a₀ a₁) (v : Path A b₀ b₁)
+                   (r₀ : Path A a₀ b₀) (r₁ : Path A a₁ b₁) : U
  := PathP (<i> (Path A (r₀ @ i) (r₁ @ i))) u v
 
 def sb (A : U) (a : A) (p : Path A a a) : Square A a a a a p (<_> a) p (<_> a) := <j i> p @ i \/ j
 def s₀ (A : U) (a : A) (p : Path A a a) : Square A a a a a p p (<_> a) (<_> a) := <_> p
 def s₁ (A : U) (a : A) (p : Path A a a) : Square A a a a a (<_> a) p (<_> a) p := <j i> p @ i /\ j
-def cs (A : U) (a : A) (p : Path A a a) : Square A a a a a p p p p
+
+def Cube (A : U) (a0 b0 c0 d0 a1 b1 c1 d1 : A)
+                 (ab0 : Path A a0 b0) (cd0 : Path A c0 d0)
+                 (ac0 : Path A a0 c0) (bd0 : Path A b0 d0)
+                 (ab1 : Path A a1 b1) (cd1 : Path A c1 d1)
+                 (ac1 : Path A a1 c1) (bd1 : Path A b1 d1)
+                 (s0 : Square A a0 b0 c0 d0 ab0 cd0 ac0 bd0)
+                 (s1 : Square A a1 b1 c1 d1 ab1 cd1 ac1 bd1)
+                 (pa : Path A a0 a1) (pb : Path A b0 b1)
+                 (pc : Path A c0 c1) (pd : Path A d0 d1)
+                 (sab : Square A a0 b0 a1 b1 ab0 ab1 pa pb)
+                 (scd : Square A c0 d0 c1 d1 cd0 cd1 pc pd)
+                 (sac : Square A a0 c0 a1 c1 ac0 ac1 pa pc)
+                 (sbd : Square A b0 d0 b1 d1 bd0 bd1 pb pd) : U :=
+        PathP (<i> (Square A (pa @ i) (pb @ i) (pc @ i) (pd @ i)
+                             (sab @ i) (scd @ i) (sac @ i) (sbd @ i))) s0 s1
+
+def Fd (A : U) (a b c : A) (p : Path A a b) (q : Path A b c) : Square A a b b c p q p q
  := <j i> hcomp A (∂ i ∨ ∂ j)
-    (λ (k : I), [(i = 0) → s₀ A a p @ k @ j,
-                 (i = 1) → s₁ A a p @ k @ j,
-                 (j = 0) → s₀ A a p @ k @ i,
-                 (j = 1) → s₁ A a p @ k @ i]) (inc (sb A a p @ i @ j))
+          (λ (k : I),[ (i = 0) -> p @ j,
+                       (i = 1) -> q @ k /\ j,
+                       (j = 0) -> p @ i,
+                       (j = 1) -> q @ k /\ i ]) (inc (p @ i \/ j))
+
+-- infinite loop found during B porting
+
+-- def B (A : U) (a b c d : A) (p : Path A a b) (q : Path A b c) (r : Path A c d)
+--  : Cube A b b b b b c c d (<_> b) (<_> b) (<_> b) (<_> b) q r q r (<_> <_> b)
+--    (Fd A b c d q r) (<_> b) q q (<i> (Fd A b c d q r @ i @ i))
+--    (<i j> q @ i /\ j) (<i j> ((Fd A b c d q r) @ i @ j /\ i))
+--    (<i j> q @ i /\ j) (<i j> ((Fd A b c d q r) @ i @ j /\ i))
+-- := <k j i> (Fd A b c d q r) @ (∂ i /\ ∂ j /\ ∂ k) @ (∂ k /\ (∂ i \/ ∂ j))

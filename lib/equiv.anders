@@ -27,6 +27,14 @@ def isHae (A B : U) (f : A -> B): U := Σ (g : B -> A)
     Π (x : A), Path B (f ((eta_ @ 0) x)) ((eps_ @ 0) (f x))
 def hae (A B : U) : U := Σ (f : A -> B), isHae A B f
 
+def inv-equiv (A B : U) (w : equiv A B) : B -> A := λ (y : B), (w.2 y).1.1
+
+def ret-equiv (A B : U) (w : equiv A B) (y : B) : Path B (w.1 (inv-equiv A B w y)) y :=
+<i> (w.2 y).1.2 @ -i
+
+def sec-equiv (A B : U) (w : equiv A B) (x : A) : Path A (inv-equiv A B w (w.1 x)) x :=
+<i> ((w.2 (w.1 x)).2 (x, <j> w.1 x) @ i).1
+
 -- Univalence (Formation, Intro, Elim, Computation)
 
 -- def univ_Formation (A B : U) : U := equiv A B -> Path U A B

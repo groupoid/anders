@@ -39,8 +39,8 @@ let rec eval (e0 : exp) (ctx : ctx) = traceEval e0; match e0 with
   | EAppFormula (e, x) -> appFormula (eval e ctx) (eval x ctx)
   | EI                 -> VI
   | EDir d             -> VDir d
-  | EAnd (e1, e2)      -> andFormula (eval e1 ctx, eval e2 ctx)
-  | EOr (e1, e2)       -> orFormula (eval e1 ctx, eval e2 ctx)
+  | EAnd (e1, e2)      -> evalAnd (eval e1 ctx) (eval e2 ctx)
+  | EOr (e1, e2)       -> evalOr (eval e1 ctx) (eval e2 ctx)
   | ENeg e             -> negFormula (eval e ctx)
   | ETransp (p, i)     -> transport ctx p i
   | EHComp e           -> VHComp (eval e ctx)
@@ -208,9 +208,9 @@ and conv v1 v2 : bool = traceConv v1 v2;
     | VPi (a, g), VPi (b, h) | VSig (a, g), VSig (b, h)
     | VLam (a, g), VLam (b, h) ->
       let (p, e1, ctx1) = g in let (q, e2, ctx2) = h in
-      let x = Var (p, a) in conv a b &&
-        (weak e1 (upLocal ctx1 p a (Var (p, a))) =
-         weak e2 (upLocal ctx2 q b (Var (q, b))) ||
+      let x = Var (p, a) in let y = Var (q, b) in conv a b &&
+        (weak e1 (upLocal ctx1 p a x) =
+         weak e2 (upLocal ctx2 q b y) ||
          conv (closByVal a g x) (closByVal a h x))
     | VLam (a, (p, e, v)), b | b, VLam (a, (p, e, v)) ->
       let x = Var (p, a) in conv (app (b, x)) (closByVal a (p, e, v) x)

@@ -93,8 +93,8 @@ let rec ppExp paren e = let x = match e with
   | EPi (a, (p, b)) -> showPiExp a p b
   | ESig (a, (p, b)) -> Printf.sprintf "Σ %s, %s" (showTele p a) (showExp b)
   | EPair (fst, snd) -> Printf.sprintf "(%s, %s)" (showExp fst) (showExp snd)
-  | EFst exp -> ppExp paren exp ^ ".1"
-  | ESnd exp -> ppExp paren exp ^ ".2"
+  | EFst exp -> ppExp true exp ^ ".1"
+  | ESnd exp -> ppExp true exp ^ ".2"
   | EApp (f, x) -> Printf.sprintf "%s %s" (showExp f) (ppExp true x)
   | EVar p -> showName p
   | EHole -> "?"
@@ -135,8 +135,8 @@ let rec ppValue paren v = let x = match v with
   | VPi (x, (p, e, rho)) -> showPi x p e rho
   | VSig (x, (p, e, rho)) -> Printf.sprintf "Σ %s, %s" (showTele p x rho) (showExp e)
   | VPair (fst, snd) -> Printf.sprintf "(%s, %s)" (showValue fst) (showValue snd)
-  | VFst v -> showValue v ^ ".1"
-  | VSnd v -> showValue v ^ ".2"
+  | VFst v -> ppValue true v ^ ".1"
+  | VSnd v -> ppValue true v ^ ".2"
   | VApp (f, x) -> Printf.sprintf "%s %s" (showValue f) (ppValue true x)
   | Var (p, _) -> showName p
   | VHole -> "?"
@@ -164,7 +164,7 @@ let rec ppValue paren v = let x = match v with
   | VKan _ | VHole | VDir _ | VPair _ | VNeg _ -> x
   | _ -> parens paren x
 
-and showValue e = ppValue false e
+and showValue v = ppValue false v
 
 and showTele p x rho : string =
   if isRhoVisible rho then Printf.sprintf "(%s : %s, %s)" (showName p) (showValue x) (showRho rho)

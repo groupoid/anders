@@ -1,0 +1,28 @@
+module ab where
+import lib/cat
+
+def zeroObject(C: precategory) (X: carrier C): U₁ := Σ
+    (bot: isInitial C X)
+    (top: isTerminal C X), U
+
+def hasZeroObject (C: precategory) : U₁ := Σ
+    (ob: carrier C)
+    (zero: zeroObject C ob), U
+
+axiom hasAllProducts (C: precategory) : U
+axiom hasAllCoproducts (C: precategory) : U
+axiom hasAllKernels (C: precategory) : U
+axiom hasAllCokernels (C: precategory) : U
+axiom isMonic (C: precategory) (A S : carrier C) (k: hom C S A) : U
+axiom isEpic (C: precategory) (B S : carrier C) (k: hom C B S) : U
+axiom isKernel (C: precategory) (zero: hasZeroObject C) (A B S: carrier C) (f: hom C A B) (k: hom C S A) : U
+axiom isCokernel (C: precategory) (zero: hasZeroObject C) (A B S: carrier C) (f: hom C A B) (k: hom C B S) : U
+
+def isAbelian (C: precategory): U₁ := Σ
+    (zero: hasZeroObject C)
+    (prod: hasAllProducts C)
+    (coprod: hasAllCoproducts C)
+    (ker: hasAllKernels C)
+    (coker: hasAllCokernels C)
+    (monicsAreKernels: Π (A S: carrier C) (k: hom C S A) (_: isMonic C A S k), Σ (B: carrier C) (f: hom C A B), isKernel C zero A B S f k)
+    (epicsAreCoKernels: Π (B S: carrier C) (k: hom C B S) (_: isEpic C B S k), Σ (A: carrier C) (f: hom C A B), isCokernel C zero A B S f k), U

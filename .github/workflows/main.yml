@@ -1,4 +1,4 @@
-name: OCaml
+name: opam
 
 on:
   - pull_request

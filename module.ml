@@ -1,4 +1,5 @@
 open Prelude
+open Ident
 open Elab
 open Expr
 
@@ -11,6 +12,7 @@ type command =
 type decl =
   | Def of string * exp option * exp
   | Axiom of string * exp
+  | Record of string * tele list
 
 type line =
   | Import of string list
@@ -27,6 +29,7 @@ let showDecl : decl -> string = function
   | Def (p, Some exp1, exp2) -> Printf.sprintf "def %s : %s := %s" p (showExp exp1) (showExp exp2)
   | Def (p, None, exp) -> Printf.sprintf "def %s := %s" p (showExp exp)
   | Axiom (p, exp) -> Printf.sprintf "axiom %s : %s" p (showExp exp)
+  | Record (p, xs) -> Printf.sprintf "record %s := %s" p (String.concat "\n" (List.map showTeleExp xs))
 
 let showLine : line -> string = function
   | Import p -> Printf.sprintf "import %s" (String.concat " " p)
@@ -40,3 +43,9 @@ let freshDecl : decl -> decl = function
   | Def (p, Some exp1, exp2) -> Def (p, Some (freshExp exp1), freshExp exp2)
   | Def (p, None, exp) -> Def (p, None, freshExp exp)
   | Axiom (p, exp) -> Axiom (p, freshExp exp)
+  | Record (p, xs) ->
+    let ns = ref Env.empty in
+    let ys = List.map (fun (p, e) ->
+      let q = fresh p in let e' = salt !ns e in
+      ns := Env.add p q !ns; (q, e')) xs in
+    Record (p, ys)

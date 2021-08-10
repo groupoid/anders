@@ -60,6 +60,7 @@ rule main = parse
 | nl              { nextLine lexbuf; main lexbuf }
 | comment         { nextLine lexbuf; main lexbuf }
 | ws+             { main lexbuf }
+| "record"        { RECORD }
 | "module"        { MODULE }           | "where"         { WHERE }
 | "import"        { IMPORT }           | "option"        { OPTION }
 | def             { DEF }              | colon           { COLON }

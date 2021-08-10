@@ -23,4 +23,4 @@ let tokenToString : token -> string = function
   | IDJ        -> "IDJ"         | PARTIAL    -> "PARTIAL"
   | MAP        -> "MAP"         | IMPORT     -> "IMPORT"
   | INC        -> "INC"         | OUC        -> "OUC"
-  | HCOMP      -> "HCOMP"
+  | HCOMP      -> "HCOMP"       | RECORD     -> "RECORD"

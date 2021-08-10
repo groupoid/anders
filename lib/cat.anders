@@ -79,3 +79,4 @@ def isCatGroupoid (C: cat): U := Σ
     (right: Π (x y: C.1) (f: C.2 x y), Path (C.2 x y) (c x y y f (id y)) f),
     Π (x y z w: C.1) (f: C.2 x y) (g: C.2 y z) (h: C.2 z w),
     Path (C.2 x w) (c x z w (c x y z f g) h) (c x y w f (c y z w g h))
+

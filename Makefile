@@ -1,5 +1,6 @@
 FLAGS = -use-menhir -yaccflag "--explain" -ocamlc "ocamlc -w +a-4-29"
 OPTFLAGS = -classic-display -ocamlopt "ocamlopt -O3"
+NATIVEFLAGS = -ocamlopt "ocamlopt -O3"
 
 default: native
 
@@ -7,7 +8,7 @@ clean:
 	ocamlbuild -clean
 
 native:
-	ocamlbuild $(FLAGS) anders.native
+	ocamlbuild $(FLAGS) anders.native $(NATIVEFLAGS)
 
 release:
 	ocamlbuild $(FLAGS) anders.native $(OPTFLAGS)

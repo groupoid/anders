@@ -14,8 +14,8 @@
 %token <int> PRE
 %token LPARENS RPARENS LSQ RSQ
 %token COMMA COLON IRREF EOF HOLE
-%token DEFEQ PROD ARROW FST SND LAM DEF
-%token MODULE WHERE IMPORT AXIOM
+%token DEFEQ PROD ARROW FST SND LAM
+%token MODULE WHERE IMPORT DEF AXIOM RECORD
 %token SIGMA PI OPTION LT GT
 %token APPFORMULA PATHP TRANSP HCOMP
 %token PARTIAL MAP INC OUC
@@ -99,3 +99,4 @@ declarations:
   | DEF IDENT params COLON exp2 DEFEQ exp2 { Def ($2, Some (telescope ePi $5 $3), telescope eLam $7 $3) }
   | DEF IDENT params DEFEQ exp2 { Def ($2, None, telescope eLam $5 $3) }
   | AXIOM IDENT params COLON exp2 { Axiom ($2, telescope ePi $5 $3) }
+  | RECORD IDENT DEFEQ telescope { Record ($2, $4) }

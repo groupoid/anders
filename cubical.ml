@@ -42,6 +42,7 @@ let extractDecl : decl -> string = function
   | Def (p, Some t, e) -> Printf.sprintf "%s : %s = %s" p (extractExp t) (extractExp e)
   | Def (_, None, _) -> fail "cubicaltt does not support automatic type inference of declaration"
   | Axiom (p, t) -> Printf.sprintf "%s : %s = undefined" p (extractExp t)
+  | Record _ -> fail "cubicaltt does not support records"
 
 let extractLine : line -> string = function
   | Import xs -> String.concat "\n" (List.map (Printf.sprintf "import %s") xs)

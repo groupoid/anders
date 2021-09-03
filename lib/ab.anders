@@ -13,8 +13,17 @@ axiom hasAllProducts (C: precategory) : U
 axiom hasAllCoproducts (C: precategory) : U
 axiom hasAllKernels (C: precategory) : U
 axiom hasAllCokernels (C: precategory) : U
-axiom isMonic (C: precategory) (A S : carrier C) (k: hom C S A) : U
-axiom isEpic (C: precategory) (B S : carrier C) (k: hom C B S) : U
+
+def isMonic (P: precategory) (Y Z : carrier P) (f : hom P Y Z) : U
+ := Π (X : carrier P) (g1 g2 : hom P X Y),
+    Path (hom P X Z) (compose P X Y Z g1 f) (compose P X Y Z g2 f)
+ -> Path (hom P X Y) g1 g2
+
+def isEpic (P : precategory) (X Y : carrier P) (f : hom P X Y) : U
+ := Π (Z : carrier P) (g1 g2 : hom P Y Z),
+    Path (hom P X Z) (compose P X Y Z f g1) (compose P X Y Z f g2)
+ -> Path (hom P Y Z) g1 g2
+
 axiom isKernel (C: precategory) (zero: hasZeroObject C) (A B S: carrier C) (f: hom C A B) (k: hom C S A) : U
 axiom isCokernel (C: precategory) (zero: hasZeroObject C) (A B S: carrier C) (f: hom C A B) (k: hom C B S) : U
 
@@ -24,5 +33,5 @@ def isAbelian (C: precategory): U₁ := Σ
     (coprod: hasAllCoproducts C)
     (ker: hasAllKernels C)
     (coker: hasAllCokernels C)
-    (monicsAreKernels: Π (A S: carrier C) (k: hom C S A) (_: isMonic C A S k), Σ (B: carrier C) (f: hom C A B), isKernel C zero A B S f k)
+    (monicsAreKernels: Π (A S: carrier C) (k: hom C S A) (_: isMonic C S A k), Σ (B: carrier C) (f: hom C A B), isKernel C zero A B S f k)
     (epicsAreCoKernels: Π (B S: carrier C) (k: hom C B S) (_: isEpic C B S k), Σ (A: carrier C) (f: hom C A B), isCokernel C zero A B S f k), U

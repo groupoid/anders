@@ -23,6 +23,10 @@ import lib/path
 -- https://www.cs.bham.ac.uk/~mhe/papers/realadt.pdf
 -- https://www.cs.bham.ac.uk/~mhe/agda-new/Escardo-Simpson-LICS2001.html
 
+-- Auke Bart Booij, PhD 2020
+-- Analysis in Univalent Type Theory
+-- https://www.cs.bham.ac.uk/~abb538/thesis.pdf
+
 -- Todd Waugh Ambridge, 2020
 -- Formalising the Escardó-Simpson Closed Interval Axiomatisation in Univalent Type Theory
 -- https://hott-uf.github.io/2020/HoTTUF_2020_paper_17.pdf

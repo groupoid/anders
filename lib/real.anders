@@ -1,0 +1,44 @@
+{- Real Numbers:
+   - Escardó-Simpson reals
+   - Cauchy reals
+   - Dedekind reals
+
+   HoTT 11.3 Cauchy reals
+
+   Copyright (c) Groupoid Infinity, 2014-2021. -}
+
+module real where
+import lib/path
+
+-- Martín Hötzel Escardó, Thomas Streicher, 1999
+-- Induction and recursion on the partial real line with applications to Real PCF
+-- https://core.ac.uk/download/pdf/82595986.pdf
+
+-- Martín Hötzel Escardó, Alex Simpson, 2001
+-- A Universal Characterisation of the Closed Euclidean Interval
+-- https://www.cs.bham.ac.uk/~mhe/papers/interval.pdf
+
+-- Martín Hötzel Escardó, Alex Simpson, 2014
+-- Abstract Datatypes for Real Numbers in Type Theory
+-- https://www.cs.bham.ac.uk/~mhe/papers/realadt.pdf
+-- https://www.cs.bham.ac.uk/~mhe/agda-new/Escardo-Simpson-LICS2001.html
+
+-- Todd Waugh Ambridge, 2020
+-- Formalising the Escardó-Simpson Closed Interval Axiomatisation in Univalent Type Theory
+-- https://hott-uf.github.io/2020/HoTTUF_2020_paper_17.pdf
+-- https://www.cs.bham.ac.uk/~mhe/agda-new/UF-SIP-IntervalObject.html
+
+-- RC ⊆ RH ⊆ RD
+
+axiom ℕ : U
+axiom zero : ℕ
+axiom succ : ℕ → ℕ
+
+axiom 2 : U
+axiom ₀ : 2
+axiom ₁ : 2
+
+def ≤₂ (a b : 2) : U := Path 2 a ₁ → Path 2 b ₁
+def is-decreasing (α : ℕ → 2) : U := Π (i : ℕ), ≤₂ (α (succ i)) (α i)
+def ℕ∞ : U := Σ (α : ℕ → 2), is-decreasing α
+def incl (α : ℕ∞) : ℕ → 2 := α.1

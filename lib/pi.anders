@@ -1,6 +1,6 @@
 {- Pi Type:
-   * Pi;
-   * FunExt.
+   - Pi;
+   - FunExt.
 
    HoTT 1.5 Product types
    HoTT 2.9 Pi-types and the function extensionality axiom.

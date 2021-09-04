@@ -9,8 +9,16 @@ def hasZeroObject (C: precategory) : U₁ := Σ
     (ob: carrier C)
     (zero: zeroObject C ob), U
 
-axiom hasAllProducts (C: precategory) : U
-axiom hasAllCoproducts (C: precategory) : U
+def hasAllProducts (C: precategory) : U₁ := Σ
+    (product: carrier C -> carrier C -> carrier C)
+    (π₁: Π (A B : carrier C), hom C (product A B) A)
+    (π₂: Π (A B : carrier C), hom C (product A B) B), U
+
+def hasAllCoproducts (C: precategory) : U₁ := Σ
+    (coproduct: carrier C -> carrier C -> carrier C)
+    (σ₁: Π (A B : carrier C), hom C A (coproduct A B))
+    (σ₂: Π (A B : carrier C), hom C B (coproduct A B)), U
+
 axiom hasAllKernels (C: precategory) : U
 axiom hasAllCokernels (C: precategory) : U
 

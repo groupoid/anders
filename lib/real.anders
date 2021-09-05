@@ -15,6 +15,10 @@ import lib/path
 -- Exact Real Computer Arithmetic
 -- http://www.doc.ic.ac.uk/research/technicalreports/1997/DTR97-9.pdf
 
+-- Peter John Potts, Abbas Edalat, 1998
+-- A New Representation for Exact Real Numbers
+-- https://www.sciencedirect.com/science/article/pii/S1571066105801665
+
 -- Martín Hötzel Escardó, Thomas Streicher, 1999
 -- Induction and recursion on the partial real line with applications to Real PCF
 -- https://core.ac.uk/download/pdf/82595986.pdf

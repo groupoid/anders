@@ -1,14 +1,19 @@
 {- Real Numbers:
-   - Escardó-Simpson reals
-   - Cauchy reals
    - Dedekind reals
+   - Cauchy reals
+   - Escardó-Simpson reals
 
+   HoTT 11.2 Dedekind reals
    HoTT 11.3 Cauchy reals
 
    Copyright (c) Groupoid Infinity, 2014-2021. -}
 
 module real where
 import lib/path
+
+-- Peter John Potts, Abbas Edalat, 1997
+-- Exact Real Computer Arithmetic
+-- http://www.doc.ic.ac.uk/research/technicalreports/1997/DTR97-9.pdf
 
 -- Martín Hötzel Escardó, Thomas Streicher, 1999
 -- Induction and recursion on the partial real line with applications to Real PCF
@@ -32,7 +37,7 @@ import lib/path
 -- https://hott-uf.github.io/2020/HoTTUF_2020_paper_17.pdf
 -- https://www.cs.bham.ac.uk/~mhe/agda-new/UF-SIP-IntervalObject.html
 
--- RC ⊆ RH ⊆ RD
+-- R_C ⊆ R_H ⊆ R_D
 
 axiom ℕ : U
 axiom zero : ℕ
@@ -46,3 +51,17 @@ def ≤₂ (a b : 2) : U := Path 2 a ₁ → Path 2 b ₁
 def is-decreasing (α : ℕ → 2) : U := Π (i : ℕ), ≤₂ (α (succ i)) (α i)
 def ℕ∞ : U := Σ (α : ℕ → 2), is-decreasing α
 def incl (α : ℕ∞) : ℕ → 2 := α.1
+
+-- ES Reals
+
+-- (1) Midpoint Algebra
+-- (2) Convex Body
+-- (3) Interval Object
+
+-- Dedekind Cuts and Cauchy Reals
+
+{-
+
+|| isCut(x) || => isCauchyReal(x)
+
+-}

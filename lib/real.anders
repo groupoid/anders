@@ -15,6 +15,10 @@ import lib/path
 -- Exact Real Computer Arithmetic
 -- http://www.doc.ic.ac.uk/research/technicalreports/1997/DTR97-9.pdf
 
+-- Peter Potts, Abbas Edalat, Martín Hötzel Escardó, 1997
+-- Semantics of Exact Real Arithmetic
+-- https://www.researchgate.net/publication/221443275_Semantics_of_Exact_Real_Arithmetic
+
 -- Peter John Potts, Abbas Edalat, 1998
 -- A New Representation for Exact Real Numbers
 -- https://www.sciencedirect.com/science/article/pii/S1571066105801665

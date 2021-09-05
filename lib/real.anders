@@ -11,6 +11,10 @@
 module real where
 import lib/path
 
+-- Peter John Potts, 1996
+-- Computable Real Arithmetic Using Linear Fractional Transformations
+-- https://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.24.7373&rep=rep1&type=pdf
+
 -- Peter John Potts, Abbas Edalat, 1997
 -- Exact Real Computer Arithmetic
 -- http://www.doc.ic.ac.uk/research/technicalreports/1997/DTR97-9.pdf
@@ -18,6 +22,14 @@ import lib/path
 -- Peter Potts, Abbas Edalat, Martín Hötzel Escardó, 1997
 -- Semantics of Exact Real Arithmetic
 -- https://www.researchgate.net/publication/221443275_Semantics_of_Exact_Real_Arithmetic
+
+-- Reinhold Heckmann, 1998
+-- The Appearance of Big Integers in Exact Real Arithmetic Based on Linear Fractional Transformations
+-- https://link.springer.com/content/pdf/10.1007%2FBFb0053549.pdf
+
+-- Peter John Potts, PhD, 1998
+-- Exact Real Arithmetics using Mobius Transformations
+-- https://www.doc.ic.ac.uk/~ae/papers/potts-phd.pdf
 
 -- Peter John Potts, Abbas Edalat, 1998
 -- A New Representation for Exact Real Numbers

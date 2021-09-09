@@ -8,8 +8,60 @@
 
    Copyright (c) Groupoid Infinity, 2014-2021. -}
 
+-- Martín Hötzel Escardó, Thomas Streicher, 1999
+-- Induction and recursion on the partial real line with applications to Real PCF
+-- https://core.ac.uk/download/pdf/82595986.pdf
+
+-- Martín Hötzel Escardó, Alex Simpson, 2001
+-- A Universal Characterisation of the Closed Euclidean Interval
+-- https://www.cs.bham.ac.uk/~mhe/papers/interval.pdf
+
+-- Martín Hötzel Escardó, Alex Simpson, 2014
+-- Abstract Datatypes for Real Numbers in Type Theory
+-- https://www.cs.bham.ac.uk/~mhe/papers/realadt.pdf
+-- https://www.cs.bham.ac.uk/~mhe/agda-new/Escardo-Simpson-LICS2001.html
+
+-- Auke Bart Booij, PhD 2020
+-- Analysis in Univalent Type Theory
+-- https://www.cs.bham.ac.uk/~abb538/thesis.pdf
+
+-- Todd Waugh Ambridge, 2020
+-- Formalising the Escardó-Simpson Closed Interval Axiomatisation in Univalent Type Theory
+-- https://hott-uf.github.io/2020/HoTTUF_2020_paper_17.pdf
+-- https://www.cs.bham.ac.uk/~mhe/agda-new/UF-SIP-IntervalObject.html
+
 module real where
 import lib/path
+
+axiom ℕ : U
+axiom zero : ℕ
+axiom succ : ℕ → ℕ
+
+axiom 2 : U
+axiom ₀ : 2
+axiom ₁ : 2
+
+def ≤₂ (a b : 2) : U := Path 2 a ₁ → Path 2 b ₁
+def is-decreasing (α : ℕ → 2) : U := Π (i : ℕ), ≤₂ (α (succ i)) (α i)
+def ℕ∞ : U := Σ (α : ℕ → 2), is-decreasing α
+def incl (α : ℕ∞) : ℕ → 2 := α.1
+def tail (A : U) (a : ℕ → A) : ℕ → A := \ (n : ℕ), a (succ n)
+
+def midpoint-alg (A : U) (O : A → A → A) : U₁ :=
+  Σ (isSet : isSet A)
+    (idempodent : Π (a : A), Path A (O a a) a)
+    (commutative : Π (x y : A), Path A (O x y) (O y x))
+    (transpositional : Π (a b c d : A), Path A (O (O a b) (O c d)) (O (O a c) (O b d))), U
+
+def convex-body (A : U) (O : A → A → A) : U₁ :=
+  Σ (midpoint : midpoint-alg A O)
+    (cancelative : Π (a b c : A), Path A (O a c) (O b c) → Path A a b)
+    (iterative : Σ (M : Π (_ : ℕ → A), A)
+                   (x : Π (a : ℕ → A), Path A (M a) (O (a zero) (M (tail A a)))),
+                   Π (a x : ℕ → A) (y : Π (i : ℕ), Path A (a i) (O (x i) (a (succ i)))),
+                     Path A (a zero) (M x)), U
+
+-- Exact Real Arithmetics
 
 -- Peter John Potts, 1996
 -- Computable Real Arithmetic Using Linear Fractional Transformations
@@ -35,53 +87,3 @@ import lib/path
 -- A New Representation for Exact Real Numbers
 -- https://www.sciencedirect.com/science/article/pii/S1571066105801665
 
--- Martín Hötzel Escardó, Thomas Streicher, 1999
--- Induction and recursion on the partial real line with applications to Real PCF
--- https://core.ac.uk/download/pdf/82595986.pdf
-
--- Martín Hötzel Escardó, Alex Simpson, 2001
--- A Universal Characterisation of the Closed Euclidean Interval
--- https://www.cs.bham.ac.uk/~mhe/papers/interval.pdf
-
--- Martín Hötzel Escardó, Alex Simpson, 2014
--- Abstract Datatypes for Real Numbers in Type Theory
--- https://www.cs.bham.ac.uk/~mhe/papers/realadt.pdf
--- https://www.cs.bham.ac.uk/~mhe/agda-new/Escardo-Simpson-LICS2001.html
-
--- Auke Bart Booij, PhD 2020
--- Analysis in Univalent Type Theory
--- https://www.cs.bham.ac.uk/~abb538/thesis.pdf
-
--- Todd Waugh Ambridge, 2020
--- Formalising the Escardó-Simpson Closed Interval Axiomatisation in Univalent Type Theory
--- https://hott-uf.github.io/2020/HoTTUF_2020_paper_17.pdf
--- https://www.cs.bham.ac.uk/~mhe/agda-new/UF-SIP-IntervalObject.html
-
--- R_C ⊆ R_H ⊆ R_D
-
-axiom ℕ : U
-axiom zero : ℕ
-axiom succ : ℕ → ℕ
-
-axiom 2 : U
-axiom ₀ : 2
-axiom ₁ : 2
-
-def ≤₂ (a b : 2) : U := Path 2 a ₁ → Path 2 b ₁
-def is-decreasing (α : ℕ → 2) : U := Π (i : ℕ), ≤₂ (α (succ i)) (α i)
-def ℕ∞ : U := Σ (α : ℕ → 2), is-decreasing α
-def incl (α : ℕ∞) : ℕ → 2 := α.1
-
--- ES Reals
-
--- (1) Midpoint Algebra
--- (2) Convex Body
--- (3) Interval Object
-
--- Dedekind Cuts and Cauchy Reals
-
-{-
-
-|| isCut(x) || => isCauchyReal(x)
-
--}

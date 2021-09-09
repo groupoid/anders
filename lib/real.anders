@@ -53,13 +53,35 @@ def midpoint-alg (A : U) (O : A → A → A) : U₁ :=
     (commutative : Π (x y : A), Path A (O x y) (O y x))
     (transpositional : Π (a b c d : A), Path A (O (O a b) (O c d)) (O (O a c) (O b d))), U
 
-def convex-body (A : U) (O : A → A → A) : U₁ :=
-  Σ (midpoint : midpoint-alg A O)
+def convex-body : U₁ :=
+  Σ (A : U)
+    (O : A → A → A)
+    (midpoint : midpoint-alg A O)
     (cancelative : Π (a b c : A), Path A (O a c) (O b c) → Path A a b)
-    (iterative : Σ (M : Π (_ : ℕ → A), A)
-                   (x : Π (a : ℕ → A), Path A (M a) (O (a zero) (M (tail A a)))),
-                   Π (a x : ℕ → A) (y : Π (i : ℕ), Path A (a i) (O (x i) (a (succ i)))),
-                     Path A (a zero) (M x)), U
+    (iterative :
+    Σ (M : Π (_ : ℕ → A), A)
+      (x : Π (a : ℕ → A), Path A (M a) (O (a zero) (M (tail A a)))),
+    Π (a x : ℕ → A) (y : Π (i : ℕ), Path A (a i) (O (x i) (a (succ i)))),
+      Path A (a zero) (M x)), U
+
+def ob (X: convex-body) : U := X.1
+def op (X: convex-body) : ob X -> ob X -> ob X := X.2.1
+
+def isSingleton (A: U) : U := Π (a: A), Σ (x: A), Path A a x
+def ∃! (A : U) (B : A -> U) : U := isSingleton (Σ (x: A), B x)
+
+{- The key structure of the axiomatisation: an interval object.
+   An interval object is defined by a Convex-body J and two points u,v : J.ob, such that
+   For every two points a,b : K.ob of a Convex-body K there exists a unique h : J.ob -> K.ob such that:
+   h u ≡ a /\ h v ≡ b /\ ∀ x,y : J.ob, h (x J.op y) ≡ h x K.op h y -}
+
+def Interval-Object : U₁ :=
+  Σ (J : convex-body) (u v : ob J),
+  Π (K : convex-body) (a b : ob K),
+ ∃! (ob J -> ob K)
+    ( λ (h : ob J -> ob K),
+      Σ (_ : Path (ob K) (h u) a) (_ : Path (ob K) (h v) b),
+      Π (x y : ob J), Path (ob K) (h ((op J) x y)) ((op K) (h x) (h y)))
 
 -- Exact Real Arithmetics
 

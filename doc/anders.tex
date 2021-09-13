@@ -57,22 +57,24 @@ Here is presented a reincarnation of \textbf{cubicaltt} called \textbf{anders}.
 \section{Motivation}
 \label{sec:typesetting-summary}
 
-The HTS\footnote{\url{https://www.math.ias.edu/vladimir/sites/math.ias.edu.vladimir/files/HTS.pdf} -- HTS}
+The \textbf{HTS}\footnote{\url{https://www.math.ias.edu/vladimir/sites/math.ias.edu.vladimir/files/HTS.pdf}}
 language proposed by Voevodsky exposes two different presheaf models of type theory:
 the inner one is homotopy type system presheaf that models HoTT and the outer one is traditional Martin-Löf
-type system presheaf that models set theory with UIP. The motivation behind this doubling is to
-have an ability to express semisemplicial types. Theoretical work on merging inner
-and outer languages was continued in 2LTT\footnote{\url{https://arxiv.org/pdf/1705.03307.pdf} -- 2LTT}.
+type system presheaf that models set theory with UIP. The motivation is to have an ability to
+express semisemplicial types. Theoretical work was continued in \textbf{2LTT}\footnote{\url{https://arxiv.org/pdf/1705.03307.pdf}}.
 
-While we are on our road to Lean-like tactic language, currently we are at the stage of regular
-cubical HTS type checker with CHM-style [5] primitives. You may try it at Github \footnote{https://github.com/groupoid/anders -- Anders} or install through OPAM: \textbf{opam install anders}.
+Our aim here is to preserve cubicaltt programs and remain implemented compatible with publications.
+While we are on our road to Lean-like tactic language, currently we are at the stage of regular cubical type
+checker with CHM-style primitives. You may try it at Github \footnote{https://github.com/groupoid/anders}
+or install through OPAM: \textbf{opam install anders}.
 
 \section{Syntax}
 
-The syntax resembles original syntax of the reference CCHM type checker cubicaltt,
-is slightly compatible with Lean syntax and contains the full set of Cubical Agda\footnote{https://staff.math.su.se/anders.mortberg/papers/cubicalagda.pdf -- Cubical Agda} primitives.
-
-Here is given the mathematical pseudo-code notation of the language expressions that come immediately after parsing. The core syntax definition of HTS language E
+The syntax resembles original syntax of the reference \textbf{CCHM} type checker cubicaltt,
+is slightly compatible with Lean syntax and contains the full set of Cubical
+Agda\footnote{https://staff.math.su.se/anders.mortberg/papers/cubicalagda.pdf} primitives.
+Here is given the mathematical pseudo-code notation of the language expressions that come
+immediately after parsing. The core syntax definition of \textbf{HTS} language E
 corresponds to exp type defined in expr.ml OCaml module.
 
 \begin{table}[ht]
@@ -92,7 +94,7 @@ corresponds to exp type defined in expr.ml OCaml module.
 \end{tabular}
 \end{table}
 
-Further Menhir BNF notation will be used to describe the top-level language E parser as type checker is written in OCaml.
+Further Menhir BNF notation will be used to describe the top-level language E parser.
 
 \begin{table}[ht]
 \centering
@@ -103,6 +105,7 @@ Further Menhir BNF notation will be used to describe the top-level language E pa
    MLTT :=&$pi\ |\ sigma\ |\ id$ \\
 \end{tabular}
 \end{table}
+
 
 \textbf{Keywords}. The words of a top-level language (file or repl) consist of keywords or identifiers.
 The keywords are following: \textbf{module}, \textbf{where}, \textbf{import}, \textbf{option}, \textbf{def}, \textbf{axiom},

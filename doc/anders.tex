@@ -65,28 +65,18 @@ have an ability to express semisemplicial types. Theoretical work on merging inn
 and outer languages was continued in 2LTT\footnote{\url{https://arxiv.org/pdf/1705.03307.pdf} -- 2LTT}.
 
 While we are on our road to Lean-like tactic language, currently we are at the stage of regular
-cubical HTS type checker with CHM-style [5] primitives. You may try it at Github \footnote{https://github.com/groupoid/anders} or install through OPAM: \textbf{opam install anders}.
+cubical HTS type checker with CHM-style [5] primitives. You may try it at Github \footnote{https://github.com/groupoid/anders -- Anders} or install through OPAM: \textbf{opam install anders}.
 
 \section{Syntax}
 
 The syntax resembles original syntax of the reference CCHM type checker cubicaltt,
-is slightly compatible with Lean syntax and contains the full set of Cubical Agda\footnote{https://staff.math.su.se/anders.mortberg/papers/cubicalagda.pdf} primitives.
+is slightly compatible with Lean syntax and contains the full set of Cubical Agda\footnote{https://staff.math.su.se/anders.mortberg/papers/cubicalagda.pdf -- Cubical Agda} primitives.
 
 Here is given the mathematical pseudo-code notation of the language expressions that come immediately after parsing. The core syntax definition of HTS language E
 corresponds to exp type defined in expr.ml OCaml module:
 
 \begin{table}[ht]
-\begin{tabular}{rl}
-      E :=&$cosmos\ |\ var\ |\ MLTT\ |\ CCHM\ |\ HIT$ \\
-    HIT :=&$\mathbf{inductive}\ E\ E\ |\ \mathbf{ctor}\ name\ E\ |\ \mathbf{match}\ E\ E$ \\
-   CCHM :=&$path\ |\ I\ |\ part\ |\ sub\ |\ kan\ |\ glue$ \\
-   MLTT :=&$pi\ |\ sigma\ |\ id$ \\
-\end{tabular}
-\end{table}
-
-Further Menhir BNF notation will be used to describe the top-level language parser as type checker is written in OCaml.
-
-\begin{table}[ht]
+\centering
 \begin{tabular}{rl}
  cosmos :=&$\mathbf{U}_j \ |\ \mathbf{V}_k$ \\
     var :=&$\mathbf{var}\ name\ |\ \mathbf{hole}$ \\
@@ -96,67 +86,140 @@ Further Menhir BNF notation will be used to describe the top-level language pars
    path :=&$\mathbf{Path}\ E\ |\ E^i\ |\ E\ @\ E$ \\
       I :=&$\mathbf{I}\ |\ 0\ |\ 1\ |\ E\ \bigvee\ E\ |\ E\ \bigwedge\ E\ |\ \neg E$ \\
    part :=&$\mathbf{Partial}\ E\ E\ |\ \mathbf{[}\ (E=I) \rightarrow E, ...\ \mathbf{]}$ \\
-    sub :=&$\mathbf{inc}\ E\ |\ \mathbf{ouc}\ E\ |\ E\ \mathbf{[}\ I\ |->\ E\ \mathbf{]}$ \\
+    sub :=&$\mathbf{inc}\ E\ |\ \mathbf{ouc}\ E\ |\ E\ \mathbf{[}\ I\ \mapsto\ E\ \mathbf{]}$ \\
     kan :=&$\mathbf{transp}\ E\ E\ |\ \mathbf{hcomp}\ E$ \\
    glue :=&$\mathbf{Glue}\ E\ |\ \mathbf{glue}\ E\ |\ \mathbf{unglue}\ E\ E$ \\
 \end{tabular}
 \end{table}
 
-\newpage
+Further Menhir BNF notation will be used to describe the top-level language parser as type checker is written in OCaml.
+
+\begin{table}[ht]
+\centering
+\begin{tabular}{rl}
+      E :=&$cosmos\ |\ var\ |\ MLTT\ |\ CCHM\ |\ HIT$ \\
+    HIT :=&$\mathbf{inductive}\ E\ E\ |\ \mathbf{ctor}\ name\ E\ |\ \mathbf{match}\ E\ E$ \\
+   CCHM :=&$path\ |\ I\ |\ part\ |\ sub\ |\ kan\ |\ glue$ \\
+   MLTT :=&$pi\ |\ sigma\ |\ id$ \\
+\end{tabular}
+\end{table}
 
 \textbf{Keywords}. The words of a top-level language (file or repl) consist of keywords or identifiers.
 The keywords are following: \textbf{module}, \textbf{where}, \textbf{import}, \textbf{option}, \textbf{def}, \textbf{axiom},
 \textbf{postulate}, \textbf{theorem}, \textbf{(}, \textbf{)}, \textbf{[}, \textbf{]}, \textbf{<}, \textbf{>},
 \textbf{/}, \textbf{.1}, \textbf{.2}, \textbf{$\Pi$}, \textbf{$\Sigma$}, \textbf{,}, \textbf{$\lambda$}, \textbf{$\times$}, \textbf{$\rightarrow$}, \textbf{:}, \textbf{:=},
-\textbf{|->}, \textbf{U}, \textbf{V}, \textbf{$\bigvee$}, \textbf{$\bigwedge$}, \textbf{-}, \textbf{+}, \textbf{@}, \textbf{PathP},
+\textbf{$\mapsto$}, \textbf{U}, \textbf{V}, \textbf{$\bigvee$}, \textbf{$\bigwedge$}, \textbf{-}, \textbf{+}, \textbf{@}, \textbf{PathP},
 \textbf{transp}, \textbf{hcomp}, \textbf{zero}, \textbf{one}, \textbf{Partial}, \textbf{inc},
-\textbf{ouc}, \textbf{interval}, \textbf{inductive}, \textbf{Glue}, \textbf{glue}, \textbf{unglue}.
+\textbf{ouc}, \textbf{interval}, \textbf{inductive}, \textbf{Glue}, \textbf{glue}, \textbf{unglue}.\\
 
 \textbf{Indentifiers}. Identifiers support UTF-8. Indentifiers couldn't start with $:$, $-$, $\rightarrow$. Sample identifiers:
-$\neg$-of-$\bigvee$, 1$\rightarrow$1, is-?, =, \$$\sim$]!005x, $\infty$, x$\rightarrow$Nat
+$\neg$-of-$\bigvee$, 1$\rightarrow$1, is-?, =, \$$\sim$]!005x, $\infty$, x$\rightarrow$Nat.\\
 
 \textbf{Modules}. Modules represent files with declarations. More accurate, BNF notation of module consists of imports, options and declarations.
+\begin{table}[ht]
+\begin{tabular}{l}
+\textbf{menhir} \\
+\ \ \ start <Module.file> file \\
+\ \ \ start <Module.command> repl \\
+\ \ \ repl : COLON IDENT exp1 EOF | COLON IDENT EOF | exp0 EOF | EOF \\
+\ \ \ file : MODULE IDENT WHERE line* EOF \\
+\ \ \ path : IDENT \\
+\ \ \ line : IMPORT path+ | OPTION IDENT IDENT | declarations \\
+\end{tabular}
+\end{table}
 
-\textbf{Imports}. The import construction supports file folder structure (without file extensions) by using reserved symbol / for hierarchy walking.
+\textbf{Imports}. The import construction supports file folder structure (without file extensions) by using reserved symbol / for hierarchy walking.\\
 
 \textbf{Options}. Each option holds bool value. Language supports following options: 1) girard (enables U : U); 2) pre-eval (normalization cache);
 3) impredicative (infinite hierarchy with impredicativity rule);
 In Anders you can enable or disable language core types, adjust syntaxes or tune inner variables of the type checker. Here is the example how to setup minimal core able to prove internalization of MLTT-73 variation (Path instead of Id and no inductive types, see base library):
-
-\begin{table}[ht]
-\begin{tabular}{rl}
-\textbf{option} & HIT false \\
-\textbf{option} & CCHM false \\
-\textbf{option} & MLTT true \\
-\end{tabular}
-\end{table}
-
 In order to turn HIT into ordinary CiC calculus you may say:
 
-\textbf{Declarations}. Language supports following top level declarations: 1) axiom (non-computable declaration that breakes normalization); 2) postulate (alternative or inverted axiom that can preserve consistency); 3) definition (almost any explicit term or type in type theory); 5) lemma (helper in big game). 4) theorem (something valuable or complex enough).
-Sample declarations. For example, signature isProp (A : U) of type U could be defined as normalization-blocking axiom without proof-term or by providing proof-term as definition.
 \begin{table}[ht]
+\begin{tabular}{l}
+\textbf{option} HIT false \\
+\textbf{option} CCHM false \\
+\textbf{option} MLTT true \\
+\end{tabular}
+\end{table}
+
+\textbf{Declarations}. Language supports following top level declarations:
+1) axiom (non-computable declaration that breakes normalization);
+2) postulate (alternative or inverted axiom that can preserve consistency);
+3) definition (almost any explicit term or type in type theory);
+4) lemma (helper in big game);
+5) theorem (something valuable or complex enough).
+
+
+\begin{table}[ht!]
 \begin{tabular}{rl}
 \textbf{axiom} & isProp (A : U) : U \\
-\textbf{def} & isSet (A : U) : U \\
- := & \textbf{$\Pi$} (a b : A) (x y : Path A a b), Path (Path A a b) x y \\
+\textbf{def} & isSet (A : U) : U := \textbf{$\Pi$} (a b : A) (x y : Path A a b), Path (Path A a b) x y \\
+\end{tabular}
+\end{table}
+
+Sample declarations. For example, signature isProp (A : U) of type U could be
+defined as normalization-blocking axiom without proof-term or by providing proof-term as definition.
+
+In this example (A : U), (a b : A) and (x y : Path A a b) are called telescopes.
+Each telescope consists of a series of lenses or empty. Each lense provides a
+set of variables of the same type. Telescope defines parameters of a declaration.
+Types in a telescope, type of a declaration and a proof-terms are a language expressions exp1.
+
+\begin{table}[ht]
+\begin{tabular}{l}
+\textbf{menhir} \\
+\ \ \ ident : IRREF | IDENT \\
+\ \ \ vars : ident+ \\
+\ \ \ lense : LPARENS vars COLON exp1 RPARENS \\
+\ \ \ telescope : lense telescope \\
+\ \ \ params : telescope | [] \\
+\ \ \ declarations: \\
+\ \ \ \ \ \ | DEF IDENT params DEFEQ exp1 \\
+\ \ \ \ \ \ | DEF IDENT params COLON exp1 DEFEQ exp1 \\
+\ \ \ \ \ \ | AXIOM IDENT params COLON exp1
+\end{tabular}
+\end{table}
+
+\textbf{Expressions}. All atomic language expressions are grouped by four categories:
+exp0 (pair constructions), exp1 (non neutral constructions), exp2 (path and pi applcations),
+exp3 (neutral constructions).
+
+\begin{table}[ht]
+\begin{tabular}{ll}
+\textbf{menhir} \\
+\ \ \ face : LPARENS IDENT IDENT IDENT RPARENS \\
+\ \ \ partial : face+ ARROW exp1 \\
+\ \ \ exp0 : exp1 COMMA exp0 | exp1 \\
+\multicolumn{2}{l}{\ \ \ exp1: LSQ separated(COMMA, partial) RSQ } \\
+\ \ \ \ \ \ | LAM telescope COMMA exp1   & | PI telescope COMMA exp1 \\
+\ \ \ \ \ \ | SIGMA telescope COMMA exp1 & | LSQ IRREF ARROW exp1 RSQ \\
+\ \ \ \ \ \ | LT vars GT exp1            & | exp2 ARROW exp1 \\
+\ \ \ \ \ \ | exp2 PROD exp1             & | exp2 \\
+\end{tabular}
+\end{table}
+
+The LR parsers demand to define exp1 as expressions that cannot be used (without a parens enclosure) as a right part of left-associative application for both Path and Pi lambdas.
+Universe indecies $U_j$ (inner fibrant), $V_k$ (outer pretypes) and S (outer strict omega) are using unicode subscript letters that are already processed in lexer.
+
+\begin{table}[ht!]
+\begin{tabular}{llll}
+\textbf{menhir} \\
+\multicolumn{3}{l}{\ \ \ exp2 : exp2 exp3 | exp2 APPFORMULA exp3 | exp3 } \\
+\multicolumn{4}{l}{\ \ \ exp3: LPARENS exp0 RPARENS LSQ exp0 MAP exp0 RSQ } \\
+\ \ \ \ \ \   | HOLE              & | PRE          & | KAN          & | IDJ exp3 \\
+\ \ \ \ \ \   | exp3 FST          & | exp3 SND     & | NEGATE exp3  & | INC exp3 \\
+\ \ \ \ \ \   | exp3 AND exp3     & | exp3 OR exp3 & | ID exp3      & | REF exp3\\
+\ \ \ \ \ \   | OUC exp3          & | PATHP exp3   & | PARTIAL exp3 & | IDENT \\
+\multicolumn{3}{l}{\ \ \ \ \ \    | IDENT LSQ exp0 MAP exp0 RSQ }   & | HCOMP exp3 \\
+\multicolumn{3}{l}{\ \ \ \ \ \    | LPARENS exp0 RPARENS }          & | TRANSP exp3 exp3 \\
 \end{tabular}
 \end{table}
 
 
-In this example (A : U), (a b : A) and (x y : Path A a b) are called telescopes. Each telescope consists of a series of lenses or empty. Each lense provides a set of variables of the same type. Telescope defines parameters of a declaration. Types in a telescope, type of a declaration and a proof-terms are a language expressions exp1.
-
-Expressions. All atomic language expressions are grouped by four categories: exp0 (pair constructions), exp1 (non neutral constructions), exp2 (path and pi applcations), exp3 (neutral constructions).
-
-The LR parsers demand to define exp1 as expressions that cannot be used (without a parens enclosure) as a right part of left-associative application for both Path and Pi lambdas.
-
-Universe indecies Uj (inner fibrant), Vk (outer pretypes) and S (outer strict omega) are using unicode subscript letters that are already processed in lexer.
-
+\newpage
 \section{Semantics}
-
 The idea is to have a unified layered type checker, so you can disbale/enable any MLTT-style inference, assign types to universes and enable/disable hierachies. This will be done by providing linking API for pluggable presheaf modules. We selected 5 levels of type checker awareness from universes and pure type systems up to synthetic language of homotopy type theory. Each layer corresponds to its presheaves with separate configuration for universe hierarchies.
-
-
 \begin{table}[ht]
 \begin{tabular}{rcl}
  \textbf{inductive} lang : \textbf{U} & := & UNI: cosmos $\rightarrow$ lang \\
@@ -168,7 +231,6 @@ The idea is to have a unified layered type checker, so you can disbale/enable an
    & | & HIT: hit lang $\rightarrow$ lang \\
 \end{tabular}
 \end{table}
-
 We want to mention here with homage to its authors all categorical models of dependent type theory: Comprehension Categories (Grothendieck, Jacobs), LCCC (Seely), D-Categories and CwA (Cartmell), CwF (Dybjer), C-Systems (Voevodsky), Natural Models (Awodey). While we can build some transports between them, we leave this excercise for our mathematical components library.
 
 We will use here the Coquand's notation for Presheaf Type Theories in terms of restriction maps.
@@ -177,17 +239,13 @@ We will use here the Coquand's notation for Presheaf Type Theories in terms of r
 
 Language supports Agda-style hierarchy of universes: fibrant (U), interval pretypes (V) and strict omega
 with explicit level manipulation. All universes are bounded with preorder
-
 \begin{equation}
 Fibrant_j \prec Pretypes_k \prec Strict_l,
 \end{equation}
-
 in which $j,k,l$ are bounded with equation:
-
 \begin{equation}
 j < k < l.
 \end{equation}
-
 Large elimination to upper universes is prohibited. This is extendable to Agda model:
 
 \begin{table}[ht]
@@ -201,11 +259,59 @@ Large elimination to upper universes is prohibited. This is extendable to Agda m
 \end{tabular}
 \end{table}
 
+\newpage
+
 \subsection{Dependent Types}
+
+\begin{definition}[Type]
+A type is interpreted as a presheaf $A$, a family of sets $A_I$ with restriction maps
+$u \mapsto u\ f, A_I \rightarrow A_J$ for $f: J\rightarrow I$. A dependent type
+B on A is interpreted by a presheaf on category of elements of $A$: the objects
+are pairs $(I,u)$ with $u : A_I$ and morphisms $f: (J,v) \rightarrow (I,u)$ are
+maps $f : J \rightarrow$ such that $v = u\ f$. A dependent type B is thus given
+by a family of sets $B(I,u)$ and restriction maps $B(I,u) \rightarrow B(J,u\ f)$.
+\end{definition}
+
+
+We think of $A$ as a type and $B$ as a family of presheves $B(x)$ varying $x:A$.
+The operation $\Pi(x:A)B(x)$ generalizes the semantics of
+implication in a Kripke model.
+
+\begin{definition}[Pi]
+An element $w:[\Pi(x:A)B(x)](I)$ is a family of functions $w_f : \Pi(u:A(J))B(J,u)$
+for $f : J \rightarrow I$ such that $(w_f u)g=w_{f\ g}(u\ g)$ when $u:A(J)$ and $g:K\rightarrow J$.
+\end{definition}
+
+\begin{table}[ht]
+\begin{tabular}{rcl}
+  \textbf{inductive} pure (lang : U) : \textbf{U}& := & var: name $\rightarrow$ nat $\rightarrow$ pure lang \\
+  &|& pi: name $\rightarrow$ nat $\rightarrow$ lang $\rightarrow$ lang $\rightarrow$ pure lang \\
+  &|& lambda: name $\rightarrow$ nat $\rightarrow$ lang $\rightarrow$ lang $\rightarrow$ pure lang \\
+  &|& app: lang $\rightarrow$ lang $\rightarrow$ pure lang \\
+\end{tabular}
+\end{table}
+
+\begin{definition}[Sigma]
+The set $\Sigma(x:A)B(x)$ is the set of pairs $(u,v)$ when $u:A(I),v:B(I,u)$ and restriction map $(u,v)\ f=(u\ f,v\ f)$.
+\end{definition}
+
+\begin{table}[ht]
+\begin{tabular}{rcl}
+  \textbf{inductive} total (lang : U) : \textbf{U}& := & sigma: name $\rightarrow$ lang $\rightarrow$ total lang \\
+  &|& pair: lang $\rightarrow$ lang $\rightarrow$ total lang \\
+  &|& fst: lang $\rightarrow$ total lang \\
+  &|& snd: lang $\rightarrow$ total lang \\
+\end{tabular}
+\end{table}
+
+The preseaf configuration with only Pi and Sigma is called \textbf{MLTT-72}.
 
 \subsection{Path Equality}
 
+\subsection{String Equality}
 
+\subsection{Glue Types}
 
+\subsection{Higher Inductive Types}
 
 \end{document}

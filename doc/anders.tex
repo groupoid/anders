@@ -1,0 +1,211 @@
+\documentclass[a4paper,UKenglish,cleveref, autoref, thm-restate]{lipics-v2021}
+\bibliographystyle{plainurl}
+\title{Homotopy Type System with Strict Equality}
+\titlerunning{CCHM/HTS}
+\author{Namdak Tonpa}{Groupoid Infinity}{maxim@synrc.com}{https://orcid.org/0000-0001-7127-8796}{}
+\author{Siegmentation Fault}{Groupoid Infinity}{siegmentationfault@yandex.ru}{}{}
+\authorrunning{Namdak Tonpa and Siegmentation Fault} %TODO mandatory. First: Use abbreviated first/middle names. Second (only in severe cases): Use first author plus 'et al.'
+\Copyright{Namdak Tonpa and Siegmentation Fault} %TODO mandatory, please use full first names. LIPIcs license is "CC-BY";  http://creativecommons.org/licenses/by/3.0/
+
+\begin{CCSXML}
+<ccs2012>
+<concept>
+<concept_id>10003752.10003753.10003754.10003733</concept_id>
+<concept_desc>Theory of computation~Lambda calculus</concept_desc>
+<concept_significance>300</concept_significance>
+</concept>
+</ccs2012>
+\end{CCSXML}
+
+\ccsdesc[300]{Theory of computation~Lambda calculus}
+\keywords{Homotopy Type System, Cubical Type Theory}
+
+%\category{} %optional, e.g. invited paper
+
+%\relatedversion{https://groupoid.space/anders.pdf} %optional, e.g. full version hosted on arXiv, HAL, or other respository/website
+%\relatedversiondetails[linktext={opt. text shown instead of the URL}, cite=DBLP:books/mk/GrayR93]{Classification (e.g. Full Version, Extended Version, Previous Version}{URL to related version} %linktext and cite are optional
+%\supplement{}%optional, e.g. related research data, source code, ... hosted on a repository like zenodo, figshare, GitHub, ...
+%\supplementdetails[linktext={opt. text shown instead of the URL}, cite=DBLP:books/mk/GrayR93, subcategory={Description, Subcategory}, swhid={Software Heritage Identifier}]{General Classification (e.g. Software, Dataset, Model, ...)}{URL to related version} %linktext, cite, and subcategory are optional
+%\funding{(Optional) general funding statement \dots}%optional, to capture a funding statement, which applies to all authors. Please enter author specific funding statements as fifth argument of the \author macro.
+
+%\acknowledgements{Univalent people}%optional
+
+\nolinenumbers %uncomment to disable line numbering
+\hideLIPIcs  %uncomment to remove references to LIPIcs series (logo, DOI, ...), e.g. when preparing a pre-final version to be uploaded to arXiv or another public repository
+
+%Editor-only macros:: begin (do not touch as author)%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%\EventEditors{John Q. Open and Joan R. Access}
+%\EventNoEds{2}
+%\EventLongTitle{42nd Conference on Very Important Topics (CVIT 2016)}
+%\EventShortTitle{CVIT 2016}
+%\EventAcronym{CVIT}
+%\EventYear{2016}
+%\EventDate{December 24--27, 2016}
+%\EventLocation{Little Whinging, United Kingdom}
+%\EventLogo{}
+%\SeriesVolume{42}
+%\ArticleNo{23}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+Here is presented a more modern version of \textbf{cubicaltt} called \textbf{anders}.
+\end{abstract}
+
+\section{Motivation}
+\label{sec:typesetting-summary}
+
+The HTS\footnote{\url{https://www.math.ias.edu/vladimir/sites/math.ias.edu.vladimir/files/HTS.pdf} -- HTS}
+language proposed by Voevodsky exposes two different presheaf models of type theory:
+the inner one is homotopy type system presheaf that models HoTT and the outer one is traditional Martin-Löf
+type system presheaf that models set theory with UIP. The motivation behind this doubling is to
+have an ability to express semisemplicial types. Theoretical work on merging inner
+and outer languages was continued in 2LTT\footnote{\url{https://arxiv.org/pdf/1705.03307.pdf} -- 2LTT}.
+
+While we are on our road to Lean-like tactic language, currently we are at the stage of regular
+cubical HTS type checker with CHM-style [5] primitives. You may try it at Github \footnote{https://github.com/groupoid/anders} or install through OPAM: \textbf{opam install anders}.
+
+\section{Syntax}
+
+The syntax resembles original syntax of the reference CCHM type checker cubicaltt,
+is slightly compatible with Lean syntax and contains the full set of Cubical Agda\footnote{https://staff.math.su.se/anders.mortberg/papers/cubicalagda.pdf} primitives.
+
+Here is given the mathematical pseudo-code notation of the language expressions that come immediately after parsing. The core syntax definition of HTS language E
+corresponds to exp type defined in expr.ml OCaml module:
+
+\begin{table}[ht]
+\begin{tabular}{rl}
+      E :=&$cosmos\ |\ var\ |\ MLTT\ |\ CCHM\ |\ HIT$ \\
+    HIT :=&$\mathbf{inductive}\ E\ E\ |\ \mathbf{ctor}\ name\ E\ |\ \mathbf{match}\ E\ E$ \\
+   CCHM :=&$path\ |\ I\ |\ part\ |\ sub\ |\ kan\ |\ glue$ \\
+   MLTT :=&$pi\ |\ sigma\ |\ id$ \\
+\end{tabular}
+\end{table}
+
+Further Menhir BNF notation will be used to describe the top-level language parser as type checker is written in OCaml.
+
+\begin{table}[ht]
+\begin{tabular}{rl}
+ cosmos :=&$\mathbf{U}_j \ |\ \mathbf{V}_k$ \\
+    var :=&$\mathbf{var}\ name\ |\ \mathbf{hole}$ \\
+     pi :=&$\Pi\ name\ E\ E\ |\ \lambda\ name\ E\ E\ |\ E\ E$ \\
+  sigma :=&$\Sigma\ name\ E\ E\ |\ (E,E)\ |\ E.1\ |\ E.2$ \\
+     id :=&$\mathbf{Id}\ E\ |\ \mathbf{ref}\ E\ |\ \mathbf{idJ}\ E$ \\
+   path :=&$\mathbf{Path}\ E\ |\ E^i\ |\ E\ @\ E$ \\
+      I :=&$\mathbf{I}\ |\ 0\ |\ 1\ |\ E\ \bigvee\ E\ |\ E\ \bigwedge\ E\ |\ \neg E$ \\
+   part :=&$\mathbf{Partial}\ E\ E\ |\ \mathbf{[}\ (E=I) \rightarrow E, ...\ \mathbf{]}$ \\
+    sub :=&$\mathbf{inc}\ E\ |\ \mathbf{ouc}\ E\ |\ E\ \mathbf{[}\ I\ |->\ E\ \mathbf{]}$ \\
+    kan :=&$\mathbf{transp}\ E\ E\ |\ \mathbf{hcomp}\ E$ \\
+   glue :=&$\mathbf{Glue}\ E\ |\ \mathbf{glue}\ E\ |\ \mathbf{unglue}\ E\ E$ \\
+\end{tabular}
+\end{table}
+
+\newpage
+
+\textbf{Keywords}. The words of a top-level language (file or repl) consist of keywords or identifiers.
+The keywords are following: \textbf{module}, \textbf{where}, \textbf{import}, \textbf{option}, \textbf{def}, \textbf{axiom},
+\textbf{postulate}, \textbf{theorem}, \textbf{(}, \textbf{)}, \textbf{[}, \textbf{]}, \textbf{<}, \textbf{>},
+\textbf{/}, \textbf{.1}, \textbf{.2}, \textbf{$\Pi$}, \textbf{$\Sigma$}, \textbf{,}, \textbf{$\lambda$}, \textbf{$\times$}, \textbf{$\rightarrow$}, \textbf{:}, \textbf{:=},
+\textbf{|->}, \textbf{U}, \textbf{V}, \textbf{$\bigvee$}, \textbf{$\bigwedge$}, \textbf{-}, \textbf{+}, \textbf{@}, \textbf{PathP},
+\textbf{transp}, \textbf{hcomp}, \textbf{zero}, \textbf{one}, \textbf{Partial}, \textbf{inc},
+\textbf{ouc}, \textbf{interval}, \textbf{inductive}, \textbf{Glue}, \textbf{glue}, \textbf{unglue}.
+
+\textbf{Indentifiers}. Identifiers support UTF-8. Indentifiers couldn't start with $:$, $-$, $\rightarrow$. Sample identifiers:
+$\neg$-of-$\bigvee$, 1$\rightarrow$1, is-?, =, \$$\sim$]!005x, $\infty$, x$\rightarrow$Nat
+
+\textbf{Modules}. Modules represent files with declarations. More accurate, BNF notation of module consists of imports, options and declarations.
+
+\textbf{Imports}. The import construction supports file folder structure (without file extensions) by using reserved symbol / for hierarchy walking.
+
+\textbf{Options}. Each option holds bool value. Language supports following options: 1) girard (enables U : U); 2) pre-eval (normalization cache);
+3) impredicative (infinite hierarchy with impredicativity rule);
+In Anders you can enable or disable language core types, adjust syntaxes or tune inner variables of the type checker. Here is the example how to setup minimal core able to prove internalization of MLTT-73 variation (Path instead of Id and no inductive types, see base library):
+
+\begin{table}[ht]
+\begin{tabular}{rl}
+\textbf{option} & HIT false \\
+\textbf{option} & CCHM false \\
+\textbf{option} & MLTT true \\
+\end{tabular}
+\end{table}
+
+In order to turn HIT into ordinary CiC calculus you may say:
+
+\textbf{Declarations}. Language supports following top level declarations: 1) axiom (non-computable declaration that breakes normalization); 2) postulate (alternative or inverted axiom that can preserve consistency); 3) definition (almost any explicit term or type in type theory); 5) lemma (helper in big game). 4) theorem (something valuable or complex enough).
+Sample declarations. For example, signature isProp (A : U) of type U could be defined as normalization-blocking axiom without proof-term or by providing proof-term as definition.
+\begin{table}[ht]
+\begin{tabular}{rl}
+\textbf{axiom} & isProp (A : U) : U \\
+\textbf{def} & isSet (A : U) : U \\
+ := & \textbf{$\Pi$} (a b : A) (x y : Path A a b), Path (Path A a b) x y \\
+\end{tabular}
+\end{table}
+
+
+In this example (A : U), (a b : A) and (x y : Path A a b) are called telescopes. Each telescope consists of a series of lenses or empty. Each lense provides a set of variables of the same type. Telescope defines parameters of a declaration. Types in a telescope, type of a declaration and a proof-terms are a language expressions exp1.
+
+Expressions. All atomic language expressions are grouped by four categories: exp0 (pair constructions), exp1 (non neutral constructions), exp2 (path and pi applcations), exp3 (neutral constructions).
+
+The LR parsers demand to define exp1 as expressions that cannot be used (without a parens enclosure) as a right part of left-associative application for both Path and Pi lambdas.
+
+Universe indecies Uj (inner fibrant), Vk (outer pretypes) and S (outer strict omega) are using unicode subscript letters that are already processed in lexer.
+
+\section{Semantics}
+
+The idea is to have a unified layered type checker, so you can disbale/enable any MLTT-style inference, assign types to universes and enable/disable hierachies. This will be done by providing linking API for pluggable presheaf modules. We selected 5 levels of type checker awareness from universes and pure type systems up to synthetic language of homotopy type theory. Each layer corresponds to its presheaves with separate configuration for universe hierarchies.
+
+
+\begin{table}[ht]
+\begin{tabular}{rcl}
+ \textbf{inductive} lang : \textbf{U} & := & UNI: cosmos $\rightarrow$ lang \\
+   & | & PI: pure lang $\rightarrow$ lang \\
+   & | & SIGMA: total lang $\rightarrow$ lang \\
+   & | & ID: uip lang $\rightarrow lang$ \\
+   & | & PATH: homotopy lang $\rightarrow$ lang \\
+   & | & GLUE: gluening lang $\rightarrow$ lang \\
+   & | & HIT: hit lang $\rightarrow$ lang \\
+\end{tabular}
+\end{table}
+
+We want to mention here with homage to its authors all categorical models of dependent type theory: Comprehension Categories (Grothendieck, Jacobs), LCCC (Seely), D-Categories and CwA (Cartmell), CwF (Dybjer), C-Systems (Voevodsky), Natural Models (Awodey). While we can build some transports between them, we leave this excercise for our mathematical components library.
+
+We will use here the Coquand's notation for Presheaf Type Theories in terms of restriction maps.
+
+\subsection{Universe Hierarchies}
+
+Language supports Agda-style hierarchy of universes: fibrant (U), interval pretypes (V) and strict omega
+with explicit level manipulation. All universes are bounded with preorder
+
+\begin{equation}
+Fibrant_j \prec Pretypes_k \prec Strict_l,
+\end{equation}
+
+in which $j,k,l$ are bounded with equation:
+
+\begin{equation}
+j < k < l.
+\end{equation}
+
+Large elimination to upper universes is prohibited. This is extendable to Agda model:
+
+\begin{table}[ht]
+\begin{tabular}{rcl}
+  \textbf{inductive} cosmos : \textbf{U}& := & prop: nat $\rightarrow$ cosmos \\
+   &|& fibrant: nat $\rightarrow$ cosmos \\
+   &|& pretypes: nat $\rightarrow$ cosmos \\
+   &|& strict: nat $\rightarrow$ cosmos \\
+   &|& omega: cosmos \\
+   &|& lock: cosmos \\
+\end{tabular}
+\end{table}
+
+\subsection{Dependent Types}
+
+\subsection{Path Equality}
+
+
+
+
+\end{document}

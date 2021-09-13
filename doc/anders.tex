@@ -92,7 +92,7 @@ corresponds to exp type defined in expr.ml OCaml module:
 \end{tabular}
 \end{table}
 
-Further Menhir BNF notation will be used to describe the top-level language parser as type checker is written in OCaml.
+Further Menhir BNF notation will be used to describe the top-level language E parser as type checker is written in OCaml.
 
 \begin{table}[ht]
 \centering
@@ -132,7 +132,8 @@ $\neg$-of-$\bigvee$, 1$\rightarrow$1, is-?, =, \$$\sim$]!005x, $\infty$, x$\righ
 
 \textbf{Options}. Each option holds bool value. Language supports following options: 1) girard (enables U : U); 2) pre-eval (normalization cache);
 3) impredicative (infinite hierarchy with impredicativity rule);
-In Anders you can enable or disable language core types, adjust syntaxes or tune inner variables of the type checker. Here is the example how to setup minimal core able to prove internalization of MLTT-73 variation (Path instead of Id and no inductive types, see base library):
+In Anders you can enable or disable language core types, adjust syntaxes or tune inner variables of the type checker.
+Here is the example how to setup minimal core able to prove internalization of \textbf{MLTT-73} variation (Path instead of Id and no inductive types, see base library):
 In order to turn HIT into ordinary CiC calculus you may say:
 
 \begin{table}[ht]
@@ -188,9 +189,9 @@ exp3 (neutral constructions).
 \begin{table}[ht]
 \begin{tabular}{ll}
 \textbf{menhir} \\
-\ \ \ face : LPARENS IDENT IDENT IDENT RPARENS \\
-\ \ \ partial : face+ ARROW exp1 \\
-\ \ \ exp0 : exp1 COMMA exp0 | exp1 \\
+\multicolumn{2}{l}{\ \ \ face : LPARENS IDENT IDENT IDENT RPARENS } \\
+\multicolumn{2}{l}{\ \ \ partial : face+ ARROW exp1 } \\
+\multicolumn{2}{l}{\ \ \ exp0 : exp1 COMMA exp0 | exp1 } \\
 \multicolumn{2}{l}{\ \ \ exp1: LSQ separated(COMMA, partial) RSQ } \\
 \ \ \ \ \ \ | LAM telescope COMMA exp1   & | PI telescope COMMA exp1 \\
 \ \ \ \ \ \ | SIGMA telescope COMMA exp1 & | LSQ IRREF ARROW exp1 RSQ \\
@@ -232,7 +233,6 @@ The idea is to have a unified layered type checker, so you can disbale/enable an
 \end{tabular}
 \end{table}
 We want to mention here with homage to its authors all categorical models of dependent type theory: Comprehension Categories (Grothendieck, Jacobs), LCCC (Seely), D-Categories and CwA (Cartmell), CwF (Dybjer), C-Systems (Voevodsky), Natural Models (Awodey). While we can build some transports between them, we leave this excercise for our mathematical components library.
-
 We will use here the Coquand's notation for Presheaf Type Theories in terms of restriction maps.
 
 \subsection{Universe Hierarchies}

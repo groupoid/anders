@@ -286,8 +286,7 @@ for $f : J \rightarrow I$ such that $(w_f u)g=w_{f\ g}(u\ g)$ when $u:A(J)$ and 
 \end{definition}
 \begin{table}[ht]
 \begin{tabular}{rcl}
-  \textbf{inductive} pure (lang : U) : \textbf{U}& := & var: name $\rightarrow$ nat $\rightarrow$ pure lang \\
-  &|& pi: name $\rightarrow$ nat $\rightarrow$ lang $\rightarrow$ lang $\rightarrow$ pure lang \\
+  \textbf{inductive} pure (lang : U) : \textbf{U}& := & pi: name $\rightarrow$ nat $\rightarrow$ lang $\rightarrow$ lang $\rightarrow$ pure lang \\
   &|& lambda: name $\rightarrow$ nat $\rightarrow$ lang $\rightarrow$ lang $\rightarrow$ pure lang \\
   &|& app: lang $\rightarrow$ lang $\rightarrow$ pure lang \\
 \end{tabular}

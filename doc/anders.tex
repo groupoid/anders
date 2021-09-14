@@ -284,7 +284,6 @@ implication in a Kripke model.
 An element $w:[\Pi(x:A)B(x)](I)$ is a family of functions $w_f : \Pi(u:A(J))B(J,u)$
 for $f : J \rightarrow I$ such that $(w_f u)g=w_{f\ g}(u\ g)$ when $u:A(J)$ and $g:K\rightarrow J$.
 \end{definition}
-
 \begin{table}[ht]
 \begin{tabular}{rcl}
   \textbf{inductive} pure (lang : U) : \textbf{U}& := & var: name $\rightarrow$ nat $\rightarrow$ pure lang \\
@@ -297,7 +296,6 @@ for $f : J \rightarrow I$ such that $(w_f u)g=w_{f\ g}(u\ g)$ when $u:A(J)$ and 
 \begin{definition}[Sigma]
 The set $\Sigma(x:A)B(x)$ is the set of pairs $(u,v)$ when $u:A(I),v:B(I,u)$ and restriction map $(u,v)\ f=(u\ f,v\ f)$.
 \end{definition}
-
 \begin{table}[ht]
 \begin{tabular}{rcl}
   \textbf{inductive} total (lang : U) : \textbf{U}& := & sigma: name $\rightarrow$ lang $\rightarrow$ total lang \\
@@ -307,8 +305,27 @@ The set $\Sigma(x:A)B(x)$ is the set of pairs $(u,v)$ when $u:A(I),v:B(I,u)$ and
 \end{tabular}
 \end{table}
 
-The preseaf configuration with only Pi and Sigma is called \textbf{MLTT-72}.
+The presheaf with only Pi and Sigma is called \textbf{MLTT-72}. Its internalization in \textbf{anders} is as follows:
 
+\begin{table}[ht!]
+\begin{tabular}{l}
+\textbf{def} MLTT-72 (A : U) : U := $\Sigma$ \\
+\ \ \ \ \ \  ($\Pi$-form  : $\Pi$ (B : A $\rightarrow$ U), U) \\
+\ \ \ \ \ \  ($\Pi$-ctor$_1$ : $\Pi$ (B : A $\rightarrow$ U), Pi A B $\rightarrow$ Pi A B) \\
+\ \ \ \ \ \  ($\Pi$-elim$_1$ : $\Pi$ (B : A $\rightarrow$ U), Pi A B $\rightarrow$ Pi A B) \\
+\ \ \ \ \ \  ($\Pi$-comp$_1$ : $\Pi$ (B : A $\rightarrow$ U) (a : A) (f : Pi A B), Equ (B a) ($\Pi$-elim$_1$ B ($\Pi$-ctor$_1$ B f) a) (f a)) \\
+\ \ \ \ \ \  ($\Pi$-comp$_2$ : $\Pi$ (B : A $\rightarrow$ U) (a : A) (f : Pi A B), Equ (Pi A B) f ($\lambda$ (x : A), f x)) \\
+\ \ \ \ \ \  ($\Sigma$-form  : $\Pi$ (B : A $\rightarrow$ U), U) \\
+\ \ \ \ \ \  ($\Sigma$-ctor$_1$ : $\Pi$ (B : A $\rightarrow$ U) (a : A) (b : B a) , Sigma A B) \\
+\ \ \ \ \ \  ($\Sigma$-elim$_1$ : $\Pi$ (B : A $\rightarrow$ U) (p : Sigma A B), A) \\
+\ \ \ \ \ \  ($\Sigma$-elim$_2$ : $\Pi$ (B : A $\rightarrow$ U) (p : Sigma A B), B (pr$_1$ A B p)) \\
+\ \ \ \ \ \  ($\Sigma$-comp$_1$ : $\Pi$ (B : A $\rightarrow$ U) (a : A) (b: B a), Equ A a ($\Sigma$-elim$_1$ B ($\Sigma$-ctor$_1$ B a b))) \\
+\ \ \ \ \ \  ($\Sigma$-comp$_2$ : $\Pi$ (B : A $\rightarrow$ U) (a : A) (b: B a), Equ (B a) b ($\Sigma$-elim$_2$ B (a, b))) \\
+\ \ \ \ \ \  ($\Sigma$-comp$_3$ : $\Pi$ (B : A $\rightarrow$ U) (p : Sigma A B), Equ (Sigma A B) p (pr$_1$ A B p, pr$_2$ A B p)), U
+\end{tabular}
+\end{table}
+
+\newpage
 \subsection{Path Equality}
 
 \subsection{Strict Equality}

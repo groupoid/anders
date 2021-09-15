@@ -61,13 +61,13 @@ Here is presented a reincarnation of \textbf{cubicaltt} called \textbf{anders}.
 \section{Motivation}
 \label{sec:typesetting-summary}
 
-The \textbf{HTS}\footnote{\url{https://www.math.ias.edu/vladimir/sites/math.ias.edu.vladimir/files/HTS.pdf}}
-language proposed by Voevodsky exposes two different presheaf models of type theory:
-the inner one is homotopy type system presheaf that models HoTT and the outer one is traditional Martin-Löf
-type system presheaf that models set theory with UIP. The motivation is to have an ability to
-express semisemplicial types. Theoretical work was continued in \textbf{2LTT}\footnote{\url{https://arxiv.org/pdf/1705.03307.pdf}}.
+The \textbf{HTS}\cite{Voevodsky13} language proposed by Voevodsky exposes two different
+presheaf models of type theory: the inner one is homotopy type system presheaf that
+models HoTT and the outer one is traditional Martin-Löf type system presheaf that
+models set theory with UIP. The motivation is to have an ability to express
+semisemplicial types. Theoretical work was continued in \textbf{2LTT}\cite{Annenkov19}.
 
-Our aim here is to preserve cubicaltt programs and remain language implementation compatible with original publications.
+Our aim here is to preserve \textbf{cubicaltt} programs and remain language implementation compatible with original publications.
 While we are on our road to Lean-like tactic language, currently we are at the stage of regular cubical type
 checker with CHM-style primitives. You may try it at Github \footnote{https://github.com/groupoid/anders}
 or install through OPAM: \textbf{opam install anders}.
@@ -76,10 +76,10 @@ or install through OPAM: \textbf{opam install anders}.
 
 The syntax resembles original syntax of the reference \textbf{CCHM} type checker cubicaltt,
 is slightly compatible with Lean syntax and contains the full set of Cubical
-Agda\footnote{https://staff.math.su.se/anders.mortberg/papers/cubicalagda.pdf} primitives.
-Here is given the mathematical pseudo-code notation of the language expressions that come
-immediately after parsing. The core syntax definition of \textbf{HTS} language E
-corresponds to exp type defined in expr.ml OCaml module.
+Agda\cite{Vezzosi19} primitives. Here is given the mathematical pseudo-code
+notation of the language expressions that come immediately after parsing.
+The core syntax definition of \textbf{HTS} language E corresponds to \textbf{exp} type
+defined in \textbf{expr.ml} OCaml module.
 
 \begin{table}[ht]
 \centering
@@ -349,5 +349,7 @@ The presheaf with only Pi and Sigma is called \textbf{MLTT-72}. Its internalizat
 \subsection{Glue Types}
 
 \subsection{Higher Inductive Types}
+
+\bibliography{anders}
 
 \end{document}

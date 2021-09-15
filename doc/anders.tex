@@ -46,6 +46,10 @@
 %\SeriesVolume{42}
 %\ArticleNo{23}
 
+\frenchspacing
+
+\newcommand{\tabstyle}[0]{\scriptsize\ttfamily\fontseries{l}\selectfont}
+
 \begin{document}
 
 \maketitle
@@ -120,6 +124,7 @@ $\neg$-of-$\bigvee$, 1$\rightarrow$1, is-?, =, \$$\sim$]!005x, $\infty$, x$\righ
 
 \textbf{Modules}. Modules represent files with declarations. More accurate, BNF notation of module consists of imports, options and declarations.
 \begin{table}[ht]
+\tabstyle
 \begin{tabular}{l}
 \textbf{menhir} \\
 \ \ \ start <Module.file> file \\
@@ -140,6 +145,7 @@ Here is the example how to setup minimal core able to prove internalization of \
 In order to turn HIT into ordinary CiC calculus you may say:
 
 \begin{table}[ht]
+\tabstyle
 \begin{tabular}{l}
 \textbf{option} HIT false \\
 \textbf{option} CCHM false \\
@@ -156,9 +162,10 @@ In order to turn HIT into ordinary CiC calculus you may say:
 
 
 \begin{table}[ht!]
-\begin{tabular}{rl}
-\textbf{axiom} & isProp (A : U) : U \\
-\textbf{def} & isSet (A : U) : U := \textbf{$\Pi$} (a b : A) (x y : Path A a b), Path (Path A a b) x y \\
+\tabstyle
+\begin{tabular}{l}
+\textbf{axiom} isProp (A : U) : U \\
+\textbf{def} isSet (A : U) : U := \textbf{$\Pi$} (a b : A) (x y : Path A a b), Path (Path A a b) x y
 \end{tabular}
 \end{table}
 
@@ -171,6 +178,7 @@ set of variables of the same type. Telescope defines parameters of a declaration
 Types in a telescope, type of a declaration and a proof-terms are a language expressions exp1.
 
 \begin{table}[ht]
+\tabstyle
 \begin{tabular}{l}
 \textbf{menhir} \\
 \ \ \ ident : IRREF | IDENT \\
@@ -190,6 +198,7 @@ exp0 (pair constructions), exp1 (non neutral constructions), exp2 (path and pi a
 exp3 (neutral constructions).
 
 \begin{table}[ht]
+\tabstyle
 \begin{tabular}{ll}
 \textbf{menhir} \\
 \multicolumn{2}{l}{\ \ \ face : LPARENS IDENT IDENT IDENT RPARENS } \\
@@ -207,10 +216,11 @@ The LR parsers demand to define exp1 as expressions that cannot be used (without
 Universe indicies $U_j$ (inner fibrant), $V_k$ (outer pretypes) and S (outer strict omega) are using unicode subscript letters that are already processed in lexer.
 
 \begin{table}[ht!]
+\tabstyle
 \begin{tabular}{llll}
 \textbf{menhir} \\
 \multicolumn{3}{l}{\ \ \ exp2 : exp2 exp3 | exp2 APPFORMULA exp3 | exp3 } \\
-\multicolumn{4}{l}{\ \ \ exp3: LPARENS exp0 RPARENS LSQ exp0 MAP exp0 RSQ } \\
+\multicolumn{4}{l}{\ \ \ exp3 : LPARENS exp0 RPARENS LSQ exp0 MAP exp0 RSQ } \\
 \ \ \ \ \ \   | HOLE              & | PRE          & | KAN          & | IDJ exp3 \\
 \ \ \ \ \ \   | exp3 FST          & | exp3 SND     & | NEGATE exp3  & | INC exp3 \\
 \ \ \ \ \ \   | exp3 AND exp3     & | exp3 OR exp3 & | ID exp3      & | REF exp3\\
@@ -225,6 +235,7 @@ Universe indicies $U_j$ (inner fibrant), $V_k$ (outer pretypes) and S (outer str
 \section{Semantics}
 The idea is to have a unified layered type checker, so you can disbale/enable any MLTT-style inference, assign types to universes and enable/disable hierachies. This will be done by providing linking API for pluggable presheaf modules. We selected 5 levels of type checker awareness from universes and pure type systems up to synthetic language of homotopy type theory. Each layer corresponds to its presheaves with separate configuration for universe hierarchies.
 \begin{table}[ht]
+\tabstyle
 \begin{tabular}{rcl}
  \textbf{inductive} lang : \textbf{U} & := & UNI: cosmos $\rightarrow$ lang \\
    & | & PI: pure lang $\rightarrow$ lang \\
@@ -240,18 +251,19 @@ We will use here the Coquand's notation for Presheaf Type Theories in terms of r
 
 \subsection{Universe Hierarchies}
 
-Language supports Agda-style hierarchy of universes: fibrant (U), interval pretypes (V) and strict omega
+Language supports Agda-style hierarchy of universes: prop, fibrant (U), interval pretypes (V) and strict omega
 with explicit level manipulation. All universes are bounded with preorder
 \begin{equation}
-Fibrant_j \prec Pretypes_k \prec Strict_l,
+Prop_i \prec Fibrant_j \prec Pretypes_k \prec Strict_l,
 \end{equation}
-in which $j,k,l$ are bounded with equation:
+in which $i,j,k,l$ are bounded with equation:
 \begin{equation}
-j < k < l.
+i < j < k < l.
 \end{equation}
 Large elimination to upper universes is prohibited. This is extendable to Agda model:
 
 \begin{table}[ht]
+\tabstyle
 \begin{tabular}{rcl}
   \textbf{inductive} cosmos : \textbf{U}& := & prop: nat $\rightarrow$ cosmos \\
    &|& fibrant: nat $\rightarrow$ cosmos \\
@@ -261,6 +273,8 @@ Large elimination to upper universes is prohibited. This is extendable to Agda m
    &|& lock: cosmos \\
 \end{tabular}
 \end{table}
+
+The \textbf{anders} model contains only fibrant $U_j$ and pretypes $V_k$ universe hierarchies.
 
 \newpage
 
@@ -285,6 +299,7 @@ An element $w:[\Pi(x:A)B(x)](I)$ is a family of functions $w_f : \Pi(u:A(J))B(J,
 for $f : J \rightarrow I$ such that $(w_f u)g=w_{f\ g}(u\ g)$ when $u:A(J)$ and $g:K\rightarrow J$.
 \end{definition}
 \begin{table}[ht]
+\tabstyle
 \begin{tabular}{rcl}
   \textbf{inductive} pure (lang : U) : \textbf{U}& := & pi: name $\rightarrow$ nat $\rightarrow$ lang $\rightarrow$ lang $\rightarrow$ pure lang \\
   &|& lambda: name $\rightarrow$ nat $\rightarrow$ lang $\rightarrow$ lang $\rightarrow$ pure lang \\
@@ -296,6 +311,7 @@ for $f : J \rightarrow I$ such that $(w_f u)g=w_{f\ g}(u\ g)$ when $u:A(J)$ and 
 The set $\Sigma(x:A)B(x)$ is the set of pairs $(u,v)$ when $u:A(I),v:B(I,u)$ and restriction map $(u,v)\ f=(u\ f,v\ f)$.
 \end{definition}
 \begin{table}[ht]
+\tabstyle
 \begin{tabular}{rcl}
   \textbf{inductive} total (lang : U) : \textbf{U}& := & sigma: name $\rightarrow$ lang $\rightarrow$ total lang \\
   &|& pair: lang $\rightarrow$ lang $\rightarrow$ total lang \\
@@ -307,20 +323,21 @@ The set $\Sigma(x:A)B(x)$ is the set of pairs $(u,v)$ when $u:A(I),v:B(I,u)$ and
 The presheaf with only Pi and Sigma is called \textbf{MLTT-72}. Its internalization in \textbf{anders} is as follows:
 
 \begin{table}[ht!]
+\tabstyle
 \begin{tabular}{l}
-\textbf{def} MLTT-72 (A : U) : U := $\Sigma$ \\
-\ \ \ \ \ \  ($\Pi$-form  : $\Pi$ (B : A $\rightarrow$ U), U) \\
-\ \ \ \ \ \  ($\Pi$-ctor$_1$ : $\Pi$ (B : A $\rightarrow$ U), Pi A B $\rightarrow$ Pi A B) \\
-\ \ \ \ \ \  ($\Pi$-elim$_1$ : $\Pi$ (B : A $\rightarrow$ U), Pi A B $\rightarrow$ Pi A B) \\
-\ \ \ \ \ \  ($\Pi$-comp$_1$ : $\Pi$ (B : A $\rightarrow$ U) (a : A) (f : Pi A B), Equ (B a) ($\Pi$-elim$_1$ B ($\Pi$-ctor$_1$ B f) a) (f a)) \\
-\ \ \ \ \ \  ($\Pi$-comp$_2$ : $\Pi$ (B : A $\rightarrow$ U) (a : A) (f : Pi A B), Equ (Pi A B) f ($\lambda$ (x : A), f x)) \\
-\ \ \ \ \ \  ($\Sigma$-form  : $\Pi$ (B : A $\rightarrow$ U), U) \\
-\ \ \ \ \ \  ($\Sigma$-ctor$_1$ : $\Pi$ (B : A $\rightarrow$ U) (a : A) (b : B a) , Sigma A B) \\
-\ \ \ \ \ \  ($\Sigma$-elim$_1$ : $\Pi$ (B : A $\rightarrow$ U) (p : Sigma A B), A) \\
-\ \ \ \ \ \  ($\Sigma$-elim$_2$ : $\Pi$ (B : A $\rightarrow$ U) (p : Sigma A B), B (pr$_1$ A B p)) \\
-\ \ \ \ \ \  ($\Sigma$-comp$_1$ : $\Pi$ (B : A $\rightarrow$ U) (a : A) (b: B a), Equ A a ($\Sigma$-elim$_1$ B ($\Sigma$-ctor$_1$ B a b))) \\
-\ \ \ \ \ \  ($\Sigma$-comp$_2$ : $\Pi$ (B : A $\rightarrow$ U) (a : A) (b: B a), Equ (B a) b ($\Sigma$-elim$_2$ B (a, b))) \\
-\ \ \ \ \ \  ($\Sigma$-comp$_3$ : $\Pi$ (B : A $\rightarrow$ U) (p : Sigma A B), Equ (Sigma A B) p (pr$_1$ A B p, pr$_2$ A B p)), U
+\textbf{def} MLTT-72 (A : U) (B : A $\rightarrow$ U) : U := $\Sigma$ \\
+\ \ ($\Pi$-form$_1$ : U) \\
+\ \ ($\Pi$-ctor$_1$ : Pi A B $\rightarrow$ Pi A B) \\
+\ \ ($\Pi$-elim$_1$ : Pi A B $\rightarrow$ Pi A B) \\
+\ \ ($\Pi$-comp$_1$ : (a : A) (f : Pi A B), $\Pi$-elim$_1$ ($\Pi$-ctor$_1$ f) a = f a) \\
+\ \ ($\Pi$-comp$_2$ : (a : A) (f : Pi A B), f = $\lambda$ (x : A), f x) \\
+\ \ ($\Sigma$-form$_1$ : U) \\
+\ \ ($\Sigma$-ctor$_1$ : $\Pi$ (a : A) (b : B a) , Sigma A B) \\
+\ \ ($\Sigma$-elim$_1$ : $\Pi$ (p : Sigma A B), A) \\
+\ \ ($\Sigma$-elim$_2$ : $\Pi$ (p : Sigma A B), B (pr$_1$ A B p)) \\
+\ \ ($\Sigma$-comp$_1$ : $\Pi$ (a : A) (b: B a), a = $\Sigma$-elim$_1$ ($\Sigma$-ctor$_1$ a b)) \\
+\ \ ($\Sigma$-comp$_2$ : $\Pi$ (a : A) (b: B a), b = $\Sigma$-elim$_2$ (a, b)) \\
+\ \ ($\Sigma$-comp$_3$ : $\Pi$ (p : Sigma A B), p = (pr$_1$ A B p, pr$_2$ A B p)), U
 \end{tabular}
 \end{table}
 

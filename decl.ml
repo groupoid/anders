@@ -34,8 +34,9 @@ let checkDecl ctx d : ctx =
       n := imax !n (infer !ctx' e); let t = eval e !ctx' in
       ctx' := upGlobal !ctx' p t (Var (p, t))
     end in List.iter checkLense xs; List.iter checkLense ys;
-    let (ys, (_, e)) = initLast ys in let t = telescope ePi (telescope eSig e ys) xs in
-    Env.add (name p) (Global, Value !n, Value (eval t ctx)) ctx
+    let (ys, (_, e)) = initLast ys in let k = telescope ePi (rbV !n) xs in
+    let t = telescope eLam (telescope eSig e ys) xs in
+    Env.add (name p) (Global, Value (eval k ctx), Value (eval t ctx)) ctx
 
 let getBoolVal opt = function
   | "tt" | "true"  -> true

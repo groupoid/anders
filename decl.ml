@@ -11,7 +11,7 @@ let ext x = x ^ ".anders"
 type state = ctx * Files.t
 let empty : state = (Env.empty, Files.empty)
 
-let getDeclName : decl -> string = function Def (p, _, _) | Axiom (p, _) -> p | Record (p, _) -> p
+let getDeclName : decl -> string = function Def (p, _, _) | Axiom (p, _) -> p | Record (p, _, _) -> p
 let getTerm e ctx = if !Prefs.preeval then Value (eval e ctx) else Exp e
 
 let checkDecl ctx d : ctx =
@@ -28,12 +28,13 @@ let checkDecl ctx d : ctx =
   | Axiom (p, a) ->
     ignore (extSet (infer ctx a)); let x = name p in
     let t = eval a ctx in Env.add x (Global, Value t, Value (Var (x, t))) ctx
-  | Record (p, xs) ->
+  | Record (p, xs, ys) ->
     let ctx' = ref ctx in let n = ref (VKan 0) in
-    List.iter (fun (p, e) -> n := imax !n (infer !ctx' e);
-      let t = eval e !ctx' in ctx' := upGlobal !ctx' p t (Var (p, t))) xs;
-
-    let (ys, (_, e)) = initLast xs in let t = telescope eSig e ys in
+    let checkLense = fun (p, e) -> begin
+      n := imax !n (infer !ctx' e); let t = eval e !ctx' in
+      ctx' := upGlobal !ctx' p t (Var (p, t))
+    end in List.iter checkLense xs; List.iter checkLense ys;
+    let (ys, (_, e)) = initLast ys in let t = telescope ePi (telescope eSig e ys) xs in
     Env.add (name p) (Global, Value !n, Value (eval t ctx)) ctx
 
 let getBoolVal opt = function

@@ -31,6 +31,7 @@ let rec eval (e0 : exp) (ctx : ctx) = traceEval e0; match e0 with
   | EPair (e1, e2)     -> VPair (eval e1 ctx, eval e2 ctx)
   | EFst e             -> vfst (eval e ctx)
   | ESnd e             -> vsnd (eval e ctx)
+  | EField (e, p)      -> evalField p (eval e ctx)
   | EId e              -> VId (eval e ctx)
   | ERef e             -> VRef (eval e ctx)
   | EJ e               -> VJ (eval e ctx)
@@ -131,6 +132,12 @@ and inferV v = traceInferV v; match v with
     | _ -> raise (ExpectedSubtype (rbV v))
   end
   | v                        -> raise (ExpectedNeutral v)
+
+and evalField p v = match inferV v with
+  | VSig (_, (q, _, _)) ->
+    if matchIdent p q then vfst v
+    else evalField p (vsnd v)
+  | t                     -> raise (ExpectedSig t)
 
 (* Readback *)
 and rbV v : exp = traceRbV v; match v with
@@ -317,6 +324,7 @@ and infer ctx e : value = traceInfer e; match e with
   end
   | EFst e -> fst (extSigG (infer ctx e))
   | ESnd e -> let (t, g) = extSigG (infer ctx e) in closByVal t g (vfst (eval e ctx))
+  | EField (e, p) -> inferField ctx p e
   | EPre u -> VPre (u + 1)
   | EPathP p -> inferPath ctx p
   | EPartial e -> let n = extSet (infer ctx e) in implv VI (EPre n) ctx
@@ -338,6 +346,12 @@ and infer ctx e : value = traceInfer e; match e with
   end
   | e -> raise (InferError e)
 
+and inferField ctx p e = match infer ctx e with
+  | VSig (t, (q, _, _)) ->
+    if matchIdent p q then t
+    else inferField ctx p (ESnd e)
+  | t                     -> raise (ExpectedSig t)
+	
 and inferTele ctx binop p a b =
   ignore (extSet (infer ctx a));
   let t = eval a ctx in let x = Var (p, t) in

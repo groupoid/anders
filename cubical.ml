@@ -33,6 +33,7 @@ let rec extractExp : exp -> string = function
   | EPair (fst, snd) -> Printf.sprintf "(%s, %s)" (extractExp fst) (extractExp snd)
   | EFst exp -> extractExp exp ^ ".1"
   | ESnd exp -> extractExp exp ^ ".2"
+  | EField _ -> fail "cubicaltt does not support named sigma accessors"
   | EApp (f, x) -> Printf.sprintf "(%s %s)" (extractExp f) (extractExp x)
   | EVar p -> showName p
   | EHole -> "?"
@@ -42,7 +43,6 @@ let extractDecl : decl -> string = function
   | Def (p, Some t, e) -> Printf.sprintf "%s : %s = %s" p (extractExp t) (extractExp e)
   | Def (_, None, _) -> fail "cubicaltt does not support automatic type inference of declaration"
   | Axiom (p, t) -> Printf.sprintf "%s : %s = undefined" p (extractExp t)
-  | Record _ -> fail "cubicaltt does not support records"
 
 let extractLine : line -> string = function
   | Import xs -> String.concat "\n" (List.map (Printf.sprintf "import %s") xs)

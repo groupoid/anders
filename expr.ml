@@ -7,7 +7,8 @@ type exp =
   | EPre of int | EKan of int                                                              (* cosmos *)
   | EVar of name | EHole                                                                (* variables *)
   | EPi of exp * (name * exp) | ELam of exp * (name * exp) | EApp of exp * exp                 (* pi *)
-  | ESig of exp * (name * exp) | EPair  of exp * exp | EFst of exp | ESnd of exp            (* sigma *)
+  | ESig of exp * (name * exp) | EPair  of exp * exp                                        (* sigma *)
+  | EFst of exp | ESnd of exp | EField of exp * string                                      (* sigma *)
   | EId of exp | ERef of exp | EJ of exp                                          (* strict equality *)
   | EPathP of exp | EPLam of exp | EAppFormula of exp * exp                         (* path equality *)
   | EI | EDir of dir | EAnd of exp * exp | EOr of exp * exp | ENeg of exp           (* CCHM interval *)
@@ -95,6 +96,7 @@ let rec ppExp paren e = let x = match e with
   | EPair (fst, snd) -> Printf.sprintf "(%s, %s)" (showExp fst) (showExp snd)
   | EFst exp -> ppExp true exp ^ ".1"
   | ESnd exp -> ppExp true exp ^ ".2"
+  | EField (exp, field) -> ppExp true exp ^ "." ^ field
   | EApp (f, x) -> Printf.sprintf "%s %s" (showExp f) (ppExp true x)
   | EVar p -> showName p
   | EHole -> "?"

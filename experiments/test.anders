@@ -12,7 +12,6 @@ def trio : U₂ := Σ (fst : U₁) (snd : U₁), U₁
 def lower : U₁₁₂₁₂ := U₁₁₂₁₁
 def instance : trio := (U, U -> U, U -> U -> U)
 
-record noparam := (T₁ T₂ : U)
-
-record pair (A B : U) :=
-(pr₁ : A) (pr₂ : B)
+def pair (A B : U) := Σ (fst : A), B
+def diag (A : U) (a : A) : pair A A := (a, a)
+def diag/fst (A : U) (a : A) : A := (diag A a).fst

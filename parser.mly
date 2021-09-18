@@ -14,8 +14,8 @@
 %token <int> PRE
 %token LPARENS RPARENS LSQ RSQ
 %token COMMA COLON IRREF EOF HOLE
-%token DEFEQ PROD ARROW FST SND LAM
-%token MODULE WHERE IMPORT DEF AXIOM RECORD
+%token DEFEQ PROD ARROW DOT LAM
+%token MODULE WHERE IMPORT DEF AXIOM
 %token SIGMA PI OPTION LT GT
 %token APPFORMULA PATHP TRANSP HCOMP
 %token PARTIAL MAP INC OUC
@@ -28,7 +28,7 @@
 %right ARROW PROD
 
 %nonassoc NEGATE
-%nonassoc FST SND
+%nonassoc DOT
 
 %start <Module.file> file
 %start <Module.command> repl
@@ -88,8 +88,12 @@ exp6:
   | HOLE { EHole }
   | PRE { EPre $1 }
   | KAN { EKan $1 }
-  | exp6 FST { EFst $1 }
-  | exp6 SND { ESnd $1 }
+  | exp6 DOT IDENT {
+    match $3 with
+    | "1"   -> EFst $1
+    | "2"   -> ESnd $1
+    | field -> EField ($1, field)
+  }
   | NEGATE exp6 { ENeg $2 }
   | LSQ separated_list(COMMA, partial) RSQ { ESystem $2 }
   | LPARENS exp1 RPARENS { $2 }
@@ -99,4 +103,3 @@ declarations:
   | DEF IDENT params COLON exp2 DEFEQ exp2 { Def ($2, Some (telescope ePi $5 $3), telescope eLam $7 $3) }
   | DEF IDENT params DEFEQ exp2 { Def ($2, None, telescope eLam $5 $3) }
   | AXIOM IDENT params COLON exp2 { Axiom ($2, telescope ePi $5 $3) }
-  | RECORD IDENT params DEFEQ telescope { Record ($2, $3, $5) }

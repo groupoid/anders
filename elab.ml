@@ -49,6 +49,7 @@ let rec salt (ns : name Env.t) : exp -> exp = function
   | EPair (a, b)       -> EPair (salt ns a, salt ns b)
   | EFst e             -> EFst (salt ns e)
   | ESnd e             -> ESnd (salt ns e)
+  | EField (e, p)      -> EField (salt ns e, p)
   | EApp (f, x)        -> EApp (salt ns f, salt ns x)
   | EVar x             -> EVar (freshVar ns x)
   | EHole              -> EHole

@@ -42,6 +42,9 @@ let gen () = inc := !inc + 1; !inc
 let fresh : name -> name = function
   | Irrefutable -> Irrefutable | Name (p, _) -> Name (p, gen ())
 
+let matchIdent p : name -> bool = function
+  | Irrefutable -> false | Name (q, _) -> p = q
+
 let getDigit x = Char.chr (x + 0x80) |> Printf.sprintf "\xE2\x82%c"
 
 let rec showSubscript x =

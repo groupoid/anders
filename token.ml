@@ -11,7 +11,6 @@ let tokenToString : token -> string = function
   | LAM        -> "LAM"         | PROD       -> "PROD"
   | OPTION     -> "OPTION"      | AXIOM      -> "AXIOM"
   | IRREF      -> "IRREF"       | EOF        -> "EOF"
-  | FST        -> "FST"         | SND        -> "SND"
   | DEFEQ      -> "DEFEQ"       | COMMA      -> "COMMA"
   | COLON      -> "COLON"       | ARROW      -> "ARROW"
   | WHERE      -> "WHERE"       | MODULE     -> "MODULE"
@@ -23,4 +22,4 @@ let tokenToString : token -> string = function
   | IDJ        -> "IDJ"         | PARTIAL    -> "PARTIAL"
   | MAP        -> "MAP"         | IMPORT     -> "IMPORT"
   | INC        -> "INC"         | OUC        -> "OUC"
-  | HCOMP      -> "HCOMP"       | RECORD     -> "RECORD"
+  | HCOMP      -> "HCOMP"       | DOT        -> "DOT"

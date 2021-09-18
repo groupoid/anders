@@ -59,15 +59,13 @@ let pre       = 'V' subscript*
 rule main = parse
 | nl              { nextLine lexbuf; main lexbuf }
 | comment         { nextLine lexbuf; main lexbuf }
-| ws+             { main lexbuf }
-| "record"        { RECORD }
+| ws+             { main lexbuf }      | "."             { DOT }
 | "module"        { MODULE }           | "where"         { WHERE }
 | "import"        { IMPORT }           | "option"        { OPTION }
 | def             { DEF }              | colon           { COLON }
 | ','             { COMMA }            | '_'             { IRREF }
 | '('             { LPARENS }          | ')'             { RPARENS }
 | '['             { LSQ }              | ']'             { RSQ }
-| ".1"            { FST }              | ".2"            { SND }
 | pi              { PI }               | sigma           { SIGMA }
 | "<"             { LT }               | ">"             { GT }
 | negFormula      { NEGATE }           | andFormula      { AND }

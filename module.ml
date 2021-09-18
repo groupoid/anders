@@ -12,7 +12,6 @@ type command =
 type decl =
   | Def of string * exp option * exp
   | Axiom of string * exp
-  | Record of string * tele list * tele list
 
 type line =
   | Import of string list
@@ -29,10 +28,6 @@ let showDecl : decl -> string = function
   | Def (p, Some exp1, exp2) -> Printf.sprintf "def %s : %s := %s" p (showExp exp1) (showExp exp2)
   | Def (p, None, exp) -> Printf.sprintf "def %s := %s" p (showExp exp)
   | Axiom (p, exp) -> Printf.sprintf "axiom %s : %s" p (showExp exp)
-  | Record (p, xs, ys) ->
-    Printf.sprintf "record %s %s := %s" p
-      (String.concat " " (List.map showTeleExp xs))
-      (String.concat "\n" (List.map showTeleExp ys))
 
 let showLine : line -> string = function
   | Import p -> Printf.sprintf "import %s" (String.concat " " p)
@@ -50,8 +45,3 @@ let freshDecl : decl -> decl = function
   | Def (p, Some exp1, exp2) -> Def (p, Some (freshExp exp1), freshExp exp2)
   | Def (p, None, exp) -> Def (p, None, freshExp exp)
   | Axiom (p, exp) -> Axiom (p, freshExp exp)
-  | Record (p, xs, ys) ->
-    let ns = ref Env.empty in
-    let xs = List.map (freshTele ns) xs in
-    let ys = List.map (freshTele ns) ys in
-    Record (p, xs, ys)

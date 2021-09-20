@@ -67,8 +67,8 @@ models HoTT and the outer one is traditional Martin-Löf type system presheaf th
 models set theory with UIP. The motivation is to have an ability to express
 semisemplicial types. Theoretical work was continued in \textbf{2LTT} \cite{Annenkov19}.
 
-Our aim is to preserve \textbf{cubicaltt} programs and remain language
-implementation of \textbf{anders} compatible with original \textbf{CCHM} \cite{Mortberg15} publications
+Our aim is to preserve \textbf{cubicaltt} programs and remain \textbf{anders}
+implementation compatible with original \textbf{CCHM} \cite{Mortberg15} publications
 along with \textbf{HTS} and \textbf{2LTT}. While we are on our road
 to subset of \textbf{Lean} tactic language, currently we are at the stage of
 regular cubical type checker with \textbf{CHM} \cite{Huber18} primitives.
@@ -185,11 +185,10 @@ Types in a telescope, type of a declaration and a proof-terms are a language exp
 \begin{tabular}{l}
 \textbf{menhir} \\
 \ \ \ ident : IRREF | IDENT \\
-\ \ \ vars : ident+ \\
-\ \ \ lense : LPARENS vars COLON exp1 RPARENS \\
+\ \ \ lense : LPARENS ident+ COLON exp1 RPARENS \\
 \ \ \ telescope : lense telescope \\
 \ \ \ params : telescope | [] \\
-\ \ \ declarations: \\
+\ \ \ declarations : \\
 \ \ \ \ \ \ | DEF IDENT params DEFEQ exp1 \\
 \ \ \ \ \ \ | DEF IDENT params COLON exp1 DEFEQ exp1 \\
 \ \ \ \ \ \ | AXIOM IDENT params COLON exp1
@@ -205,12 +204,12 @@ exp3 (neutral constructions).
 \begin{tabular}{ll}
 \textbf{menhir} \\
 \multicolumn{2}{l}{\ \ \ face : LPARENS IDENT IDENT IDENT RPARENS } \\
-\multicolumn{2}{l}{\ \ \ partial : face+ ARROW exp1 } \\
+\multicolumn{2}{l}{\ \ \ part : face+ ARROW exp1 } \\
 \multicolumn{2}{l}{\ \ \ exp0 : exp1 COMMA exp0 | exp1 } \\
-\multicolumn{2}{l}{\ \ \ exp1: LSQ separated(COMMA, partial) RSQ } \\
+\multicolumn{2}{l}{\ \ \ exp1 : LSQ separated(COMMA, part) RSQ } \\
 \ \ \ \ \ \ | LAM telescope COMMA exp1   & | PI telescope COMMA exp1 \\
 \ \ \ \ \ \ | SIGMA telescope COMMA exp1 & | LSQ IRREF ARROW exp1 RSQ \\
-\ \ \ \ \ \ | LT vars GT exp1            & | exp2 ARROW exp1 \\
+\ \ \ \ \ \ | LT ident+ GT exp1          & | exp2 ARROW exp1 \\
 \ \ \ \ \ \ | exp2 PROD exp1             & | exp2 \\
 \end{tabular}
 \end{table}

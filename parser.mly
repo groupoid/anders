@@ -50,7 +50,7 @@ face :
   | LPARENS IDENT COLON IDENT IDENT IDENT RPARENS { face (name $2) (getVar $4) $5 $6 }
 partial : face+ ARROW exp2 { ($1, $3) }
 
-exp1 : exp2 COMMA exp1 { EPair ($1, $3) } | exp2 { $1 }
+exp1 : exp2 COMMA exp1 { EPair (ref None, $1, $3) } | exp2 { $1 }
 
 exp2:
   | LAM telescope COMMA exp2 { telescope eLam $4 $2 }

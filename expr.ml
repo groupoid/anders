@@ -1,13 +1,15 @@
 open Prelude
 open Ident
 
+type tag = (string option) ref
+
 (* Language Expressions *)
 
 type exp =
   | EPre of int | EKan of int                                                              (* cosmos *)
   | EVar of name | EHole                                                                (* variables *)
   | EPi of exp * (name * exp) | ELam of exp * (name * exp) | EApp of exp * exp                 (* pi *)
-  | ESig of exp * (name * exp) | EPair  of exp * exp                                        (* sigma *)
+  | ESig of exp * (name * exp) | EPair of tag * exp * exp                                   (* sigma *)
   | EFst of exp | ESnd of exp | EField of exp * string                                      (* sigma *)
   | EId of exp | ERef of exp | EJ of exp                                          (* strict equality *)
   | EPathP of exp | EPLam of exp | EAppFormula of exp * exp                         (* path equality *)
@@ -26,8 +28,8 @@ type scope = Local | Global
 type value =
   | VKan of int | VPre of int
   | Var of name * value | VHole
-  | VPi of value * clos | VLam of value * clos | VApp   of value * value
-  | VSig of value * clos | VPair  of value * value | VFst of value | VSnd of value
+  | VPi of value * clos | VLam of value * clos | VApp of value * value
+  | VSig of value * clos | VPair of tag * value * value | VFst of value | VSnd of value
   | VId of value | VRef of value | VJ of value
   | VPathP of value | VPLam of value | VAppFormula of value * value
   | VI | VDir of dir | VAnd of value * value | VOr of value * value | VNeg of value
@@ -93,7 +95,7 @@ let rec ppExp paren e = let x = match e with
   | ELam (a, (p, b)) -> Printf.sprintf "λ %s, %s" (showTeleExp (p, a)) (showExp b)
   | EPi (a, (p, b)) -> showPiExp a p b
   | ESig (a, (p, b)) -> Printf.sprintf "Σ %s, %s" (showTeleExp (p, a)) (showExp b)
-  | EPair (fst, snd) -> Printf.sprintf "(%s, %s)" (showExp fst) (showExp snd)
+  | EPair (_, fst, snd) -> Printf.sprintf "(%s, %s)" (showExp fst) (showExp snd)
   | EFst exp -> ppExp true exp ^ ".1"
   | ESnd exp -> ppExp true exp ^ ".2"
   | EField (exp, field) -> ppExp true exp ^ "." ^ field
@@ -136,7 +138,7 @@ let rec ppValue paren v = let x = match v with
   | VLam (x, (p, e, rho)) -> Printf.sprintf "λ %s, %s" (showTeleValue p x rho) (showExp e)
   | VPi (x, (p, e, rho)) -> showPi x p e rho
   | VSig (x, (p, e, rho)) -> Printf.sprintf "Σ %s, %s" (showTeleValue p x rho) (showExp e)
-  | VPair (fst, snd) -> Printf.sprintf "(%s, %s)" (showValue fst) (showValue snd)
+  | VPair (_, fst, snd) -> Printf.sprintf "(%s, %s)" (showValue fst) (showValue snd)
   | VFst v -> ppValue true v ^ ".1"
   | VSnd v -> ppValue true v ^ ".2"
   | VApp (f, x) -> Printf.sprintf "%s %s" (showValue f) (ppValue true x)

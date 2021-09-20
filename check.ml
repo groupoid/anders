@@ -9,12 +9,12 @@ let freshDim () = let i = freshName "ι" in (i, EVar i, Var (i, VI))
 
 let ieq u v : bool = !Prefs.girard || u = v
 let vfst : value -> value = function
-  | VPair (u, _) -> u
-  | v            -> VFst v
+  | VPair (_, u, _) -> u
+  | v               -> VFst v
 
 let vsnd : value -> value = function
-  | VPair (_, u) -> u
-  | v            -> VSnd v
+  | VPair (_, _, u) -> u
+  | v               -> VSnd v
 
 let isOneCtx ctx0 xs = List.fold_left (fun ctx (p, v) -> upLocal ctx p (isOne v) (Var (p, isOne v))) ctx0 xs
 
@@ -28,7 +28,7 @@ let rec eval (e0 : exp) (ctx : ctx) = traceEval e0; match e0 with
   | ELam (a, (p, b))   -> VLam (eval a ctx, (p, b, ctx))
   | EApp (f, x)        -> app (eval f ctx, eval x ctx)
   | ESig (a, (p, b))   -> VSig (eval a ctx, (p, b, ctx))
-  | EPair (e1, e2)     -> VPair (eval e1 ctx, eval e2 ctx)
+  | EPair (r, e1, e2)  -> VPair (r, eval e1 ctx, eval e2 ctx)
   | EFst e             -> vfst (eval e ctx)
   | ESnd e             -> vsnd (eval e ctx)
   | EField (e, p)      -> evalField p (eval e ctx)
@@ -133,16 +133,24 @@ and inferV v = traceInferV v; match v with
   end
   | v                        -> raise (ExpectedNeutral v)
 
-and evalField p v = match inferV v with
-  | VSig (_, (q, _, _)) ->
-    if matchIdent p q then vfst v
-    else evalField p (vsnd v)
-  | t                     -> raise (ExpectedSig t)
+and extByTag p : value -> value option = function
+  | VPair (t, fst, snd) -> begin match !t with
+    | Some q -> if p = q then Some fst else extByTag p snd
+    | _      -> extByTag p snd
+  end | _ -> None
+
+and evalField p v =
+  match extByTag p v with
+  | Some k -> k | None -> begin match inferV v with
+    | VSig (_, (q, _, _)) ->
+      if matchIdent p q then vfst v else evalField p (vsnd v)
+    | t -> raise (ExpectedSig t)
+  end
 
 (* Readback *)
 and rbV v : exp = traceRbV v; match v with
   | VLam (t, g)        -> rbVTele eLam t g
-  | VPair (u, v)       -> EPair (rbV u, rbV v)
+  | VPair (r, u, v)    -> EPair (r, rbV u, rbV v)
   | VKan u             -> EKan u
   | VPi (t, g)         -> rbVTele ePi t g
   | VSig (t, g)        -> rbVTele eSig t g
@@ -189,7 +197,7 @@ and weak (e : exp) ctx = traceWeak e; match e with
   | EFst e             -> EFst (weak e ctx)
   | ESnd e             -> ESnd (weak e ctx)
   | EApp (f, x)        -> EApp (weak f ctx, weak x ctx)
-  | EPair (e1, e2)     -> EPair (weak e1 ctx, weak e2 ctx)
+  | EPair (r, e1, e2)  -> EPair (r, weak e1 ctx, weak e2 ctx)
   | EPathP u           -> EPathP (weak u ctx)
   | EPLam u            -> EPLam (weak u ctx)
   | EPartial e         -> EPartial (weak e ctx)
@@ -210,8 +218,8 @@ and weakTele ctor ctx p a b : exp =
 and conv v1 v2 : bool = traceConv v1 v2;
   v1 == v2 || begin match v1, v2 with
     | VKan u, VKan v -> ieq u v
-    | VPair (a, b), VPair (c, d) -> conv a c && conv b d
-    | VPair (a, b), v | v, VPair (a, b) -> conv (vfst v) a && conv (vsnd v) b
+    | VPair (_, a, b), VPair (_, c, d) -> conv a c && conv b d
+    | VPair (_, a, b), v | v, VPair (_, a, b) -> conv (vfst v) a && conv (vsnd v) b
     | VPi (a, g), VPi (b, h) | VSig (a, g), VSig (b, h)
     | VLam (a, g), VLam (b, h) ->
       let (p, e1, ctx1) = g in let (q, e2, ctx2) = h in
@@ -279,9 +287,13 @@ and check ctx (e0 : exp) (t0 : value) =
     ignore (extSet (infer ctx a)); eqNf (eval a ctx) t;
     let x = Var (p, t) in let ctx' = upLocal ctx p t x in
     check ctx' b (closByVal t g x)
-  | EPair (e1, e2), VSig (t, g) ->
+  | EPair (r, e1, e2), VSig (t, g) ->
     ignore (extSet (infer ctx (rbV t)));
-    check ctx e1 t; check ctx e2 (closByVal t g (eval e1 ctx))
+    check ctx e1 t; check ctx e2 (closByVal t g (eval e1 ctx));
+    let (p, _, _) = g in begin match p with
+      | Name (v, _) -> r := Some v
+      | Irrefutable -> ()
+    end
   | EHole, v -> traceHole v ctx
   | e, VApp (VApp (VPathP p, u0), u1) ->
     let v0 = act e ezero ctx in

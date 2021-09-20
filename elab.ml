@@ -46,7 +46,7 @@ let rec salt (ns : name Env.t) : exp -> exp = function
   | EKan n             -> EKan n
   | EPi (a, (p, b))    -> saltTele ePi ns p a b
   | ESig (a, (p, b))   -> saltTele eSig ns p a b
-  | EPair (a, b)       -> EPair (salt ns a, salt ns b)
+  | EPair (r, a, b)    -> EPair (r, salt ns a, salt ns b)
   | EFst e             -> EFst (salt ns e)
   | ESnd e             -> ESnd (salt ns e)
   | EField (e, p)      -> EField (salt ns e, p)

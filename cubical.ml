@@ -30,7 +30,7 @@ let rec extractExp : exp -> string = function
   | ELam (a, (p, b)) -> Printf.sprintf "(\\%s -> %s)" (extractTele p a) (extractExp b)
   | EPi (a, (p, b)) -> Printf.sprintf "(%s -> %s)" (extractTele p a) (extractExp b)
   | ESig (a, (p, b)) -> Printf.sprintf "(%s * %s)" (extractTele p a) (extractExp b)
-  | EPair (fst, snd) -> Printf.sprintf "(%s, %s)" (extractExp fst) (extractExp snd)
+  | EPair (_, fst, snd) -> Printf.sprintf "(%s, %s)" (extractExp fst) (extractExp snd)
   | EFst exp -> extractExp exp ^ ".1"
   | ESnd exp -> extractExp exp ^ ".2"
   | EField _ -> fail "cubicaltt does not support named sigma accessors"

@@ -11,72 +11,63 @@
 module cat where
 import lib/path
 
-def cat : U₁ := Σ (A: U), A -> A -> U
-def isPrecategory (C: cat) : U := Σ
-    (id: Π (x: C.1), C.2 x x)
-    (∘: Π (x y z:C.1), C.2 x y -> C.2 y z -> C.2 x z)
-    (homSet: Π (x y: C.1), isSet (C.2 x y))
-    (∘-left: Π (x y: C.1) (f: C.2 x y), Path (C.2 x y) (∘ x x y (id x) f) f)
-    (∘-right: Π (x y: C.1) (f: C.2 x y), Path (C.2 x y) (∘ x y y f (id y)) f),
-    Π (x y z w: C.1) (f: C.2 x y) (g: C.2 y z) (h: C.2 z w),
-    Path (C.2 x w) (∘ x z w (∘ x y z f g) h) (∘ x y w f (∘ y z w g h))
+axiom unit : U
+axiom one : unit
 
-def precategory: U₁ := Σ (C: cat), isPrecategory C
-def carrier (C: precategory): U := C.1.1
-def hom (C: precategory) (a b: carrier C): U := C.1.2 a b
-def homSet (C: precategory) (a b: carrier C): isSet (hom C a b) := C.2.2.2.1 a b
-def compose (C: precategory) (x y z: carrier C) (f: hom C x y) (g: hom C y z): hom C x z := C.2.2.1 x y z f g
-def path (C: precategory) (x: carrier C): hom C x x := C.2.1 x
-def pathL (C: precategory) (x y: carrier C) (f: hom C x y): Path (hom C x y) (compose C x x y (path C x) f) f := C.2.2.2.2.1 x y f
-def pathR (C: precategory) (x y: carrier C) (f: hom C x y): Path (hom C x y) (compose C x y y f (path C y)) f := C.2.2.2.2.2.1 x y f
-def pathC (C: precategory) (x y z w: carrier C) (f: hom C x y) (g: hom C y z) (h: hom C z w)
-  : Path (hom C x w) (compose C x z w (compose C x y z f g) h) (compose C x y w f (compose C y z w g h)) := C.2.2.2.2.2.2 x y z w f g h
+def cat : U₁ := Σ (ob: U) (hom: ob -> ob -> U), unit
+def isPrecategory (C: cat) : U := Σ
+    (id: Π (x: C.ob), C.hom x x)
+    (∘: Π (x y z:C.ob), C.hom x y -> C.hom y z -> C.hom x z)
+    (homSet: Π (x y: C.ob), isSet (C.hom x y))
+    (∘-left: Π (x y: C.ob) (f: C.hom x y), Path (C.hom x y) (∘ x x y (id x) f) f)
+    (∘-right: Π (x y: C.ob) (f: C.hom x y), Path (C.hom x y) (∘ x y y f (id y)) f)
+    (∘-assoc: Π (x y z w: C.ob) (f: C.hom x y) (g: C.hom y z) (h: C.hom z w),
+                Path (C.hom x w) (∘ x z w (∘ x y z f g) h) (∘ x y w f (∘ y z w g h))), unit
+
+def precategory: U₁ := Σ (C: cat) (P: isPrecategory C), unit
 
 def catᵒᵖ (P: precategory) : precategory :=
-    ((carrier P, λ (A B: carrier P), hom P B A),
-    λ (A: carrier P), path P A,
-    λ (A B C: carrier P) (f: hom P B A) (g: hom P C B), compose P C B A g f,
-    λ (A B: carrier P), homSet P B A,
-    λ (A B: carrier P) (f: hom P B A), pathR P B A f,
-    λ (A B: carrier P) (f: hom P B A), pathL P B A f,
-    λ (A B C D: carrier P) (f: hom P B A) (g: hom P C B) (h: hom P D C), <i> (pathC P D C B A h g f) @ -i)
+    ((P.C.ob, (λ (A B: P.C.ob), P.C.hom B A), P.C.2.2),
+     ((λ (A : P.C.ob), P.P.id A),
+      (λ (A B C: P.C.ob) (f: P.C.hom B A) (g: P.C.hom C B), P.P.∘ C B A g f),
+      (λ (A B: P.C.ob), P.P.homSet B A),
+      (λ (A B: P.C.ob) (f: P.C.hom B A), P.P.∘-right B A f),
+      (λ (A B: P.C.ob) (f: P.C.hom B A), P.P.∘-left B A f),
+      (λ (A B C D: P.C.ob) (f: P.C.hom B A) (g: P.C.hom C B) (h: P.C.hom D C), <i> (P.P.∘-assoc D C B A h g f) @ -i), P.P.2.2.2.2.2.2), P.2.2)
 
 def opPreserve (C: precategory) : PathP (<_>precategory) (catᵒᵖ (catᵒᵖ C)) C := <i> C
 
-def iso (C: precategory) (A B: carrier C) : U {-₁-} := Σ (f: hom C A B) (g: hom C B A)
-    (section: Path (hom C A A) (compose C A B A f g) (path C A)), Path (hom C B B) (compose C B A B g f) (path C B)
+def iso (P: precategory) (A B: P.C.ob) : U {-₁-} := Σ (f: P.C.hom A B) (g: P.C.hom B A)
+    (retract: Path (P.C.hom A A) (P.P.∘ A B A f g) (P.P.id A))
+    (section: Path (P.C.hom B B) (P.P.∘ B A B g f) (P.P.id B)), unit
 
-def isCategory (C: precategory): U := Σ (A: carrier C), isContr (Π (B: carrier C), iso C A B)
-def category: U₁ := Σ (C: precategory), isCategory C
-def isInitial (C: precategory) (bot: carrier C): U := Π (x: carrier C), isContr (hom C bot x)
-def isTerminal (C: precategory) (top: carrier C): U := Π (x: carrier C), isContr (hom C x top)
-def initial (C: precategory): U := Σ (bot: carrier C), isInitial C bot
-def terminal (C: precategory): U := Σ (top: carrier C), isTerminal C top
+def isCategory (P: precategory): U := Σ (A: P.C.ob), isContr (Π (B: P.C.ob), iso P A B)
+def category: U₁ := Σ (P: precategory), isCategory P
+def isInitial (P: precategory) (bot: P.C.ob): U := Π (x: P.C.ob), isContr (P.C.hom bot x)
+def isTerminal (P: precategory) (top: P.C.ob): U := Π (x: P.C.ob), isContr (P.C.hom x top)
+def initial (P: precategory): U := Σ (bot: P.C.ob), isInitial P bot
+def terminal (P: precategory): U := Σ (top: P.C.ob), isTerminal P top
 
-def homTo  (C: precategory) (X: carrier C): U := Σ (Y: carrier C), hom C Y X
-def cospan (C: precategory): U := Σ (X: carrier C) (_: homTo C X), homTo C X
-
-def hasCospanCone (C: precategory) (D: cospan C) (W: carrier C) : U := Σ (f: hom C W D.2.1.1) (g: hom C W D.2.2.1),
-    Path (hom C W D.1) (compose C W D.2.1.1 D.1 f D.2.1.2) (compose C W D.2.2.1 D.1 g D.2.2.2)
-
-def cospanCone (C: precategory) (D: cospan C): U := Σ (W: carrier C), hasCospanCone C D W
-def isCospanConeHom (C: precategory) (D: cospan C) (E1 E2: cospanCone C D) (h: hom C E1.1 E2.1) : U := Σ
-    (_ : Path (hom C E1.1 D.2.1.1) (compose C E1.1 E2.1 D.2.1.1 h E2.2.1) E1.2.1),
-    Path (hom C E1.1 D.2.2.1) (compose C E1.1 E2.1 D.2.2.1 h E2.2.2.1) E1.2.2.1
-
-def cospanConeHom (C: precategory) (D: cospan C) (E1 E2: cospanCone C D) : U := Σ (h: hom C E1.1 E2.1), isCospanConeHom C D E1 E2 h
-def isPullback (C: precategory) (D: cospan C) (E: cospanCone C D) : U := Σ (h: cospanCone C D), isContr (cospanConeHom C D h E)
-def hasPullback (C: precategory) (D: cospan C) : U := Σ (E: cospanCone C D), isPullback C D E
+def homTo  (P: precategory) (X: P.C.ob): U := Σ (Y: P.C.ob), P.C.hom Y X
+def cospan (P: precategory): U := Σ (X: P.C.ob) (_: homTo P X), homTo P X
+def hasCospanCone (P: precategory) (D: cospan P) (W: P.C.ob) : U := Σ (f: P.C.hom W D.2.1.1) (g: P.C.hom W D.2.2.1),
+    Path (P.C.hom W D.1) (P.P.∘ W D.2.1.1 D.1 f D.2.1.2) (P.P.∘ W D.2.2.1 D.1 g D.2.2.2)
+def cospanCone (P: precategory) (D: cospan P): U := Σ (W: P.C.ob), hasCospanCone P D W
+def isCospanConeHom (P: precategory) (D: cospan P) (E1 E2: cospanCone P D) (h: P.C.hom E1.1 E2.1) : U := Σ
+    (_ : Path (P.C.hom E1.1 D.2.1.1) (P.P.∘ E1.1 E2.1 D.2.1.1 h E2.2.1) E1.2.1),
+    Path (P.C.hom E1.1 D.2.2.1) (P.P.∘ E1.1 E2.1 D.2.2.1 h E2.2.2.1) E1.2.2.1
+def cospanConeHom (P: precategory) (D: cospan P) (E1 E2: cospanCone P D) : U := Σ (h: P.C.hom E1.1 E2.1), isCospanConeHom P D E1 E2 h
+def isPullback (P: precategory) (D: cospan P) (E: cospanCone P D) : U := Σ (h: cospanCone P D), isContr (cospanConeHom P D h E)
+def hasPullback (P: precategory) (D: cospan P) : U := Σ (E: cospanCone P D), isPullback P D E
 
 def isCatGroupoid (C: cat): U := Σ
-    (id: Π (x: C.1), C.2 x x)
-    (c: Π (x y z:C.1), C.2 x y -> C.2 y z -> C.2 x z)
-    (HomGrpd: Π (x y: C.1), isGroupoid (C.2 x y))
-    (inv: Π (x y: C.1), C.2 x y -> C.2 y x)
-    (inv_left: Π (x y: C.1) (p: C.2 x y), Path (C.2 x x) (c x y x p (inv x y p)) (id x))
-    (inv_right: Π (x y: C.1) (p: C.2 x y), Path (C.2 y y) (c y x y (inv x y p) p) (id y))
-    (left: Π (x y: C.1) (f: C.2 x y), Path (C.2 x y) (c x x y (id x) f) f)
-    (right: Π (x y: C.1) (f: C.2 x y), Path (C.2 x y) (c x y y f (id y)) f),
-    Π (x y z w: C.1) (f: C.2 x y) (g: C.2 y z) (h: C.2 z w),
-    Path (C.2 x w) (c x z w (c x y z f g) h) (c x y w f (c y z w g h))
-
+    (id: Π (x: C.ob), C.hom x x)
+    (c: Π (x y z:C.ob), C.hom x y -> C.hom y z -> C.hom x z)
+    (HomGrpd: Π (x y: C.ob), isGroupoid (C.hom x y))
+    (inv: Π (x y: C.ob), C.hom x y -> C.hom y x)
+    (inv_left: Π (x y: C.ob) (p: C.hom x y), Path (C.hom x x) (c x y x p (inv x y p)) (id x))
+    (inv_right: Π (x y: C.ob) (p: C.hom x y), Path (C.hom y y) (c y x y (inv x y p) p) (id y))
+    (left: Π (x y: C.ob) (f: C.hom x y), Path (C.hom x y) (c x x y (id x) f) f)
+    (right: Π (x y: C.ob) (f: C.hom x y), Path (C.hom x y) (c x y y f (id y)) f),
+    Π (x y z w: C.ob) (f: C.hom x y) (g: C.hom y z) (h: C.hom z w),
+    Path (C.hom x w) (c x z w (c x y z f g) h) (c x y w f (c y z w g h))

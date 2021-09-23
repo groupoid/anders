@@ -83,3 +83,9 @@ and saltFace ns xs =
   (exp, !ns')
 
 let freshExp = salt Env.empty
+
+let face p x e d = match e, getDir d with
+    | "=", Zero -> (p, ENeg x)
+    | "=", One  -> (p, x)
+    | _,   _    -> failwith "invalid face"
+

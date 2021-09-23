@@ -11,10 +11,8 @@
 module cat where
 import lib/path
 
-axiom unit : U
-axiom one : unit
-
 def cat : U₁ := Σ (ob: U) (hom: ob -> ob -> U), unit
+
 def isPrecategory (C: cat) : U := Σ
     (id: Π (x: C.ob), C.hom x x)
     (∘: Π (x y z:C.ob), C.hom x y -> C.hom y z -> C.hom x z)
@@ -22,7 +20,7 @@ def isPrecategory (C: cat) : U := Σ
     (∘-left: Π (x y: C.ob) (f: C.hom x y), Path (C.hom x y) (∘ x x y (id x) f) f)
     (∘-right: Π (x y: C.ob) (f: C.hom x y), Path (C.hom x y) (∘ x y y f (id y)) f)
     (∘-assoc: Π (x y z w: C.ob) (f: C.hom x y) (g: C.hom y z) (h: C.hom z w),
-                Path (C.hom x w) (∘ x z w (∘ x y z f g) h) (∘ x y w f (∘ y z w g h))), unit
+       Path (C.hom x w) (∘ x z w (∘ x y z f g) h) (∘ x y w f (∘ y z w g h))), unit
 
 def precategory: U₁ := Σ (C: cat) (P: isPrecategory C), unit
 
@@ -37,7 +35,9 @@ def catᵒᵖ (P: precategory) : precategory :=
 
 def opPreserve (C: precategory) : PathP (<_>precategory) (catᵒᵖ (catᵒᵖ C)) C := <i> C
 
-def iso (P: precategory) (A B: P.C.ob) : U {-₁-} := Σ (f: P.C.hom A B) (g: P.C.hom B A)
+def iso (P: precategory) (A B: P.C.ob) : U := Σ
+    (f: P.C.hom A B)
+    (g: P.C.hom B A)
     (retract: Path (P.C.hom A A) (P.P.∘ A B A f g) (P.P.id A))
     (section: Path (P.C.hom B B) (P.P.∘ B A B g f) (P.P.id B)), unit
 

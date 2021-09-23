@@ -20,6 +20,7 @@ Features
 * Lexer in 80 LOC
 * UTF-8 support including universe levels
 * Lean syntax for ΠΣ
+* Poor Man's records as Σ with named accessors (access to telescope variables)
 * 1D syntax with top-level declarations
 * Groupoid Infinity CCHM base library: https://groupoid.space/math
 * Best suited for academic papers and fast type checking

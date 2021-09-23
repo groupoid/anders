@@ -22,11 +22,11 @@ def mono (P: precategory) (Y Z: P.C.ob) (f: P.C.hom Y Z): U := Π (X: P.C.ob) (g
 def subobjectClassifier (C: precategory): U := Σ
     (omega: C.C.ob)
     (end: terminal C)
-    (trueHom: C.C.hom end.1 omega)
+    (trueHom: C.C.hom end.top omega)
     (xi: Π (Y X: C.C.ob) (j: C.C.hom Y X), C.C.hom X omega)
-    (square: Π (Y X: C.C.ob) (j: C.C.hom Y X), mono C Y X j -> hasPullback C (omega,(end.1,trueHom),(X,xi Y X j))),
+    (square: Π (Y X: C.C.ob) (j: C.C.hom Y X), mono C Y X j -> hasPullback C (omega,(end.top,trueHom),(X,xi Y X j))),
     Π (Y X: C.C.ob) (j: C.C.hom Y X) (k: C.C.hom X omega),
-    (mono C Y X j) -> (hasPullback C (omega,(end.1,trueHom),(X,k))) -> (Path (C.C.hom X omega) (xi Y X j) k)
+    (mono C Y X j) -> (hasPullback C (omega,(end.top,trueHom),(X,k))) -> (Path (C.C.hom X omega) (xi Y X j) k)
 
 def isCCC (C: precategory): U := Σ
     (Exp: Π (A B: C.C.ob), C.C.ob)
@@ -46,4 +46,4 @@ def Co (C: precategory) (cod: C.C.ob) : U := Σ (dom: C.C.ob), C.C.hom dom cod
 def Delta (C: precategory) (d: C.C.ob) : U₁ := Σ (index: U), index -> Co C d
 def Coverage (C: precategory): U₁ := Σ (cod: C.C.ob) (fam: Delta C cod) (coverings: C.C.ob -> Delta C cod -> U), coverings cod fam
 def site  (C: precategory): U₁ := Σ (C: precategory), Coverage C
-def sheaf (C: precategory): U₁ := Σ (S: site C), presheaf S.1
+def sheaf (C: precategory): U₁ := Σ (S: site C), presheaf S.C

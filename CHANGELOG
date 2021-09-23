@@ -1,6 +1,12 @@
 Changelog
 =========
 
+1 OCT 2021 Version 0.10 Categorical Library:
+
+* Sigma with auto projections
+* Modules: cat, fun, topos, ab, kraus
+* LaTeX paper
+
 15 JUL 2021 Version 0.7.2 Kan Operations:
 
 * Strict Equality (Id, ref, idJ)

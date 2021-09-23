@@ -99,9 +99,9 @@ sys     0m0.183s
 
 ```
 $ time for i in lib/* ; do ./anders.native check $i ; done
-real    0m0.083s
-user    0m0.080s
-sys     0m0.004s
+real    0m0.257s
+user    0m0.231s
+sys     0m0.028s
 ```
 
 Acknowledgements

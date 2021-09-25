@@ -21,9 +21,6 @@ let checkAndEval ctx e : value * value =
 let main ctx : command -> unit = function
   | Eval e -> let (t, v) = checkAndEval ctx (freshExp e) in
     Printf.printf "TYPE: %s\nEVAL: %s\n" (showValue t) (showValue v)
-  | Command ("n", e) -> let (t0, v0) = checkAndEval ctx (freshExp e) in
-    let t = Check.rbV t0 in let v = Check.rbV v0 in
-    Printf.printf "TYPE: %s\nNORMEVAL: %s\n" (showExp t) (showExp v)
   | Action "q" -> exit 0
   | Action "r" -> st := init; raise Restart
   | Action "h" -> print_endline help

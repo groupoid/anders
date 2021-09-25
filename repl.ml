@@ -6,8 +6,7 @@ open Expr
 
 let help =
 "Available commands:
-  <statement>    infer type and evaluate statement
-  :n <statement> normalize statement
+  <statement>    infer type and normalize statement
   :q             quit
   :r             restart
   :h             display this message"

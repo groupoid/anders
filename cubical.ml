@@ -14,7 +14,7 @@ let rec extractExp : exp -> string = function
   | EKan _ -> fail "cubicaltt does not support universe hierarchy"
   | EPre _ -> fail "cubicaltt does not support explicit pretypes"
   | EInc _ | EOuc _ | ESub _ -> fail "cubicaltt does not support explicit cubical subtypes"
-  | ESystem e -> showSystem extractExp extractExp e
+  | ESystem e -> showSystem extractExp (fun _ -> extractExp) e
   | EHComp _ -> fail "not implemented yet"
   | EApp (ETransp (p, i), a) -> Printf.sprintf "transGen %s %s %s" (extractExp p) (extractExp i) (extractExp a)
   | ETransp _ -> fail "cubicaltt does not support currying of generalized transport"

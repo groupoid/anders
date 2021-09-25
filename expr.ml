@@ -2,22 +2,21 @@ open Prelude
 open Ident
 
 type tag = (string option) ref
+type ('a, 'b) system = ((name * 'a) list * 'b) list
 
 (* Language Expressions *)
 
 type exp =
-  | EPre of int | EKan of int                                                              (* cosmos *)
-  | EVar of name | EHole                                                                (* variables *)
-  | EPi of exp * (name * exp) | ELam of exp * (name * exp) | EApp of exp * exp                 (* pi *)
-  | ESig of exp * (name * exp) | EPair of tag * exp * exp                                   (* sigma *)
-  | EFst of exp | ESnd of exp | EField of exp * string                                      (* sigma *)
-  | EId of exp | ERef of exp | EJ of exp                                          (* strict equality *)
-  | EPathP of exp | EPLam of exp | EAppFormula of exp * exp                         (* path equality *)
-  | EI | EDir of dir | EAnd of exp * exp | EOr of exp * exp | ENeg of exp           (* CCHM interval *)
-  | ETransp of exp * exp | EHComp of exp | EPartial of exp | ESystem of exp system (* Kan operations *)
-  | ESub of exp * exp * exp | EInc of exp | EOuc of exp                          (* cubical subtypes *)
-
-and 'a system = ((name * 'a) list * exp) list
+  | EPre of int | EKan of int                                                                     (* cosmos *)
+  | EVar of name | EHole                                                                       (* variables *)
+  | EPi of exp * (name * exp) | ELam of exp * (name * exp) | EApp of exp * exp                        (* pi *)
+  | ESig of exp * (name * exp) | EPair of tag * exp * exp                                          (* sigma *)
+  | EFst of exp | ESnd of exp | EField of exp * string                                             (* sigma *)
+  | EId of exp | ERef of exp | EJ of exp                                                 (* strict equality *)
+  | EPathP of exp | EPLam of exp | EAppFormula of exp * exp                                (* path equality *)
+  | EI | EDir of dir | EAnd of exp * exp | EOr of exp * exp | ENeg of exp                  (* CCHM interval *)
+  | ETransp of exp * exp | EHComp of exp | EPartial of exp | ESystem of (exp, exp) system (* Kan operations *)
+  | ESub of exp * exp * exp | EInc of exp | EOuc of exp                                 (* cubical subtypes *)
 
 type tele = name * exp
 
@@ -33,10 +32,10 @@ type value =
   | VId of value | VRef of value | VJ of value
   | VPathP of value | VPLam of value | VAppFormula of value * value
   | VI | VDir of dir | VAnd of value * value | VOr of value * value | VNeg of value
-  | VTransp of value * value | VHComp of value | VPartial of value | VSystem of value system * ctx
+  | VTransp of value * value | VHComp of value | VPartial of value | VSystem of (value, value list -> value) system
   | VSub of value * value * value | VInc of value | VOuc of value
 
-and clos = name * exp * ctx
+and clos = name * (value -> value)
 
 and term = Exp of exp | Value of value
 
@@ -59,8 +58,8 @@ let name x = Name (x, 0)
 let decl x = EVar (name x)
 
 let upVar p x ctx = match p with Irrefutable -> ctx | _ -> Env.add p x ctx
-let upLocal (ctx : ctx) (p : name) t v : ctx = upVar p (Local, Value t, Value v) ctx
-let upGlobal (ctx : ctx) (p : name) t v : ctx = upVar p (Global, Value t, Value v) ctx
+let upLocal (ctx : ctx) (p : name) t v = upVar p (Local, Value t, Value v) ctx
+let upGlobal (ctx : ctx) (p : name) t v = upVar p (Global, Value t, Value v) ctx
 
 let isGlobal : record -> bool = function Global, _, _ -> false | Local, _, _ -> true
 let freshVar ns n = match Env.find_opt n ns with Some x -> x | None -> n
@@ -84,8 +83,8 @@ let showAtom show = function
   | x,           t -> Printf.sprintf "(%s : %s = 1)" (showName x) (show t)
 let showFace show = List.map (showAtom show) >> String.concat " "
 
-let showSystem showVar showTerm xs =
-  List.map (fun (x, e) -> Printf.sprintf "%s → %s" (showFace showVar x) (showTerm e)) xs
+let showSystem show showClos xs =
+  List.map (fun (x, e) -> Printf.sprintf "%s → %s" (showFace show x) (showClos x e)) xs
   |> String.concat ", "
 
 let parens b x = if b then "(" ^ x ^ ")" else x
@@ -106,7 +105,7 @@ let rec ppExp paren e = let x = match e with
   | EPLam (ELam (_, (i, e))) -> Printf.sprintf "<%s> %s" (showName i) (showExp e)
   | EPLam _ -> failwith "showExp: unreachable code was reached"
   | EAppFormula (f, x) -> Printf.sprintf "%s @ %s" (ppExp true f) (ppExp true x)
-  | ESystem x -> Printf.sprintf "[%s]" (showSystem showExp showExp x)
+  | ESystem x -> Printf.sprintf "[%s]" (showSystem showExp (fun _ -> showExp) x)
   | ESub (a, i, u) -> Printf.sprintf "%s[%s ↦ %s]" (ppExp true a) (showExp i) (showExp u)
   | EI -> !intervalPrim | EDir d -> showDir d
   | EAnd (a, b) -> Printf.sprintf "%s ∧ %s" (ppExp true a) (ppExp true b)
@@ -133,11 +132,14 @@ and showPiExp a p b = match p with
   | Irrefutable -> Printf.sprintf "%s → %s" (ppExp true a) (showExp b)
   | _           -> Printf.sprintf "Π %s, %s" (showTeleExp (p, a)) (showExp b)
 
+let isOne i = VApp (VApp (VId VI, VDir One), i)
+let extFace x e = e (List.map (fun (p, v) -> Var (p, isOne v)) x)
+
 let rec ppValue paren v = let x = match v with
   | VKan n -> "U" ^ showSubscript n
-  | VLam (x, (p, e, rho)) -> Printf.sprintf "λ %s, %s" (showTeleValue p x rho) (showExp e)
-  | VPi (x, (p, e, rho)) -> showPi x p e rho
-  | VSig (x, (p, e, rho)) -> Printf.sprintf "Σ %s, %s" (showTeleValue p x rho) (showExp e)
+  | VLam (x, (p, clos)) -> Printf.sprintf "λ %s, %s" (showTele p x) (showClos p x clos)
+  | VPi (x, (p, clos)) -> showPiValue x p clos
+  | VSig (x, (p, clos)) -> Printf.sprintf "Σ %s, %s" (showTele p x) (showClos p x clos)
   | VPair (_, fst, snd) -> Printf.sprintf "(%s, %s)" (showValue fst) (showValue snd)
   | VFst v -> ppValue true v ^ ".1"
   | VSnd v -> ppValue true v ^ ".2"
@@ -146,10 +148,10 @@ let rec ppValue paren v = let x = match v with
   | VHole -> "?"
   | VPre n -> "V" ^ showSubscript n
   | VTransp (p, i) -> Printf.sprintf "transp %s %s" (ppValue true p) (ppValue true i)
-  | VPLam (VLam (_, (p, e, rho))) -> showLam p e rho
+  | VPLam (VLam (_, (p, clos))) -> Printf.sprintf "<%s> %s" (showName p) (showClos p VI clos)
   | VPLam _ -> failwith "showExp: unreachable code was reached"
   | VAppFormula (f, x) -> Printf.sprintf "%s @ %s" (ppValue true f) (ppValue true x)
-  | VSystem (x, rho) -> showSystemV x rho
+  | VSystem xs -> Printf.sprintf "[%s]" (showSystem showValue (fun x e -> showValue (extFace x e)) xs)
   | VSub (a, i, u) -> Printf.sprintf "%s[%s ↦ %s]" (ppValue true a) (showValue i) (showValue u)
   | VI -> !intervalPrim | VDir d -> showDir d
   | VAnd (a, b) -> Printf.sprintf "%s ∧ %s" (ppValue true a) (ppValue true b)
@@ -169,34 +171,20 @@ let rec ppValue paren v = let x = match v with
   | _ -> parens paren x
 
 and showValue v = ppValue false v
+and showTele p x = Printf.sprintf "(%s : %s)" (showName p) (showValue x)
 
-and showTeleValue p x rho : string =
-  if isRhoVisible rho then Printf.sprintf "(%s : %s, %s)" (showName p) (showValue x) (showRho rho)
-  else Printf.sprintf "(%s : %s)" (showName p) (showValue x)
+and showPiValue x p clos = match p with
+  | Irrefutable -> Printf.sprintf "%s → %s" (ppValue true x) (showClos p x clos)
+  | _           -> Printf.sprintf "Π %s, %s" (showTele p x) (showClos p x clos)
 
-and showLam p e rho =
-  if isRhoVisible rho then Printf.sprintf "<%s, %s> %s" (showName p) (showRho rho) (showExp e)
-  else Printf.sprintf "<%s> %s" (showName p) (showExp e)
+and showClos p t clos = showValue (clos (Var (p, t)))
+and showTerm : term -> string = function Exp e -> showExp e | Value v -> showValue v
 
-and showSystemV x rho =
-  if isRhoVisible rho then Printf.sprintf "[%s, %s]" (showSystem showValue showExp x) (showRho rho)
-  else Printf.sprintf "[%s]" (showSystem showValue showExp x)
-
-and showTermBind : name * record -> string option = function
+let showTermBind : name * record -> string option = function
   | p, (Local, _, t) -> Some (Printf.sprintf "%s := %s" (showName p) (showTerm t))
   | _, _             -> None
 
-and showPi x p e rho = match p with
-  | Irrefutable ->
-    if isRhoVisible rho then Printf.sprintf "(%s, %s) → %s" (showValue x) (showRho rho) (showExp e)
-    else Printf.sprintf "%s → %s" (ppValue true x) (showExp e)
-  | _           -> Printf.sprintf "Π %s, %s" (showTeleValue p x rho) (showExp e)
-
-and isRhoVisible = Env.exists (fun _ -> isGlobal)
-
-and showRho ctx : string = Env.bindings ctx |> List.filter_map showTermBind |> String.concat ", "
-
-and showTerm : term -> string = function Exp e -> showExp e | Value v -> showValue v
+let showRho ctx : string = Env.bindings ctx |> List.filter_map showTermBind |> String.concat ", "
 
 let showGamma (ctx : ctx) : string =
   Env.bindings ctx

@@ -29,14 +29,8 @@ let imax a b = match a, b with
   | VKan _, _ | VPre _, _ -> raise (ExpectedVSet b)
   | _, _ -> raise (ExpectedVSet a)
 
-let univImpl a b = match a, b with
-  | VKan u, VKan v | VPre u, VKan v -> VKan (max u v)
-  | VPre u, VPre v | VKan u, VPre v -> VPre (max u v)
-  | VKan _, _      | VPre _, _      -> raise (ExpectedVSet b)
-  | _, _ -> raise (ExpectedVSet a)
-
-let implv a b ctx = VPi (a, (Irrefutable, b, ctx))
-let isOne i = VApp (VApp (VId VI, VDir One), i)
+let idv t x y = VApp (VApp (VId t, x), y)
+let implv a b = VPi (a, (Irrefutable, fun _ -> b))
 
 let impl a b = EPi (a, (Irrefutable, b))
 let prod a b = ESig (a, (Irrefutable, b))
@@ -83,9 +77,3 @@ and saltFace ns xs =
   (exp, !ns')
 
 let freshExp = salt Env.empty
-
-let face p x e d = match e, getDir d with
-    | "=", Zero -> (p, ENeg x)
-    | "=", One  -> (p, x)
-    | _,   _    -> failwith "invalid face"
-

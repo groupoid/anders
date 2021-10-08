@@ -1,0 +1,12 @@
+module BPE where
+import experiments/BASE
+
+axiom start : Proc -> IO Sup
+axiom stop : String -> IO Sup
+axiom next : ProcId -> IO ProcRes
+axiom amend : Π (k: U), ProcId -> k -> IO ProcRes
+axiom discard : Π (k: U), ProcId -> k -> IO ProcRes
+axiom modify : Π (k: U), ProcId -> k -> Atom -> IO ProcRes
+axiom event : ProcId -> String -> IO ProcRes
+axiom head : ProcId -> IO Hist
+axiom hist : ProcId -> IO (List Hist)

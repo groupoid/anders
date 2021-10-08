@@ -202,32 +202,6 @@ and prune ctx x = match Env.find_opt x ctx with
   | Some (_, _, Value v) -> rbV v
   | None                 -> raise (VariableNotFound x)
 
-(* Weak *)
-and weak (e : exp) ctx = traceWeak e; match e with
-  | EVar x             -> prune ctx x
-  | ELam (a, (p, b))   -> weakTele eLam ctx p a b
-  | EPi  (a, (p, b))   -> weakTele ePi  ctx p a b
-  | ESig (a, (p, b))   -> weakTele eSig ctx p a b
-  | EFst e             -> EFst (weak e ctx)
-  | ESnd e             -> ESnd (weak e ctx)
-  | EApp (f, x)        -> EApp (weak f ctx, weak x ctx)
-  | EPair (r, e1, e2)  -> EPair (r, weak e1 ctx, weak e2 ctx)
-  | EPathP u           -> EPathP (weak u ctx)
-  | EPLam u            -> EPLam (weak u ctx)
-  | EPartial e         -> EPartial (weak e ctx)
-  | EAppFormula (f, x) -> EAppFormula (weak f ctx, weak x ctx)
-  | EAnd (e1, e2)      -> EAnd (weak e1 ctx, weak e2 ctx)
-  | EOr (e1, e2)       -> EOr (weak e1 ctx, weak e2 ctx)
-  | ENeg e             -> ENeg (weak e ctx)
-  | EId e              -> EId (weak e ctx)
-  | ERef e             -> ERef (weak e ctx)
-  | EJ e               -> EJ (weak e ctx)
-  | e                  -> e
-
-and weakTele ctor ctx p a b : exp =
-  let t = weak a ctx in
-    ctor p t (weak b (upVar p (Local, Exp t, Exp (EVar p)) ctx))
-
 (* Convertibility *)
 and conv v1 v2 : bool = traceConv v1 v2;
   v1 == v2 || begin match v1, v2 with

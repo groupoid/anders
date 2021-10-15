@@ -1,31 +1,30 @@
 module algebra where
 import lib/path
 
-def isAssoc  (M : U) (op : M -> M -> M) : U := Π (a b c : M), Path M (op a (op b c)) (op (op a b) c)
 def isComm   (M : U) (op : M -> M -> M) : U := Π (x y : M), Path M (op x y) (op y x)
-def hasLInv  (G : U) (op : G -> G -> G) (id : G) (inv : G -> G) : U := Π (x : G), Path G (op (inv x) x) id
-def hasRInv  (G : U) (op : G -> G -> G) (id : G) (inv : G -> G) : U := Π (x : G), Path G (op x (inv x)) id
-def hasInv   (G : U) (op : G -> G -> G) (id : G) (inv : G -> G) : U := Σ (_ : hasLInv G op id inv), hasRInv G op id inv
+def isAssoc  (M : U) (op : M -> M -> M) : U := Π (a b c : M), Path M (op a (op b c)) (op (op a b) c)
 def hasLId   (M : U) (op : M -> M -> M) (id : M) : U := Π (x : M), Path M (op id x) x
 def hasRId   (M : U) (op : M -> M -> M) (id : M) : U := Π (x : M), Path M (op x id) x
 def hasId    (M : U) (op : M -> M -> M) (id : M) : U := Σ (_ : hasLId M op id), hasRId M op id
-def isLDistr (R : U) (add : R -> R -> R) (mul : R -> R -> R) : U := Π (a b c: R), Path R (mul a (add b c)) (add (mul a b) (mul a c))
-def isRDistr (R : U) (add : R -> R -> R) (mul : R -> R -> R) : U := Π (a b c: R), Path R (mul (add b c) a) (add (mul b a) (mul c a))
-def isDistr  (R : U) (add : R -> R -> R) (mul : R -> R -> R) : U := Σ (_ : isLDistr R add mul), isRDistr R add mul
+def hasLInv  (G : U) (op : G -> G -> G) (id : G) (inv : G -> G) : U := Π (x : G), Path G (op (inv x) x) id
+def hasRInv  (G : U) (op : G -> G -> G) (id : G) (inv : G -> G) : U := Π (x : G), Path G (op x (inv x)) id
+def hasInv   (G : U) (op : G -> G -> G) (id : G) (inv : G -> G) : U := Σ (_ : hasLInv G op id inv), hasRInv G op id inv
+def isLDistr (R : U) (ad : R -> R -> R) (mu : R -> R -> R) : U := Π (a b c: R), Path R (mu a (ad b c)) (ad (mu a b) (mu a c))
+def isRDistr (R : U) (ad : R -> R -> R) (mu : R -> R -> R) : U := Π (a b c: R), Path R (mu (ad b c) a) (ad (mu b a) (mu c a))
+def isDistr  (R : U) (ad : R -> R -> R) (mu : R -> R -> R) : U := Σ (_ : isLDistr R ad mu), isRDistr R ad mu
 
-def isMonoid (M : SET) : U := Σ (op: M.1 -> M.1 -> M.1) (assoc: isAssoc M.1 op) (id: M.1), hasId M.1 op id
-def isGroup (G : SET) : U := Σ (m: isMonoid G) (inv: G.1 -> G.1), hasInv G.1 m.1 m.2.2.1 inv
-def isDiffGroup (G : SET) : U := Σ (g: isGroup G) (comm: isComm G.1 g.1.1) (b: G.1 -> G.1), Π (x : G.1), Path G.1 (b (b x)) g.1.2.2.1
-def isCMonoid (M: SET) : U := Σ (m: isMonoid M), isComm M.1 m.1
-def isAbGroup (G: SET) : U := Σ (g: isGroup G), isComm G.1 g.1.1
-def isRing (R: SET) : U := Σ (mul: isMonoid R) (add: isAbGroup R), isDistr R.1 add.1.1.1 mul.1
-def isAbRing (R: SET) : U := Σ (mul: isCMonoid R) (add: isAbGroup R), isDistr R.1 add.1.1.1 mul.1.1
+def isMonoid    (M : SET) : U := Σ (o: M.1 -> M.1 -> M.1) (a: isAssoc M.1 o) (id: M.1), hasId M.1 o id
+def isGroup     (G : SET) : U := Σ (m: isMonoid G) (inv: G.1 -> G.1), hasInv G.1 m.1 m.2.2.1 inv
+def isDiffGroup (G : SET) : U := Σ (g: isGroup G) (c: isComm G.1 g.1.1) (b: G.1 -> G.1), Π (x : G.1), Path G.1 (b (b x)) g.1.2.2.1
+def isCMonoid   (M : SET) : U := Σ (m: isMonoid M), isComm M.1 m.1
+def isAbGroup   (G : SET) : U := Σ (g: isGroup G), isComm G.1 g.1.1
+def isRing      (R : SET) : U := Σ (m: isMonoid R) (a: isAbGroup R), isDistr R.1 a.1.1.1 m.1
+def isAbRing    (R : SET) : U := Σ (m: isCMonoid R) (a: isAbGroup R), isDistr R.1 a.1.1.1 m.1.1
 
-def monoid : U₁ := Σ (X : SET), isMonoid X
+def monoid  : U₁ := Σ (X : SET), isMonoid X
 def cmonoid : U₁ := Σ (X : SET), isCMonoid X
-def group : U₁ := Σ (X : SET), isGroup X
+def group   : U₁ := Σ (X : SET), isGroup X
 def abgroup : U₁ := Σ (X : SET), isAbGroup X
-def ring : U₁ := Σ (X : SET), isRing X
-def abring : U₁ := Σ (X : SET), isAbRing X
-def dgroup : U₁ := Σ (X : SET), isDiffGroup X
-
+def ring    : U₁ := Σ (X : SET), isRing X
+def abring  : U₁ := Σ (X : SET), isAbRing X
+def dgroup  : U₁ := Σ (X : SET), isDiffGroup X

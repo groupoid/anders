@@ -58,6 +58,8 @@ def isSet (A : U) : U := Π (a b : A) (a0 b0 : Path A a b), Path (Path A a b) a0
 def isGroupoid (A : U) : U := Π (a b : A) (x y : Path A a b)
                (i j : Path (Path A a b) x y), Path (Path (Path A a b) x y) i j
 
+def SET : U₁ := Σ (X : U), isSet X
+
 -- computational properties
 
 def transport (A B: U) (p : PathP (<_> U) A B) (a: A): B := transp p 0 a

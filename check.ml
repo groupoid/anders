@@ -16,8 +16,6 @@ let vsnd : value -> value = function
   | VPair (_, _, u) -> u
   | v               -> VSnd v
 
-let isOneCtx ctx0 xs = List.fold_left (fun ctx (p, v) -> upLocal ctx p (isOne v) (Var (p, isOne v))) ctx0 xs
-
 (* Evaluator *)
 let rec eval (e0 : exp) (ctx : ctx) = traceEval e0; match e0 with
   | EPre u             -> VPre u
@@ -46,7 +44,7 @@ let rec eval (e0 : exp) (ctx : ctx) = traceEval e0; match e0 with
   | ETransp (p, i)     -> transport ctx p i
   | EHComp e           -> VHComp (eval e ctx)
   | EPartial e         -> VPartial (eval e ctx)
-  | ESystem xs         -> VSystem (evalFaces ctx (simplifyClauses ctx xs))
+  | ESystem xs         -> VSystem (evalSystem ctx xs)
   | ESub (a, i, u)     -> VSub (eval a ctx, eval i ctx, eval u ctx)
   | EInc e             -> begin match eval e ctx with VOuc v -> v | v -> VInc v end
   | EOuc e             -> begin match eval e ctx with VInc x -> x | v -> evalOuc ctx v end
@@ -75,29 +73,24 @@ and closByVal ctx p t e v = traceClos e p v;
 and app : value * value -> value = function
   | VApp (VApp (VApp (VApp (VJ _, _), _), f), _), VRef _ -> f
   | VApp (VApp (VHComp _, VDir One), f), _ -> app (app (f, vone), VRef vone)
-  | VSystem xs, x -> evalSystem xs x
+  | VSystem ts, x -> reduceSystem ts x
   | VLam (_, (_, f)), v -> f v
   | f, x -> VApp (f, x)
 
-and simplifyClauses ctx fn =
-  let evalFace (xs, e) =
-    let ys = List.map (fun (x, e) -> (x, eval e ctx)) xs in
-    if List.exists (fun (_, v) -> conv v vzero) ys
-    then None else Some (ys, e) in
-  List.filter_map evalFace fn
+and evalSystem ctx ts =
+  let out =
+    System.fold (fun alpha talpha ->
+      Env.bindings alpha
+      |> List.map (fun (i, d) -> solve (getRho ctx i) d)
+      |> meetss
+      |> List.map (fun beta -> (beta, eval talpha (faceEnv beta ctx)))
+      |> List.append) ts [] in
+  System.of_seq (List.to_seq out)
 
-and evalFaces ctx fn =
-  List.map (fun (xs, e) ->
-    (xs, fun ys ->
-      List.fold_left2 (fun ctx' (p, t) v ->
-        upLocal ctx' p (isOne t) v) ctx xs ys
-      |> eval e)) fn
-
-and evalSystem xs v =
-  let holds = List.for_all (fun (_, v) -> conv v vone) in
-  match List.find_opt (fun (x, _) -> holds x) xs with
-  | Some (phi, e) -> e (List.map (fun _ -> VRef vone) phi)
-  | None -> VApp (VSystem xs, v)
+and reduceSystem ts x =
+  match System.find_opt eps ts with
+  | Some v -> v
+  | None   -> VApp (VSystem ts, x)
 
 and evalOuc ctx v = match inferV v with
   | VSub (_, i, f) ->
@@ -177,9 +170,7 @@ and rbV v : exp = traceRbV v; match v with
   | VHole              -> EHole
   | VPathP v           -> EPathP (rbV v)
   | VPartial v         -> EPartial (rbV v)
-  | VSystem xs         -> ESystem (List.map (fun (ys, e) ->
-    (List.map (fun (p, v) -> (p, rbV v)) ys,
-     rbV (e (List.map (fun (p, t) -> Var (p, isOne t)) ys)))) xs)
+  | VSystem ts         -> ESystem (System.map rbV ts)
   | VSub (a, i, u)     -> ESub (rbV a, rbV i, rbV u)
   | VTransp (p, i)     -> ETransp (rbV p, rbV i)
   | VHComp v           -> EHComp (rbV v)
@@ -223,7 +214,7 @@ and conv v1 v2 : bool = traceConv v1 v2;
     | VPathP a, VPathP b -> conv a b
     | VPartial a, VPartial b -> conv a b
     | VAppFormula (f, x), VAppFormula (g, y) -> conv f g && conv x y
-    | VSystem xs, VSystem ys -> systemSubset xs ys && systemSubset ys xs
+    | VSystem xs, VSystem ys -> keys xs = keys ys && System.for_all (fun _ b -> b) (intersectionWith conv xs ys)
     | VTransp (p, i), VTransp (q, j) -> conv p q && conv i j
     | VHComp a, VHComp b -> conv a b
     | VSub (a, i, u), VSub (b, j, v) -> conv a b && conv i j && conv u v
@@ -290,14 +281,15 @@ and check ctx (e0 : exp) (t0 : value) =
   end
   | ESystem xs, VApp (VPartial t, i) ->
     eqNf (eval (getFormula xs) ctx) i;
+    System.iter (fun alpha e -> check (faceEnv alpha ctx) e t) xs;
 
-    let xs' = simplifyClauses ctx xs in
-    List.iter (fun (x, e) -> check (isOneCtx ctx x) e t) xs';
     (* check overlapping cases *)
-    List.iter (fun (x1, e1) ->
-      List.iter (fun (x2, e2) ->
-        if List.exists (fun (_, i1) -> List.exists (fun (_, i2) -> conv i1 i2) x2) x1 then
-          eqNf (eval e1 (isOneCtx ctx x1)) (eval e2 (isOneCtx ctx x2))) xs') xs'
+    System.iter (fun alpha e1 ->
+      System.iter (fun beta e2 ->
+        if compatible alpha beta then
+          eqNf (eval e1 (faceEnv alpha ctx))
+               (eval e2 (faceEnv beta ctx))
+        else ()) xs) xs
   | EInc e, VSub (t, i, u) -> check ctx e t;
     let n = freshName "υ" in
       List.iter (fun phi -> let ctx' = faceEnv phi ctx in

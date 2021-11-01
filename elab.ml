@@ -58,8 +58,7 @@ let rec salt (ns : name Env.t) : exp -> exp = function
   | EAppFormula (p, i) -> EAppFormula (salt ns p, salt ns i)
   | EPartial e         -> EPartial (salt ns e)
   | ESub (a, i, u)     -> ESub (salt ns a, salt ns i, salt ns u)
-  | ESystem xs         -> ESystem (List.map (fun (phi, e) ->
-    let (phi', ns') = saltFace ns phi in (phi', salt ns' e)) xs)
+  | ESystem xs         -> ESystem (System.fold (fun k v -> System.add (freshFace ns k) (salt ns v)) xs System.empty)
   | EInc e             -> EInc (salt ns e)
   | EOuc e             -> EOuc (salt ns e)
   | EI                 -> EI
@@ -68,12 +67,10 @@ let rec salt (ns : name Env.t) : exp -> exp = function
   | EOr (a, b)         -> EOr (salt ns a, salt ns b)
   | ENeg e             -> ENeg (salt ns e)
 
+and freshFace ns phi =
+  Env.fold (fun k v -> Env.add (freshVar ns k) v) phi Env.empty
+
 and saltTele ctor ns p a b =
   let x = fresh p in ctor x (salt ns a) (salt (Env.add p x ns) b)
-
-and saltFace ns xs =
-  let ns' = ref ns in let exp = List.map (fun (x, e) ->
-    let y = fresh x in ns' := Env.add x y !ns'; (y, salt ns e)) xs in
-  (exp, !ns')
 
 let freshExp = salt Env.empty

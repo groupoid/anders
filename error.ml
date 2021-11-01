@@ -11,7 +11,7 @@ exception ExpectedPath of value
 exception ExpectedVSet of value
 exception Ineq of value * value
 exception ExpectedSubtype of exp
-exception Parser of int * string
+exception Parser of int * string * string
 exception ExpectedSystem of value
 exception UnknownOption of string
 exception ExpectedNeutral of value
@@ -46,7 +46,7 @@ let prettyPrintError : exn -> unit = function
   | UnknownCommand s -> Printf.printf "Unknown command “%s”\n" s
   | UnknownOption opt -> Printf.printf "Unknown option “%s”\n" opt
   | UnknownOptionValue (opt, value) -> Printf.printf "Unknown value “%s” of option “%s”\n" value opt
-  | Parser (x, buf) -> Printf.printf "Parsing error at line %d: “%s”\n" x buf
+  | Parser (x, buf, filename) -> Printf.printf "Parsing error at line %d while parsing “%s”: “%s”\n" x filename buf
   | IncompatibleFaces -> Printf.printf "Incompatible faces\n"
   | Sys_error s -> print_endline s
   | Restart -> raise Restart

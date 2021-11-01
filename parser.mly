@@ -3,10 +3,9 @@
    open Elab
    open Expr
 
-  let face p x e d = match e, getDir d with
-    | "=", Zero -> (p, ENeg x)
-    | "=", One  -> (p, x)
-    | _,   _    -> failwith "invalid face"
+  let face p e d : name * dir = match e, getDir d with
+    | "=", d -> (name p, d)
+    | _,   _ -> failwith "invalid face"
 %}
 
 %token <string> IDENT
@@ -41,10 +40,10 @@ lense : LPARENS vars COLON exp2 RPARENS { List.map (fun x -> (x, $4)) $2 }
 telescope : lense telescope { List.append $1 $2 } | lense { $1 }
 params : telescope { $1 } | { [] }
 path : IDENT { getPath $1 }
-face : LPARENS IDENT IDENT IDENT RPARENS { face Irrefutable (getVar $2) $3 $4 }
-     | LPARENS IDENT COLON IDENT IDENT IDENT RPARENS { face (name $2) (getVar $4) $5 $6 }
+face : LPARENS IDENT IDENT IDENT RPARENS { face $2 $3 $4 }
+     (*| LPARENS IDENT COLON IDENT IDENT IDENT RPARENS { failwith "not implemented yet" }*)
 
-part : face+ ARROW exp2 { ($1, $3) }
+part : face+ ARROW exp2 { (Env.of_seq (List.to_seq $1), $3) }
 file : MODULE IDENT WHERE line* EOF { ($2, $4) }
 line : IMPORT path+ { Import $2 } | OPTION IDENT IDENT { Option ($2, $3) } | declarations { Decl $1 }
 repl : COLON IDENT exp2 EOF { Command ($2, $3) } | COLON IDENT EOF { Action $2 } | exp2 EOF { Eval $1 } | EOF { Nope }
@@ -88,7 +87,7 @@ exp6:
   | KAN { EKan $1 }
   | exp6 DOT IDENT { match $3 with | "1" -> EFst $1 | "2" -> ESnd $1 | field -> EField ($1, field) }
   | NEGATE exp6 { ENeg $2 }
-  | LSQ separated_list(COMMA, part) RSQ { ESystem $2 }
+  | LSQ separated_list(COMMA, part) RSQ { ESystem (System.of_seq (List.to_seq $2)) }
   | LPARENS exp1 RPARENS { $2 }
   | IDENT { getVar $1 }
 

@@ -53,7 +53,7 @@ and checkFile p path =
   let filename = Filename.basename path in
 
   let chan = open_in path in
-  let (name, con) = Reader.parseErr Parser.file (Lexing.from_channel chan) in
+  let (name, con) = Reader.parseErr Parser.file (Lexing.from_channel chan) path in
   close_in chan; if !Prefs.verbose then begin
     Printf.printf "Parsed “%s” successfully.\n" filename; flush_all ()
   end;

@@ -1,9 +1,9 @@
 open Lexing
 
-let parseErr f lexbuf =
+let parseErr f lexbuf filename =
   try f Lexer.main lexbuf
   with Parser.Error ->
-    raise (Error.Parser (lexbuf.lex_curr_p.pos_lnum, lexeme lexbuf))
+    raise (Error.Parser (lexbuf.lex_curr_p.pos_lnum, lexeme lexbuf, filename))
 
 let lex filename =
   let chan = open_in filename in
@@ -22,6 +22,6 @@ let parse filename =
   Error.handleErrors
     (fun chan ->
       let lexbuf = Lexing.from_channel chan in
-      let file = parseErr Parser.file lexbuf in
+      let file = parseErr Parser.file lexbuf filename in
       print_endline (Module.showFile file))
     chan ()

@@ -2,9 +2,6 @@ open Ident
 open Error
 open Expr
 
-let mergeConjunction xs = List.fold_left (fun e (_, e') -> EAnd (e', e)) (EDir One) xs
-let getFormula       xs = List.fold_left (fun e (x, _) -> EOr (mergeConjunction x, e)) (EDir Zero) xs
-
 (* Arbitrary formula φ after calling andFormula/orFormula/negFormula
    will have form (α₁ ∧ ... ∧ αₙ) ∨ ... ∨ (β₁ ∧ ... ∧ βₘ),
    where “∧” and “∨” are right-associative,
@@ -67,13 +64,13 @@ let orEq f g =
    of the form (α₁ ∧ ... ∧ αₙ) *)
 let andEq f g = Conjunction.equal (extAnd f) (extAnd g)
 
-let meet phi psi : face =
-  Env.merge (fun _ x y ->
-    match x, y with
-    | Some _, Some _ -> raise IncompatibleFaces
-    | Some u, None   -> Some u
-    | None,   Some v -> Some v
-    | None,   None   -> None) phi psi
+let compatible xs ys =
+  Env.merge (fun _ x y -> match x, y with
+    | Some d1, Some d2 -> Some (d1 = d2)
+    | _,       _       -> Some true) xs ys
+  |> Env.for_all (fun _ b -> b)
+
+let meet = Env.union (fun _ x y -> if x = y then Some x else raise IncompatibleFaces)
 
 let nubRev xs =
   let ys = ref [] in
@@ -92,6 +89,15 @@ let meets xs ys =
 
 let union xs ys = nubRev (List.append xs ys)
 let eps : face = Env.empty
+let meetss xss = List.fold_right meets xss [eps]
+
+let sign x = function
+  | Zero -> ENeg (EVar x)
+  | One  -> EVar x
+
+let getFace xs = Env.fold (fun x d y -> EAnd (y, sign x d)) xs (EDir One)
+let getFormula ts = System.fold (fun x _ e -> EOr (getFace x, e)) ts (EDir Zero)
+
 let singleton p x = Env.add p x Env.empty
 let faceEnv = Env.fold (fun p dir -> Env.add p (Local, Value VI, Value (VDir dir)))
 

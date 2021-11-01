@@ -145,15 +145,15 @@ def φ-0 : PathP (<_> U₁) (φ 0 1=1) U := <_> U
 def φ-1 : PathP (<_> U₁) (φ 1 1=1) (U → U) := <_> U → U
 def φ-eq-φ′ (i : I) : Id (Partial U₁ (i ∨ -i)) (φ i) (φ′ i) := ref (φ′ i)
 def ρ (i j : I) : Partial U₁ (-i ∨ (i ∧ j)) := [(i = 0) → U, (i = 1) (j = 1) → U]
-def κ : Partial U₁ 1 := [(1 = 1) → U]
+--def κ : Partial U₁ 1 := [(1 = 1) → U]
 
 def ≤ (i j : I) := Id I (i ∧ j) i
 def ≥ (i j : I) := ≤ j i
 
-def ∧-split (i j : I) : Partial (1= i) (i ∧ j) := [(φ : i = 1) (ψ : j = 1) → φ]
+--def ∧-split (i j : I) : Partial (1= i) (i ∧ j) := [(φ : i = 1) (ψ : j = 1) → φ]
 def ∨-left (i j : I) (p : 1= i) : 1= (i ∨ j) := idJ I (λ (i i′ : I) (_ : Id I i i′), Id I 1 (i′ ∨ j)) 1 1=1 i p
 def ∨-right (i j : I) (p : 1= j) : 1= (i ∨ j) := ∨-left j i p -- works due to commutativity of ∨
-def ∧-1 (i j : I) (p : 1= (i ∧ j)) : 1= i := ∧-split i j p
+--def ∧-1 (i j : I) (p : 1= (i ∧ j)) : 1= i := ∧-split i j p
 def ∧-1′ (i j : I) (p : 1= (i ∧ j)) : 1= i := cong-Id I I (λ (k : I), k ∨ i) 1 (i ∧ j) p
 def ∧-min-left  (i j : I) : ≤ (i ∧ j) i := ref (i ∧ j)
 def ∧-min-right (i j : I) : ≤ (i ∧ j) j := ref (i ∧ j)
@@ -184,8 +184,8 @@ def Δ²-1-2 : PathP (<_> Δ²) Δ²-1 Δ²-2 := <i> (0, i, ref 0)
 def Δ²-2-3 : PathP (<_> Δ²) Δ²-2 Δ²-3 := <i> (i, 1, ref i)
 def Δ²-1-3 : PathP (<_> Δ²) Δ²-1 Δ²-3 := <i> (i, i, ref i)
 
-def lem-edge (i : I) : Partial (1= (i ∨ -i)) (i ∨ -i)
- := [(φ : i = 0) → ∨-right i -i φ, (ψ : i = 1) → ∨-left i -i ψ]
+--def lem-edge (i : I) : Partial (1= (i ∨ -i)) (i ∨ -i)
+-- := [(φ : i = 0) → ∨-right i -i φ, (ψ : i = 1) → ∨-left i -i ψ]
 
 def ε (A : U) : Partial A 0 := []
 def ⊥ := Π (A : U), A
@@ -193,8 +193,8 @@ def ⊥ := Π (A : U), A
 def I-nontriv (p : Id I 0 1) : ⊥ := λ (A : U), ε A (rev I 0 1 p)
 def 0≥1-impl-absurd : (≥ 0 1) → ⊥ := I-nontriv
 
-def ε′ (A : U) (a : A) : Partial A 0 := [(0 = 1) → a]
-def ε-eq-ε′ (A : U) (a : A) : Id (Partial A 0) (ε A) (ε′ A a) := ref (ε A)
+--def ε′ (A : U) (a : A) : Partial A 0 := [(0 = 1) → a]
+--def ε-eq-ε′ (A : U) (a : A) : Id (Partial A 0) (ε A) (ε′ A a) := ref (ε A)
 
 -- cubical subtypes
 
@@ -225,11 +225,11 @@ def comp-Path⁻¹ (A : U) (a b : A) (p : Path A a b) : Path (Path A a a) (comp-
 def kan (A : U) (a b c d : A) (p : Path A a c) (q : Path A b d) (r : Path A a b) : Path A c d
  := <i> hcomp A (∂ i) (λ (j : I), [(i = 0) → p @ j, (i = 1) → q @ j]) (inc (r @ i))
 
-def comp (A : I → U) (r : I) (u : Π (i : I), Partial (A i) r) (u₀ : (A 0)[r ↦ u 0]) : A 1
- := hcomp (A 1) r (λ (i : I), [(φ : r = 1) → transp (<j> A (i ∨ j)) i (u i φ)]) (inc (transp (<i> A i) 0 (ouc u₀)))
+--def comp (A : I → U) (r : I) (u : Π (i : I), Partial (A i) r) (u₀ : (A 0)[r ↦ u 0]) : A 1
+-- := hcomp (A 1) r (λ (i : I), [(φ : r = 1) → transp (<j> A (i ∨ j)) i (u i φ)]) (inc (transp (<i> A i) 0 (ouc u₀)))
 
-def ghcomp (A : U) (r : I) (u : I → Partial A r) (u₀ : A[r ↦ u 0]) : A
- := hcomp A (∂ r) (λ (j : I), [(φ : r = 1) → u j φ, (r = 0) → ouc u₀]) (inc (ouc u₀))
+--def ghcomp (A : U) (r : I) (u : I → Partial A r) (u₀ : A[r ↦ u 0]) : A
+-- := hcomp A (∂ r) (λ (j : I), [(φ : r = 1) → u j φ, (r = 0) → ouc u₀]) (inc (ouc u₀))
 
 
 {-

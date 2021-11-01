@@ -70,6 +70,15 @@ struct
   let compare a b = X.compare (Env.bindings a) (Env.bindings b)
 end
 
+module System = Map.Make(Face)
+
+let keys ts = List.of_seq (Seq.map fst (System.to_seq ts))
+let intersectionWith f =
+  System.merge (fun _ x y ->
+    match x, y with
+    | Some a, Some b -> Some (f a b)
+    | _,      _      -> None)
+
 module Files = Set.Make(String)
 
 let inc : int ref = ref 0

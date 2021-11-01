@@ -38,5 +38,6 @@ let repl () =
     print_string "> ";
     let line = read_line () in
     handleErrors (fun x ->
-      let cmd = Reader.parseErr Parser.repl (Lexing.from_string x) in main ctx cmd) line ()
+      let cmd = Reader.parseErr Parser.repl (Lexing.from_string x) "<stdin>" in
+        main ctx cmd) line ()
   done with End_of_file -> ()

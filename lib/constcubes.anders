@@ -1,6 +1,8 @@
 module constcubes where
 import lib/path
 
+option pre-eval false
+
 def Square (A : U)
     (a₀ a₁ b₀ b₁ : A)
     (u  : Path A a₀ a₁) (v : Path A b₀ b₁)
@@ -26,9 +28,10 @@ def cs (A : U) (a : A) (p : Path A a a)
   : Square A a a a a p p p p
  := <j i> hcomp A (∂ i ∨ ∂ j)
      	  (λ (k : I), [ (i = 0) -> s₀ A a p @ k @ j,
-                        (i = 1) -> s₁ A a p @ k @ j,
-                        (j = 0) -> s₀ A a p @ k @ i,
-                        (j = 1) -> s₁ A a p @ k @ i ]) (inc (sb A a p @ i @ j))
+                      (i = 1) -> s₁ A a p @ k @ j,
+                      (j = 0) -> s₀ A a p @ k @ i,
+                      (j = 1) -> s₁ A a p @ k @ i ])
+        (inc (sb A a p @ i @ j))
 
 def c₀ (A : U) (a : A) (p : Path A a a)
   : Cube A a a a a a a a a p p p p p p p p (cs A a p) (cs A a p)
@@ -45,7 +48,8 @@ def Fd (A : U) (a b c : A) (p : Path A a b) (q : Path A b c) : Square A a b b c 
           (λ (k : I), [ (i = 0) -> p @ j,
                         (i = 1) -> q @ k /\ j,
                         (j = 0) -> p @ i,
-                        (j = 1) -> q @ k /\ i ]) (inc (p @ i \/ j))
+                        (j = 1) -> q @ k /\ i ])
+          (inc (p @ i \/ j))
 
 def B (A : U) (a b c d : A) (p : Path A a b) (q : Path A b c) (r : Path A c d)
   : Cube A b b b b b c c d (<_> b) (<_> b) (<_> b) (<_> b) q r q r (<_> <_> b)

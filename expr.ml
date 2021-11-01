@@ -1,4 +1,3 @@
-open Prelude
 open Ident
 
 type tag = (string option) ref
@@ -7,16 +6,16 @@ type ('a, 'b) system = ((name * 'a) list * 'b) list
 (* Language Expressions *)
 
 type exp =
-  | EPre of int | EKan of int                                                                     (* cosmos *)
-  | EVar of name | EHole                                                                       (* variables *)
-  | EPi of exp * (name * exp) | ELam of exp * (name * exp) | EApp of exp * exp                        (* pi *)
-  | ESig of exp * (name * exp) | EPair of tag * exp * exp                                          (* sigma *)
-  | EFst of exp | ESnd of exp | EField of exp * string                                             (* sigma *)
-  | EId of exp | ERef of exp | EJ of exp                                                 (* strict equality *)
-  | EPathP of exp | EPLam of exp | EAppFormula of exp * exp                                (* path equality *)
-  | EI | EDir of dir | EAnd of exp * exp | EOr of exp * exp | ENeg of exp                  (* CCHM interval *)
-  | ETransp of exp * exp | EHComp of exp | EPartial of exp | ESystem of (exp, exp) system (* Kan operations *)
-  | ESub of exp * exp * exp | EInc of exp | EOuc of exp                                 (* cubical subtypes *)
+  | EPre of int | EKan of int                                                                  (* cosmos *)
+  | EVar of name | EHole                                                                    (* variables *)
+  | EPi of exp * (name * exp) | ELam of exp * (name * exp) | EApp of exp * exp                     (* pi *)
+  | ESig of exp * (name * exp) | EPair of tag * exp * exp                                       (* sigma *)
+  | EFst of exp | ESnd of exp | EField of exp * string                                          (* sigma *)
+  | EId of exp | ERef of exp | EJ of exp                                              (* strict equality *)
+  | EPathP of exp | EPLam of exp | EAppFormula of exp * exp                             (* path equality *)
+  | EI | EDir of dir | EAnd of exp * exp | EOr of exp * exp | ENeg of exp               (* CCHM interval *)
+  | ETransp of exp * exp | EHComp of exp | EPartial of exp | ESystem of exp System.t   (* Kan operations *)
+  | ESub of exp * exp * exp | EInc of exp | EOuc of exp                              (* cubical subtypes *)
 
 type tele = name * exp
 
@@ -32,7 +31,7 @@ type value =
   | VId of value | VRef of value | VJ of value
   | VPathP of value | VPLam of value | VAppFormula of value * value
   | VI | VDir of dir | VAnd of value * value | VOr of value * value | VNeg of value
-  | VTransp of value * value | VHComp of value | VPartial of value | VSystem of (value, value list -> value) system
+  | VTransp of value * value | VHComp of value | VPartial of value | VSystem of value System.t
   | VSub of value * value * value | VInc of value | VOuc of value
 
 and clos = name * (value -> value)
@@ -78,13 +77,15 @@ let getVar x =
 
 let showDir : dir -> string = function | Zero -> !zeroPrim | One -> !onePrim
 
-let showAtom show = function
-  | Irrefutable, t -> Printf.sprintf "(%s = 1)" (show t)
-  | x,           t -> Printf.sprintf "(%s : %s = 1)" (showName x) (show t)
-let showFace show = List.map (showAtom show) >> String.concat " "
+let showFace phi =
+  if Env.is_empty phi then "(1 = 1)"
+  else Env.bindings phi
+       |> List.map (fun (x, d) -> Printf.sprintf "(%s = %s)" (showName x) (showDir d))
+       |> String.concat " "
 
-let showSystem show showClos xs =
-  List.map (fun (x, e) -> Printf.sprintf "%s → %s" (showFace show x) (showClos x e)) xs
+let showSystem show xs =
+  System.bindings xs
+  |> List.map (fun (x, e) -> Printf.sprintf "%s → %s" (showFace x) (show e))
   |> String.concat ", "
 
 let parens b x = if b then "(" ^ x ^ ")" else x
@@ -105,7 +106,7 @@ let rec ppExp paren e = let x = match e with
   | EPLam (ELam (_, (i, e))) -> Printf.sprintf "<%s> %s" (showName i) (showExp e)
   | EPLam _ -> failwith "showExp: unreachable code was reached"
   | EAppFormula (f, x) -> Printf.sprintf "%s @ %s" (ppExp true f) (ppExp true x)
-  | ESystem x -> Printf.sprintf "[%s]" (showSystem showExp (fun _ -> showExp) x)
+  | ESystem x -> Printf.sprintf "[%s]" (showSystem showExp x)
   | ESub (a, i, u) -> Printf.sprintf "%s[%s ↦ %s]" (ppExp true a) (showExp i) (showExp u)
   | EI -> !intervalPrim | EDir d -> showDir d
   | EAnd (a, b) -> Printf.sprintf "%s ∧ %s" (ppExp true a) (ppExp true b)
@@ -151,7 +152,7 @@ let rec ppValue paren v = let x = match v with
   | VPLam (VLam (_, (p, clos))) -> Printf.sprintf "<%s> %s" (showName p) (showClos p VI clos)
   | VPLam _ -> failwith "showExp: unreachable code was reached"
   | VAppFormula (f, x) -> Printf.sprintf "%s @ %s" (ppValue true f) (ppValue true x)
-  | VSystem xs -> Printf.sprintf "[%s]" (showSystem showValue (fun x e -> showValue (extFace x e)) xs)
+  | VSystem xs -> Printf.sprintf "[%s]" (showSystem showValue xs)
   | VSub (a, i, u) -> Printf.sprintf "%s[%s ↦ %s]" (ppValue true a) (showValue i) (showValue u)
   | VI -> !intervalPrim | VDir d -> showDir d
   | VAnd (a, b) -> Printf.sprintf "%s ∧ %s" (ppValue true a) (ppValue true b)

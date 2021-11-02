@@ -287,8 +287,8 @@ and check ctx (e0 : exp) (t0 : value) =
     System.iter (fun alpha e1 ->
       System.iter (fun beta e2 ->
         if overlaps alpha beta then
-          eqNf (eval e1 (faceEnv alpha ctx))
-               (eval e2 (faceEnv beta ctx))
+          let ctx' = faceEnv beta (faceEnv alpha ctx) in
+          eqNf (eval e1 ctx') (eval e2 ctx')
         else ()) xs) xs
   | EInc e, VSub (t, i, u) -> check ctx e t;
     let n = freshName "υ" in

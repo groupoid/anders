@@ -27,7 +27,7 @@ def Cube (A : U)
 def cs (A : U) (a : A) (p : Path A a a)
   : Square A a a a a p p p p
  := <j i> hcomp A (∂ i ∨ ∂ j)
-     	  (λ (k : I), [ (i = 0) -> s₀ A a p @ k @ j,
+        (λ (k : I), [ (i = 0) -> s₀ A a p @ k @ j,
                       (i = 1) -> s₁ A a p @ k @ j,
                       (j = 0) -> s₀ A a p @ k @ i,
                       (j = 1) -> s₁ A a p @ k @ i ])

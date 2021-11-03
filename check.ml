@@ -286,7 +286,7 @@ and check ctx (e0 : exp) (t0 : value) =
     (* check overlapping cases *)
     System.iter (fun alpha e1 ->
       System.iter (fun beta e2 ->
-        if overlaps alpha beta then
+        if comparable alpha beta then
           let ctx' = faceEnv beta (faceEnv alpha ctx) in
           eqNf (eval e1 ctx') (eval e2 ctx')
         else ()) xs) xs

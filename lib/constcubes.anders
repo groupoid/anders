@@ -1,8 +1,6 @@
 module constcubes where
 import lib/path
 
-option pre-eval false
-
 def Square (A : U)
     (a₀ a₁ b₀ b₁ : A)
     (u  : Path A a₀ a₁) (v : Path A b₀ b₁)

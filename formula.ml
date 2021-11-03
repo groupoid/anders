@@ -70,12 +70,12 @@ let compatible xs ys =
     | _,       _       -> Some true) xs ys
   |> Env.for_all (fun _ b -> b)
 
-let subface xs ys =
+let leq xs ys =
   Env.for_all (fun k d1 -> match Env.find_opt k ys with
     | Some d2 -> d1 = d2
     | None    -> false) xs
 
-let overlaps xs ys = subface xs ys || subface ys xs
+let comparable xs ys = leq xs ys || leq ys xs
 
 let meet = Env.union (fun _ x y -> if x = y then Some x else raise IncompatibleFaces)
 

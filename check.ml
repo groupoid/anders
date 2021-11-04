@@ -78,14 +78,19 @@ and app : value * value -> value = function
   | f, x -> VApp (f, x)
 
 and evalSystem ctx ts =
-  let out =
+  let ts' =
     System.fold (fun alpha talpha ->
       Env.bindings alpha
       |> List.map (fun (i, d) -> solve (getRho ctx i) d)
       |> meetss
       |> List.map (fun beta -> (beta, eval talpha (faceEnv beta ctx)))
       |> List.append) ts [] in
-  System.of_seq (List.to_seq out)
+
+  (* ensure incomparability *)
+  List.filter (fun (alpha, _) ->
+    List.for_all (fun (beta, _) ->
+      not (lt beta alpha)) ts') ts'
+  |> mkSystem
 
 and reduceSystem ts x =
   match System.find_opt eps ts with

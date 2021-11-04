@@ -75,6 +75,8 @@ let leq xs ys =
     | Some d2 -> d1 = d2
     | None    -> false) xs
 
+let lt xs ys = leq xs ys && xs <> ys
+
 let comparable xs ys = leq xs ys || leq ys xs
 
 let meet = Env.union (fun _ x y -> if x = y then Some x else raise IncompatibleFaces)
@@ -94,9 +96,11 @@ let meets xs ys =
       with IncompatibleFaces -> ()) ys) xs;
   nubRev !zs
 
-let union xs ys = nubRev (List.append xs ys)
 let eps : face = Env.empty
 let meetss xss = List.fold_right meets xss [eps]
+
+let union xs ys = nubRev (List.append xs ys)
+let mkSystem xs = System.of_seq (List.to_seq xs)
 
 let sign x = function
   | Zero -> ENeg (EVar x)

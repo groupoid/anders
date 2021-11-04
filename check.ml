@@ -81,10 +81,10 @@ and evalSystem ctx ts =
   let ts' =
     System.fold (fun alpha talpha ->
       Env.bindings alpha
-      |> List.map (fun (i, d) -> solve (getRho ctx i) d)
+      |> List.rev_map (fun (i, d) -> solve (getRho ctx i) d)
       |> meetss
-      |> List.map (fun beta -> (beta, eval talpha (faceEnv beta ctx)))
-      |> List.append) ts [] in
+      |> List.rev_map (fun beta -> (beta, eval talpha (faceEnv beta ctx)))
+      |> List.rev_append) ts [] in
 
   (* ensure incomparability *)
   List.filter (fun (alpha, _) ->

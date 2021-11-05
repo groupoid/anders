@@ -66,7 +66,7 @@ CCHM
 
 Anders was built by strictly following these publications:
 
-* <a href="http://www.cse.chalmers.se/~simonhu/papers/cubicaltt.pdf">Cubical Type Theory: a constructive interpretation of the univalence axiom</a> [Cohen, Coquand, Huber, Mörtberg]
+* <a href="http://www.cse.chalmers.se/~simonhu/papers/cubicaltt.pdf">CTT: a constructive interpretation of the univalence axiom</a> [Cohen, Coquand, Huber, Mörtberg]
 * <a href="https://staff.math.su.se/anders.mortberg/papers/cubicalhits.pdf">On Higher Inductive Types in Cubical Type Theory</a> [Coquand, Huber, Mörtberg]
 * <a href="https://arxiv.org/pdf/1607.04156.pdf">Canonicity for Cubical Type Theory</a> [Huber]
 * <a href="http://www.cse.chalmers.se/~simonhu/papers/can.pdf">Canonicity and homotopy canonicity for cubical type theory</a> [Coquand, Huber, Sattler]

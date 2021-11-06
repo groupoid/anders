@@ -150,10 +150,10 @@ def ρ (i j : I) : Partial U₁ (-i ∨ (i ∧ j)) := [(i = 0) → U, (i = 1) (j
 def ≤ (i j : I) := Id I (i ∧ j) i
 def ≥ (i j : I) := ≤ j i
 
---def ∧-split (i j : I) : Partial (1= i) (i ∧ j) := [(i = 1) (j = 1) → ?]
+def ∧-split (i j : I) : Partial (1= i) (i ∧ j) := [(i = 1) (j = 1) → 1=1]
 def ∨-left (i j : I) (p : 1= i) : 1= (i ∨ j) := idJ I (λ (i i′ : I) (_ : Id I i i′), Id I 1 (i′ ∨ j)) 1 1=1 i p
 def ∨-right (i j : I) (p : 1= j) : 1= (i ∨ j) := ∨-left j i p -- works due to commutativity of ∨
---def ∧-1 (i j : I) (p : 1= (i ∧ j)) : 1= i := ∧-split i j p
+def ∧-1 (i j : I) (p : 1= (i ∧ j)) : 1= i := ∧-split i j p
 def ∧-1′ (i j : I) (p : 1= (i ∧ j)) : 1= i := cong-Id I I (λ (k : I), k ∨ i) 1 (i ∧ j) p
 def ∧-min-left  (i j : I) : ≤ (i ∧ j) i := ref (i ∧ j)
 def ∧-min-right (i j : I) : ≤ (i ∧ j) j := ref (i ∧ j)

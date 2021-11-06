@@ -337,7 +337,7 @@ and check ctx (e0 : exp) (t0 : value) =
   end
   | ESystem xs, VApp (VPartial t, i) ->
     eqNf (eval (getFormula xs) ctx) i;
-    System.iter (fun alpha e -> check (faceEnv alpha ctx) e t) xs;
+    System.iter (fun alpha e -> check (faceEnv alpha ctx) e (upd alpha t)) xs;
 
     (* check overlapping cases *)
     System.iter (fun alpha e1 ->

@@ -96,9 +96,9 @@ let meets xs ys =
   nubRev !zs
 
 let eps : face = Env.empty
-let meetss xss = List.fold_right meets xss [eps]
+let meetss = List.fold_left meets [eps]
 
-let union xs ys = nubRev (List.append xs ys)
+let union xs ys = nubRev (List.rev_append xs ys)
 let mkSystem xs = System.of_seq (List.to_seq xs)
 
 let sign x = function

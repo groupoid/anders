@@ -32,7 +32,7 @@ let rec extAnd : value -> conjunction = function
   | Var (x, _)        -> Conjunction.singleton (x, One)
   | VNeg (Var (x, _)) -> Conjunction.singleton (x, Zero)
   | VAnd (x, y)       -> Conjunction.union (extAnd x) (extAnd y)
-  | v -> raise (ExpectedConjunction v)
+  | v                 -> raise (ExpectedConjunction v)
 
 (* extOr converts (α₁ ∧ ... ∧ αₙ) ∨ ... ∨ (β₁ ∧ ... ∧ βₘ)
    into list of extAnd results. *)

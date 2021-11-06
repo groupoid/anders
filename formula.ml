@@ -110,7 +110,6 @@ let getFace xs = Env.fold (fun x d y -> EAnd (y, sign x d)) xs (EDir One)
 let getFormula ts = System.fold (fun x _ e -> EOr (getFace x, e)) ts (EDir Zero)
 
 let singleton p x = Env.add p x Env.empty
-let faceEnv = Env.fold (fun p dir -> Env.add p (Local, Value VI, Value (VDir dir)))
 
 let contrAtom : name * dir -> value = function
   | (x, Zero) -> VNeg (Var (x, VI))

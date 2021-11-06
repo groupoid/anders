@@ -91,11 +91,11 @@ def Tesseract (A : U)
                (cu02 @ i) (cu13 @ i) (sa @ i) (sb @ i) (sc @ i) (sd @ i)
                (cuab @ i) (cucd @ i) (cuac @ i) (cubd @ i))) cu01 cu23
 
--- another loop
-axiom cb (A : U) (a : A) (p : Path A a a)
-  : Cube A a a a a a a a a p p p p p (<_> a) p (<_> a) (cs A a p) (sb A a p) p p p
-    (<_> a) (cs A a p) (sb A a p) (cs A a p) (sb A a p)
--- := <k j i> cs A a p @ (i \/ j \/ k) @ ((i \/ j) /\ (i \/ k) /\ (j \/ k))
+-- type mismatch
+--def cb (A : U) (a : A) (p : Path A a a)
+--  : Cube A a a a a a a a a p p p p p (<_> a) p (<_> a) (cs A a p) (sb A a p) p p p
+--    (<_> a) (cs A a p) (sb A a p) (cs A a p) (sb A a p) :=
+--<k j i> cs A a p @ (i \/ j \/ k) @ ((i \/ j) /\ (i \/ k) /\ (j \/ k))
 
 axiom cc (A : U) (a : A) (p : Path A a a)
   : Cube A a a a a a a a a p p p p p p p p (cs A a p) (cs A a p) p p p p (cs A a p) (cs A a p) (cs A a p) (cs A a p)

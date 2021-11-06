@@ -1,4 +1,5 @@
 open Formula
+open Prelude
 open Error
 open Trace
 open Ident
@@ -158,6 +159,56 @@ and evalField p v =
     | VSig (_, (q, _)) -> if matchIdent p q then vfst v else evalField p (vsnd v)
     | t -> raise (ExpectedSig t)
   end
+
+and upd e = function
+  | VLam (t, (x, g))   -> VLam (upd e t, (x, g >> upd e))
+  | VPair (r, u, v)    -> VPair (r, upd e u, upd e v)
+  | VKan u             -> VKan u
+  | VPi (t, (x, g))    -> VPi (upd e t, (x, g >> upd e))
+  | VSig (t, (x, g))   -> VSig (upd e t, (x, g >> upd e))
+  | VPre u             -> VPre u
+  | VPLam f            -> VPLam (upd e f)
+  | Var (i, VI)        ->
+    begin match Env.find_opt i e with
+      | Some d -> VDir d
+      | None   -> Var (i, VI)
+    end
+  | Var (x, v)         -> Var (x, v)
+  | VApp (f, x)        -> VApp (upd e f, upd e x)
+  | VFst k             -> VFst (upd e k)
+  | VSnd k             -> VSnd (upd e k)
+  | VHole              -> VHole
+  | VPathP v           -> VPathP (upd e v)
+  | VPartial v         -> VPartial (upd e v)
+  | VSystem ts         ->
+    VSystem (System.bindings ts
+            |> List.filter_map (fun (e', v) ->
+              if compatible e e' then
+                Some (Env.filter (fun k _ -> not (Env.mem k e)) e', v)
+              else None)
+            |> mkSystem)
+  | VSub (a, i, u)     -> VSub (upd e a, upd e i, upd e u)
+  | VTransp (p, i)     -> VTransp (upd e p, upd e i)
+  | VHComp v           -> VHComp (upd e v)
+  | VAppFormula (f, x) -> VAppFormula (upd e f, upd e x)
+  | VId v              -> VId (upd e v)
+  | VRef v             -> VRef (upd e v)
+  | VJ v               -> VJ (upd e v)
+  | VI                 -> VI
+  | VDir d             -> VDir d
+  | VAnd (u, v)        -> andFormula (upd e u, upd e v)
+  | VOr (u, v)         -> orFormula (upd e u, upd e v)
+  | VNeg u             -> negFormula (upd e u)
+  | VInc v             -> VInc (upd e v)
+  | VOuc v             -> VOuc (upd e v)
+
+and updTerm alpha = function
+  | Exp e   -> Exp e
+  | Value v -> Value (upd alpha v)
+
+and faceEnv alpha ctx =
+  Env.map (fun (p, t, v) -> (p, updTerm alpha t, updTerm alpha v)) ctx
+  |> Env.fold (fun p dir -> Env.add p (Local, Value VI, Value (VDir dir))) alpha
 
 (* Readback *)
 and rbV v : exp = traceRbV v; match v with

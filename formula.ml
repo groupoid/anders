@@ -45,19 +45,13 @@ let rec extOr : value -> disjunction = function
    It does not remove conjunction like (x ∧ −x), because algebra of interval
    is not boolean, it is De Morgan algebra: distributive lattice with De Morgan laws.
    https://ncatlab.org/nlab/show/De+Morgan+algebra *)
-let uniq f =
+let uniq t =
   let super x y = not (Conjunction.equal x y) && Conjunction.subset y x in
-  Disjunction.filter (fun x -> not (Disjunction.exists (super x) f)) f
-
-(* orSubset checks that all conjunctions from xs present in ys. *)
-let orSubset xs ys =
-  Disjunction.for_all (fun x -> Disjunction.exists (Conjunction.equal x) ys) xs
+  Disjunction.filter (fun x -> not (Disjunction.exists (super x) t)) t
 
 (* orEq checks equivalence of two formulas
    of the form (α₁ ∧ ... ∧ αₙ) ∨ ... ∨ (β₁ ∧ ... ∧ βₘ) *)
-let orEq f g =
-  let f' = uniq (extOr f) in let g' = uniq (extOr g) in
-  orSubset f' g' && orSubset g' f'
+let orEq f g = Disjunction.equal (uniq (extOr f)) (uniq (extOr g))
 
 (* andEq check equivalence of two formulas
    of the form (α₁ ∧ ... ∧ αₙ) *)

@@ -75,7 +75,7 @@ let leq xs ys =
     | Some d2 -> d1 = d2
     | None    -> false) xs
 
-let lt xs ys = leq xs ys && xs <> ys
+let lt xs ys = not (Env.equal (=) xs ys) && leq xs ys
 
 let comparable xs ys = leq xs ys || leq ys xs
 

@@ -91,30 +91,28 @@ def Tesseract (A : U)
                (cu02 @ i) (cu13 @ i) (sa @ i) (sb @ i) (sc @ i) (sd @ i)
                (cuab @ i) (cucd @ i) (cuac @ i) (cubd @ i))) cu01 cu23
 
--- type mismatch
 def cb (A : U) (a : A) (p : Path A a a)
   : Cube A a a a a a a a a p p p p p (<_> a) p (<_> a) (cs A a p) (sb A a p) p p p
     (<_> a) (cs A a p) (sb A a p) (cs A a p) (sb A a p)
 := <k j i> cs A a p @ (i \/ j \/ k) @ ((i \/ j) /\ (i \/ k) /\ (j \/ k))
 
-axiom cc (A : U) (a : A) (p : Path A a a)
+def cc (A : U) (a : A) (p : Path A a a)
   : Cube A a a a a a a a a p p p p p p p p (cs A a p) (cs A a p) p p p p (cs A a p) (cs A a p) (cs A a p) (cs A a p)
--- typecheck ?
--- := <k j i> hcomp A (∂ i \/ ∂ j \/ ∂ k)
---            (λ (l : I), [ (i = 0) -> c₀ A a p @ l @ j @ k,
---                          (i = 1) -> c₁ A a p @ l @ j @ k,
---                          (j = 0) -> c₀ A a p @ l @ i @ k,
---                          (j = 1) -> c₁ A a p @ l @ i @ k,
---                          (k = 0) -> c₀ A a p @ l @ i @ j,
---                          (k = 1) -> c₁ A a p @ l @ i @ j ]) (inc (cb A a p @ i @ j @ k))
+:= <k j i> hcomp A (∂ i \/ ∂ j \/ ∂ k)
+           (λ (l : I), [ (i = 0) -> c₀ A a p @ l @ j @ k,
+                         (i = 1) -> c₁ A a p @ l @ j @ k,
+                         (j = 0) -> c₀ A a p @ l @ i @ k,
+                         (j = 1) -> c₁ A a p @ l @ i @ k,
+                         (k = 0) -> c₀ A a p @ l @ i @ j,
+                         (k = 1) -> c₁ A a p @ l @ i @ j ]) (inc (cb A a p @ i @ j @ k))
 
-axiom tb (A : U) (a : A) (p : Path A a a)
+-- Uncaught exception: Stack overflow
+def tb (A : U) (a : A) (p : Path A a a)
   : Tesseract A a a a a a a a a a a a a a a a a p p p p p p p p
     (cs A a p) (cs A a p) p p p p (cs A a p) (cs A a p) (cs A a p) (cs A a p) (cc A a p) p p p p p (<_> a) p (<_> a)
     (cs A a p) (sb A a p) p p p (<_> a) (cs A a p) (sb A a p) (cs A a p) (sb A a p) (cb A a p) p p p p p p p (<_> a)
     (cs A a p) (cs A a p) (cs A a p) (cs A a p) (cs A a p) (sb A a p) (cs A a p) (sb A a p) (cs A a p)
     (cs A a p) (cs A a p) (sb A a p) (cc A a p) (cb A a p) (cc A a p) (cb A a p) (cc A a p) (cb A a p)
--- Uncaught exception: Stack overflow
--- := <l k j i> cc A a p @ (i \/ j \/ k \/ l)
---            @ ((i \/ j \/ k) /\ (i \/ j \/ l) /\ (i \/ k \/ l) /\ (j \/ k \/ l))
---            @ ((i \/ j) /\ (i \/ k) /\ (i \/ l) /\ (j \/ k) /\ (j \/ l) /\ (k \/ l))
+:= <l k j i> cc A a p @ (i \/ j \/ k \/ l)
+           @ ((i \/ j \/ k) /\ (i \/ j \/ l) /\ (i \/ k \/ l) /\ (j \/ k \/ l))
+           @ ((i \/ j) /\ (i \/ k) /\ (i \/ l) /\ (j \/ k) /\ (j \/ l) /\ (k \/ l))

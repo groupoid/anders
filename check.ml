@@ -89,8 +89,7 @@ and evalSystem ctx ts =
 
   (* ensure incomparability *)
   List.filter (fun (alpha, _) ->
-    List.for_all (fun (beta, _) ->
-      not (lt beta alpha)) ts') ts'
+    not (List.exists (fun (beta, _) -> lt beta alpha) ts')) ts'
   |> mkSystem
 
 and reduceSystem ts x =

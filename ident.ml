@@ -23,33 +23,6 @@ module Env = Map.Make(Name)
 type dir   = Zero | One
 type face  = dir Env.t
 
-module OrderedList (Ord : Map.OrderedType) =
-struct
-  type t = Ord.t list
-
-  let rec compare a b =
-    match (a, b) with
-    |   [],      []    -> 0
-    |   [],    _ :: _  -> -1
-    | _ :: _,    []    -> 1
-    | x :: xs, y :: ys -> begin
-      match Ord.compare x y with
-      | 0 -> compare xs ys
-      | n -> n
-    end
-end
-
-module OrderedPair (X : Map.OrderedType)
-                   (Y : Map.OrderedType) =
-struct
-  type t = X.t * Y.t
-
-  let compare a b =
-    match X.compare (fst a) (fst b) with
-    | 0 -> Y.compare (snd a) (snd b)
-    | n -> n
-end
-
 let negDir : dir -> dir = function
   | Zero -> One | One -> Zero
 
@@ -66,8 +39,7 @@ end
 module Face =
 struct
   type t = face
-  module X = OrderedList(OrderedPair(Name)(Dir))
-  let compare a b = X.compare (Env.bindings a) (Env.bindings b)
+  let compare = Env.compare Dir.compare
 end
 
 module System = Map.Make(Face)

@@ -144,7 +144,7 @@ and inferV v = traceInferV v; match v with
   | VHComp v -> inferHComp v
   | VSub (a, _, _) -> VPre (extSet (inferV a))
   | VPartial v -> let n = extSet (inferV v) in implv VI (VPre n)
-  | v                        -> raise (ExpectedNeutral v)
+  | v -> raise (ExpectedNeutral v)
 
 and extByTag p : value -> value option = function
   | VPair (t, fst, snd) -> begin match !t with

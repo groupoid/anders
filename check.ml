@@ -184,7 +184,7 @@ and upd e = function
     VSystem (System.bindings ts
             |> List.filter_map (fun (e', v) ->
               if compatible e e' then
-                Some (Env.filter (fun k _ -> not (Env.mem k e)) e', v)
+                Some (Env.filter (fun k _ -> not (Env.mem k e)) e', upd e v)
               else None)
             |> mkSystem)
   | VSub (a, i, u)     -> VSub (upd e a, upd e i, upd e u)

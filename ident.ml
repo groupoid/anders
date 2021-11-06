@@ -80,6 +80,9 @@ end
 module Conjunction = Set.Make(Atom)
 type conjunction = Conjunction.t
 
+module Disjunction = Set.Make(Conjunction)
+type disjunction = Disjunction.t
+
 let zeroPrim     = ref "0"
 let onePrim      = ref "1"
 let intervalPrim = ref "I"

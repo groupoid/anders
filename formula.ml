@@ -36,10 +36,9 @@ let rec extAnd : value -> conjunction = function
 
 (* extOr converts (α₁ ∧ ... ∧ αₙ) ∨ ... ∨ (β₁ ∧ ... ∧ βₘ)
    into list of extAnd results. *)
-type disjunction = conjunction list
 let rec extOr : value -> disjunction = function
-  | VOr (x, y) -> List.rev_append (extOr x) (extOr y)
-  | k          -> [extAnd k]
+  | VOr (x, y) -> Disjunction.union (extOr x) (extOr y)
+  | k          -> Disjunction.singleton (extAnd k)
 
 (* uniq removes all conjunctions that are superset of another,
    i. e. xy ∨ x = (x ∧ y) ∨ (x ∧ 1) = x ∧ (y ∨ 1) = x ∧ 1 = x.
@@ -48,11 +47,11 @@ let rec extOr : value -> disjunction = function
    https://ncatlab.org/nlab/show/De+Morgan+algebra *)
 let uniq f =
   let super x y = not (Conjunction.equal x y) && Conjunction.subset y x in
-  List.filter (fun x -> not (List.exists (super x) f)) f
+  Disjunction.filter (fun x -> not (Disjunction.exists (super x) f)) f
 
 (* orSubset checks that all conjunctions from xs present in ys. *)
 let orSubset xs ys =
-  List.for_all (fun x -> List.exists (Conjunction.equal x) ys) xs
+  Disjunction.for_all (fun x -> Disjunction.exists (Conjunction.equal x) ys) xs
 
 (* orEq checks equivalence of two formulas
    of the form (α₁ ∧ ... ∧ αₙ) ∨ ... ∨ (β₁ ∧ ... ∧ βₘ) *)
@@ -115,15 +114,11 @@ let contrAtom : name * dir -> value = function
   | (x, Zero) -> VNeg (Var (x, VI))
   | (x, One)  -> Var (x, VI)
 
-let contrAnd (xs : conjunction) : value =
-  match Conjunction.elements xs with
-  | y :: ys -> List.fold_left (fun e e' -> VAnd (contrAtom e', e)) (contrAtom y) ys
-  | []      -> VDir One
+let contrAnd (t : conjunction) : value =
+  Conjunction.fold (fun e e' -> andFormula (contrAtom e, e')) t (VDir One)
 
-let contrOr (xs : disjunction) : value =
-  match nubRev xs with
-  | y :: ys -> List.fold_left (fun e e' -> VOr (contrAnd e', e)) (contrAnd y) ys
-  | []      -> VDir Zero
+let contrOr (t : disjunction) : value =
+  Disjunction.fold (fun e e' -> orFormula (contrAnd e, e')) t (VDir Zero)
 
 let evalAnd a b =
   match andFormula (a, b) with

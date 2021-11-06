@@ -206,7 +206,7 @@ and updTerm alpha = function
   | Value v -> Value (upd alpha v)
 
 and faceEnv alpha ctx =
-  Env.map (fun (p, t, v) -> (p, updTerm alpha t, updTerm alpha v)) ctx
+  Env.map (fun (p, t, v) -> if p = Local then (p, updTerm alpha t, updTerm alpha v) else (p, t, v)) ctx
   |> Env.fold (fun p dir -> Env.add p (Local, Value VI, Value (VDir dir))) alpha
 
 (* Readback *)

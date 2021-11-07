@@ -15,3 +15,6 @@ release:
 
 byte:
 	ocamlbuild $(FLAGS) anders.byte -tag 'debug'
+
+profiler:
+	ocamlbuild $(FLAGS) anders.d.byte

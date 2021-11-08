@@ -145,7 +145,7 @@ def φ-0 : PathP (<_> U₁) (φ 0 1=1) U := <_> U
 def φ-1 : PathP (<_> U₁) (φ 1 1=1) (U → U) := <_> U → U
 def φ-eq-φ′ (i : I) : Id (Partial U₁ (i ∨ -i)) (φ i) (φ′ i) := ref (φ′ i)
 def ρ (i j : I) : Partial U₁ (-i ∨ (i ∧ j)) := [(i = 0) → U, (i = 1) (j = 1) → U]
---def κ : Partial U₁ 1 := [(1 = 1) → U]
+def κ : Partial U₁ 1 := [(1 = 1) → U]
 
 def ≤ (i j : I) := Id I (i ∧ j) i
 def ≥ (i j : I) := ≤ j i

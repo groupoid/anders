@@ -1,7 +1,6 @@
 open Ident
 
 type tag = (string option) ref
-type ('a, 'b) system = ((name * 'a) list * 'b) list
 
 (* Language Expressions *)
 

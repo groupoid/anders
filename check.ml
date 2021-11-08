@@ -1,3 +1,4 @@
+open Prettyprinter
 open Formula
 open Prelude
 open Error

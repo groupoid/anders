@@ -1,3 +1,4 @@
+open Prettyprinter
 open Ident
 open Error
 open Expr

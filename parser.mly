@@ -4,6 +4,12 @@
    open Elab
    open Expr
 
+  let rec telescope ctor e : tele list -> exp = function
+    | []           -> e
+    | (p, a) :: xs -> ctor p a (telescope ctor e xs)
+
+  let rec pLam e : name list -> exp = function [] -> e | x :: xs -> EPLam (ELam (EI, (x, pLam e xs)))
+
   type formula =
     | Falsehood
     | Equation of name * dir

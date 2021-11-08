@@ -1,7 +1,8 @@
+open Prettyprinter
 open Ident
 open Expr
 
-let traceHole v gma = print_string ("\nHole:\n\n" ^ Expr.showGamma gma ^ "\n" ^ String.make 80 '-' ^ "\n" ^ Expr.showValue v ^ "\n\n")
+let traceHole v gma = print_string ("\nHole:\n\n" ^ showGamma gma ^ "\n" ^ String.make 80 '-' ^ "\n" ^ showValue v ^ "\n\n")
 let trace x = print_string x; flush_all ()
 
 let traceCheck (e : exp) (t : value) : unit = if !Prefs.trace then

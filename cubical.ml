@@ -1,3 +1,4 @@
+open Prettyprinter
 open Reader
 open Module
 open Ident

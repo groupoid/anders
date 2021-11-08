@@ -1,3 +1,4 @@
+open Prettyprinter
 open Prelude
 open Ident
 open Elab

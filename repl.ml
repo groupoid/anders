@@ -1,3 +1,4 @@
+open Prettyprinter
 open Module
 open Error
 open Decl

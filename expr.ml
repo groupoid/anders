@@ -66,7 +66,3 @@ let isGlobal : record -> bool = function Global, _, _ -> false | Local, _, _ -> 
 let freshVar ns n = match Env.find_opt n ns with Some x -> x | None -> n
 let mapFace fn phi = Env.fold (fun p d -> Env.add (fn p) d) phi Env.empty
 let freshFace ns = mapFace (freshVar ns)
-
-let getVar x =
-  let xs = [(!zeroPrim, EDir Zero); (!onePrim, EDir One); (!intervalPrim, EI)] in
-  match List.assoc_opt x xs with Some e -> e | None -> decl x

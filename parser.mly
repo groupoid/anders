@@ -4,6 +4,10 @@
    open Elab
    open Expr
 
+  let getVar x =
+    let xs = [(!zeroPrim, EDir Zero); (!onePrim, EDir One); (!intervalPrim, EI)] in
+    match List.assoc_opt x xs with Some e -> e | None -> decl x
+
   let rec telescope ctor e : tele list -> exp = function
     | []           -> e
     | (p, a) :: xs -> ctor p a (telescope ctor e xs)

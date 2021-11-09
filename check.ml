@@ -67,6 +67,10 @@ and transport p i = let (_, _, v) = freshDim () in match appFormula p v, i with
   | VKan k, _ -> let a = fresh (name "A") in VLam (VKan k, (a, fun a -> a))
   | _, _ -> VTransp (p, i)
 
+and hcomp t r u u0 = match r with
+  | VDir One -> app (app (u, vone), VRef vone)
+  | _        -> VApp (VApp (VApp (VHComp t, r), u), u0)
+
 and closByVal ctx p t e v = traceClos e p v;
   (* dirty hack to handle free variables introduced by type checker,
      for example, while checking terms like p : Path P a b *)
@@ -77,7 +81,7 @@ and closByVal ctx p t e v = traceClos e p v;
 
 and app : value * value -> value = function
   | VApp (VApp (VApp (VApp (VJ _, _), _), f), _), VRef _ -> f
-  | VApp (VApp (VHComp _, VDir One), f), _ -> app (app (f, vone), VRef vone)
+  | VApp (VApp (VHComp t, r), u), u0 -> hcomp t r u u0
   | VSystem ts, x -> reduceSystem ts x
   | VLam (_, (_, f)), v -> f v
   | f, x -> VApp (f, x)
@@ -425,10 +429,10 @@ and inferTransport (ctx : ctx) (p : exp) (i : exp) =
     (solve (eval i ctx) One);
   implv u0 u1
 
-and inferHComp v =
+and inferHComp t =
   let r = fresh (name "r") in let u = fresh (name "u") in
-  VPi (VI, (r, fun r -> VPi (implv VI (VApp (VPartial v, r)), (u, fun u ->
-    implv (VSub (v, r, VApp (u, VDir Zero))) v))))
+  VPi (VI, (r, fun r -> VPi (implv VI (VApp (VPartial t, r)), (u, fun u ->
+    implv (VSub (t, r, VApp (u, VDir Zero))) t))))
 
 and inferJ v t =
   let x = freshName "x" in let y = freshName "y" in let pi = freshName "P" in let p = freshName "p" in

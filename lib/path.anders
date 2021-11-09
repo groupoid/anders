@@ -235,7 +235,7 @@ def trans-Path (A B : I → U) (P : Π (i : I), PathP (<_> U) (A i) (B i)) (v : 
 
 def trans-Path′ (A B : I → U) (P : Π (i : I), PathP (<_> U) (A i) (B i)) (v : Π (i : I), P i @ 0) (w : Π (i : I), P i @ 1)
   (u₀ : PathP (<i> P 0 @ i) (v 0) (w 0)) : PathP (<i> P 1 @ i) (v 1) (w 1) :=
-transp (<i> PathP (<j> P i @ j) (v i) (w i)) 0 u₀
+transp (<i> PathP (P i) (v i) (w i)) 0 u₀
 
 def ghcomp (A : U) (r : I) (u : I → Partial A r) (u₀ : A[r ↦ u 0]) : A
  := hcomp A (∂ r) (λ (j : I), [(r = 1) → u j 1=1, (r = 0) → ouc u₀]) (inc (ouc u₀))

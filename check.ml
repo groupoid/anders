@@ -60,9 +60,12 @@ and appFormula v x = match v with
       | i         -> VAppFormula (v, i)
     end
 
-and transport p i = match i with
-  | VDir One -> let a = fresh (name "a") in VLam (appFormula p vzero, (a, fun u0 -> u0))
-  | _        -> VTransp (p, i)
+and transport p i = let (_, _, v) = freshDim () in match appFormula p v, i with
+  (* transp p 1 u₀ ~> u₀ *)
+  | _, VDir One -> let a = fresh (name "u₀") in VLam (appFormula p vzero, (a, fun u0 -> u0))
+  (* transp (<_> U) i A ~> A *)
+  | VKan k, _ -> let a = fresh (name "A") in VLam (VKan k, (a, fun a -> a))
+  | _, _ -> VTransp (p, i)
 
 and closByVal ctx p t e v = traceClos e p v;
   (* dirty hack to handle free variables introduced by type checker,

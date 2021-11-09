@@ -231,7 +231,7 @@ def comp (A : I → U) (r : I) (u : Π (i : I), Partial (A i) r) (u₀ : (A 0)[r
 
 def trans-Path (A B : I → U) (P : Π (i : I), PathP (<_> U) (A i) (B i)) (v : Π (i : I), P i @ 0) (w : Π (i : I), P i @ 1)
   (u₀ : PathP (<i> P 0 @ i) (v 0) (w 0)) : PathP (<i> P 1 @ i) (v 1) (w 1) :=
-<i> comp (λ (j : I), P j @ i) (∂ i) (λ (j : I), [(i = 0) → v j, (i = 1) → w j]) (inc (u₀ @ i))
+<j> comp (λ (i : I), P i @ j) (∂ j) (λ (i : I), [(j = 0) → v i, (j = 1) → w i]) (inc (u₀ @ j))
 
 def trans-Path′ (A B : I → U) (P : Π (i : I), PathP (<_> U) (A i) (B i)) (v : Π (i : I), P i @ 0) (w : Π (i : I), P i @ 1)
   (u₀ : PathP (<i> P 0 @ i) (v 0) (w 0)) : PathP (<i> P 1 @ i) (v 1) (w 1) :=

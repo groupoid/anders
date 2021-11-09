@@ -43,7 +43,7 @@ let rec eval (e0 : exp) (ctx : ctx) = traceEval e0; match e0 with
   | EAnd (e1, e2)      -> evalAnd (eval e1 ctx) (eval e2 ctx)
   | EOr (e1, e2)       -> evalOr (eval e1 ctx) (eval e2 ctx)
   | ENeg e             -> negFormula (eval e ctx)
-  | ETransp (p, i)     -> transport (eval p ctx) (eval i ctx)
+  | ETransp (p, i)     -> VTransp (eval p ctx, eval i ctx)
   | EHComp e           -> VHComp (eval e ctx)
   | EPartial e         -> VPartial (eval e ctx)
   | ESystem xs         -> VSystem (evalSystem ctx xs)
@@ -60,16 +60,25 @@ and appFormula v x = match v with
       | i         -> VAppFormula (v, i)
     end
 
-and transport p i = let (_, _, v) = freshDim () in match appFormula p v, i with
+and border xs v = mkSystem (List.map (fun alpha -> (alpha, upd alpha v)) xs)
+
+and transport p phi u0 = let (_, _, v) = freshDim () in match appFormula p v, phi with
   (* transp p 1 u₀ ~> u₀ *)
-  | _, VDir One -> let a = fresh (name "u₀") in VLam (appFormula p vzero, (a, fun u0 -> u0))
+  | _, VDir One -> u0
   (* transp (<_> U) i A ~> A *)
-  | VKan k, _ -> let a = fresh (name "A") in VLam (VKan k, (a, fun a -> a))
-  | _, _ -> VTransp (p, i)
+  | VKan _, _ -> u0
+  | _, _ -> VApp (VTransp (p, phi), u0)
 
 and hcomp t r u u0 = match r with
   | VDir One -> app (app (u, vone), VRef vone)
   | _        -> VApp (VApp (VApp (VHComp t, r), u), u0)
+
+and comp t r u u0 =
+  let i = fresh (name "ι") in let j = fresh (name "υ") in
+  hcomp (t vone) r (VLam (VI, (i, fun i ->
+    let u1 = transport (VPLam (VLam (VI, (j, fun j -> t (orFormula (i, j)))))) i (app (app (u, i), VRef vone)) in
+      VSystem (border (solve r One) u1))))
+    (VInc (transport (VPLam (VLam (VI, (i, t)))) vzero (VOuc u0)))
 
 and closByVal ctx p t e v = traceClos e p v;
   (* dirty hack to handle free variables introduced by type checker,
@@ -81,6 +90,7 @@ and closByVal ctx p t e v = traceClos e p v;
 
 and app : value * value -> value = function
   | VApp (VApp (VApp (VApp (VJ _, _), _), f), _), VRef _ -> f
+  | VTransp (p, i), u0 -> transport p i u0
   | VApp (VApp (VHComp t, r), u), u0 -> hcomp t r u u0
   | VSystem ts, x -> reduceSystem ts x
   | VLam (_, (_, f)), v -> f v
@@ -195,7 +205,7 @@ and upd e = function
               else None)
             |> mkSystem)
   | VSub (a, i, u)     -> VSub (upd e a, upd e i, upd e u)
-  | VTransp (p, i)     -> transport (upd e p) (upd e i)
+  | VTransp (p, i)     -> VTransp (upd e p, upd e i)
   | VHComp v           -> VHComp (upd e v)
   | VAppFormula (f, x) -> appFormula (upd e f) (upd e x)
   | VId v              -> VId (upd e v)

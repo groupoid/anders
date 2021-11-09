@@ -191,9 +191,9 @@ and upd e = function
       | None   -> Var (i, VI)
     end
   | Var (x, v)         -> Var (x, v)
-  | VApp (f, x)        -> VApp (upd e f, upd e x)
-  | VFst k             -> VFst (upd e k)
-  | VSnd k             -> VSnd (upd e k)
+  | VApp (f, x)        -> app (upd e f, upd e x)
+  | VFst k             -> vfst (upd e k)
+  | VSnd k             -> vsnd (upd e k)
   | VHole              -> VHole
   | VPathP v           -> VPathP (upd e v)
   | VPartial v         -> VPartial (upd e v)
@@ -216,6 +216,7 @@ and upd e = function
   | VAnd (u, v)        -> andFormula (upd e u, upd e v)
   | VOr (u, v)         -> orFormula (upd e u, upd e v)
   | VNeg u             -> negFormula (upd e u)
+  | VInc (VOuc v)      -> upd e v
   | VInc v             -> VInc (upd e v)
   | VOuc v             -> VOuc (upd e v)
 

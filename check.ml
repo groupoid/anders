@@ -43,7 +43,7 @@ let rec eval (e0 : exp) (ctx : ctx) = traceEval e0; match e0 with
   | EAnd (e1, e2)      -> evalAnd (eval e1 ctx) (eval e2 ctx)
   | EOr (e1, e2)       -> evalOr (eval e1 ctx) (eval e2 ctx)
   | ENeg e             -> negFormula (eval e ctx)
-  | ETransp (p, i)     -> transport ctx p i
+  | ETransp (p, i)     -> transport (eval p ctx) (eval i ctx)
   | EHComp e           -> VHComp (eval e ctx)
   | EPartial e         -> VPartial (eval e ctx)
   | ESystem xs         -> VSystem (evalSystem ctx xs)
@@ -60,9 +60,9 @@ and appFormula v x = match v with
       | i         -> VAppFormula (v, i)
     end
 
-and transport (ctx : ctx) (p : exp) (i : exp) = match eval i ctx with
-  | VDir One -> let a = fresh (name "a") in VLam (act p ezero ctx, (a, fun x -> x))
-  | v        -> VTransp (eval p ctx, v)
+and transport p i = match i with
+  | VDir One -> let a = fresh (name "a") in VLam (appFormula p vzero, (a, fun u0 -> u0))
+  | _        -> VTransp (p, i)
 
 and closByVal ctx p t e v = traceClos e p v;
   (* dirty hack to handle free variables introduced by type checker,
@@ -188,9 +188,9 @@ and upd e = function
               else None)
             |> mkSystem)
   | VSub (a, i, u)     -> VSub (upd e a, upd e i, upd e u)
-  | VTransp (p, i)     -> VTransp (upd e p, upd e i)
+  | VTransp (p, i)     -> transport (upd e p) (upd e i)
   | VHComp v           -> VHComp (upd e v)
-  | VAppFormula (f, x) -> VAppFormula (upd e f, upd e x)
+  | VAppFormula (f, x) -> appFormula (upd e f) (upd e x)
   | VId v              -> VId (upd e v)
   | VRef v             -> VRef (upd e v)
   | VJ v               -> VJ (upd e v)

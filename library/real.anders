@@ -31,7 +31,7 @@
 -- https://www.cs.bham.ac.uk/~mhe/agda-new/UF-SIP-IntervalObject.html
 
 module real where
-import lib/path
+import library/path
 
 axiom ℕ : U
 axiom zero : ℕ

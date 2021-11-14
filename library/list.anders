@@ -4,7 +4,7 @@
    Copyright (c) Groupoid Infinity, 2014-2021. -}
 
 module list where
-import lib/leibniz lib/bool
+import library/leibniz library/bool
 option girard true
 
 def ∘ (α β γ : U) (f : β → γ) (g : α → β) : α → γ ≔ λ (x : α), f (g x)

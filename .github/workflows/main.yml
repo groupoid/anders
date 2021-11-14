@@ -33,16 +33,16 @@ jobs:
       - run: opam install . --deps-only
       - run: opam exec -- dune build
       - run: opam install .
-      - run: opam exec -- dune exec anders silent check lib/mltt.anders
-      - run: opam exec -- dune exec anders silent check lib/buddhism.anders
-      - run: opam exec -- dune exec anders silent check lib/cat.anders
-      - run: opam exec -- dune exec anders silent check lib/church.anders
-      - run: opam exec -- dune exec anders silent check lib/fun.anders
-      - run: opam exec -- dune exec anders silent check lib/impredicative.anders
-      - run: opam exec -- dune exec anders silent check lib/kraus.anders
-      - run: opam exec -- dune exec anders silent check lib/leibniz.anders
-      - run: opam exec -- dune exec anders silent check lib/list.anders
-      - run: opam exec -- dune exec anders silent check lib/mltt.anders
-      - run: opam exec -- dune exec anders silent check lib/path.anders
-      - run: opam exec -- dune exec anders silent check lib/pi.anders
-      - run: opam exec -- dune exec anders silent check lib/topos.anders
+      - run: opam exec -- dune exec anders silent check library/mltt.anders
+      - run: opam exec -- dune exec anders silent check library/buddhism.anders
+      - run: opam exec -- dune exec anders silent check library/cat.anders
+      - run: opam exec -- dune exec anders silent check library/church.anders
+      - run: opam exec -- dune exec anders silent check library/fun.anders
+      - run: opam exec -- dune exec anders silent check library/impredicative.anders
+      - run: opam exec -- dune exec anders silent check library/kraus.anders
+      - run: opam exec -- dune exec anders silent check library/leibniz.anders
+      - run: opam exec -- dune exec anders silent check library/list.anders
+      - run: opam exec -- dune exec anders silent check library/mltt.anders
+      - run: opam exec -- dune exec anders silent check library/path.anders
+      - run: opam exec -- dune exec anders silent check library/pi.anders
+      - run: opam exec -- dune exec anders silent check library/topos.anders

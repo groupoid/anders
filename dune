@@ -2,10 +2,10 @@
 (ocamllex lexer)
 (menhir (modules parser))
 (executable (name anders) (package anders) (public_name anders))
-(install (files lib/buddhism.anders       lib/cat.anders
-                lib/church.anders         lib/fun.anders
-                lib/impredicative.anders  lib/kraus.anders
-                lib/leibniz.anders        lib/list.anders
-                lib/mltt.anders           lib/path.anders
-                lib/equiv.anders          lib/constcubes.anders
-                lib/pi.anders             lib/topos.anders) (section share) (package anders))
+(install (files library/buddhism.anders       library/cat.anders
+                library/church.anders         library/fun.anders
+                library/impredicative.anders  library/kraus.anders
+                library/leibniz.anders        library/list.anders
+                library/mltt.anders           library/path.anders
+                library/equiv.anders          library/constcubes.anders
+                library/pi.anders             library/topos.anders) (section share) (package anders))

@@ -9,7 +9,7 @@
    Copyright (c) Groupoid Infinity, 2014-2021. -}
 
 module cat where
-import lib/path
+import library/path
 
 def cat : U₁ := Σ (ob: U) (hom: ob -> ob -> U), unit
 

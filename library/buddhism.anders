@@ -1,5 +1,5 @@
 module buddhism where
-import lib/path
+import library/path
 
 option girard true
 

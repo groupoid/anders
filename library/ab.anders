@@ -1,5 +1,5 @@
 module ab where
-import lib/cat
+import library/cat
 
 def zeroObject(C: precategory) (X: C.C.ob): U₁ := Σ
     (bot: isInitial C X)

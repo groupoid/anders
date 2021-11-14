@@ -54,7 +54,7 @@ hcomp A (∂ r) (λ (j : I), [(r = 1) → u j 1=1, (r = 0) → ouc u₀]) (ouc u
 ```
 
 ```shell
-$ anders check path.anders
+$ anders check library/path.anders
 ```
 
 CCHM
@@ -95,7 +95,7 @@ sys     0m0.183s
 ```
 
 ```
-$ time for i in lib/* ; do ./anders.native check $i ; done
+$ time for i in library/* ; do ./anders.native check $i ; done
 real    0m0.257s
 user    0m0.231s
 sys     0m0.028s

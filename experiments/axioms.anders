@@ -1,5 +1,5 @@
 module axioms where
-import lib/leibniz
+import library/leibniz
 
 axiom T : U
 axiom t₁ : T

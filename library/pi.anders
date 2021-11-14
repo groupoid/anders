@@ -8,7 +8,7 @@
    Copyright (c) Groupoid Infinity, 2014-2021. -}
 
 module pi where
-import lib/path
+import library/path
 
 def Pi (A : U) (B : A → U) : U := Π (x : A), B x
 def lambda (A: U) (B: A → U) (b: Pi A B) : Pi A B := λ (x : A), b x

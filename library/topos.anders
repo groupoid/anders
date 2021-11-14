@@ -9,9 +9,9 @@
    Copyright (c) Groupoid Infinity, 2014-2021. -}
 
 module topos where
-import lib/cat
-import lib/fun
-import lib/pi
+import library/cat
+import library/fun
+import library/pi
 
 def epi (P: precategory) (X Y: P.C.ob) (f: P.C.hom X Y): U := Π (Z: P.C.ob) (g1 g2: P.C.hom Y Z),
     Path (P.C.hom X Z) (P.P.∘ X Y Z f g1) (P.P.∘ X Y Z f g2) -> Path (P.C.hom Y Z) g1 g2

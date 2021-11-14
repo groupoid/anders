@@ -29,7 +29,7 @@ def cs (A : U) (a : A) (p : Path A a a)
                       (i = 1) -> s₁ A a p @ k @ j,
                       (j = 0) -> s₀ A a p @ k @ i,
                       (j = 1) -> s₁ A a p @ k @ i ])
-        (inc (sb A a p @ i @ j))
+        (sb A a p @ i @ j)
 
 def c₀ (A : U) (a : A) (p : Path A a a)
   : Cube A a a a a a a a a p p p p p p p p (cs A a p) (cs A a p)
@@ -47,7 +47,7 @@ def Fd (A : U) (a b c : A) (p : Path A a b) (q : Path A b c) : Square A a b b c 
                         (i = 1) -> q @ k /\ j,
                         (j = 0) -> p @ i,
                         (j = 1) -> q @ k /\ i ])
-          (inc (p @ i \/ j))
+          (p @ i \/ j)
 
 def B (A : U) (a b c d : A) (p : Path A a b) (q : Path A b c) (r : Path A c d)
   : Cube A b b b b b c c d (<_> b) (<_> b) (<_> b) (<_> b) q r q r (<_> <_> b)
@@ -104,7 +104,8 @@ def cc (A : U) (a : A) (p : Path A a a)
                          (j = 0) -> c₀ A a p @ l @ i @ k,
                          (j = 1) -> c₁ A a p @ l @ i @ k,
                          (k = 0) -> c₀ A a p @ l @ i @ j,
-                         (k = 1) -> c₁ A a p @ l @ i @ j ]) (inc (cb A a p @ i @ j @ k))
+                         (k = 1) -> c₁ A a p @ l @ i @ j ])
+           (cb A a p @ i @ j @ k)
 
 -- Uncaught exception: Stack overflow
 def tb (A : U) (a : A) (p : Path A a a)

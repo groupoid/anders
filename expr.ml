@@ -5,16 +5,17 @@ type tag = (string option) ref
 (* Language Expressions *)
 
 type exp =
-  | EPre of int | EKan of int                                                                  (* cosmos *)
-  | EVar of name | EHole                                                                    (* variables *)
-  | EPi of exp * (name * exp) | ELam of exp * (name * exp) | EApp of exp * exp                     (* pi *)
-  | ESig of exp * (name * exp) | EPair of tag * exp * exp                                       (* sigma *)
-  | EFst of exp | ESnd of exp | EField of exp * string                                          (* sigma *)
-  | EId of exp | ERef of exp | EJ of exp                                              (* strict equality *)
-  | EPathP of exp | EPLam of exp | EAppFormula of exp * exp                             (* path equality *)
-  | EI | EDir of dir | EAnd of exp * exp | EOr of exp * exp | ENeg of exp               (* CCHM interval *)
-  | ETransp of exp * exp | EHComp of exp | EPartial of exp | ESystem of exp System.t   (* Kan operations *)
-  | ESub of exp * exp * exp | EInc of exp | EOuc of exp                              (* cubical subtypes *)
+  | EPre of int | EKan of int                                                          (* cosmos *)
+  | EVar of name | EHole                                                            (* variables *)
+  | EPi of exp * (name * exp) | ELam of exp * (name * exp) | EApp of exp * exp             (* pi *)
+  | ESig of exp * (name * exp) | EPair of tag * exp * exp                               (* sigma *)
+  | EFst of exp | ESnd of exp | EField of exp * string                                  (* sigma *)
+  | EId of exp | ERef of exp | EJ of exp                                      (* strict equality *)
+  | EPathP of exp | EPLam of exp | EAppFormula of exp * exp                     (* path equality *)
+  | EI | EDir of dir | EAnd of exp * exp | EOr of exp * exp | ENeg of exp       (* CCHM interval *)
+  | ETransp of exp * exp | EHComp of exp * exp * exp * exp                     (* Kan operations *)
+  | EPartial of exp | ESystem of exp System.t                               (* partial functions *)
+  | ESub of exp * exp * exp | EInc of exp * exp | EOuc of exp                (* cubical subtypes *)
 
 type tele = name * exp
 
@@ -30,8 +31,9 @@ type value =
   | VId of value | VRef of value | VJ of value
   | VPathP of value | VPLam of value | VAppFormula of value * value
   | VI | VDir of dir | VAnd of value * value | VOr of value * value | VNeg of value
-  | VTransp of value * value | VHComp of value | VPartial of value | VSystem of value System.t
-  | VSub of value * value * value | VInc of value | VOuc of value
+  | VTransp of value * value | VHComp of value * value * value * value
+  | VPartial of value | VSystem of value System.t
+  | VSub of value * value * value | VInc of value * value | VOuc of value
 
 and clos = name * (value -> value)
 

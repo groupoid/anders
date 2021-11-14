@@ -96,11 +96,11 @@ exp4 :
   | ID exp6 { EId $2 }
   | REF exp6 { ERef $2 }
   | IDJ exp6 { EJ $2 }
-  | INC exp6 { EInc $2 }
+  | INC exp6 exp6 { EInc ($2, $3) }
   | OUC exp6 { EOuc $2 }
   | PATHP exp6 { EPathP $2 }
   | TRANSP exp6 exp6 { ETransp ($2, $3) }
-  | HCOMP exp6 { EHComp $2 }
+  | HCOMP exp6 exp6 exp6 exp6 { EHComp ($2, $3, $4, $5) }
   | PARTIAL exp6 { EPartial $2 }
   | exp5 { $1 }
 

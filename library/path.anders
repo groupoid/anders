@@ -78,7 +78,7 @@ def J-β (A : U) (a : A) (C : D A) (d: C a a (idp A a)) : Path (C a a (idp A a))
 -- which is “Path A a a” only propositionally
 -- def K (A : U) (a : A) (p : Path A a a) : Path (Path A a a) (<_> a) p := <i j> p @ i /\ j
 
--- pre-DNF solver
+-- DNF solver
 
 def ∂ (i : I) := i ∨ -i
 def ∂-eq-neg-∂ (i : I) : Id I (∂ i) (∂ -i) := ref (∂ i)

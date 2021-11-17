@@ -4,6 +4,7 @@ axiom Binary : U
 axiom IO (A: U) : U
 axiom TableId : U
 axiom Atom : U
+axiom Tuple : U
 axiom Integer : U
 axiom TableOptions : U
 axiom List (A: U) : U

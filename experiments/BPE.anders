@@ -4,9 +4,18 @@ import experiments/BASE
 axiom start : Proc -> IO Sup
 axiom stop : String -> IO Sup
 axiom next : ProcId -> IO ProcRes
+axiom load : ProcId -> IO ProcRes
+axiom proc : ProcId -> IO ProcRes
+axiom assign : ProcId -> IO ProcRes
+axiom persist : ProcId -> Proc -> IO ProcRes
 axiom amend : Π (k: U), ProcId -> k -> IO ProcRes
 axiom discard : Π (k: U), ProcId -> k -> IO ProcRes
 axiom modify : Π (k: U), ProcId -> k -> Atom -> IO ProcRes
 axiom event : ProcId -> String -> IO ProcRes
 axiom head : ProcId -> IO Hist
 axiom hist : ProcId -> IO (List Hist)
+axiom step : ProcId -> Atom -> IO (List Hist)
+axiom docs : ProcId -> IO (List Tuple)
+axiom events : ProcId -> IO (List Tuple)
+axiom tasks : ProcId -> IO (List Tuple)
+axiom doc : Tuple -> ProcId -> IO (List Tuple)

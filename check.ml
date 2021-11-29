@@ -82,14 +82,24 @@ and transport p phi u0 = let (_, _, v) = freshDim () in match appFormula p v, ph
                                  (border (solve j One) w)))))) uj)))
   | _, _ -> VApp (VTransp (p, phi), u0)
 
-and hcomp t r u u0 = match r with
-  | VDir One -> app (app (u, vone), VRef vone)
-  | _        -> VHComp (t, r, u, u0)
+and hcomp t r u u0 = match t, r with
+  | _, VDir One -> app (app (u, vone), VRef vone)
+  (* hcomp (PathP A v w) φ u u₀ ~> <j> hcomp (A @ j) (λ (i : I),
+      [(r = 1) → u i 1=1, (j = 0) → v, (j = 1) → w]) (u₀ @ j) *)
+  | VApp (VApp (VPathP t, v), w), _ ->
+    let (j, _, _) = freshDim () in let (i, _, _) = freshDim () in
+    VPLam (VLam (VI, (j, fun j ->
+      hcomp (appFormula t j) (orFormula (r, orFormula (j, negFormula j)))
+        (VLam (VI, (i, fun i ->
+          (VSystem (unionSystem (border (solve r One) (appFormula (app (app (u, i), VRef vone)) j))
+            (unionSystem (border (solve j Zero) v) (border (solve j One) w)))))))
+          (appFormula u0 j))))
+  | _, _ -> VHComp (t, r, u, u0)
 
 and inc t r v = app (VInc (t, r), v)
 
 and comp t r u u0 =
-  let i = fresh (name "ι") in let j = fresh (name "υ") in
+  let (i, _, _) = freshDim () in let (j, _, _) = freshDim () in
   hcomp (t vone) r (VLam (VI, (i, fun i ->
     let u1 = transport (VPLam (VLam (VI, (j, fun j -> t (orFormula (i, j)))))) i (app (app (u, i), VRef vone)) in
       VSystem (border (solve r One) u1))))

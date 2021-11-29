@@ -46,7 +46,7 @@ def kan (A : U) (a b c d : A) (p : Path A a c) (q : Path A b d) (r : Path A a b)
 <i> hcomp A (∂ i) (λ (j : I), [(i = 0) → p @ j, (i = 1) → q @ j]) (r @ i)
 
 def comp (A : I → U) (r : I) (u : Π (i : I), Partial (A i) r) (u₀ : (A 0)[r ↦ u 0]) : A 1 :=
-hcomp (A 1) r (λ (i : I), [(r = 1) → transp (<j> A (i ∨ j)) i (u i 1=1)]) (transp (<i> A i) 0 (ouc u₀))
+hcomp (A 1) r (λ (i : I), [(r = 1) → transp (<j>A (i ∨ j)) i (u i 1=1)]) (transp(<i> A i) 0 (ouc u₀))
 
 def ghcomp (A : U) (r : I) (u : I → Partial A r) (u₀ : A[r ↦ u 0]) : A :=
 hcomp A (∂ r) (λ (j : I), [(r = 1) → u j 1=1, (r = 0) → ouc u₀]) (ouc u₀)

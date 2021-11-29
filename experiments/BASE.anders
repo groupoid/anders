@@ -1,9 +1,14 @@
 module BASE where
 
+axiom Action : U
+axiom Element : U
+
+axiom Either (L R: U) : U
 axiom Binary : U
 axiom IO (A: U) : U
 axiom TableId : U
 axiom Atom : U
+axiom Tuple : U
 axiom Integer : U
 axiom TableOptions : U
 axiom List (A: U) : U

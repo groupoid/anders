@@ -1,0 +1,15 @@
+module NITRO where
+import experiments/BASE
+
+axiom q : Π (k: U), Atom -> k
+axiom qc : Π (k: U), Atom -> k
+axiom jse : Maybe Binary -> Binary
+axiom hte : Maybe Binary -> Binary
+axiom wire (actions: List Action) : IO (List Action)
+axiom render (content: Either Action Element) : Binary
+axiom insert_top (dom: Atom) (content: List Element) : IO (List Action)
+axiom insert_bottom (dom: Atom) (content: List Element) : IO (List Action)
+axiom update (dom: Atom) (content: List Element) : IO (List Action)
+axiom clear (dom: Atom) : IO Unit
+axiom remove (dom: Atom) : IO Unit
+

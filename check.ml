@@ -84,6 +84,12 @@ and transport p phi u0 = let (_, _, v) = freshDim () in match appFormula p v, ph
 
 and hcomp t r u u0 = match t, r with
   | _, VDir One -> app (app (u, vone), VRef vone)
+  (* hcomp (Π (x : A), B x) φ u u₀ ~> λ (x : A), hcomp (B x) φ (λ (i : I), [φ → u i 1=1 x]) (u₀ x) *)
+  | VPi (t, (_, b)), _ -> let (i, _, _) = freshDim () in let x = fresh (name "x") in
+    VLam (t, (x, fun x ->
+      hcomp (b x) r (VLam (VI, (i, fun i ->
+        VSystem (border (solve r One)
+          (app (app (app (u, i), VRef vone), x)))))) (app (u0, x))))
   (* hcomp (PathP A v w) φ u u₀ ~> <j> hcomp (A @ j) (λ (i : I),
       [(r = 1) → u i 1=1, (j = 0) → v, (j = 1) → w]) (u₀ @ j) *)
   | VApp (VApp (VPathP t, v), w), _ ->

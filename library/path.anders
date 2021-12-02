@@ -253,6 +253,12 @@ def hcomp-Π (A : U) (B : A → U) (r : I) (u : I → Partial (Π (x : A), B x) 
 def hcomp-Π′ (A : U) (B : A → U) (r : I) (u : I → Partial (Π (x : A), B x) r) (u₀ : (Π (x : A), B x)[r ↦ u 0]) :=
 hcomp (Π (x : A), B x) r u (ouc u₀)
 
+def hfill (A : U) (r : I) (u : I → Partial A r) (u₀ : A[r ↦ u 0]) :=
+λ (j : I), hcomp A (-j ∨ r) (λ (i : I), [(r = 1) → u i 1=1, (j = 0) → ouc u₀]) (ouc u₀)
+
+def hfill′ (A : U) (r : I) (u : I → Partial A r) (u₀ : A[r ↦ u 0]) : Path A (ouc u₀) (hcomp A r u (ouc u₀)) :=
+<j> hfill A r u u₀ j
+
 {-
 
    Simon Huber notes: http://www.cse.chalmers.se/~simonhu/misc/hcomp.pdf

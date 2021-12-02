@@ -316,6 +316,7 @@ and conv v1 v2 : bool = traceConv v1 v2;
     | VPartial a, VPartial b -> conv a b
     | VAppFormula (f, x), VAppFormula (g, y) -> conv f g && conv x y
     | VSystem xs, VSystem ys -> keys xs = keys ys && System.for_all (fun _ b -> b) (intersectionWith conv xs ys)
+    | VSystem xs, x | x, VSystem xs -> System.for_all (fun alpha y -> conv (app (upd alpha x, VRef vone)) y) xs
     | VTransp (p, i), VTransp (q, j) -> conv p q && conv i j
     | VHComp (t1, r1, u1, v1), VHComp (t2, r2, u2, v2) -> conv t1 t2 && conv r1 r2 && conv u1 u2 && conv v1 v2
     | VSub (a, i, u), VSub (b, j, v) -> conv a b && conv i j && conv u v

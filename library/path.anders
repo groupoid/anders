@@ -247,6 +247,12 @@ def hcomp-Path (A : U) (v w : A) (r : I) (u : I → Partial (Path A v w) r) (u�
 def hcomp-Path′ (A : U) (v w : A) (r : I) (u : I → Partial (Path A v w) r) (u₀ : (Path A v w)[r ↦ u 0]) :=
 hcomp (Path A v w) r u (ouc u₀)
 
+def hcomp-Π (A : U) (B : A → U) (r : I) (u : I → Partial (Π (x : A), B x) r) (u₀ : (Π (x : A), B x)[r ↦ u 0]) :=
+λ (v : A), hcomp (B v) r (λ (k : I), [(r = 1) → u k 1=1 v]) ((ouc u₀) v)
+
+def hcomp-Π′ (A : U) (B : A → U) (r : I) (u : I → Partial (Π (x : A), B x) r) (u₀ : (Π (x : A), B x)[r ↦ u 0]) :=
+hcomp (Π (x : A), B x) r u (ouc u₀)
+
 {-
 
    Simon Huber notes: http://www.cse.chalmers.se/~simonhu/misc/hcomp.pdf

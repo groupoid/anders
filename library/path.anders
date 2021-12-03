@@ -259,6 +259,14 @@ def hfill (A : U) (r : I) (u : I → Partial A r) (u₀ : A[r ↦ u 0]) :=
 def hfill′ (A : U) (r : I) (u : I → Partial A r) (u₀ : A[r ↦ u 0]) : Path A (ouc u₀) (hcomp A r u (ouc u₀)) :=
 <j> hfill A r u u₀ j
 
+--cd srdef hcomp-Σ (A : U) (B : A → U) (r : I) (u : I → Partial (Σ (x : A), B x) r) (u₀ : (Σ (x : A), B x)[r ↦ u 0]) : Σ (x : A), B x :=
+--cd sr(hcomp A r (λ (k : I), [(r = 1) → (u k 1=1).1]) (ouc u₀).1,
+--cd sr comp (λ (i : I), B (hfill A r (λ (k : I), [(r = 1) → (u k 1=1).1]) (inc A r (ouc u₀).1) i))
+--cd sr   r (λ (k : I), [(r = 1) → (u k 1=1).2]) (ouc u₀).2)
+
+def hcomp-Σ′ (A : U) (B : A → U) (r : I) (u : I → Partial (Σ (x : A), B x) r) (u₀ : (Σ (x : A), B x)[r ↦ u 0]) :=
+hcomp (Σ (x : A), B x) r u (ouc u₀)
+
 {-
 
    Simon Huber notes: http://www.cse.chalmers.se/~simonhu/misc/hcomp.pdf

@@ -234,7 +234,7 @@ and upd e = function
             |> mkSystem)
   | VSub (t, i, u)       -> VSub (upd e t, upd e i, upd e u)
   | VTransp (p, i)       -> VTransp (upd e p, upd e i)
-  | VHComp (t, r, u, u0) -> VHComp (upd e t, upd e r, upd e u, upd e u0)
+  | VHComp (t, r, u, u0) -> hcomp (upd e t) (upd e r) (upd e u) (upd e u0)
   | VAppFormula (f, x)   -> appFormula (upd e f) (upd e x)
   | VId v                -> VId (upd e v)
   | VRef v               -> VRef (upd e v)

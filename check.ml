@@ -90,10 +90,10 @@ and hcomp t r u u0 = match t, r with
       hcomp (b x) r (VLam (VI, (i, fun i ->
         VSystem (border (solve r One)
           (app (app (app (u, i), VRef vone), x)))))) (app (u0, x))))
-  (* hcomp (Σ (x : A), B x) φ u u₀ ~>
+   (* hcomp (Σ (x : A), B x) φ u u₀ ~>
      (hfill A φ (λ (k : I), [(r = 1) → (u k 1=1).1]) u₀.1 1,
-      comp (λ i, B (hfill A φ (λ (k : I), [(r = 1) → (u k 1=1).1]) u₀.1 i) φ
-        (λ (k : I), [(r = 1) → (u k 1=1).2]) u₀.2))) *)
+      comp (λ i, B (hfill A φ (λ (k : I), [(r = 1) → (u k 1=1).1]) u₀.1 i)) φ
+        (λ (k : I), [(r = 1) → (u k 1=1).2]) u₀.2) *)
   | VSig (t, (_, b)), _ ->
     let (k, _, _) = freshDim () in
     let v1 = hfill t r (VLam (VI, (k, fun k ->

@@ -448,15 +448,14 @@ and inferTele ctx p a b =
 and inferLam ctx p a e =
   ignore (extSet (infer ctx a)); let t = eval a ctx in
   ignore (infer (upLocal ctx p t (Var (p, t))) e);
-  VPi (t, (p, fun x -> infer (upLocal ctx p t x) e))
+  VPi (t, (p, fun x -> inferV (eval e (upLocal ctx p t x))))
 
 and inferPath (ctx : ctx) (p : exp) =
   let (i, x, v) = freshDim () in let ctx' = upLocal ctx i VI v in
   let t = infer ctx' (rbV (act p x ctx')) in ignore (extSet t);
   let v0 = act p ezero ctx in let v1 = act p eone ctx in implv v0 (implv v1 t)
 
-and inferInc t r =
-  let a = freshName "a" in
+and inferInc t r = let a = freshName "a" in
   VPi (t, (a, fun v -> VSub (t, r, VSystem (border (solve r One) v))))
 
 and inferTransport (ctx : ctx) (p : exp) (i : exp) =

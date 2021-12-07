@@ -68,8 +68,8 @@ and transport p phi u0 = let (_, _, v) = freshDim () in match appFormula p v, ph
   (* transp (<_> U) i A ~> A *)
   | VKan _, _ -> u0
   (* transp (<i> PathP (P i) (v i) (w i)) φ ~>
-     <j> comp (λ i, P i @ j) (φ ∨ j ∨ -j) (λ (i : I), [(φ = 1) → u₀ @ j, (j = 0) → v i, (j = 1) → w i])
-              (inc (P 0 @ j) (φ ∨ j ∨ -j) (u₀ @ j)) *)
+     <j> comp (λ i, P i @ j) (φ ∨ j ∨ -j)
+       (λ (i : I), [(φ = 1) → u₀ @ j, (j = 0) → v i, (j = 1) → w i]) (u₀ @ j) *)
   | VApp (VApp (VPathP _, _), _), _ ->
     let i = fresh (name "ι") in let j = fresh (name "υ") in
     VPLam (VLam (VI, (j, fun j ->
@@ -90,6 +90,19 @@ and hcomp t r u u0 = match t, r with
       hcomp (b x) r (VLam (VI, (i, fun i ->
         VSystem (border (solve r One)
           (app (app (app (u, i), VRef vone), x)))))) (app (u0, x))))
+  (* hcomp (Σ (x : A), B x) φ u u₀ ~>
+     (hfill A φ (λ (k : I), [(r = 1) → (u k 1=1).1]) u₀.1 1,
+      comp (λ i, B (hfill A φ (λ (k : I), [(r = 1) → (u k 1=1).1]) u₀.1 i) φ
+        (λ (k : I), [(r = 1) → (u k 1=1).2]) u₀.2))) *)
+  | VSig (t, (_, b)), _ ->
+    let (k, _, _) = freshDim () in
+    let v1 = hfill t r (VLam (VI, (k, fun k ->
+      VSystem (border (solve r One)
+        (vfst (app (app (u, k), VRef vone))))))) (vfst u0) in
+    let v2 = comp (v1 >> b) r (VLam (VI, (k, fun k ->
+      VSystem (border (solve r One)
+        (vsnd (app (app (u, k), VRef vone))))))) (vsnd u0) in
+    VPair (ref None, v1 vone, v2)
   (* hcomp (PathP A v w) φ u u₀ ~> <j> hcomp (A @ j) (λ (i : I),
       [(r = 1) → u i 1=1, (j = 0) → v, (j = 1) → w]) (u₀ @ j) *)
   | VApp (VApp (VPathP t, v), w), _ ->
@@ -110,6 +123,14 @@ and comp t r u u0 =
     let u1 = transport (VPLam (VLam (VI, (j, fun j -> t (orFormula (i, j)))))) i (app (app (u, i), VRef vone)) in
       VSystem (border (solve r One) u1))))
     (transport (VPLam (VLam (VI, (i, t)))) vzero u0)
+
+and hfill t r u u0 j =
+  let (i, _, _) = freshDim () in
+  hcomp t (orFormula (negFormula j, r))
+    (VLam (VI, (i, fun i ->
+      VSystem (unionSystem (border (solve r One)
+        (app (app (u, andFormula (i, j)), VRef vone)))
+          (border (solve j Zero) u0))))) u0
 
 and closByVal ctx p t e v = traceClos e p v;
   (* dirty hack to handle free variables introduced by type checker,

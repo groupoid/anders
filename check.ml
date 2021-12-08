@@ -80,6 +80,17 @@ and transport p phi u0 = let (_, _, v) = freshDim () in match appFormula p v, ph
         let (_, (_, b)) = extPiG (appFormula p i) in
           b (v (negFormula i))))))
         phi (app (u0, v vone))))
+  (* transp (<i> Σ (x : A i), B i x) φ u₀ ~>
+     (transp (<j> A j) φ u₀.1,
+      transp (<i> B i (transFill (<j> A j) φ u₀.1 i)) φ u₀.2) *)
+  | VSig _, _ ->
+    let (i, _, _) = freshDim () in let (j, _, _) = freshDim () in
+    let a = VPLam (VLam (VI, (j, fun j -> fst (extSigG (appFormula p j))))) in
+    let v1 = transFill a phi (vfst u0) in
+    let v2 = transport (VPLam (VLam (VI, (i, fun i ->
+      let (_, (_, b)) = extSigG (appFormula p i) in
+        b (v1 i))))) phi (vsnd u0) in
+    VPair (ref None, v1 vone, v2)
   (* transp (<i> PathP (P i) (v i) (w i)) φ u₀ ~>
      <j> comp (λ i, P i @ j) (φ ∨ j ∨ -j)
        (λ (i : I), [(φ = 1) → u₀ @ j, (j = 0) → v i, (j = 1) → w i]) (u₀ @ j) *)

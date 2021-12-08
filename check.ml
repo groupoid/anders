@@ -81,8 +81,8 @@ and transport p phi u0 = let (_, _, v) = freshDim () in match appFormula p v, ph
           b (v (negFormula i))))))
         phi (app (u0, v vone))))
   (* transp (<i> Σ (x : A i), B i x) φ u₀ ~>
-     (transp (<j> A j) φ u₀.1,
-      transp (<i> B i (transFill (<j> A j) φ u₀.1 i)) φ u₀.2) *)
+    (transp (<j> A j) φ u₀.1,
+     transp (<i> B i (transFill (<j> A j) φ u₀.1 i)) φ u₀.2) *)
   | VSig _, _ ->
     let (i, _, _) = freshDim () in let (j, _, _) = freshDim () in
     let a = VPLam (VLam (VI, (j, fun j -> fst (extSigG (appFormula p j))))) in

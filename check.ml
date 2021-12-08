@@ -67,7 +67,20 @@ and transport p phi u0 = let (_, _, v) = freshDim () in match appFormula p v, ph
   | _, VDir One -> u0
   (* transp (<_> U) i A ~> A *)
   | VKan _, _ -> u0
-  (* transp (<i> PathP (P i) (v i) (w i)) φ ~>
+  (* transp (<i> Π (x : A i), B i x) φ u₀ ~>
+     λ (x : A 1), transp (<i> B i (transFill (<j> A -j) φ x i)) φ
+      (u₀ (transFill (<j> A -j) φ x 1)) *)
+  | VPi _, _ -> let x = fresh (name "x") in
+    let (i, _, _) = freshDim () in let (j, _, _) = freshDim () in
+    let (t, _) = extPiG (appFormula p vone) in
+    VLam (t, (x, fun x ->
+      let v = transFill (VPLam (VLam (VI, (j, fun j ->
+        fst (extPiG (appFormula p (negFormula j))))))) phi x in
+      transport (VPLam (VLam (VI, (i, fun i ->
+        let (_, (_, b)) = extPiG (appFormula p i) in
+          b (v (negFormula i))))))
+        phi (app (u0, v vone))))
+  (* transp (<i> PathP (P i) (v i) (w i)) φ u₀ ~>
      <j> comp (λ i, P i @ j) (φ ∨ j ∨ -j)
        (λ (i : I), [(φ = 1) → u₀ @ j, (j = 0) → v i, (j = 1) → w i]) (u₀ @ j) *)
   | VApp (VApp (VPathP _, _), _), _ ->
@@ -131,6 +144,10 @@ and hfill t r u u0 j =
       VSystem (unionSystem (border (solve r One)
         (app (app (u, andFormula (i, j)), VRef vone)))
           (border (solve j Zero) u0))))) u0
+
+and transFill p phi u0 j = let (i, _, _) = freshDim () in
+  transport (VPLam (VLam (VI, (i, fun i -> appFormula p (andFormula (i, j))))))
+    (orFormula (phi, negFormula j)) u0
 
 and closByVal ctx p t e v = traceClos e p v;
   (* dirty hack to handle free variables introduced by type checker,

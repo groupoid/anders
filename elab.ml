@@ -2,6 +2,10 @@ open Ident
 open Error
 open Expr
 
+let extPiG : value -> value * clos = function
+  | VPi (t, g) -> (t, g)
+  | u -> raise (ExpectedPi u)
+
 let extSigG : value -> value * clos = function
   | VSig (t, g) -> (t, g)
   | u -> raise (ExpectedSig u)

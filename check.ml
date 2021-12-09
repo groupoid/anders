@@ -238,8 +238,12 @@ and inferV v = traceInferV v; match v with
   | VDir _ | VOr _ | VAnd _ | VNeg _ -> VI
   | VTransp (p, _) -> implv (appFormula p vzero) (appFormula p vone)
   | VHComp (t, _, _, _) -> t
-  | VSub (a, _, _) -> VPre (extSet (inferV a))
+  | VSub (t, _, _) -> VPre (extSet (inferV t))
   | VPartial v -> let n = extSet (inferV v) in implv VI (VPre n)
+  | VSystem ts -> begin match System.choose_opt ts with
+    | None        -> failwith "Cannot infer type of empty system"
+    | Some (_, v) -> partialv (inferV v) (getFormulaV ts)
+  end
   | v -> raise (ExpectedNeutral v)
 
 and extByTag p : value -> value option = function
@@ -434,17 +438,19 @@ and check ctx (e0 : exp) (t0 : value) =
   end
   | ESystem xs, VApp (VPartial t, i) ->
     eqNf (eval (getFormula xs) ctx) i;
-    System.iter (fun alpha e -> check (faceEnv alpha ctx) e (upd alpha t)) xs;
-
-    (* check overlapping cases *)
-    System.iter (fun alpha e1 ->
-      System.iter (fun beta e2 ->
-        if comparable alpha beta then
-          let ctx' = faceEnv (meet alpha beta) ctx in
-          eqNf (eval e1 ctx') (eval e2 ctx')
-        else ()) xs) xs
+    System.iter (fun alpha e ->
+      check (faceEnv alpha ctx) e (upd alpha t)) xs;
+    checkOverlapping ctx xs
   | e, t -> eqNf (infer ctx e) t
   with ex -> Printf.printf "When trying to typecheck\n  %s\nAgainst type\n  %s\n" (showExp e0) (showValue t0); raise ex
+
+and checkOverlapping ctx ts =
+  System.iter (fun alpha e1 ->
+    System.iter (fun beta e2 ->
+      if comparable alpha beta then
+        let ctx' = faceEnv (meet alpha beta) ctx in
+        eqNf (eval e1 ctx') (eval e2 ctx')
+      else ()) ts) ts
 
 and infer ctx e : value = traceInfer e; match e with
   | EVar x -> lookup x ctx
@@ -482,6 +488,15 @@ and infer ctx e : value = traceInfer e; match e with
   | EOuc e -> begin match infer ctx e with
     | VSub (t, _, _) -> t
     | _ -> raise (ExpectedSubtype e)
+  end
+  | ESystem ts -> begin match System.choose_opt ts with
+    | None        -> failwith "Cannot infer type of empty system"
+    | Some (tau, e0) -> let t = infer ctx e0 in
+      System.iter (fun mu e ->
+        if Env.equal (=) tau mu then ()
+        else check (faceEnv mu ctx) e t) ts;
+      checkOverlapping ctx ts;
+      partialv t (eval (getFormula ts) ctx)
   end
   | e -> raise (InferError e)
 

@@ -117,6 +117,9 @@ let contrAnd (t : conjunction) : value =
 let contrOr (t : disjunction) : value =
   Disjunction.fold (fun e e' -> orFormula (contrAnd e, e')) t (VDir Zero)
 
+let getFaceV xs = Env.fold (fun x d y -> andFormula (y, contrAtom (x, d))) xs vone
+let getFormulaV ts = System.fold (fun x _ v -> orFormula (getFaceV x, v)) ts vzero
+
 let evalAnd a b =
   match andFormula (a, b) with
   | VAnd (a, b) -> contrAnd (extAnd (VAnd (a, b)))

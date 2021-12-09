@@ -490,7 +490,7 @@ and infer ctx e : value = traceInfer e; match e with
     | _ -> raise (ExpectedSubtype e)
   end
   | ESystem ts -> begin match System.choose_opt ts with
-    | None        -> failwith "Cannot infer type of empty system"
+    | None           -> failwith "Cannot infer type of empty system"
     | Some (tau, e0) -> let t = infer ctx e0 in
       System.iter (fun mu e ->
         if Env.equal (=) tau mu then ()

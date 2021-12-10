@@ -173,7 +173,6 @@ def 0-is-min (i : I) : ≤ 0 i := ref 0
 def 1-is-max (i : I) : ≤ i 1 := ref i
 
 def Δ² := Σ (i j : I), ≤ i j
-def Δ³ := Σ (i j k : I), (≤ i j) × (≤ j k)
 
 def Δ²-1 : Δ² := (0, 0, ref 0)
 def Δ²-2 : Δ² := (0, 1, ref 0)
@@ -182,6 +181,21 @@ def Δ²-3 : Δ² := (1, 1, ref 1)
 def Δ²-1-2 : PathP (<_> Δ²) Δ²-1 Δ²-2 := <i> (0, i, ref 0)
 def Δ²-2-3 : PathP (<_> Δ²) Δ²-2 Δ²-3 := <i> (i, 1, ref i)
 def Δ²-1-3 : PathP (<_> Δ²) Δ²-1 Δ²-3 := <i> (i, i, ref i)
+
+def Δ³ := Σ (i j k : I), (≤ i j) × (≤ j k)
+
+def Δ³-1 : Δ³ := (0, 0, 0, ref 0, ref 0)
+def Δ³-2 : Δ³ := (0, 0, 1, ref 0, ref 0)
+def Δ³-3 : Δ³ := (0, 1, 1, ref 0, ref 1)
+def Δ³-4 : Δ³ := (1, 1, 1, ref 1, ref 1)
+
+def Δ³-1-2 : PathP (<_> Δ³) Δ³-1 Δ³-2 := <i> (0, 0, i, ref 0, ref 0)
+def Δ³-2-3 : PathP (<_> Δ³) Δ³-2 Δ³-3 := <i> (0, i, 1, ref 0, ref i)
+def Δ³-1-3 : PathP (<_> Δ³) Δ³-1 Δ³-3 := <i> (0, i, i, ref 0, ref i)
+
+def Δ³-1-4 : PathP (<_> Δ³) Δ³-1 Δ³-4 := <i> (i, i, i, ref i, ref i)
+def Δ³-2-4 : PathP (<_> Δ³) Δ³-2 Δ³-4 := <i> (i, i, 1, ref i, ref i)
+def Δ³-3-4 : PathP (<_> Δ³) Δ³-3 Δ³-4 := <i> (i, 1, 1, ref i, ref 1)
 
 def ε (A : U) : Partial A 0 := []
 def ⊥ := Π (A : U), A

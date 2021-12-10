@@ -45,7 +45,10 @@ let rec eval (e0 : exp) (ctx : ctx) = traceEval e0; match e0 with
   | ENeg e               -> negFormula (eval e ctx)
   | ETransp (p, i)       -> VTransp (eval p ctx, eval i ctx)
   | EHComp (t, r, u, u0) -> hcomp (eval t ctx) (eval r ctx) (eval u ctx) (eval u0 ctx)
-  | EPartial e           -> VPartial (eval e ctx)
+  | EPartial e           -> let (i, _, _) = freshDim () in
+    VLam (VI, (i, fun r -> let ts = mkSystem (List.map (fun mu ->
+      (mu, eval e (faceEnv mu ctx))) (solve r One)) in VPartialP (VSystem ts, r)))
+  | EPartialP (t, r)     -> VPartialP (eval t ctx, eval r ctx)
   | ESystem xs           -> VSystem (evalSystem ctx xs)
   | ESub (a, i, u)       -> VSub (eval a ctx, eval i ctx, eval u ctx)
   | EInc (t, r)          -> VInc (eval t ctx, eval r ctx)
@@ -61,6 +64,8 @@ and appFormula v x = match v with
     end
 
 and border xs v = mkSystem (List.map (fun alpha -> (alpha, upd alpha v)) xs)
+
+and partialv t r = VPartialP (VSystem (border (solve r One) t) , r)
 
 and transport p phi u0 = let (_, _, v) = freshDim () in match appFormula p v, phi with
   (* transp p 1 u₀ ~> u₀ *)
@@ -216,8 +221,9 @@ and inferV v = traceInferV v; match v with
   | VFst e                   -> fst (extSigG (inferV e))
   | VSnd e                   -> let (_, (_, g)) = extSigG (inferV e) in g (vfst e)
   | VApp (VTransp (p, _), _) -> appFormula p vone
-  | VApp (f, x)              -> begin match inferV f with
-    | VApp (VPartial t, _) -> t
+  | VApp (f, x)              ->
+  begin match inferV f with
+    | VPartialP (t, _) -> app (t, x)
     | VPi (_, (_, g)) -> g x
     | v -> raise (ExpectedPi v)
   end
@@ -227,7 +233,8 @@ and inferV v = traceInferV v; match v with
   | VKan n                   -> VKan (n + 1)
   | VI                       -> VPre 0
   | VInc (t, i)              -> inferInc t i
-  | VOuc v                   -> begin match inferV v with
+  | VOuc v                   ->
+  begin match inferV v with
     | VSub (t, _, _) -> t
     | _ -> raise (ExpectedSubtype (rbV v))
   end
@@ -239,18 +246,22 @@ and inferV v = traceInferV v; match v with
   | VTransp (p, _) -> implv (appFormula p vzero) (appFormula p vone)
   | VHComp (t, _, _, _) -> t
   | VSub (t, _, _) -> VPre (extSet (inferV t))
-  | VPartial v -> let n = extSet (inferV v) in implv VI (VPre n)
-  | VSystem ts -> begin match System.choose_opt ts with
-    | None        -> failwith "Cannot infer type of empty system"
-    | Some (_, v) -> partialv (inferV v) (getFormulaV ts)
+  | VPartialP (VSystem ts, _) ->
+  begin match System.choose_opt ts with
+    | Some (_, t) -> VPre (extSet (inferV t))
+    | None        -> VPre 0
   end
+  | VPartialP (t, _) -> inferV (inferV t)
+  | VSystem ts -> VPartialP (VSystem (System.map inferV ts), getFormulaV ts)
   | v -> raise (ExpectedNeutral v)
 
 and extByTag p : value -> value option = function
-  | VPair (t, fst, snd) -> begin match !t with
+  | VPair (t, fst, snd) ->
+  begin match !t with
     | Some q -> if p = q then Some fst else extByTag p snd
     | _      -> extByTag p snd
-  end | _ -> None
+  end
+  | _ -> None
 
 and evalField p v =
   match extByTag p v with
@@ -278,7 +289,7 @@ and upd e = function
   | VSnd k               -> vsnd (upd e k)
   | VHole                -> VHole
   | VPathP v             -> VPathP (upd e v)
-  | VPartial v           -> VPartial (upd e v)
+  | VPartialP (t, r)     -> VPartialP (upd e t, upd e r)
   | VSystem ts           ->
     VSystem (System.bindings ts
             |> List.filter_map (fun (e', v) ->
@@ -324,7 +335,7 @@ and rbV v : exp = traceRbV v; match v with
   | VSnd k               -> ESnd (rbV k)
   | VHole                -> EHole
   | VPathP v             -> EPathP (rbV v)
-  | VPartial v           -> EPartial (rbV v)
+  | VPartialP (t, r)     -> EPartialP (rbV t, rbV r)
   | VSystem ts           -> ESystem (System.map rbV ts)
   | VSub (a, i, u)       -> ESub (rbV a, rbV i, rbV u)
   | VTransp (p, i)       -> ETransp (rbV p, rbV i)
@@ -367,7 +378,7 @@ and conv v1 v2 : bool = traceConv v1 v2;
     | VApp (f, a), VApp (g, b) -> conv f g && conv a b
     | VFst x, VFst y | VSnd x, VSnd y -> conv x y
     | VPathP a, VPathP b -> conv a b
-    | VPartial a, VPartial b -> conv a b
+    | VPartialP (t1, r1), VPartialP (t2, r2) -> conv t1 t2 && conv r1 r2
     | VAppFormula (f, x), VAppFormula (g, y) -> conv f g && conv x y
     | VSystem xs, VSystem ys -> keys xs = keys ys && System.for_all (fun _ b -> b) (intersectionWith conv xs ys)
     | VSystem xs, x | x, VSystem xs -> System.for_all (fun alpha y -> conv (app (upd alpha x, VRef vone)) y) xs
@@ -385,15 +396,12 @@ and conv v1 v2 : bool = traceConv v1 v2;
     | VInc (t1, r1), VInc (t2, r2) -> conv t1 t2 && conv r1 r2
     | VOuc u, VOuc v -> conv u v
     | _, _ -> false
-  end || convId v1 v2
+  end || convWithSystem (v1, v2) || convId v1 v2
 
-and faceSubset phi psi =
-  List.for_all (fun (_, x) -> List.exists (fun (_, y) -> conv x y) psi) phi
-and faceConv phi psi = faceSubset phi psi && faceSubset psi phi
-
-and systemSubset xs ys =
-  List.for_all (fun (p, x) -> List.exists (fun (q, y) ->
-    faceConv p q && conv (extFace p x) (extFace q y)) ys) xs
+and convWithSystem = function
+  | v, VApp (VSystem ts, _) | VApp (VSystem ts, _), v ->
+    System.for_all (fun mu -> conv (upd mu v)) ts
+  | _, _ -> false
 
 and convId v1 v2 =
   (* Id A a b is proof-irrelevant *)
@@ -436,11 +444,12 @@ and check ctx (e0 : exp) (t0 : value) =
     | VKan v | VPre v -> if ieq u v then () else raise (Ineq (VPre u, VPre v))
     | t -> raise (Ineq (VPre u, t))
   end
-  | ESystem xs, VApp (VPartial t, i) ->
-    eqNf (eval (getFormula xs) ctx) i;
+  | ESystem ts, VPartialP (u, i) ->
+    eqNf (eval (getFormula ts) ctx) i;
     System.iter (fun alpha e ->
-      check (faceEnv alpha ctx) e (upd alpha t)) xs;
-    checkOverlapping ctx xs
+      check (faceEnv alpha ctx) e
+        (app (upd alpha u, VRef vone))) ts;
+    checkOverlapping ctx ts
   | e, t -> eqNf (infer ctx e) t
   with ex -> Printf.printf "When trying to typecheck\n  %s\nAgainst type\n  %s\n" (showExp e0) (showValue t0); raise ex
 
@@ -458,7 +467,7 @@ and infer ctx e : value = traceInfer e; match e with
   | ESig (a, (p, b)) | EPi (a, (p, b)) -> inferTele ctx p a b
   | ELam (a, (p, b)) -> inferLam ctx p a b
   | EApp (f, x) -> begin match infer ctx f with
-    | VApp (VPartial t, i) -> check ctx x (isOne i); t
+    | VPartialP (t, i) -> check ctx x (isOne i); app (t, eval x ctx)
     | VPi (t, (_, g)) -> check ctx x t; g (eval x ctx)
     | v -> raise (ExpectedPi v)
   end
@@ -468,6 +477,11 @@ and infer ctx e : value = traceInfer e; match e with
   | EPre u -> VPre (u + 1)
   | EPathP p -> inferPath ctx p
   | EPartial e -> let n = extSet (infer ctx e) in implv VI (VPre n)
+  | EPartialP (u, r0) -> check ctx r0 VI; let t = infer ctx u in
+  begin match t with
+    | VPartialP (ts, r) -> eqNf r (eval r0 ctx); inferV (inferV ts)
+    | _ -> failwith "Expected partial function into universe"
+  end
   | EAppFormula (f, x) -> check ctx x VI; let (p, _, _) = extPathP (infer ctx (rbV (eval f ctx))) in
     appFormula p (eval x ctx)
   | ETransp (p, i) -> inferTransport ctx p i
@@ -489,15 +503,8 @@ and infer ctx e : value = traceInfer e; match e with
     | VSub (t, _, _) -> t
     | _ -> raise (ExpectedSubtype e)
   end
-  | ESystem ts -> begin match System.choose_opt ts with
-    | None           -> failwith "Cannot infer type of empty system"
-    | Some (tau, e0) -> let t = infer ctx e0 in
-      System.iter (fun mu e ->
-        if Env.equal (=) tau mu then ()
-        else check (faceEnv mu ctx) e t) ts;
-      checkOverlapping ctx ts;
-      partialv t (eval (getFormula ts) ctx)
-  end
+  | ESystem ts -> checkOverlapping ctx ts;
+    VPartialP (VSystem (System.map (infer ctx) ts), eval (getFormula ts) ctx)
   | e -> raise (InferError e)
 
 and inferField ctx p e = match infer ctx e with

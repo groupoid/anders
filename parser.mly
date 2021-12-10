@@ -45,7 +45,7 @@
 %token MODULE WHERE IMPORT DEF AXIOM
 %token SIGMA PI OPTION LT GT
 %token APPFORMULA PATHP TRANSP HCOMP
-%token PARTIAL MAP INC OUC
+%token PARTIAL PARTIALP MAP INC OUC
 %token AND OR NEGATE
 %token ID REF IDJ
 
@@ -102,6 +102,7 @@ exp4 :
   | TRANSP exp6 exp6 { ETransp ($2, $3) }
   | HCOMP exp6 exp6 exp6 exp6 { EHComp ($2, $3, $4, $5) }
   | PARTIAL exp6 { EPartial $2 }
+  | PARTIALP exp6 exp6 { EPartialP ($2, $3) }
   | exp5 { $1 }
 
 exp5:

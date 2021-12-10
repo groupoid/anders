@@ -39,7 +39,6 @@ let implv a b = VPi (a, (Irrefutable, fun _ -> b))
 let impl a b = EPi (a, (Irrefutable, b))
 let prod a b = ESig (a, (Irrefutable, b))
 
-let partialv t r = VApp (VPartial t, r)
 let hcompval u = EApp (EApp (u, ezero), ERef eone)
 
 let rec salt (ns : name Env.t) : exp -> exp = function
@@ -64,6 +63,7 @@ let rec salt (ns : name Env.t) : exp -> exp = function
   | EPLam e              -> EPLam (salt ns e)
   | EAppFormula (p, i)   -> EAppFormula (salt ns p, salt ns i)
   | EPartial e           -> EPartial (salt ns e)
+  | EPartialP (t, r)     -> EPartialP (salt ns t, salt ns r)
   | ESub (a, i, u)       -> ESub (salt ns a, salt ns i, salt ns u)
   | ESystem xs           -> ESystem (System.fold (fun k v -> System.add (freshFace ns k) (salt ns v)) xs System.empty)
   | EInc (t, r)          -> EInc (salt ns t, salt ns r)

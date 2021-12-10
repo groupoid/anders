@@ -140,6 +140,12 @@ def φ-eq-φ′ (i : I) : Id (Partial U₁ (i ∨ -i)) (φ i) (φ′ i) := ref (
 def ρ (i j : I) : Partial U₁ (-i ∨ (i ∧ j)) := [(i = 0) → U, (i = 1) (j = 1) → U]
 def κ : Partial U₁ 1 := [(1 = 1) → U]
 
+def partial-app-test (A : U) (a : A) (φ : I) (p : 1= φ) : A :=
+[(φ = 1) → a] p
+
+def θ (A B : U) (a : A) (b : B) (φ : I) : PartialP [(φ = 0) → A, (φ = 1) → B] (φ ∨ -φ) :=
+[(φ = 0) → a, (φ = 1) → b]
+
 def ≤ (i j : I) := Id I (i ∧ j) i
 def ≥ (i j : I) := ≤ j i
 

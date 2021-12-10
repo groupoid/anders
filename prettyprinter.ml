@@ -45,6 +45,7 @@ let rec ppExp paren e = let x = match e with
   | EJ e -> Printf.sprintf "idJ %s" (ppExp true e)
   | EHComp (t, r, u, u0) -> Printf.sprintf "hcomp %s %s %s %s" (ppExp true t) (ppExp true r) (ppExp true u) (ppExp true u0)
   | EPartial e -> Printf.sprintf "Partial %s" (ppExp true e)
+  | EPartialP (t, r) -> Printf.sprintf "PartialP %s %s" (ppExp true t) (ppExp true r)
   | EInc (t, r) -> Printf.sprintf "inc %s %s" (ppExp true t) (ppExp true r)
   | EOuc e -> Printf.sprintf "ouc %s" (ppExp true e)
   in match e with
@@ -85,7 +86,7 @@ let rec ppValue paren v = let x = match v with
   | VId v -> Printf.sprintf "Id %s" (ppValue true v)
   | VRef v -> Printf.sprintf "ref %s" (ppValue true v)
   | VJ v -> Printf.sprintf "idJ %s" (ppValue true v)
-  | VPartial v -> Printf.sprintf "Partial %s" (ppValue true v)
+  | VPartialP (t, r) -> Printf.sprintf "PartialP %s %s" (ppValue true t) (ppValue true r)
   | VHComp (t, r, u, u0) -> Printf.sprintf "hcomp %s %s %s %s" (ppValue true t) (ppValue true r) (ppValue true u) (ppValue true u0)
   | VInc (t, r) -> Printf.sprintf "inc %s %s" (ppValue true t) (ppValue true r)
   | VOuc v -> Printf.sprintf "ouc %s" (ppValue true v)

@@ -14,7 +14,7 @@ type exp =
   | EPathP of exp | EPLam of exp | EAppFormula of exp * exp                     (* path equality *)
   | EI | EDir of dir | EAnd of exp * exp | EOr of exp * exp | ENeg of exp       (* CCHM interval *)
   | ETransp of exp * exp | EHComp of exp * exp * exp * exp                     (* Kan operations *)
-  | EPartial of exp | ESystem of exp System.t                               (* partial functions *)
+  | EPartial of exp | EPartialP of exp * exp | ESystem of exp System.t      (* partial functions *)
   | ESub of exp * exp * exp | EInc of exp * exp | EOuc of exp                (* cubical subtypes *)
 
 type tele = name * exp
@@ -32,7 +32,7 @@ type value =
   | VPathP of value | VPLam of value | VAppFormula of value * value
   | VI | VDir of dir | VAnd of value * value | VOr of value * value | VNeg of value
   | VTransp of value * value | VHComp of value * value * value * value
-  | VPartial of value | VSystem of value System.t
+  | VPartialP of value * value | VSystem of value System.t
   | VSub of value * value * value | VInc of value * value | VOuc of value
 
 and clos = name * (value -> value)

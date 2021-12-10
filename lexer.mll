@@ -76,7 +76,8 @@ rule main = parse
 | "PathP"         { PATHP }            | "transp"        { TRANSP }
 | "Id"            { ID }               | "ref"           { REF }
 | "idJ"           { IDJ }              | pre as s        { PRE (getLevel s) }
-| "?"             { HOLE }             | "Partial"       { PARTIAL }
+| "Partial"       { PARTIAL }          | "PartialP"      { PARTIALP }
+| "?"             { HOLE }             | map             { MAP }
 | "inc"           { INC }              | "ouc"           { OUC }
-| "hcomp"         { HCOMP }            | map             { MAP }
-| ident as s      { IDENT s }          | eof             { EOF }
+| "hcomp"         { HCOMP }            | ident as s      { IDENT s }
+| eof             { EOF }

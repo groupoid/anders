@@ -150,24 +150,29 @@ def ≤ (i j : I) := Id I (i ∧ j) i
 def ≥ (i j : I) := ≤ j i
 
 def ∧-split (i j : I) : Partial (1= i) (i ∧ j) := [(i = 1) (j = 1) → 1=1]
-def ∨-left (i j : I) (p : 1= i) : 1= (i ∨ j) := idJ I (λ (i i′ : I) (_ : Id I i i′), Id I 1 (i′ ∨ j)) 1 1=1 i p
+def ∨-left (i j : I) (p : 1= i) : 1= (i ∨ j) :=
+idJ I (λ (i i′ : I) (_ : Id I i i′), Id I 1 (i′ ∨ j)) 1 1=1 i p
 def ∨-right (i j : I) (p : 1= j) : 1= (i ∨ j) := ∨-left j i p -- works due to commutativity of ∨
+
 def ∧-1 (i j : I) (p : 1= (i ∧ j)) : 1= i := ∧-split i j p
 def ∧-1′ (i j : I) (p : 1= (i ∧ j)) : 1= i := cong-Id I I (λ (k : I), k ∨ i) 1 (i ∧ j) p
+
 def ∧-min-left  (i j : I) : ≤ (i ∧ j) i := ref (i ∧ j)
 def ∧-min-right (i j : I) : ≤ (i ∧ j) j := ref (i ∧ j)
 def ∨-max-left  (i j : I) : ≤ i (i ∨ j) := ref i
 def ∨-max-right (i j : I) : ≤ j (i ∨ j) := ref j
-def ∧-to-∨ (i j : I) (p : Id I (i ∧ j) i)
-  : Id I (i ∨ j) j := rev I j (i ∨ j) (cong-Id I I (λ (k : I), k ∨ j) (i ∧ j) i p)
 
-def ≤-asymm (i j : I) (p : ≤ i j) (q : ≤ j i) : Id I i j := comp-Id I i (i ∧ j) j (rev I (i ∧ j) i p) q
+def ∧-to-∨ (i j : I) (p : Id I (i ∧ j) i) : Id I (i ∨ j) j :=
+rev I j (i ∨ j) (cong-Id I I (λ (k : I), k ∨ j) (i ∧ j) i p)
+
+def ≤-asymm (i j : I) (p : ≤ i j) (q : ≤ j i) : Id I i j :=
+comp-Id I i (i ∧ j) j (rev I (i ∧ j) i p) q
 def ≤-refl (i : I) : ≤ i i := ref i
-def ≤-trans (i j k : I) (p : ≤ i j) (q : ≤ j k) : ≤ i k
- := comp-Id I (i ∧ k) (i ∧ j) i
-    (comp-Id I (i ∧ k) (i ∧ j ∧ k) (i ∧ j)
-       (rev I (i ∧ j ∧ k) (i ∧ k) (cong-Id I I (min k) (i ∧ j) i p))
-       (cong-Id I I (min i) (j ∧ k) j q)) p
+def ≤-trans (i j k : I) (p : ≤ i j) (q : ≤ j k) : ≤ i k :=
+comp-Id I (i ∧ k) (i ∧ j) i
+  (comp-Id I (i ∧ k) (i ∧ j ∧ k) (i ∧ j)
+     (rev I (i ∧ j ∧ k) (i ∧ k) (cong-Id I I (min k) (i ∧ j) i p))
+     (cong-Id I I (min i) (j ∧ k) j q)) p
 
 def 0-is-min (i : I) : ≤ 0 i := ref 0
 def 1-is-max (i : I) : ≤ i 1 := ref i

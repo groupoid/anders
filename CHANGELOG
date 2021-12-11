@@ -7,6 +7,7 @@ Changelog
 * Modules: algebra, cat, fun, topos, ab, kraus
 * LaTeX paper [LIPIcs]
 * Improved Huber rules
+* PartialP primitive
 
 15 JUL 2021 Version 0.7.2 Kan Operations:
 

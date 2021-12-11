@@ -8,4 +8,5 @@
                 library/leibniz.anders        library/list.anders
                 library/mltt.anders           library/path.anders
                 library/equiv.anders          library/constcubes.anders
+                library/ab.anders             library/algebra.anders
                 library/pi.anders             library/topos.anders) (section share) (package anders))

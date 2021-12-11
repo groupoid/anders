@@ -1,6 +1,6 @@
 opam-version: "2.0"
 name: "anders"
-version: "0.7.2"
+version: "0.12.0"
 maintainer: "Namdak Tonpa <maxim@synrc.com>"
 authors: [
   "Namdak Tonpa @5HT"

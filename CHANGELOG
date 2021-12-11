@@ -1,11 +1,12 @@
 Changelog
 =========
 
-1 OCT 2021 Version 0.10 Categorical Library:
+11 DEC 2021 Version 0.12 Categorical Library:
 
 * Sigma with auto projections
-* Modules: cat, fun, topos, ab, kraus
+* Modules: algebra, cat, fun, topos, ab, kraus
 * LaTeX paper [LIPIcs]
+* Improved Huber rules
 
 15 JUL 2021 Version 0.7.2 Kan Operations:
 

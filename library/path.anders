@@ -225,6 +225,9 @@ def ouc′ (A : U) (i : I) (u : Partial A i) (a : A[i ↦ u]) : A := ouc a
 def hcomp′ (A : U) (r : I) (u : I → Partial A r) (u₀ : A[r ↦ u 0]) : A := hcomp A r u (ouc u₀)
 def hcomp-ε (A : U) (a : A) := hcomp A 0 (\(i : I), []) a
 
+def hcomp-ε→id (A : U) (a : A) : Path A (hcomp-ε A a) a :=
+<i> hcomp A i (\(j : I), [(i = 1) → a]) a
+
 def comp-Path (A : U) (a b c : A) (p : Path A a b) (q : Path A b c) : Path A a c
  := <i> hcomp A (∂ i) (λ (j : I), [(i = 0) → a, (i = 1) → q @ j]) (p @ i)
 

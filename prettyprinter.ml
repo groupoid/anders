@@ -48,6 +48,7 @@ let rec ppExp paren e = let x = match e with
   | EPartialP (t, r) -> Printf.sprintf "PartialP %s %s" (ppExp true t) (ppExp true r)
   | EInc (t, r) -> Printf.sprintf "inc %s %s" (ppExp true t) (ppExp true r)
   | EOuc e -> Printf.sprintf "ouc %s" (ppExp true e)
+  | EGlue e -> Printf.sprintf "Glue %s" (ppExp true e)
   in match e with
   | EVar _ | EFst _ | ESnd _ | EI | EPre _ | ESystem _
   | EKan _ | EHole | EDir _ | EPair _ | ENeg _ -> x
@@ -90,6 +91,7 @@ let rec ppValue paren v = let x = match v with
   | VHComp (t, r, u, u0) -> Printf.sprintf "hcomp %s %s %s %s" (ppValue true t) (ppValue true r) (ppValue true u) (ppValue true u0)
   | VInc (t, r) -> Printf.sprintf "inc %s %s" (ppValue true t) (ppValue true r)
   | VOuc v -> Printf.sprintf "ouc %s" (ppValue true v)
+  | VGlue v -> Printf.sprintf "Glue %s" (ppValue true v)
   in match v with
   | Var _ | VFst _ | VSnd _ | VI | VPre _ | VSystem _
   | VKan _ | VHole | VDir _ | VPair _ | VNeg _ -> x

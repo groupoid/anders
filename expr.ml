@@ -16,6 +16,7 @@ type exp =
   | ETransp of exp * exp | EHComp of exp * exp * exp * exp                     (* Kan operations *)
   | EPartial of exp | EPartialP of exp * exp | ESystem of exp System.t      (* partial functions *)
   | ESub of exp * exp * exp | EInc of exp * exp | EOuc of exp                (* cubical subtypes *)
+  | EGlue of exp                                                                      (* glueing *)
 
 type tele = name * exp
 
@@ -34,6 +35,7 @@ type value =
   | VTransp of value * value | VHComp of value * value * value * value
   | VPartialP of value * value | VSystem of value System.t
   | VSub of value * value * value | VInc of value * value | VOuc of value
+  | VGlue of value
 
 and clos = name * (value -> value)
 

@@ -15,12 +15,14 @@ let rec extractExp : exp -> string = function
   | EKan _ -> fail "cubicaltt does not support universe hierarchy"
   | EPre _ -> fail "cubicaltt does not support explicit pretypes"
   | EInc _ | EOuc _ | ESub _ -> fail "cubicaltt does not support explicit cubical subtypes"
+  | EGlue _ -> fail "cubicaltt does not support currying of Glue"
+  | EPathP _ -> fail "cubicaltt does not support (partial) currying of PathP"
+  | ETransp _ -> fail "cubicaltt does not support currying of generalized transport"
   | ESystem e -> showSystem extractExp e
   | EHComp _ -> fail "not implemented yet"
   | EApp (ETransp (p, i), a) -> Printf.sprintf "transGen %s %s %s" (extractExp p) (extractExp i) (extractExp a)
-  | ETransp _ -> fail "cubicaltt does not support currying of generalized transport"
   | EApp (EApp (EPathP p, a), b) -> Printf.sprintf "PathP %s %s %s" (extractExp p) (extractExp a) (extractExp b)
-  | EApp (EPathP _, _) | EPathP _ -> fail "cubicaltt does not support (partial) currying of PathP"
+  | EApp (EApp (EGlue t, _), u) -> Printf.sprintf "Glue %s %s" (extractExp t) (extractExp u)
   | EPLam (ELam (EI, (p, e))) -> Printf.sprintf "(<%s> %s)" (showName p) (extractExp e)
   | EPLam _ -> fail "invalid path lambda (should never happen)"
   | EAppFormula (f, x) -> Printf.sprintf "(%s @ %s)" (extractExp f) (extractExp x)

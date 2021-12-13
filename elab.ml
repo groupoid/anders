@@ -36,6 +36,9 @@ let imax a b = match a, b with
 let idv t x y = VApp (VApp (VId t, x), y)
 let implv a b = VPi (a, (Irrefutable, fun _ -> b))
 
+let idp v = VPLam (VLam (VI, (Irrefutable, fun _ -> v)))
+let pathv v a b = VApp (VApp (VPathP v, a), b)
+
 let impl a b = EPi (a, (Irrefutable, b))
 let prod a b = ESig (a, (Irrefutable, b))
 
@@ -73,6 +76,7 @@ let rec salt (ns : name Env.t) : exp -> exp = function
   | EAnd (a, b)          -> EAnd (salt ns a, salt ns b)
   | EOr (a, b)           -> EOr (salt ns a, salt ns b)
   | ENeg e               -> ENeg (salt ns e)
+  | EGlue e              -> EGlue (salt ns e)
 
 and freshFace ns phi =
   Env.fold (fun k v -> Env.add (freshVar ns k) v) phi Env.empty

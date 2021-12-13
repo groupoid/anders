@@ -23,4 +23,4 @@ let tokenToString : token -> string = function
   | MAP        -> "MAP"         | IMPORT     -> "IMPORT"
   | INC        -> "INC"         | OUC        -> "OUC"
   | HCOMP      -> "HCOMP"       | DOT        -> "DOT"
-  | IDJ        -> "IDJ"
+  | IDJ        -> "IDJ"         | GLUE       -> "GLUE"

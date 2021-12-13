@@ -48,6 +48,7 @@
 %token PARTIAL PARTIALP MAP INC OUC
 %token AND OR NEGATE
 %token ID REF IDJ
+%token GLUE
 
 %left APPFORMULA
 %left OR
@@ -103,6 +104,7 @@ exp4 :
   | HCOMP exp6 exp6 exp6 exp6 { EHComp ($2, $3, $4, $5) }
   | PARTIAL exp6 { EPartial $2 }
   | PARTIALP exp6 exp6 { EPartialP ($2, $3) }
+  | GLUE exp6 { EGlue $2 }
   | exp5 { $1 }
 
 exp5:

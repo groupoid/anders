@@ -53,6 +53,7 @@ let rec eval (e0 : exp) (ctx : ctx) = traceEval e0; match e0 with
   | ESub (a, i, u)       -> VSub (eval a ctx, eval i ctx, eval u ctx)
   | EInc (t, r)          -> VInc (eval t ctx, eval r ctx)
   | EOuc e               -> evalOuc (eval e ctx)
+  | EGlue e              -> VGlue (eval e ctx)
 
 and appFormula v x = match v with
   | VPLam f -> app (f, x)
@@ -166,6 +167,15 @@ and transFill p phi u0 j = let (i, _, _) = freshDim () in
   transport (VPLam (VLam (VI, (i, fun i -> appFormula p (andFormula (i, j))))))
     (orFormula (phi, negFormula j)) u0
 
+and fiber t1 t2 f y = VSig (t1, (freshName "a", fun x -> pathv (idp t2) y (app (f, x))))
+
+and isContr t = let x = freshName "x" in let y = freshName "y" in
+  VSig (t, (x, fun x -> VPi (t, (y, fun y -> pathv (idp t) x y))))
+
+and isEquiv t1 t2 f = VPi (t2, (freshName "b", isContr << fiber t1 t2 f))
+and equiv t1 t2 = VSig (implv t1 t2, (freshName "f", isEquiv t1 t2))
+and equivSingl t0 = VSig (inferV t0, (freshName "T", fun t -> equiv t t0))
+
 and closByVal ctx p t e v = traceClos e p v;
   (* dirty hack to handle free variables introduced by type checker,
      for example, while checking terms like p : Path P a b *)
@@ -176,6 +186,7 @@ and closByVal ctx p t e v = traceClos e p v;
 
 and app : value * value -> value = function
   | VApp (VApp (VApp (VApp (VJ _, _), _), f), _), VRef _ -> f
+  | VApp (VGlue _, VDir One), u -> vfst (app (u, VRef vone))
   | VTransp (p, i), u0 -> transport p i u0
   | VSystem ts, x -> reduceSystem ts x
   | VLam (_, (_, f)), v -> f v
@@ -253,6 +264,7 @@ and inferV v = traceInferV v; match v with
   end
   | VPartialP (t, _) -> inferV (inferV t)
   | VSystem ts -> VPartialP (VSystem (System.map inferV ts), getFormulaV ts)
+  | VGlue t -> inferGlue t
   | v -> raise (ExpectedNeutral v)
 
 and extByTag p : value -> value option = function
@@ -311,6 +323,7 @@ and upd e = function
   | VNeg u               -> negFormula (upd e u)
   | VInc (t, r)          -> VInc (upd e t, upd e r)
   | VOuc v               -> evalOuc (upd e v)
+  | VGlue v              -> VGlue (upd e v)
 
 and updTerm alpha = function
   | Exp e   -> Exp e
@@ -351,6 +364,7 @@ and rbV v : exp = traceRbV v; match v with
   | VNeg u               -> ENeg (rbV u)
   | VInc (t, r)          -> EInc (rbV t, rbV r)
   | VOuc v               -> EOuc (rbV v)
+  | VGlue v              -> EGlue (rbV v)
 
 and rbVTele ctor t (p, g) = let x = Var (p, t) in ctor p (rbV t) (rbV (g x))
 
@@ -395,6 +409,7 @@ and conv v1 v2 : bool = traceConv v1 v2;
     | VId u, VId v | VJ u, VJ v -> conv u v
     | VInc (t1, r1), VInc (t2, r2) -> conv t1 t2 && conv r1 r2
     | VOuc u, VOuc v -> conv u v
+    | VGlue v, VGlue u -> conv u v
     | _, _ -> false
   end || convWithSystem (v1, v2) || convId v1 v2
 
@@ -504,7 +519,9 @@ and infer ctx e : value = traceInfer e; match e with
     | _ -> raise (ExpectedSubtype e)
   end
   | ESystem ts -> checkOverlapping ctx ts;
-    VPartialP (VSystem (System.map (infer ctx) ts), eval (getFormula ts) ctx)
+    VPartialP (VSystem (System.mapi (fun mu -> infer (faceEnv mu ctx)) ts),
+               eval (getFormula ts) ctx)
+  | EGlue e -> ignore (extKan (infer ctx e)); inferGlue (eval e ctx)
   | e -> raise (InferError e)
 
 and inferField ctx p e = match infer ctx e with
@@ -529,6 +546,9 @@ and inferPath (ctx : ctx) (p : exp) =
 
 and inferInc t r = let a = freshName "a" in
   VPi (t, (a, fun v -> VSub (t, r, VSystem (border (solve r One) v))))
+
+and inferGlue t = let (r, _, _) = freshDim () in let k = inferV t in
+  VPi (VI, (r, fun r -> implv (partialv (equivSingl t) r) k))
 
 and inferTransport (ctx : ctx) (p : exp) (i : exp) =
   check ctx i VI;

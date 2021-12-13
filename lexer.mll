@@ -79,5 +79,5 @@ rule main = parse
 | "Partial"       { PARTIAL }          | "PartialP"      { PARTIALP }
 | "?"             { HOLE }             | map             { MAP }
 | "inc"           { INC }              | "ouc"           { OUC }
-| "hcomp"         { HCOMP }            | ident as s      { IDENT s }
-| eof             { EOF }
+| "hcomp"         { HCOMP }            | "Glue"          { GLUE }
+| ident as s      { IDENT s }          | eof             { EOF }

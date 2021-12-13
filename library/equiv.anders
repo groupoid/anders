@@ -35,9 +35,16 @@ def ret-equiv (A B : U) (w : equiv A B) (y : B) : Path B (w.1 (inv-equiv A B w y
 def sec-equiv (A B : U) (w : equiv A B) (x : A) : Path A (inv-equiv A B w (w.1 x)) x :=
 <i> ((w.2 (w.1 x)).2 (x, <j> w.1 x) @ i).1
 
+def Glue′ (A : U) (φ : I) (e : Partial (Σ (T : U), equiv T A) φ) : U := Glue A φ e
+
 -- Univalence (Formation, Intro, Elim, Computation)
 
--- def univ_Formation (A B : U) : U := equiv A B -> Path U A B
--- axiom equivToPath (A B : U) : univ_Formation A B -- := λ (p: equiv A B), <i> Glue B [(i=0) -> (A,p), (i=1) -> (B, subst U (equiv B) B B (<_>B) (idEquiv B)) ]
--- def pathToEquiv (A B : U) (p : Path U A B) : equiv A B := subst U (equiv A) A B p (idEquiv A)
+def univ_Formation (A B : U) := equiv A B -> PathP (<_> U) A B
+
+def equivToPath (A B : U) : univ_Formation A B :=
+λ (p : equiv A B), <i> Glue B (∂ i) [(i = 0) → (A, p), (i = 1) -> (B, idEquiv B)]
+
+def pathToEquiv (A B : U) (p : PathP (<_> U) A B) : equiv A B :=
+transp (<i> equiv A (p @ i)) 0 (idEquiv A)
+
 -- axiom uniqueness (A B : U) (w : equiv A B) : Path (A -> B) w.1 (pathToEquiv A B (equivToPath A B w)).1

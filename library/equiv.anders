@@ -39,10 +39,10 @@ def Glue′ (A : U) (φ : I) (e : Partial (Σ (T : U), equiv T A) φ) : U := Glu
 
 -- Univalence (Formation, Intro, Elim, Computation)
 
-def univ_Formation (A B : U) := equiv A B -> PathP (<_> U) A B
+def univ_Formation (A B : U) := equiv A B → PathP (<_> U) A B
 
 def equivToPath (A B : U) : univ_Formation A B :=
-λ (p : equiv A B), <i> Glue B (∂ i) [(i = 0) → (A, p), (i = 1) -> (B, idEquiv B)]
+λ (p : equiv A B), <i> Glue B (∂ i) [(i = 0) → (A, p), (i = 1) → (B, idEquiv B)]
 
 def pathToEquiv (A B : U) (p : PathP (<_> U) A B) : equiv A B :=
 transp (<i> equiv A (p @ i)) 0 (idEquiv A)

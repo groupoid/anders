@@ -15,3 +15,12 @@ def instance : trio := (U, U -> U, U -> U -> U)
 def pair (A B : U) := Σ (first : A) (second : B), U
 def pair-first  (A B : U) (X : pair A B) : A := X.first
 def pair-second (A B : U) (X : pair A B) : B := X.second
+
+def not : 𝟐 → 𝟐 :=
+rec₂ (λ (_ : 𝟐), 𝟐) 1₂ 0₂
+
+def and : 𝟐 → 𝟐 → 𝟐 :=
+rec₂ (λ (_ : 𝟐), 𝟐 → 𝟐) (const 𝟐 𝟐 false) (idfun 𝟐)
+
+def or : 𝟐 → 𝟐 → 𝟐 :=
+rec₂ (λ (_ : 𝟐), 𝟐 → 𝟐) (idfun 𝟐) (const 𝟐 𝟐 true)

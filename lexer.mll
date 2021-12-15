@@ -56,6 +56,10 @@ let subscript = '\xE2' '\x82' ['\x80'-'\x89']
 let kan       = 'U' subscript*
 let pre       = 'V' subscript*
 
+let recempty = "rec-empty" | "rec\xE2\x82\x80" (* rec₀ *)
+let recunit  = "rec-unit"  | "rec\xE2\x82\x81" (* rec₁ *)
+let recbool  = "rec-bool"  | "rec\xE2\x82\x82" (* rec₂ *)
+
 rule main = parse
 | nl              { nextLine lexbuf; main lexbuf }
 | comment         { nextLine lexbuf; main lexbuf }
@@ -80,4 +84,6 @@ rule main = parse
 | "?"             { HOLE }             | map             { MAP }
 | "inc"           { INC }              | "ouc"           { OUC }
 | "hcomp"         { HCOMP }            | "Glue"          { GLUE }
-| ident as s      { IDENT s }          | eof             { EOF }
+| recempty        { RECEMPTY }         | recunit         { RECUNIT }
+| recbool         { RECBOOL }          | ident as s      { IDENT s }
+| eof             { EOF }

@@ -49,9 +49,15 @@ let rec ppExp paren e = let x = match e with
   | EInc (t, r) -> Printf.sprintf "inc %s %s" (ppExp true t) (ppExp true r)
   | EOuc e -> Printf.sprintf "ouc %s" (ppExp true e)
   | EGlue e -> Printf.sprintf "Glue %s" (ppExp true e)
+  | Empty -> "𝟎" | EUnit -> "𝟏" | EBool -> "𝟐"
+  | EStar -> "★" | EFalse -> "0₂" | ETrue -> "1₂"
+  | ERecEmpty e -> Printf.sprintf "rec₀ %s" (ppExp true e)
+  | ERecUnit e  -> Printf.sprintf "rec₁ %s" (ppExp true e)
+  | ERecBool e  -> Printf.sprintf "rec₂ %s" (ppExp true e)
   in match e with
   | EVar _ | EFst _ | ESnd _ | EI | EPre _ | ESystem _
-  | EKan _ | EHole | EDir _ | EPair _ | ENeg _ -> x
+  | EKan _ | EHole | EDir _ | EPair _ | ENeg _
+  | Empty | EUnit | EBool | EStar | EFalse | ETrue -> x
   | _ -> parens paren x
 
 and showExp e = ppExp false e
@@ -92,9 +98,15 @@ let rec ppValue paren v = let x = match v with
   | VInc (t, r) -> Printf.sprintf "inc %s %s" (ppValue true t) (ppValue true r)
   | VOuc v -> Printf.sprintf "ouc %s" (ppValue true v)
   | VGlue v -> Printf.sprintf "Glue %s" (ppValue true v)
+  | VEmpty -> "𝟎" | VUnit -> "𝟏" | VBool -> "𝟐"
+  | VStar -> "★" | VFalse -> "0₂" | VTrue -> "1₂"
+  | VRecEmpty v -> Printf.sprintf "rec₀ %s" (ppValue true v)
+  | VRecUnit v  -> Printf.sprintf "rec₁ %s" (ppValue true v)
+  | VRecBool v  -> Printf.sprintf "rec₂ %s" (ppValue true v)
   in match v with
   | Var _ | VFst _ | VSnd _ | VI | VPre _ | VSystem _
-  | VKan _ | VHole | VDir _ | VPair _ | VNeg _ -> x
+  | VKan _ | VHole | VDir _ | VPair _ | VNeg _
+  | VEmpty | VUnit | VBool | VStar | VFalse | VTrue -> x
   | _ -> parens paren x
 
 and showValue v = ppValue false v

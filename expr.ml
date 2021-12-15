@@ -17,6 +17,9 @@ type exp =
   | EPartial of exp | EPartialP of exp * exp | ESystem of exp System.t      (* partial functions *)
   | ESub of exp * exp * exp | EInc of exp * exp | EOuc of exp                (* cubical subtypes *)
   | EGlue of exp                                                                      (* glueing *)
+  | Empty | ERecEmpty of exp                                                                (* 𝟎 *)
+  | EUnit | EStar | ERecUnit of exp                                                         (* 𝟏 *)
+  | EBool | EFalse | ETrue | ERecBool of exp                                                (* 𝟐 *)
 
 type tele = name * exp
 
@@ -36,6 +39,9 @@ type value =
   | VPartialP of value * value | VSystem of value System.t
   | VSub of value * value * value | VInc of value * value | VOuc of value
   | VGlue of value
+  | VEmpty | VRecEmpty of value
+  | VUnit | VStar | VRecUnit of value
+  | VBool | VFalse | VTrue | VRecBool of value
 
 and clos = name * (value -> value)
 

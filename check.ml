@@ -54,6 +54,15 @@ let rec eval (e0 : exp) (ctx : ctx) = traceEval e0; match e0 with
   | EInc (t, r)          -> VInc (eval t ctx, eval r ctx)
   | EOuc e               -> evalOuc (eval e ctx)
   | EGlue e              -> VGlue (eval e ctx)
+  | Empty                -> VEmpty
+  | ERecEmpty e          -> VRecEmpty (eval e ctx)
+  | EUnit                -> VUnit
+  | EStar                -> VStar
+  | ERecUnit e           -> VRecUnit (eval e ctx)
+  | EBool                -> VBool
+  | EFalse               -> VFalse
+  | ETrue                -> VTrue
+  | ERecBool e           -> VRecBool (eval e ctx)
 
 and appFormula v x = match v with
   | VPLam f -> app (f, x)
@@ -185,12 +194,20 @@ and closByVal ctx p t e v = traceClos e p v;
   eval e (upLocal ctx' p t v)
 
 and app : value * value -> value = function
+  (* J A C a φ a (ref a) ~> φ *)
   | VApp (VApp (VApp (VApp (VJ _, _), _), f), _), VRef _ -> f
+  (* Glue A 1 u ~> (u 1=1).1 *)
   | VApp (VGlue _, VDir One), u -> vfst (app (u, VRef vone))
   | VTransp (p, i), u0 -> transport p i u0
   | VSystem ts, x -> reduceSystem ts x
   | VLam (_, (_, f)), v -> f v
   | VInc _, VOuc v -> v
+  (* rec₁ C x ★ ~> x *)
+  | VApp (VRecUnit _, x), VStar -> x
+  (* rec₂ C a b 0₂ ~> a *)
+  | VApp (VApp (VRecBool _, a), _), VFalse -> a
+  (* rec₂ C a b 1₂ ~> b *)
+  | VApp (VApp (VRecBool _, _), b), VTrue -> b
   | f, x -> VApp (f, x)
 
 and evalSystem ctx ts =
@@ -265,7 +282,19 @@ and inferV v = traceInferV v; match v with
   | VPartialP (t, _) -> inferV (inferV t)
   | VSystem ts -> VPartialP (VSystem (System.map inferV ts), getFormulaV ts)
   | VGlue t -> inferGlue t
+  | VEmpty | VUnit | VBool -> VKan 0
+  | VStar -> VUnit | VFalse | VTrue -> VBool
+  | VRecEmpty t -> implv VEmpty t
+  | VRecUnit t -> recUnit t
+  | VRecBool t -> recBool t
   | v -> raise (ExpectedNeutral v)
+
+and recUnit t = let x = freshName "x" in
+  implv (app (t, VStar)) (VPi (VUnit, (x, fun x -> app (t, x))))
+
+and recBool t = let x = freshName "x" in
+  implv (app (t, VFalse)) (implv (app (t, VTrue))
+    (VPi (VBool, (x, fun x -> app (t, x)))))
 
 and extByTag p : value -> value option = function
   | VPair (t, fst, snd) ->
@@ -324,6 +353,15 @@ and upd e = function
   | VInc (t, r)          -> VInc (upd e t, upd e r)
   | VOuc v               -> evalOuc (upd e v)
   | VGlue v              -> VGlue (upd e v)
+  | VEmpty               -> VEmpty
+  | VRecEmpty v          -> VRecEmpty (upd e v)
+  | VUnit                -> VUnit
+  | VStar                -> VStar
+  | VRecUnit v           -> VRecUnit (upd e v)
+  | VBool                -> VBool
+  | VFalse               -> VFalse
+  | VTrue                -> VTrue
+  | VRecBool v           -> VRecBool (upd e v)
 
 and updTerm alpha = function
   | Exp e   -> Exp e
@@ -365,6 +403,15 @@ and rbV v : exp = traceRbV v; match v with
   | VInc (t, r)          -> EInc (rbV t, rbV r)
   | VOuc v               -> EOuc (rbV v)
   | VGlue v              -> EGlue (rbV v)
+  | VEmpty               -> Empty
+  | VRecEmpty v          -> ERecEmpty (rbV v)
+  | VUnit                -> EUnit
+  | VStar                -> EStar
+  | VRecUnit v           -> ERecUnit (rbV v)
+  | VBool                -> EBool
+  | VFalse               -> EFalse
+  | VTrue                -> ETrue
+  | VRecBool v           -> ERecBool (rbV v)
 
 and rbVTele ctor t (p, g) = let x = Var (p, t) in ctor p (rbV t) (rbV (g x))
 
@@ -410,6 +457,15 @@ and conv v1 v2 : bool = traceConv v1 v2;
     | VInc (t1, r1), VInc (t2, r2) -> conv t1 t2 && conv r1 r2
     | VOuc u, VOuc v -> conv u v
     | VGlue v, VGlue u -> conv u v
+    | VEmpty, VEmpty -> true
+    | VRecEmpty u, VRecEmpty v -> conv u v
+    | VUnit, VUnit -> true
+    | VStar, VStar -> true
+    | VRecUnit u, VRecUnit v -> conv u v
+    | VBool, VBool -> true
+    | VFalse, VFalse -> true
+    | VTrue, VTrue -> true
+    | VRecBool u, VRecBool v -> conv u v
     | _, _ -> false
   end || convWithSystem (v1, v2) || convId v1 v2
 
@@ -522,7 +578,16 @@ and infer ctx e : value = traceInfer e; match e with
     VPartialP (VSystem (System.mapi (fun mu -> infer (faceEnv mu ctx)) ts),
                eval (getFormula ts) ctx)
   | EGlue e -> ignore (extKan (infer ctx e)); inferGlue (eval e ctx)
+  | Empty | EUnit | EBool -> VKan 0
+  | EStar -> VUnit | EFalse | ETrue -> VBool
+  | ERecEmpty e -> ignore (extSet (infer ctx e)); implv VEmpty (eval e ctx)
+  | ERecUnit e -> inferInd false ctx VUnit e recUnit
+  | ERecBool e -> inferInd false ctx VBool e recBool
   | e -> raise (InferError e)
+
+and inferInd fibrant ctx t e f =
+  let (t', (p, g)) = extPiG (infer ctx e) in eqNf t t'; let k = g (Var (p, t)) in
+  ignore (if fibrant then extKan k else extSet k); f (eval e ctx)
 
 and inferField ctx p e = match infer ctx e with
   | VSig (t, (q, _)) -> if matchIdent p q then t else inferField ctx p (ESnd e)

@@ -5,7 +5,15 @@
    open Expr
 
   let getVar x =
-    let xs = [(!zeroPrim, EDir Zero); (!onePrim, EDir One); (!intervalPrim, EI)] in
+    let xs = [(!intervalPrim, EI);
+              (!zeroPrim, EDir Zero);
+              (!onePrim, EDir One);
+              ("𝟎", Empty);      ("empty", Empty);
+              ("𝟏", EUnit);      ("unit", EUnit);
+              ("𝟐", EBool);      ("bool", EBool);
+              ("★", EStar);      ("star", EStar);
+              ("false", EFalse); ("0₂", EFalse);
+              ("true", ETrue);   ("1₂", ETrue)] in
     match List.assoc_opt x xs with Some e -> e | None -> decl x
 
   let rec telescope ctor e : tele list -> exp = function
@@ -49,6 +57,7 @@
 %token AND OR NEGATE
 %token ID REF IDJ
 %token GLUE
+%token RECEMPTY RECUNIT RECBOOL
 
 %left APPFORMULA
 %left OR
@@ -105,6 +114,9 @@ exp4 :
   | PARTIAL exp6 { EPartial $2 }
   | PARTIALP exp6 exp6 { EPartialP ($2, $3) }
   | GLUE exp6 { EGlue $2 }
+  | RECEMPTY exp6 { ERecEmpty $2 }
+  | RECUNIT exp6 { ERecUnit $2 }
+  | RECBOOL exp6 { ERecBool $2 }
   | exp5 { $1 }
 
 exp5:

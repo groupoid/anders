@@ -56,11 +56,11 @@ let subscript = '\xE2' '\x82' ['\x80'-'\x89']
 let kan       = 'U' subscript*
 let pre       = 'V' subscript*
 
-let recempty = "rec-empty" | "rec\xE2\x82\x80" (* rec₀ *)
-let recunit  = "rec-unit"  | "rec\xE2\x82\x81" (* rec₁ *)
-let recbool  = "rec-bool"  | "rec\xE2\x82\x82" (* rec₂ *)
+let indempty = "ind-empty" | "ind\xE2\x82\x80" (* ind₀ *)
+let indunit  = "ind-unit"  | "ind\xE2\x82\x81" (* ind₁ *)
+let indbool  = "ind-bool"  | "ind\xE2\x82\x82" (* ind₂ *)
 
-let recw = "rec-W" | "rec\xE1\xB5\x82" (* recᵂ *)
+let indw = "ind-W" | "ind\xE1\xB5\x82" (* indᵂ *)
 
 rule main = parse
 | nl              { nextLine lexbuf; main lexbuf }
@@ -86,7 +86,7 @@ rule main = parse
 | "?"             { HOLE }             | map             { MAP }
 | "inc"           { INC }              | "ouc"           { OUC }
 | "hcomp"         { HCOMP }            | "Glue"          { GLUE }
-| recempty        { RECEMPTY }         | recunit         { RECUNIT }
-| recbool         { RECBOOL }          | "W"             { W }
-| "sup"           { SUP }              | recw            { RECW }
+| indempty        { INDEMPTY }         | indunit         { INDUNIT }
+| indbool         { INDBOOL }          | "W"             { W }
+| "sup"           { SUP }              | indw            { INDW }
 | ident as s      { IDENT s }          | eof             { EOF }

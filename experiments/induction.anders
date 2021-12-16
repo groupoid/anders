@@ -1,13 +1,13 @@
 module induction where
 
-def recᵂ-β (A : U) (B : A → U) (C : (W (x : A), B x) → U)
+def indᵂ-β (A : U) (B : A → U) (C : (W (x : A), B x) → U)
   (g : Π (x : A) (f : B x → (W (x : A), B x)),
       (Π (b : B x), C (f b)) → C (sup A B x f))
   (a : A) (f : B a → (W (x : A), B x)) :=
-g a f (λ (b : B a), recᵂ A B C g (f b))
+g a f (λ (b : B a), indᵂ A B C g (f b))
 
-def recᵂ-β′ (A : U) (B : A → U) (C : (W (x : A), B x) → U)
+def indᵂ-β′ (A : U) (B : A → U) (C : (W (x : A), B x) → U)
   (g : Π (x : A) (f : B x → (W (x : A), B x)),
       (Π (b : B x), C (f b)) → C (sup A B x f))
   (a : A) (f : B a → (W (x : A), B x)) :=
-recᵂ A B C g (sup A B a f)
+indᵂ A B C g (sup A B a f)

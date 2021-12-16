@@ -51,12 +51,12 @@ let rec ppExp paren e = let x = match e with
   | EGlue e -> Printf.sprintf "Glue %s" (ppExp true e)
   | Empty -> "𝟎" | EUnit -> "𝟏" | EBool -> "𝟐"
   | EStar -> "★" | EFalse -> "0₂" | ETrue -> "1₂"
-  | ERecEmpty e -> Printf.sprintf "rec₀ %s" (ppExp true e)
-  | ERecUnit e  -> Printf.sprintf "rec₁ %s" (ppExp true e)
-  | ERecBool e  -> Printf.sprintf "rec₂ %s" (ppExp true e)
+  | EIndEmpty e -> Printf.sprintf "ind₀ %s" (ppExp true e)
+  | EIndUnit e  -> Printf.sprintf "ind₁ %s" (ppExp true e)
+  | EIndBool e  -> Printf.sprintf "ind₂ %s" (ppExp true e)
   | EW (a, (p, b)) -> Printf.sprintf "W %s, %s" (showTeleExp (p, a)) (showExp b)
   | ESup (a, b) -> Printf.sprintf "sup %s %s" (showExp a) (showExp b)
-  | ERecW (a, b, c) -> Printf.sprintf "recᵂ %s %s %s" (showExp a) (showExp b) (showExp c)
+  | EIndW (a, b, c) -> Printf.sprintf "indᵂ %s %s %s" (showExp a) (showExp b) (showExp c)
   in match e with
   | EVar _ | EFst _ | ESnd _ | EI | EPre _ | ESystem _
   | EKan _ | EHole | EDir _ | EPair _ | ENeg _
@@ -103,12 +103,12 @@ let rec ppValue paren v = let x = match v with
   | VGlue v -> Printf.sprintf "Glue %s" (ppValue true v)
   | VEmpty -> "𝟎" | VUnit -> "𝟏" | VBool -> "𝟐"
   | VStar -> "★" | VFalse -> "0₂" | VTrue -> "1₂"
-  | VRecEmpty v -> Printf.sprintf "rec₀ %s" (ppValue true v)
-  | VRecUnit v  -> Printf.sprintf "rec₁ %s" (ppValue true v)
-  | VRecBool v  -> Printf.sprintf "rec₂ %s" (ppValue true v)
+  | VIndEmpty v -> Printf.sprintf "ind₀ %s" (ppValue true v)
+  | VIndUnit v  -> Printf.sprintf "ind₁ %s" (ppValue true v)
+  | VIndBool v  -> Printf.sprintf "ind₂ %s" (ppValue true v)
   | W (x, (p, clos)) -> Printf.sprintf "W %s, %s" (showTele p x) (showClos p x clos)
   | VSup (a, b) -> Printf.sprintf "sup %s %s" (ppValue true a) (ppValue true b)
-  | VRecW (a, b, c) -> Printf.sprintf "recᵂ %s %s %s" (ppValue true a) (ppValue true b) (ppValue true c)
+  | VIndW (a, b, c) -> Printf.sprintf "indᵂ %s %s %s" (ppValue true a) (ppValue true b) (ppValue true c)
   in match v with
   | Var _ | VFst _ | VSnd _ | VI | VPre _ | VSystem _
   | VKan _ | VHole | VDir _ | VPair _ | VNeg _

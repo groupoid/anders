@@ -57,8 +57,8 @@
 %token AND OR NEGATE
 %token ID REF IDJ
 %token GLUE
-%token RECEMPTY RECUNIT RECBOOL
-%token W RECW SUP
+%token INDEMPTY INDUNIT INDBOOL
+%token W INDW SUP
 
 %left APPFORMULA
 %left OR
@@ -116,11 +116,11 @@ exp4 :
   | PARTIAL exp6 { EPartial $2 }
   | PARTIALP exp6 exp6 { EPartialP ($2, $3) }
   | GLUE exp6 { EGlue $2 }
-  | RECEMPTY exp6 { ERecEmpty $2 }
-  | RECUNIT exp6 { ERecUnit $2 }
-  | RECBOOL exp6 { ERecBool $2 }
+  | INDEMPTY exp6 { EIndEmpty $2 }
+  | INDUNIT exp6 { EIndUnit $2 }
+  | INDBOOL exp6 { EIndBool $2 }
   | SUP exp6 exp6 { ESup ($2, $3) }
-  | RECW exp6 exp6 exp6 { ERecW ($2, $3, $4) }
+  | INDW exp6 exp6 exp6 { EIndW ($2, $3, $4) }
   | exp5 { $1 }
 
 exp5:

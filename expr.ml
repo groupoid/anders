@@ -17,10 +17,10 @@ type exp =
   | EPartial of exp | EPartialP of exp * exp | ESystem of exp System.t      (* partial functions *)
   | ESub of exp * exp * exp | EInc of exp * exp | EOuc of exp                (* cubical subtypes *)
   | EGlue of exp                                                                      (* glueing *)
-  | Empty | ERecEmpty of exp                                                                (* 𝟎 *)
-  | EUnit | EStar | ERecUnit of exp                                                         (* 𝟏 *)
-  | EBool | EFalse | ETrue | ERecBool of exp                                                (* 𝟐 *)
-  | EW of exp * (name * exp) | ESup of exp * exp | ERecW of exp * exp * exp                 (* W *)
+  | Empty | EIndEmpty of exp                                                                (* 𝟎 *)
+  | EUnit | EStar | EIndUnit of exp                                                         (* 𝟏 *)
+  | EBool | EFalse | ETrue | EIndBool of exp                                                (* 𝟐 *)
+  | EW of exp * (name * exp) | ESup of exp * exp | EIndW of exp * exp * exp                 (* W *)
 
 type tele = name * exp
 
@@ -40,10 +40,10 @@ type value =
   | VPartialP of value * value | VSystem of value System.t
   | VSub of value * value * value | VInc of value * value | VOuc of value
   | VGlue of value
-  | VEmpty | VRecEmpty of value
-  | VUnit | VStar | VRecUnit of value
-  | VBool | VFalse | VTrue | VRecBool of value
-  | W of value * clos | VSup of value * value | VRecW of value * value * value
+  | VEmpty | VIndEmpty of value
+  | VUnit | VStar | VIndUnit of value
+  | VBool | VFalse | VTrue | VIndBool of value
+  | W of value * clos | VSup of value * value | VIndW of value * value * value
 
 and clos = name * (value -> value)
 

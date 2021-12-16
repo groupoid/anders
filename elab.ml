@@ -78,17 +78,17 @@ let rec salt (ns : name Env.t) : exp -> exp = function
   | ENeg e               -> ENeg (salt ns e)
   | EGlue e              -> EGlue (salt ns e)
   | Empty                -> Empty
-  | ERecEmpty e          -> ERecEmpty (salt ns e)
+  | EIndEmpty e          -> EIndEmpty (salt ns e)
   | EUnit                -> EUnit
   | EStar                -> EStar
-  | ERecUnit e           -> ERecUnit (salt ns e)
+  | EIndUnit e           -> EIndUnit (salt ns e)
   | EBool                -> EBool
   | EFalse               -> EFalse
   | ETrue                -> ETrue
-  | ERecBool e           -> ERecBool (salt ns e)
+  | EIndBool e           -> EIndBool (salt ns e)
   | EW (a, (p, b))       -> saltTele eW ns p a b
   | ESup (a, b)          -> ESup (salt ns a, salt ns b)
-  | ERecW (a, b, c)      -> ERecW (salt ns a, salt ns b, salt ns c)
+  | EIndW (a, b, c)      -> EIndW (salt ns a, salt ns b, salt ns c)
 
 and freshFace ns phi =
   Env.fold (fun k v -> Env.add (freshVar ns k) v) phi Env.empty

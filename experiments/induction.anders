@@ -1,16 +1,16 @@
 module induction where
 
 def indᵂ-β (A : U) (B : A → U) (C : (W (x : A), B x) → U)
-  (g : Π (x : A) (f : B x → (W (x : A), B x)),
-      (Π (b : B x), C (f b)) → C (sup A B x f))
-  (a : A) (f : B a → (W (x : A), B x)) :=
-g a f (λ (b : B a), indᵂ A B C g (f b))
+    (g : Π (x : A) (f : B x → (W (x : A), B x)),
+    (Π (b : B x), C (f b)) → C (sup A B x f))
+    (a : A) (f : B a → (W (x : A), B x))
+ := g a f (λ (b : B a), indᵂ A B C g (f b))
 
 def indᵂ-β′ (A : U) (B : A → U) (C : (W (x : A), B x) → U)
-  (g : Π (x : A) (f : B x → (W (x : A), B x)),
-      (Π (b : B x), C (f b)) → C (sup A B x f))
-  (a : A) (f : B a → (W (x : A), B x)) :=
-indᵂ A B C g (sup A B a f)
+    (g : Π (x : A) (f : B x → (W (x : A), B x)),
+    (Π (b : B x), C (f b)) → C (sup A B x f))
+    (a : A) (f : B a → (W (x : A), B x))
+ := indᵂ A B C g (sup A B a f)
 
 def ℕ := W (x : 𝟐), ind₂ (λ (_ : 𝟐), U) 𝟎 𝟏 x
 def ℕ-ctor := ind₂ (λ (_ : 𝟐), U) 𝟎 𝟏

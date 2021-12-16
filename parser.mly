@@ -58,6 +58,7 @@
 %token ID REF IDJ
 %token GLUE
 %token RECEMPTY RECUNIT RECBOOL
+%token W RECW SUP
 
 %left APPFORMULA
 %left OR
@@ -90,6 +91,7 @@ exp2:
   | LAM telescope COMMA exp2 { telescope eLam $4 $2 }
   | PI telescope COMMA exp2 { telescope ePi $4 $2 }
   | SIGMA telescope COMMA exp2 { telescope eSig $4 $2 }
+  | W telescope COMMA exp2 { telescope eW $4 $2 }
   | LT vars GT exp2 { pLam $4 $2 }
   | exp3 { $1 }
 
@@ -117,6 +119,8 @@ exp4 :
   | RECEMPTY exp6 { ERecEmpty $2 }
   | RECUNIT exp6 { ERecUnit $2 }
   | RECBOOL exp6 { ERecBool $2 }
+  | SUP exp6 exp6 { ESup ($2, $3) }
+  | RECW exp6 exp6 exp6 { ERecW ($2, $3, $4) }
   | exp5 { $1 }
 
 exp5:

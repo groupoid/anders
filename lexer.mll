@@ -60,6 +60,8 @@ let recempty = "rec-empty" | "rec\xE2\x82\x80" (* rec₀ *)
 let recunit  = "rec-unit"  | "rec\xE2\x82\x81" (* rec₁ *)
 let recbool  = "rec-bool"  | "rec\xE2\x82\x82" (* rec₂ *)
 
+let recw = "rec-W" | "rec\xE1\xB5\x82" (* recᵂ *)
+
 rule main = parse
 | nl              { nextLine lexbuf; main lexbuf }
 | comment         { nextLine lexbuf; main lexbuf }
@@ -85,5 +87,6 @@ rule main = parse
 | "inc"           { INC }              | "ouc"           { OUC }
 | "hcomp"         { HCOMP }            | "Glue"          { GLUE }
 | recempty        { RECEMPTY }         | recunit         { RECUNIT }
-| recbool         { RECBOOL }          | ident as s      { IDENT s }
-| eof             { EOF }
+| recbool         { RECBOOL }          | "W"             { W }
+| "sup"           { SUP }              | recw            { RECW }
+| ident as s      { IDENT s }          | eof             { EOF }

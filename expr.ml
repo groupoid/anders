@@ -20,6 +20,7 @@ type exp =
   | Empty | ERecEmpty of exp                                                                (* 𝟎 *)
   | EUnit | EStar | ERecUnit of exp                                                         (* 𝟏 *)
   | EBool | EFalse | ETrue | ERecBool of exp                                                (* 𝟐 *)
+  | EW of exp * (name * exp) | ESup of exp * exp | ERecW of exp * exp * exp                 (* W *)
 
 type tele = name * exp
 
@@ -42,6 +43,7 @@ type value =
   | VEmpty | VRecEmpty of value
   | VUnit | VStar | VRecUnit of value
   | VBool | VFalse | VTrue | VRecBool of value
+  | W of value * clos | VSup of value * value | VRecW of value * value * value
 
 and clos = name * (value -> value)
 
@@ -56,6 +58,7 @@ and ctx = record Env.t
 let eLam p a b = ELam (a, (p, b))
 let ePi  p a b = EPi  (a, (p, b))
 let eSig p a b = ESig (a, (p, b))
+let eW   p a b = EW   (a, (p, b))
 
 let ezero = EDir Zero
 let eone  = EDir One

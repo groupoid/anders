@@ -86,6 +86,9 @@ let rec salt (ns : name Env.t) : exp -> exp = function
   | EFalse               -> EFalse
   | ETrue                -> ETrue
   | ERecBool e           -> ERecBool (salt ns e)
+  | EW (a, (p, b))       -> saltTele eW ns p a b
+  | ESup (a, b)          -> ESup (salt ns a, salt ns b)
+  | ERecW (a, b, c)      -> ERecW (salt ns a, salt ns b, salt ns c)
 
 and freshFace ns phi =
   Env.fold (fun k v -> Env.add (freshVar ns k) v) phi Env.empty

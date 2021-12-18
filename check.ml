@@ -85,6 +85,12 @@ and transport p phi u0 = let (_, _, v) = freshDim () in match appFormula p v, ph
   | _, VDir One -> u0
   (* transp (<_> U) i A ~> A *)
   | VKan _, _ -> u0
+  (* transp (<_> 𝟎) i u₀ ~> u₀ *)
+  | VEmpty, _ -> u0
+  (* transp (<_> 𝟏) i u₀ ~> u₀ *)
+  | VUnit, _ -> u0
+  (* transp (<_> 𝟐) i u₀ ~> u₀ *)
+  | VBool, _ -> u0
   (* transp (<i> Π (x : A i), B i x) φ u₀ ~>
      λ (x : A 1), transp (<i> B i (transFill (<j> A -j) φ x i)) φ
       (u₀ (transFill (<j> A -j) φ x 1)) *)

@@ -1,7 +1,7 @@
 (env (dev (flags (:standard -warn-error -A))))
 (ocamllex lexer)
 (menhir (modules parser))
-(executable (name anders) (package anders) (public_name anders))
+(executable (name anders) (libraries zarith) (package anders) (public_name anders))
 (install (files library/buddhism.anders       library/cat.anders
                 library/church.anders         library/fun.anders
                 library/impredicative.anders  library/kraus.anders

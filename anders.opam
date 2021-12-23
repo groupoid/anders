@@ -13,6 +13,7 @@ synopsis: "CCHM homotopy system type checker with strict equality"
 license: "ISC"
 depends: [
   "dune" {>= "2.0"}
+  "zarith" {>= "1.12"}
   "ocaml" {>= "4.10"}
   "menhir" {>= "20200123"}
 ]

@@ -121,7 +121,7 @@ and transport p phi u0 = let (_, _, v) = freshDim () in match appFormula p v, ph
   | VApp (VApp (VPathP _, _), _), _ ->
     let i = fresh (name "ι") in let j = fresh (name "υ") in
     VPLam (VLam (VI, (j, fun j ->
-      let uj = appFormula u0 j in let r = orFormula (phi, orFormula (j, negFormula j)) in
+      let uj = appFormula u0 j in let r = evalOr phi (evalOr j (negFormula j)) in
       comp (fun i -> let (q, _, _) = extPathP (appFormula p i) in appFormula q j) r
         (VLam (VI, (i, fun i ->
           let (_, v, w) = extPathP (appFormula p i) in
@@ -157,7 +157,7 @@ and hcomp t r u u0 = match t, r with
   | VApp (VApp (VPathP t, v), w), _ ->
     let (j, _, _) = freshDim () in let (i, _, _) = freshDim () in
     VPLam (VLam (VI, (j, fun j ->
-      hcomp (appFormula t j) (orFormula (r, orFormula (j, negFormula j)))
+      hcomp (appFormula t j) (evalOr r (evalOr j (negFormula j)))
         (VLam (VI, (i, fun i ->
           (VSystem (unionSystem (border (solve r One) (appFormula (app (app (u, i), VRef vone)) j))
             (unionSystem (border (solve j Zero) v) (border (solve j One) w)))))))
@@ -169,21 +169,21 @@ and inc t r v = app (VInc (t, r), v)
 and comp t r u u0 =
   let (i, _, _) = freshDim () in let (j, _, _) = freshDim () in
   hcomp (t vone) r (VLam (VI, (i, fun i ->
-    let u1 = transport (VPLam (VLam (VI, (j, fun j -> t (orFormula (i, j)))))) i (app (app (u, i), VRef vone)) in
+    let u1 = transport (VPLam (VLam (VI, (j, fun j -> t (evalOr i j))))) i (app (app (u, i), VRef vone)) in
       VSystem (border (solve r One) u1))))
     (transport (VPLam (VLam (VI, (i, t)))) vzero u0)
 
 and hfill t r u u0 j =
   let (i, _, _) = freshDim () in
-  hcomp t (orFormula (negFormula j, r))
+  hcomp t (evalOr (negFormula j) r)
     (VLam (VI, (i, fun i ->
       VSystem (unionSystem (border (solve r One)
-        (app (app (u, andFormula (i, j)), VRef vone)))
+        (app (app (u, evalAnd i j), VRef vone)))
           (border (solve j Zero) u0))))) u0
 
 and transFill p phi u0 j = let (i, _, _) = freshDim () in
-  transport (VPLam (VLam (VI, (i, fun i -> appFormula p (andFormula (i, j))))))
-    (orFormula (phi, negFormula j)) u0
+  transport (VPLam (VLam (VI, (i, fun i -> appFormula p (evalAnd i j)))))
+    (evalOr phi (negFormula j)) u0
 
 and fiber t1 t2 f y = VSig (t1, (freshName "a", fun x -> pathv (idp t2) y (app (f, x))))
 
@@ -272,9 +272,9 @@ and inferV v = traceInferV v; match v with
   end
   | VAppFormula (f, x)       -> let (p, _, _) = extPathP (inferV f) in appFormula p x
   | VRef v                   -> VApp (VApp (VId (inferV v), v), v)
-  | VPre n                   -> VPre (n + 1)
-  | VKan n                   -> VKan (n + 1)
-  | VI                       -> VPre 0
+  | VPre n                   -> VPre (Z.succ n)
+  | VKan n                   -> VKan (Z.succ n)
+  | VI                       -> VPre Z.zero
   | VInc (t, i)              -> inferInc t i
   | VOuc v                   ->
   begin match inferV v with
@@ -292,12 +292,12 @@ and inferV v = traceInferV v; match v with
   | VPartialP (VSystem ts, _) ->
   begin match System.choose_opt ts with
     | Some (_, t) -> VPre (extSet (inferV t))
-    | None        -> VPre 0
+    | None        -> VPre Z.zero
   end
   | VPartialP (t, _) -> inferV (inferV t)
   | VSystem ts -> VPartialP (VSystem (System.map inferV ts), getFormulaV ts)
   | VGlue t -> inferGlue t
-  | VEmpty | VUnit | VBool -> VKan 0
+  | VEmpty | VUnit | VBool -> VKan Z.zero
   | VStar -> VUnit | VFalse | VTrue -> VBool
   | VIndEmpty t -> implv VEmpty t
   | VIndUnit t -> recUnit t
@@ -376,8 +376,8 @@ and upd e = function
   | VJ v                 -> VJ (upd e v)
   | VI                   -> VI
   | VDir d               -> VDir d
-  | VAnd (u, v)          -> andFormula (upd e u, upd e v)
-  | VOr (u, v)           -> orFormula (upd e u, upd e v)
+  | VAnd (u, v)          -> evalAnd (upd e u) (upd e v)
+  | VOr (u, v)           -> evalOr (upd e u) (upd e v)
   | VNeg u               -> negFormula (upd e u)
   | VInc (t, r)          -> VInc (upd e t, upd e r)
   | VOuc v               -> evalOuc (upd e v)
@@ -572,7 +572,7 @@ and checkOverlapping ctx ts =
 
 and infer ctx e : value = traceInfer e; match e with
   | EVar x -> lookup x ctx
-  | EKan u -> VKan (u + 1)
+  | EKan u -> VKan (Z.succ u)
   | ESig (a, (p, b)) | EPi (a, (p, b)) | EW (a, (p, b)) -> inferTele ctx p a b
   | ELam (a, (p, b)) -> inferLam ctx p a b
   | EApp (f, x) -> begin match infer ctx f with
@@ -583,7 +583,7 @@ and infer ctx e : value = traceInfer e; match e with
   | EFst e -> fst (extSigG (infer ctx e))
   | ESnd e -> let (_, (_, g)) = extSigG (infer ctx e) in g (vfst (eval e ctx))
   | EField (e, p) -> inferField ctx p e
-  | EPre u -> VPre (u + 1)
+  | EPre u -> VPre (Z.succ u)
   | EPathP p -> inferPath ctx p
   | EPartial e -> let n = extSet (infer ctx e) in implv VI (VPre n)
   | EPartialP (u, r0) -> check ctx r0 VI; let t = infer ctx u in
@@ -601,7 +601,7 @@ and infer ctx e : value = traceInfer e; match e with
       eqNf (eval (hcompval u) ctx') (eval u0 ctx')) (solve r One); t
   | ESub (a, i, u) -> let n = extSet (infer ctx a) in check ctx i VI;
     check ctx u (partialv (eval a ctx) (eval i ctx)); VPre n
-  | EI -> VPre 0 | EDir _ -> VI
+  | EI -> VPre Z.zero | EDir _ -> VI
   | ENeg e -> check ctx e VI; VI
   | EOr (e1, e2) | EAnd (e1, e2) -> check ctx e1 VI; check ctx e2 VI; VI
   | EId e -> let v = eval e ctx in let n = extSet (infer ctx e) in implv v (implv v (VPre n))
@@ -616,7 +616,7 @@ and infer ctx e : value = traceInfer e; match e with
     VPartialP (VSystem (System.mapi (fun mu -> infer (faceEnv mu ctx)) ts),
                eval (getFormula ts) ctx)
   | EGlue e -> ignore (extKan (infer ctx e)); inferGlue (eval e ctx)
-  | Empty | EUnit | EBool -> VKan 0
+  | Empty | EUnit | EBool -> VKan Z.zero
   | EStar -> VUnit | EFalse | ETrue -> VBool
   | EIndEmpty e -> ignore (extSet (infer ctx e)); implv VEmpty (eval e ctx)
   | EIndUnit e -> inferInd false ctx VUnit e recUnit

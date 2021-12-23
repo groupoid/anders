@@ -62,13 +62,16 @@ let fresh : name -> name = function
 let matchIdent p : name -> bool = function
   | Irrefutable -> false | Name (q, _) -> p = q
 
-let getDigit x = Char.chr (x + 0x80) |> Printf.sprintf "\xE2\x82%c"
+let getDigit x = Char.chr (Z.to_int x + 0x80) |> Printf.sprintf "\xE2\x82%c"
+
+let ten = Z.of_int 10
 
 let rec showSubscript x =
-  if x < 0 then failwith "showSubscript: expected positive integer"
-  else if x = 0 then "" else showSubscript (x / 10) ^ getDigit (x mod 10)
+  if Z.lt x Z.zero then failwith "showSubscript: expected positive integer"
+  else if Z.equal x Z.zero then "" else let (y, d) = Z.div_rem x ten in
+    showSubscript y ^ getDigit d
 
-let freshName x = let n = gen () in Name (x ^ showSubscript n, n)
+let freshName x = let n = gen () in Name (x ^ showSubscript (Z.of_int n), n)
 
 module Atom =
 struct

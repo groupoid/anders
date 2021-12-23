@@ -10,11 +10,11 @@ let extSigG : value -> value * clos = function
   | VSig (t, g) -> (t, g)
   | u -> raise (ExpectedSig u)
 
-let extSet : value -> int = function
+let extSet : value -> Z.t = function
   | VPre n | VKan n -> n
   | v               -> raise (ExpectedVSet v)
 
-let extKan : value -> int = function
+let extKan : value -> Z.t = function
   | VKan n -> n
   | v      -> raise (ExpectedFibrant v)
 

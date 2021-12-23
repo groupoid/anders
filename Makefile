@@ -1,4 +1,4 @@
-FLAGS = -use-menhir -yaccflag "--explain" -ocamlc "ocamlc -w +a-4-29"
+FLAGS = -pkgs 'zarith' -use-menhir -yaccflag "--explain" -ocamlc "ocamlc -w +a-4-29"
 OPTFLAGS = -classic-display -ocamlopt "ocamlopt -O3"
 NATIVEFLAGS = -ocamlopt "ocamlopt -O3"
 

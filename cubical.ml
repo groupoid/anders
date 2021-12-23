@@ -8,11 +8,10 @@ open Expr
 let fail x = raise (ExtractionError x)
 
 let rec extractExp : exp -> string = function
-  | EKan 0 -> "U"
+  | EKan n -> if Z.equal n Z.zero then "U" else fail "cubicaltt does not support universe hierarchy"
   | EId _ | ERef _ | EJ _ -> fail "cubicaltt does not support strict equality"
   | EPartial _ | EPartialP _ -> fail "cubicaltt does not support explicit partial"
   | EI -> fail "cubicaltt does not support explicit interval"
-  | EKan _ -> fail "cubicaltt does not support universe hierarchy"
   | EPre _ -> fail "cubicaltt does not support explicit pretypes"
   | EInc _ | EOuc _ | ESub _ -> fail "cubicaltt does not support explicit cubical subtypes"
   | Empty | EIndEmpty _ -> fail "cubicaltt does not have built-in empty type"

@@ -8,8 +8,10 @@
       { pos with pos_bol = pos.pos_cnum;
                  pos_lnum = pos.pos_lnum + 1 }
 
+  let ten = Z.of_int 10
+
   let getLevel s =
-    let res = ref 0 in let queue = Queue.of_seq (String.to_seq s) in
+    let res = ref Z.zero in let queue = Queue.of_seq (String.to_seq s) in
     let sym = Queue.take queue in if (sym <> 'U' && sym <> 'V') then
       failwith "invalid universe";
 
@@ -19,7 +21,7 @@
       then failwith "invalid universe level while lexing";
 
       let value = Char.code (Queue.take queue) - 0x80 in
-      res := !res * 10 + value
+      res := Z.add (Z.mul !res ten) (Z.of_int value)
     done; !res
 }
 

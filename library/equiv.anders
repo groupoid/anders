@@ -33,6 +33,9 @@ def ret-equiv (A B : U) (w : equiv A B) (y : B) : Path B (w.1 (inv-equiv A B w y
 def sec-equiv (A B : U) (w : equiv A B) (x : A) : Path A (inv-equiv A B w (w.1 x)) x := <i> ((w.2 (w.1 x)).2 (x, <j> w.1 x) @ i).1
 def Glue′ (A : U) (φ : I) (e : Partial (Σ (T : U), equiv T A) φ) : U := Glue A φ e
 
+def contrSingl (A : U) (a b : A) (p : Path A a b) : Path (Σ (x : A), Path A a x) (a,<_>a) (b,p) := <i> (p @ i, <j> p @ i /\ j)
+def idIsEquiv (A : U) : isEquiv A A (id A) := \ (a : A), ((a,<_>a),\ (z : fiber A A (id A) a), contrSingl A a z.1 z.2)
+
 -- Univalence (Formation, Intro, Elim, Computation)
 
 def univ_Formation (A B : U) := equiv A B → PathP (<_> U) A B

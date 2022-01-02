@@ -18,3 +18,10 @@ def fill2 (A B : U) (f : A -> B) (g : B -> A) (x0 x1 : A) (y : B) (p0 : Path B (
 --    (t : Π (x : A), Path A (g (f x)) x) : Path A x0 x1
 -- := <r> fill2 A B f g x0 x1 y p0 p1 t r 1
 
+-- def sq (A B : U) (f : A -> B) (g : B -> A) (x0 x1 : A) (y : B) (p0 : Path B (f x0) y) (p1 : Path B (f x1) y)
+--    (t : Π (x : A), Path A (g (f x)) x) (i j: I) : A
+-- := hcomp A (?)
+--    (λ (k : I), [(i = 1) → fill1 A B f g x0 x1 y p0 p1 t j -k,
+--                 (i = 0) → fill0 A B f g x0 x1 y p0 p1 t j -k,
+--                 (j = 1) → t (fill2 A B f g x0 x1 y p0 p1 t i 1) @ -k,
+--                 (j = 0) → g y ]) (fill2 A B f g x0 x1 y p0 p1 t i j)

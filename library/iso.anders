@@ -34,7 +34,8 @@ def sq1 (A B : U) (f : A -> B) (g : B -> A) (x0 x1 : A) (y : B) (p0 : Path B (f 
                  (j = 1) → s (f (x0=x1 A B f g x0 x1 y p0 p1 t @ i)) @ k,
                  (j = 0) → s y @ k ]) (f (sq A B f g x0 x1 y p0 p1 t i j))
 
-axiom lemIso (A B : U) (f : A -> B) (g : B -> A) (x0 x1 : A) (y : B) (p0 : Path B y (f x0)) (p1 : Path B y (f x1))
+def lemIso (A B : U) (f : A -> B) (g : B -> A) (x0 x1 : A) (y : B) (p0 : Path B y (f x0)) (p1 : Path B y (f x1))
     (s : Π (y : B), Path B (f (g y)) y) (t : Π (x : A), Path A (g (f x)) x)
-  : Path (fiber A B f y) (x0,p0) (x1,p1)
--- := <i> (x0=x1 A B f g x0 x1 y p0 p1 t @ i, <j> sq1 A B f g x0 x1 y p0 p1 s t i -j)
+  : Path (fiber A B f y) (x0, p0) (x1, p1)
+ := <i> (x0=x1 A B f g x0 x1 y (<k> p0 @ -k) (<k> p1 @ -k) t @ i,
+         <j> sq1 A B f g x0 x1 y (<k> p0 @ -k) (<k> p1 @ -k) s t i j)

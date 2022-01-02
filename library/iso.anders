@@ -1,38 +1,36 @@
 module iso where
 import library/equiv
 
-def fill0 (A B : U) (f : A -> B) (g : B -> A) (x0 x1 : A) (y : B) (p0 : Path B (f x0) y) (p1 : Path B (f x1) y)
-    (t : Π (x : A), Path A (g (f x)) x) (i : I) : I -> A
+def fill0 (A B : U) (f : A -> B) (g : B -> A) (x0 x1 : A) (y : B)
+    (p0 : Path B (f x0) y) (p1 : Path B (f x1) y) (t : Π (x : A), Path A (g (f x)) x) (i : I) : I -> A
  := hfill A (∂ i) (λ (k : I), [(i = 1) → t x0 @ k, (i = 0) → g y ]) (inc A (∂ i) (g (p0 @ -i)))
 
-def fill1 (A B : U) (f : A -> B) (g : B -> A) (x0 x1 : A) (y : B) (p0 : Path B (f x0) y) (p1 : Path B (f x1) y)
-    (t : Π (x : A), Path A (g (f x)) x) (i : I) : I -> A
+def fill1 (A B : U) (f : A -> B) (g : B -> A) (x0 x1 : A) (y : B)
+    (p0 : Path B (f x0) y) (p1 : Path B (f x1) y) (t : Π (x : A), Path A (g (f x)) x) (i : I) : I -> A
  := hfill A (∂ i) (λ (k : I), [(i = 1) → t x1 @ k, (i = 0) → g y ]) (inc A (∂ i) (g (p1 @ -i)))
 
-def fill2 (A B : U) (f : A -> B) (g : B -> A) (x0 x1 : A) (y : B) (p0 : Path B (f x0) y) (p1 : Path B (f x1) y)
-    (t : Π (x : A), Path A (g (f x)) x) (i : I) : I -> A
+def fill2 (A B : U) (f : A -> B) (g : B -> A) (x0 x1 : A) (y : B)
+    (p0 : Path B (f x0) y) (p1 : Path B (f x1) y) (t : Π (x : A), Path A (g (f x)) x) (i : I) : I -> A
  := hfill A (∂ i) (λ (k : I), [(i = 1) → fill1 A B f g x0 x1 y p0 p1 t k 1,
                                (i = 0) → fill0 A B f g x0 x1 y p0 p1 t k 1]) (inc A (∂ i) (g y))
 
-def x0=x1 (A B : U) (f : A -> B) (g : B -> A) (x0 x1 : A) (y : B) (p0 : Path B (f x0) y) (p1 : Path B (f x1) y)
-    (t : Π (x : A), Path A (g (f x)) x) : Path A x0 x1
+def x0=x1 (A B : U) (f : A -> B) (g : B -> A) (x0 x1 : A) (y : B) (p0 : Path B (f x0) y)
+    (p1 : Path B (f x1) y) (t : Π (x : A), Path A (g (f x)) x) : Path A x0 x1
  := <r> fill2 A B f g x0 x1 y p0 p1 t r 1
 
-def sqA (A B : U) (f : A -> B) (g : B -> A) (x0 x1 : A) (y : B) (p0 : Path B (f x0) y) (p1 : Path B (f x1) y)
-    (t : Π (x : A), Path A (g (f x)) x) (i j : I) : A
- := hcomp A (∂ i ∨ ∂ j)
-    (λ (k : I), [(i = 1) → fill1 A B f g x0 x1 y p0 p1 t j -k,
-                 (i = 0) → fill0 A B f g x0 x1 y p0 p1 t j -k,
-                 (j = 1) → t (fill2 A B f g x0 x1 y p0 p1 t i 1) @ -k,
-                 (j = 0) → g y ]) (fill2 A B f g x0 x1 y p0 p1 t i j)
+def sqA (A B : U) (f : A -> B) (g : B -> A) (x0 x1 : A) (y : B) (p0 : Path B (f x0) y)
+    (p1 : Path B (f x1) y) (t : Π (x : A), Path A (g (f x)) x) (i j : I) : A
+ := hcomp A (∂ i ∨ ∂ j) (λ (k : I), [(i = 1) → fill1 A B f g x0 x1 y p0 p1 t j -k,
+                                     (i = 0) → fill0 A B f g x0 x1 y p0 p1 t j -k,
+                                     (j = 1) → t (fill2 A B f g x0 x1 y p0 p1 t i 1) @ -k,
+                                     (j = 0) → g y ]) (fill2 A B f g x0 x1 y p0 p1 t i j)
 
 def sqB (A B : U) (f : A -> B) (g : B -> A) (x0 x1 : A) (y : B) (p0 : Path B (f x0) y) (p1 : Path B (f x1) y)
     (s : Π (y : B), Path B (f (g y)) y) (t : Π (x : A), Path A (g (f x)) x) (i j : I) : B
- := hcomp B (∂ i ∨ ∂ j)
-    (λ (k : I), [(i = 1) → s (p1 @ -j) @ k,
-                 (i = 0) → s (p0 @ -j) @ k,
-                 (j = 1) → s (f (x0=x1 A B f g x0 x1 y p0 p1 t @ i)) @ k,
-                 (j = 0) → s y @ k ]) (f (sqA A B f g x0 x1 y p0 p1 t i j))
+ := hcomp B (∂ i ∨ ∂ j) (λ (k : I), [(i = 1) → s (p1 @ -j) @ k,
+                                     (i = 0) → s (p0 @ -j) @ k,
+                                     (j = 1) → s (f (x0=x1 A B f g x0 x1 y p0 p1 t @ i)) @ k,
+                                     (j = 0) → s y @ k ]) (f (sqA A B f g x0 x1 y p0 p1 t i j))
 
 def lemIso (A B : U) (f : A -> B) (g : B -> A)
     (s : Π (y : B), Path B (f (g y)) y) (t : Π (x : A), Path A (g (f x)) x)
@@ -71,11 +69,6 @@ def iso-Elim (A B: U) : PathP (<_>U) A B -> iso A B
 
 -- Minivalence Type (Equiv -> Iso)
 
-def mini-Form (A B : U) : U
- := equiv A B -> iso A B
-
-def mini-Intro (A B : U) : mini-Form A B
- := \ (x : equiv A B), ( x.f, inv-equiv A B x, ret-equiv A B x, sec-equiv A B x, star)
-
-def mini-Elim (A B : U) : iso A B -> equiv A B
- := \ (x : iso A B), univ-elim A B (isoPath A B x.f x.g x.s x.t)
+def mini-Form (A B : U) : U := equiv A B -> iso A B
+def mini-Intro (A B : U) : mini-Form A B := \ (x : equiv A B), ( x.f, inv-equiv A B x, ret-equiv A B x, sec-equiv A B x, star)
+def mini-Elim (A B : U) : iso A B -> equiv A B := \ (x : iso A B), univ-elim A B (isoPath A B x.f x.g x.s x.t)

@@ -108,6 +108,7 @@ def cc (A : U) (a : A) (p : Path A a a)
            (cb A a p @ i @ j @ k)
 
 -- Uncaught exception: Stack overflow
+{-
 def tb (A : U) (a : A) (p : Path A a a)
   : Tesseract A a a a a a a a a a a a a a a a a p p p p p p p p
     (cs A a p) (cs A a p) p p p p (cs A a p) (cs A a p) (cs A a p) (cs A a p) (cc A a p) p p p p p (<_> a) p (<_> a)
@@ -117,3 +118,4 @@ def tb (A : U) (a : A) (p : Path A a a)
 := <l k j i> cc A a p @ (i \/ j \/ k \/ l)
            @ ((i \/ j \/ k) /\ (i \/ j \/ l) /\ (i \/ k \/ l) /\ (j \/ k \/ l))
            @ ((i \/ j) /\ (i \/ k) /\ (i \/ l) /\ (j \/ k) /\ (j \/ l) /\ (k \/ l))
+-}

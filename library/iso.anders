@@ -1,0 +1,18 @@
+module iso where
+import library/path
+
+def xfill (A : U) (r : I) (u : I → Partial A r) (u₀ : A[r ↦ u 0]) (j : I)
+ := hcomp A (-j ∨ r) (λ (i : I), [(r = 1) → u (i ∧ j) 1=1, (j = 0) → ouc u₀]) (ouc u₀)
+
+def fill0 (A B : U) (f : A -> B) (g : B -> A) (x0 x1 : A) (y : B) (p0 : Path B (f x0) y) (p1 : Path B (f x1) y) (t : Π (x : A), Path A (g (f x)) x) (i : I) : I -> A
+ := xfill A (∂ i) (λ (k : I), [(i = 1) → t x0 @ k, (i = 0) → g y ]) (inc A (∂ i) (g (p0 @ -i)))
+
+def fill1 (A B : U) (f : A -> B) (g : B -> A) (x0 x1 : A) (y : B) (p0 : Path B (f x0) y) (p1 : Path B (f x1) y) (t : Π (x : A), Path A (g (f x)) x) (i : I) : I -> A
+ := xfill A (∂ i) (λ (k : I), [(i = 1) → t x1 @ k, (i = 0) → g y ]) (inc A (∂ i) (g (p1 @ -i)))
+
+def fill2 (A B : U) (f : A -> B) (g : B -> A) (x0 x1 : A) (y : B) (p0 : Path B (f x0) y) (p1 : Path B (f x1) y) (t : Π (x : A), Path A (g (f x)) x) (i : I) : I -> A
+ := xfill A (∂ i) (λ (k : I), [(i = 1) → fill1 A B f g x0 x1 y p0 p1 t k 1, (i = 0) → fill0 A B f g x0 x1 y p0 p1 t k 1]) (inc A (∂ i) (g y))
+
+--def p (A B : U) (f : A -> B) (g : B -> A) (x0 x1 : A) (y : B) (p0 : Path B (f x0) y) (p1 : Path B (f x1) y) (t : Π (x : A), Path A (g (f x)) x) : Path A x0 x1
+-- := <r> fill2 A B f g x0 x1 y p0 p1 t r 1
+

@@ -67,11 +67,6 @@ def convex-body : U₁ :=
 def isSingleton (A: U) : U := Π (a: A), Σ (x: A), Path A a x
 def ∃! (A : U) (B : A -> U) : U := isSingleton (Σ (x: A), B x)
 
-{- The key structure of the axiomatisation: an interval object.
-   An interval object is defined by a convex-body J and two points u,v : J.A, such that
-   For every two points a,b : K.A of a convex-body K there exists a unique h : J.A -> K.ob such that:
-   h u ≡ a /\ h v ≡ b /\ ∀ x,y : J.A, h (x J.O y) ≡ h x K.O h y -}
-
 def Interval-Object : U₁ :=
   Σ (J : convex-body) (u v : J.A),
   Π (K : convex-body) (a b : K.A),
@@ -79,6 +74,11 @@ def Interval-Object : U₁ :=
     ( λ (h : J.A -> K.A),
       Σ (_ : Path (K.A) (h u) a) (_ : Path (K.A) (h v) b),
       Π (x y : J.A), Path K.A (h (J.O x y)) (K.O (h x) (h y)))
+
+{- The key structure of the axiomatisation: an interval object.
+   An interval object is defined by a convex-body J and two points u,v : J.A, such that
+   For every two points a,b : K.A of a convex-body K there exists a unique h : J.A -> K.ob such that:
+   h u ≡ a /\ h v ≡ b /\ ∀ x,y : J.A, h (x J.O y) ≡ h x K.O h y -}
 
 -- Exact Real Arithmetics
 

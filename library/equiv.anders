@@ -22,29 +22,21 @@ def isInjective' (A B : U) (f : A -> B): U := Π (b : B), isProp (fiber A B f b)
 def injective (A B : U) : U := Σ (f : A -> B), isInjective A B f
 def isEmbedding (A B : U) (f : A -> B) : U := Π (x y : A), isEquiv (Path A x y) (Path B (f x) (f y)) (cong A B f x y)
 def embedding (A B : U) : U := Σ (f : A -> B), isEmbedding A B f
-def isHae (A B : U) (f : A -> B): U := Σ (g : B -> A)
-    (eta_: Path (idᵀ A) (∘ A B A g f) (id A)) (eps_: Path (idᵀ B) (∘ B A B f g) (id B)),
-    Π (x : A), Path B (f ((eta_ @ 0) x)) ((eps_ @ 0) (f x))
+
+def isHae (A B : U) (f : A -> B): U :=
+  Σ (g : B -> A) (eta_: Path (idᵀ A) (∘ A B A g f) (id A)) (eps_: Path (idᵀ B) (∘ B A B f g) (id B)),
+  Π (x : A), Path B (f ((eta_ @ 0) x)) ((eps_ @ 0) (f x))
 def hae (A B : U) : U := Σ (f : A -> B), isHae A B f
 
 def inv-equiv (A B : U) (w : equiv A B) : B -> A := λ (y : B), (w.2 y).1.1
-
-def ret-equiv (A B : U) (w : equiv A B) (y : B) : Path B (w.1 (inv-equiv A B w y)) y :=
-<i> (w.2 y).1.2 @ -i
-
-def sec-equiv (A B : U) (w : equiv A B) (x : A) : Path A (inv-equiv A B w (w.1 x)) x :=
-<i> ((w.2 (w.1 x)).2 (x, <j> w.1 x) @ i).1
-
+def ret-equiv (A B : U) (w : equiv A B) (y : B) : Path B (w.1 (inv-equiv A B w y)) y := <i> (w.2 y).1.2 @ -i
+def sec-equiv (A B : U) (w : equiv A B) (x : A) : Path A (inv-equiv A B w (w.1 x)) x := <i> ((w.2 (w.1 x)).2 (x, <j> w.1 x) @ i).1
 def Glue′ (A : U) (φ : I) (e : Partial (Σ (T : U), equiv T A) φ) : U := Glue A φ e
 
 -- Univalence (Formation, Intro, Elim, Computation)
 
 def univ_Formation (A B : U) := equiv A B → PathP (<_> U) A B
-
-def equivToPath (A B : U) : univ_Formation A B :=
-λ (p : equiv A B), <i> Glue B (∂ i) [(i = 0) → (A, p), (i = 1) → (B, idEquiv B)]
-
-def pathToEquiv (A B : U) (p : PathP (<_> U) A B) : equiv A B :=
-transp (<i> equiv A (p @ i)) 0 (idEquiv A)
+def equivToPath (A B : U) : univ_Formation A B := λ (p : equiv A B), <i> Glue B (∂ i) [(i = 0) → (A, p), (i = 1) → (B, idEquiv B)]
+def pathToEquiv (A B : U) (p : PathP (<_> U) A B) : equiv A B := transp (<i> equiv A (p @ i)) 0 (idEquiv A)
 
 -- axiom uniqueness (A B : U) (w : equiv A B) : Path (A -> B) w.1 (pathToEquiv A B (equivToPath A B w)).1

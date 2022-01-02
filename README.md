@@ -15,6 +15,7 @@ Features
 * Generalized Transport and Homogeneous Composition core Kan operations
 * Partial Elements
 * Cubical Subtypes
+* Glue types
 * Strict Equality on pretypes
 * Parser in 80 LOC
 * Lexer in 80 LOC

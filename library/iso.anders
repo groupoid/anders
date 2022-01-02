@@ -1,5 +1,5 @@
 module iso where
-import library/path
+import library/equiv
 
 def fill0 (A B : U) (f : A -> B) (g : B -> A) (x0 x1 : A) (y : B) (p0 : Path B (f x0) y) (p1 : Path B (f x1) y)
     (t : Π (x : A), Path A (g (f x)) x) (i : I) : I -> A
@@ -27,8 +27,14 @@ axiom sq (A B : U) (f : A -> B) (g : B -> A) (x0 x1 : A) (y : B) (p0 : Path B (f
 --                 (j = 0) → g y ]) (fill2 A B f g x0 x1 y p0 p1 t i j)
 
 axiom sq1 (A B : U) (f : A -> B) (g : B -> A) (x0 x1 : A) (y : B) (p0 : Path B (f x0) y) (p1 : Path B (f x1) y)
-    (s : Π (y : B), Path B (f (g y)) y) (i j : I) : A
--- := hcomp A (∂ (i \/ j)) (λ (k : I), [(i = 1) → s (p1 @ -j) @ k,
+    (s : Π (y : B), Path B (f (g y)) y) (i j : I) : B
+-- := hcomp A (∂ (i)) (λ (k : I), [(i = 1) → s (p1 @ -j) @ k,
 --                                      (i = 0) → s (p0 @ -j) @ k,
 --                                      (j = 1) → s (f (p @ i)) @ k,
 --                                      (j = 0) → s y @ k ]) (f (sq A B f g x0 x1 y p0 p1 t i j))
+
+axiom lemIso (A B : U) (f : A -> B) (g : B -> A) (s : Π (y : B), Path B (f (g y)) y)
+    (t : Π (x : A), Path A (g (f x)) x) (x0 x1 : A) (y : B) (p0 : Path B y (f x0)) (p1 : Path B y (f x1))
+  : Path (fiber A B f y) (x0,p0) (x1,p1)
+-- := <i> (p @ i, <j> sq1 A B f g x0 x1 y p0 p1 s i -j)
+

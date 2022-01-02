@@ -34,7 +34,7 @@ def isHae (A B : U) (f : A -> B): U :=
   Π (x : A), Path B (f ((eta_ @ 0) x)) ((eps_ @ 0) (f x))
 def hae (A B : U) : U := Σ (f : A -> B), isHae A B f
 
--- Univalence (Formation, Intro, Elim, Computation)
+-- Univalence Type (Equiv -> Path)
 
 def univ-formation (A B : U) := equiv A B -> PathP (<_>U) A B
 

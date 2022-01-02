@@ -77,5 +77,5 @@ def mini-Form (A B : U) : U
 def mini-Intro (A B : U) : mini-Form A B
  := \ (x : equiv A B), ( x.f, inv-equiv A B x, ret-equiv A B x, sec-equiv A B x, star)
 
---def mini-Elim (A B : U) : iso A B -> equiv A B
--- := \ (x : iso), univ-elim A B (isoPath A B x.f x.g x.s x.t)
+def mini-Elim (A B : U) : iso A B -> equiv A B
+ := \ (x : iso A B), univ-elim A B (isoPath A B x.f x.g x.s x.t)

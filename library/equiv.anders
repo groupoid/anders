@@ -38,17 +38,24 @@ def hae (A B : U) : U := Σ (f : A -> B), isHae A B f
 
 def univ-formation (A B : U) := equiv A B -> PathP (<_>U) A B
 
-def univ-intro (A B : U) : univ-formation A B := λ (p : equiv A B), <i> Glue B (∂ i) [(i = 0) → (A, p), (i = 1) → (B, idEquiv B)]
+def univ-intro (A B : U) : univ-formation A B
+ := λ (p : equiv A B), <i> Glue B (∂ i) [(i = 0) → (A, p), (i = 1) → (B, idEquiv B)]
 
-def univ-elim (A B : U) (p : PathP (<_> U) A B) : equiv A B := transp (<i> equiv A (p @ i)) 0 (idEquiv A)
+def univ-elim (A B : U) (p : PathP (<_> U) A B) : equiv A B
+ := transp (<i> equiv A (p @ i)) 0 (idEquiv A)
 
---def univ-computation (A B : U) (p : PathP (<_>U) A B) : PathP (<_> PathP (<_> U) A B) (univ-intro A B (univ-elim A B p)) p
---:= <j i> Glue B (j \/ ∂ i) [ (i = 0) → (A, univ-elim A B p),
---                             (i = 1) → (B, univ-elim B B (<k> B)),
---                             (j = 1) → (p @ i, univ-elim (p @ i) B (<k> p @ (i \/ k))) ]
+{-
+def univ-computation (A B : U) (p : PathP (<_>U) A B)
+  : PathP (<_> PathP (<_> U) A B) (univ-intro A B (univ-elim A B p)) p
+ := <j i> Glue B (j \/ ∂ i) [ (i = 0) → (A, univ-elim A B p),
+                              (i = 1) → (B, univ-elim B B (<k> B)),
+                              (j = 1) → (p @ i, univ-elim (p @ i) B (<k> p @ (i \/ k))) ]
 
---def univ-uniqueness (A B : U) (w : equiv A B) : Path (A -> B) w.1 (pathToEquiv A B (equivToPath A B w)).1
---  := <i> \ (a : A), let b: B = w.1 a
+-}
+
+--def univ-uniqueness (A B : U) (w : equiv A B)
+--  : Path (A -> B) w.1 (pathToEquiv A B (equivToPath A B w)).1
+-- := <i> \ (a : A), let b: B = w.1 a
 --                       u: A = comp (<j>A) a []
 --                       q: Path B (w.1 u) b = <i>w.1 (comp (<j>A) a [(i=1) -> <j>a])
 --    in comp (<j> B) (comp (<j> B) (comp (<j> B) (comp (<j> B) (w.1 u)

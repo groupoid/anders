@@ -55,17 +55,8 @@ def isoPath (A B : U)
 def iso (A B: U) : U := Σ (f: A -> B) (g: B -> A) (s: section A B f g) (t: retract A B f g), unit
 def iso-Form (A B: U) : U₁ := iso A B -> PathP (<_>U) A B
 def iso-Intro (A B: U) : iso-Form A B := \ (x : iso A B), isoPath A B x.f x.g x.s x.t
-
-{-
-def iso-Elim (A B: U) : PathP (<_>U) A B -> iso A B
- := \ (p: PathP (<_>U) A B),
-  ( coerce A B p,
-    coerce B A (<i> p @ -i),
-    ret-equiv A B (univ-elim A B p),
-    sec-equiv A B (univ-elim A B p),
-    star
-  )
--}
+--def iso-Elim (A B: U) : PathP (<_>U) A B -> iso A B
+-- := \ (p: PathP (<_>U) A B), (coerce A B p,coerce B A (<i> p @ -i),ret-equiv A B (univ-elim A B p),sec-equiv A B (univ-elim A B p),star)
 
 -- Minivalence Type (Equiv -> Iso)
 

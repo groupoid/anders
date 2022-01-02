@@ -44,7 +44,10 @@ def lemIso (A B : U) (f : A -> B) (g : B -> A)
 def gradLemma (A B : U) (f : A -> B) (g : B -> A) (s : Π (y : B), Path B (f (g y)) y) (t : Π (x : A), Path A (g (f x)) x)
   : isEquiv A B f := \ (y : B), ((g y,<i> s y @ -i), \ (z : fiber A B f y), lemIso A B f g s t (g y) z.1 y (<i> s y @ -i) z.2)
 
-def isoPath (A B : U) (f : A -> B) (g : B -> A) (s : Π (y : B), Path B (f (g y)) y) (t : Π (x : A), Path A (g (f x)) x)
+def isoPath (A B : U)
+    (f : A -> B) (g : B -> A)
+    (s : Π (y : B), Path B (f (g y)) y)
+    (t : Π (x : A), Path A (g (f x)) x)
   : PathP (<_> U) A B
  := <i> Glue B (∂ i) [(i = 0) -> (A, f, gradLemma A B f g s t),
                       (i = 1) -> (B, id B, idIsEquiv B)]

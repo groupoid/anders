@@ -260,6 +260,8 @@ and inferV v = traceInferV v; match v with
   | VPi (t, (x, f)) | VSig (t, (x, f)) | W (t, (x, f)) ->
     imax (inferV t) (inferV (f (Var (x, t))))
   | VLam (t, (x, f)) -> VPi (t, (x, fun x -> inferV (f x)))
+  | VPLam f -> let t = VLam (VI, (freshName "ι", fun i -> inferV (app (f, i)))) in
+    VApp (VApp (VPathP (VPLam t), app (f, vzero)), app (f, vone))
   | Var (_, t)               -> t
   | VFst e                   -> fst (extSigG (inferV e))
   | VSnd e                   -> let (_, (_, g)) = extSigG (inferV e) in g (vfst e)

@@ -18,7 +18,7 @@ def x0=x1 (A B : U) (f : A -> B) (g : B -> A) (x0 x1 : A) (y : B) (p0 : Path B (
     (t : Π (x : A), Path A (g (f x)) x) : Path A x0 x1
  := <r> fill2 A B f g x0 x1 y p0 p1 t r 1
 
-def sq (A B : U) (f : A -> B) (g : B -> A) (x0 x1 : A) (y : B) (p0 : Path B (f x0) y) (p1 : Path B (f x1) y)
+def sqA (A B : U) (f : A -> B) (g : B -> A) (x0 x1 : A) (y : B) (p0 : Path B (f x0) y) (p1 : Path B (f x1) y)
     (t : Π (x : A), Path A (g (f x)) x) (i j : I) : A
  := hcomp A (∂ i ∨ ∂ j)
     (λ (k : I), [(i = 1) → fill1 A B f g x0 x1 y p0 p1 t j -k,
@@ -26,20 +26,20 @@ def sq (A B : U) (f : A -> B) (g : B -> A) (x0 x1 : A) (y : B) (p0 : Path B (f x
                  (j = 1) → t (fill2 A B f g x0 x1 y p0 p1 t i 1) @ -k,
                  (j = 0) → g y ]) (fill2 A B f g x0 x1 y p0 p1 t i j)
 
-def sq1 (A B : U) (f : A -> B) (g : B -> A) (x0 x1 : A) (y : B) (p0 : Path B (f x0) y) (p1 : Path B (f x1) y)
+def sqB (A B : U) (f : A -> B) (g : B -> A) (x0 x1 : A) (y : B) (p0 : Path B (f x0) y) (p1 : Path B (f x1) y)
     (s : Π (y : B), Path B (f (g y)) y) (t : Π (x : A), Path A (g (f x)) x) (i j : I) : B
  := hcomp B (∂ i ∨ ∂ j)
     (λ (k : I), [(i = 1) → s (p1 @ -j) @ k,
                  (i = 0) → s (p0 @ -j) @ k,
                  (j = 1) → s (f (x0=x1 A B f g x0 x1 y p0 p1 t @ i)) @ k,
-                 (j = 0) → s y @ k ]) (f (sq A B f g x0 x1 y p0 p1 t i j))
+                 (j = 0) → s y @ k ]) (f (sqA A B f g x0 x1 y p0 p1 t i j))
 
 def lemIso (A B : U) (f : A -> B) (g : B -> A)
     (s : Π (y : B), Path B (f (g y)) y) (t : Π (x : A), Path A (g (f x)) x)
     (x0 x1 : A) (y : B) (p0 : Path B y (f x0)) (p1 : Path B y (f x1))
   : Path (fiber A B f y) (x0, p0) (x1, p1)
  := <i> (x0=x1 A B f g x0 x1 y (<k> p0 @ -k) (<k> p1 @ -k) t @ i,
-         <j> sq1 A B f g x0 x1 y (<k> p0 @ -k) (<k> p1 @ -k) s t i j)
+       <j> sqB A B f g x0 x1 y (<k> p0 @ -k) (<k> p1 @ -k) s t i j)
 
 def gradLemma (A B : U) (f : A -> B) (g : B -> A) (s : Π (y : B), Path B (f (g y)) y) (t : Π (x : A), Path A (g (f x)) x)
   : isEquiv A B f := \ (y : B), ((g y,<i> s y @ -i), \ (z : fiber A B f y), lemIso A B f g s t (g y) z.1 y (<i> s y @ -i) z.2)
@@ -52,3 +52,16 @@ def isoPath (A B : U)
  := <i> Glue B (∂ i) [(i = 0) -> (A, f, gradLemma A B f g s t),
                       (i = 1) -> (B, id B, idIsEquiv B)]
 
+def isIso (A B: U) : U := Σ (f: A -> B) (g: B -> A) (s: section A B f g) (t: retract A B f g), unit
+def ISO : U₁ := Σ (A: U) (B: U), isIso A B
+
+def iso-Form (A B: U) : U₁ := isIso A B -> PathP (<_>U) A B
+def iso-Intro (A B: U) : iso-Form A B := \ (x : isIso A B), isoPath A B x.f x.g x.s x.t
+def iso-Elim (A B: U) : PathP (<_>U) A B -> isIso A B
+ := \ (p: PathP (<_>U) A B),
+  ( coerce A B p,
+    coerce B A (<i> p @ -i),
+    ret-equiv A B (univ-elim A B p),
+    sec-equiv A B (univ-elim A B p),
+    star
+  )

@@ -24,9 +24,9 @@ let rec eval (e0 : exp) (ctx : ctx) = traceEval e0; match e0 with
   | EKan u               -> VKan u
   | EVar x               -> getRho ctx x
   | EHole                -> VHole
-  | EPi  (a, (p, b))     -> let t = eval a ctx in VPi (t, (p, closByVal ctx p t b))
-  | ESig (a, (p, b))     -> let t = eval a ctx in VSig (t, (p, closByVal ctx p t b))
-  | ELam (a, (p, b))     -> let t = eval a ctx in VLam (t, (p, closByVal ctx p t b))
+  | EPi  (a, (p, b))     -> let t = eval a ctx in VPi (t, (fresh p, closByVal ctx p t b))
+  | ESig (a, (p, b))     -> let t = eval a ctx in VSig (t, (fresh p, closByVal ctx p t b))
+  | ELam (a, (p, b))     -> let t = eval a ctx in VLam (t, (fresh p, closByVal ctx p t b))
   | EApp (f, x)          -> app (eval f ctx, eval x ctx)
   | EPair (r, e1, e2)    -> VPair (r, eval e1 ctx, eval e2 ctx)
   | EFst e               -> vfst (eval e ctx)
@@ -63,7 +63,7 @@ let rec eval (e0 : exp) (ctx : ctx) = traceEval e0; match e0 with
   | EFalse               -> VFalse
   | ETrue                -> VTrue
   | EIndBool e           -> VIndBool (eval e ctx)
-  | EW (a, (p, b))       -> let t = eval a ctx in W (t, (p, closByVal ctx p t b))
+  | EW (a, (p, b))       -> let t = eval a ctx in W (t, (fresh p, closByVal ctx p t b))
   | ESup (a, b)          -> VSup (eval a ctx, eval b ctx)
   | EIndW (a, b, c)      -> VIndW (eval a ctx, eval b ctx, eval c ctx)
 

@@ -36,9 +36,9 @@ def hae (A B : U) : U := Σ (f : A -> B), isHae A B f
 
 {- The notion of Univalence was discovered by Vladimir Voevodsky
    as forth and back transport between fibrational equivalence
-   as conractability of singletons and homotopical multi-dimentional
-   heterogeneous path equality. The Pi type Equiv -> Path is called Univalence type,
-   where univalence intro is obtained by Glue type and elim (path to Equiv) is
+   as contractability of fibers and homotopical multi-dimentional
+   heterogeneous path equality. The Equiv -> Path type is called Univalence type,
+   where univalence intro is obtained by Glue type and elim (Path -> Equiv) is
    obtained by sigma transport from constant map. -}
 
 -- Univalence Type (Equiv -> Path)

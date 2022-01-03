@@ -81,3 +81,8 @@ def mini-Elim (A B : U) : iso A B -> equiv A B := \ (x : iso A B), univ-elim A B
    and Bi-Invertible Equivalences could be introduced and encoded
    as isomorphism by analogy. -}
 
+def isHae (A B : U) (f : A -> B): U :=
+  Σ (g : B -> A) (eta_: Path (idᵀ A) (∘ A B A g f) (id A)) (eps_: Path (idᵀ B) (∘ B A B f g) (id B)),
+  Π (x : A), Path B (f ((eta_ @ 0) x)) ((eps_ @ 0) (f x))
+
+def hae (A B : U) : U := Σ (f : A -> B), isHae A B f

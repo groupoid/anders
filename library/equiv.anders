@@ -29,11 +29,6 @@ def ret-equiv (A B : U) (w : equiv A B) (y : B) : Path B (w.1 (inv-equiv A B w y
 def sec-equiv (A B : U) (w : equiv A B) (x : A) : Path A (inv-equiv A B w (w.1 x)) x := <i> ((w.2 (w.1 x)).2 (x, <j> w.1 x) @ i).1
 def Glue′ (A : U) (φ : I) (e : Partial (Σ (T : U), equiv T A) φ) : U := Glue A φ e
 
-def isHae (A B : U) (f : A -> B): U :=
-  Σ (g : B -> A) (eta_: Path (idᵀ A) (∘ A B A g f) (id A)) (eps_: Path (idᵀ B) (∘ B A B f g) (id B)),
-  Π (x : A), Path B (f ((eta_ @ 0) x)) ((eps_ @ 0) (f x))
-def hae (A B : U) : U := Σ (f : A -> B), isHae A B f
-
 {- The notion of Univalence was discovered by Vladimir Voevodsky
    as forth and back transport between fibrational equivalence
    as contractability of fibers and homotopical multi-dimentional

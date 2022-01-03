@@ -50,17 +50,35 @@ def isoPath (A B : U)
  := <i> Glue B (∂ i) [(i = 0) -> (A, f, gradLemma A B f g s t),
                       (i = 1) -> (B, id B, idIsEquiv B)]
 
+{- While Univalence uses 2-dimentional gluening the similar notion of Unimorphism
+   as forth-back transport between isomorphism and path equality could be introduced
+   by using only 1-dimentional gluening (the other one is hidden in lemIso as
+   tower of sqA/sqB). -}
+
 -- Unimorphism Type (Iso -> Path)
 
 def iso (A B: U) : U := Σ (f : A -> B) (g : B -> A) (s : section A B f g) (t : retract A B f g), unit
 def iso-Form (A B: U) : U₁ := iso A B -> PathP (<_>U) A B
 def iso-Intro (A B: U) : iso-Form A B := \ (x : iso A B), isoPath A B x.f x.g x.s x.t
 def iso-Elim (A B : U) : PathP (<_> U) A B -> iso A B
- := λ (p : PathP (<_> U) A B), (coerce A B p, coerce B A (<i> p @ -i),
-    trans⁻¹-trans A B p, λ (a : A), <k> trans-trans⁻¹ A B p a @ -k, star)
+ := λ (p : PathP (<_> U) A B),
+  ( coerce A B p,
+    coerce B A (<i> p @ -i),
+    trans⁻¹-trans A B p,
+    λ (a : A), <k> trans-trans⁻¹ A B p a @ -k,
+    star
+  )
+
+{- The notion of minivalence as forth-back map between fibrational equivalence
+   and section/retract-based isomorphism is mentioned in Cubical Agda sources. -}
 
 -- Minivalence Type (Equiv -> Iso)
 
 def mini-Form (A B : U) : U := equiv A B -> iso A B
 def mini-Intro (A B : U) : mini-Form A B := \ (x : equiv A B), ( x.f, inv-equiv A B x, ret-equiv A B x, sec-equiv A B x, star)
 def mini-Elim (A B : U) : iso A B -> equiv A B := \ (x : iso A B), univ-elim A B (isoPath A B x.f x.g x.s x.t)
+
+{- The other notion of equality such as Half Adjoint Equivalence
+   and Bi-Invertible Equivalences could be introduced and encoded
+   as isomorphism by analogy. -}
+

@@ -50,9 +50,9 @@ def terminal (P: precategory): U := Σ (top: P.C.ob), isTerminal P top
 
 def homTo  (P: precategory) (X: P.C.ob): U := Σ (Y: P.C.ob), P.C.hom Y X
 def cospan (P: precategory): U := Σ (X: P.C.ob) (_: homTo P X), homTo P X
-def hasCospanCone (P: precategory) (D: cospan P) (W: P.C.ob) : U := Σ (f: P.C.hom W D.2.1.1) (g: P.C.hom W D.2.2.1),
-    Path (P.C.hom W D.1) (P.P.∘ W D.2.1.1 D.1 f D.2.1.2) (P.P.∘ W D.2.2.1 D.1 g D.2.2.2)
-def cospanCone (P: precategory) (D: cospan P): U := Σ (W: P.C.ob), hasCospanCone P D W
+def hasCospanCone (P: precategory) (D: cospan P) (w: P.C.ob) : U := Σ (f: P.C.hom w D.2.1.1) (g: P.C.hom w D.2.2.1),
+    Path (P.C.hom w D.1) (P.P.∘ w D.2.1.1 D.1 f D.2.1.2) (P.P.∘ w D.2.2.1 D.1 g D.2.2.2)
+def cospanCone (P: precategory) (D: cospan P): U := Σ (w: P.C.ob), hasCospanCone P D w
 def isCospanConeHom (P: precategory) (D: cospan P) (E1 E2: cospanCone P D) (h: P.C.hom E1.1 E2.1) : U := Σ
     (_ : Path (P.C.hom E1.1 D.2.1.1) (P.P.∘ E1.1 E2.1 D.2.1.1 h E2.2.1) E1.2.1),
     Path (P.C.hom E1.1 D.2.2.1) (P.P.∘ E1.1 E2.1 D.2.2.1 h E2.2.2.1) E1.2.2.1

@@ -20,8 +20,6 @@ module path where
 
 -- Proto
 
-axiom unit : U
-axiom one : unit
 def ∘ᵀ (α β γ: U) : U := (β → γ) → (α → β) → (α → γ)
 def ∘ (α β γ : U) : ∘ᵀ α β γ := λ (g: β → γ) (f: α → β) (x: α), g (f x)
 def idᵀ (α: U): U := α → α

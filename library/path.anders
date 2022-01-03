@@ -228,6 +228,9 @@ def coerce (A B: U) (p: PathP (<_> U) A B): A → B := λ (x : A), trans A B p x
 def pcomp (A: U) (a b c: A) (p: Path A a b) (q: Path A b c): Path A a c := subst A (Path A a) b c q p
 def transId (A : U) : A → A := transp (<_> A) 1
 
+def trans⁻¹-trans (A B : U) (p : PathP (<_> U) A B) (b : B) : Path B (trans A B p (trans⁻¹ A B p b)) b
+ := <i> transp (<j> p @ i ∨ j) i (transp (<j> p @ i ∨ -j) i b)
+
 def trans-trans⁻¹ (A B : U) (p : PathP (<_> U) A B) (a : A) : Path A a (trans⁻¹ A B p (trans A B p a))
  := <i> transp (<j> p @ i ∧ -j) -i (transp (<j> p @ i ∧ j) -i a)
 

@@ -50,10 +50,9 @@ def isoPath (A B : U)
  := <i> Glue B (∂ i) [(i = 0) -> (A, f, gradLemma A B f g s t),
                       (i = 1) -> (B, id B, idIsEquiv B)]
 
-{- While Univalence uses 2-dimentional gluening the similar notion of Unimorphism
-   as forth-back transport between isomorphism and path equality could be introduced
-   by using only 1-dimentional gluening (the other one is hidden in lemIso as
-   tower of sqA/sqB). -}
+{- Similar to Fibrational Equivalence the notion of Retract/Section based Isomorphism could be introduced
+   as forth-back transport between isomorphism and path equality. This notion is somehow cannonical to all
+   cubical systems and is called Unimorphism here. -}
 
 -- Unimorphism Type (Iso -> Path)
 
@@ -69,7 +68,7 @@ def iso-Elim (A B : U) : PathP (<_> U) A B -> iso A B
     star
   )
 
-{- The notion of minivalence as forth-back map between fibrational equivalence
+{- The notion of Minivalence as forth-back map between fibrational equivalence
    and section/retract-based isomorphism is mentioned in Cubical Agda sources. -}
 
 -- Minivalence Type (Equiv -> Iso)

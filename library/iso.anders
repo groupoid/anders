@@ -39,7 +39,9 @@ def lemIso (A B : U) (f : A -> B) (g : B -> A)
  := <i> (x0=x1 A B f g x0 x1 y (<k> p0 @ -k) (<k> p1 @ -k) t @ i,
        <j> sqB A B f g x0 x1 y (<k> p0 @ -k) (<k> p1 @ -k) s t i j)
 
-def gradLemma (A B : U) (f : A -> B) (g : B -> A) (s : Π (y : B), Path B (f (g y)) y) (t : Π (x : A), Path A (g (f x)) x)
+-- [Shulman, Lumsdaine, Warren, Licata]
+
+def isoToEquiv (A B : U) (f : A -> B) (g : B -> A) (s : Π (y : B), Path B (f (g y)) y) (t : Π (x : A), Path A (g (f x)) x)
   : isEquiv A B f := \ (y : B), ((g y,<i> s y @ -i), \ (z : fiber A B f y), lemIso A B f g s t (g y) z.1 y (<i> s y @ -i) z.2)
 
 def isoPath (A B : U)
@@ -47,7 +49,7 @@ def isoPath (A B : U)
     (s : Π (y : B), Path B (f (g y)) y)
     (t : Π (x : A), Path A (g (f x)) x)
   : PathP (<_> U) A B
- := <i> Glue B (∂ i) [(i = 0) -> (A, f, gradLemma A B f g s t),
+ := <i> Glue B (∂ i) [(i = 0) -> (A, f, isoToEquiv A B f g s t),
                       (i = 1) -> (B, id B, idIsEquiv B)]
 
 {- Similar to Fibrational Equivalence the notion of Retract/Section based Isomorphism could be introduced
@@ -56,9 +58,19 @@ def isoPath (A B : U)
 
 -- Unimorphism Type (Iso -> Path)
 
-def iso (A B: U) : U := Σ (f : A -> B) (g : B -> A) (s : section A B f g) (t : retract A B f g), unit
-def iso-Form (A B: U) : U₁ := iso A B -> PathP (<_>U) A B
-def iso-Intro (A B: U) : iso-Form A B := \ (x : iso A B), isoPath A B x.f x.g x.s x.t
+def iso (A B: U) : U
+ := Σ (f : A -> B)
+      (g : B -> A)
+      (s : section A B f g)
+      (t : retract A B f g),
+      unit
+
+def iso-Form (A B: U) : U₁
+ := iso A B -> PathP (<_>U) A B
+
+def iso-Intro (A B: U) : iso-Form A B
+ := \ (x : iso A B), isoPath A B x.f x.g x.s x.t
+
 def iso-Elim (A B : U) : PathP (<_> U) A B -> iso A B
  := λ (p : PathP (<_> U) A B),
   ( coerce A B p,
@@ -71,11 +83,17 @@ def iso-Elim (A B : U) : PathP (<_> U) A B -> iso A B
 {- The notion of Minivalence as forth-back map between fibrational equivalence
    and section/retract-based isomorphism is mentioned in Cubical Agda sources. -}
 
--- Minivalence Type (Equiv -> Iso)
+-- Minivalence Type (Iso -> Equiv)
 
-def mini-Form (A B : U) : U := equiv A B -> iso A B
-def mini-Intro (A B : U) : mini-Form A B := \ (x : equiv A B), ( x.f, inv-equiv A B x, ret-equiv A B x, sec-equiv A B x, star)
-def mini-Elim (A B : U) : iso A B -> equiv A B := \ (x : iso A B), univ-elim A B (isoPath A B x.f x.g x.s x.t)
+def mini-Form (A B : U) : U := iso A B -> equiv A B
+
+def mini-Intro (A B : U) : mini-Form A B
+ := \ (x : iso A B), ( x.f, \ (y : B), ( (x.g y,<i> x.s y @ -i),
+    \ (z : fiber A B x.f y), lemIso A B x.f x.g x.s x.t (x.g y) z.1 y (<i> x.s y @ -i) z.2))
+ -- \ (x : iso A B), univ-elim A B (isoPath A B x.f x.g x.s x.t)
+
+def mini-Elim (A B : U) : equiv A B -> iso A B
+ := \ (x : equiv A B), ( x.f, inv-equiv A B x, ret-equiv A B x, sec-equiv A B x, star)
 
 {- The other notion of equality such as Half Adjoint Equivalence
    and Bi-Invertible Equivalences could be introduced and encoded

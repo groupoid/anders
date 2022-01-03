@@ -6,7 +6,7 @@
    https://groupoid.space/math/topos/
    http://www.ams.org/notices/200409/what-is-illusie.pdf
 
-   Copyright (c) Groupoid Infinity, 2014-2021. -}
+   Copyright (c) Groupoid Infinity, 2014-2022. -}
 
 module topos where
 import library/cat

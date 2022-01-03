@@ -1,6 +1,6 @@
 {- Impredicative Encoding of Inductive Types:
    - Unit.
-   Copyright (c) Groupoid Infinity, 2014-2021. -}
+   Copyright (c) Groupoid Infinity, 2014-2022. -}
 
 module impredicative where
 -- option impredicative true

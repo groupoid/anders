@@ -6,7 +6,7 @@
    HoTT 11.2 Dedekind reals
    HoTT 11.3 Cauchy reals
 
-   Copyright (c) Groupoid Infinity, 2014-2021. -}
+   Copyright (c) Groupoid Infinity, 2014-2022. -}
 
 -- Martín Hötzel Escardó, Thomas Streicher, 1999
 -- Induction and recursion on the partial real line with applications to Real PCF

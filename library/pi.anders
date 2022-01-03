@@ -5,7 +5,7 @@
    HoTT 1.5 Product types
    HoTT 2.9 Pi-types and the function extensionality axiom.
 
-   Copyright (c) Groupoid Infinity, 2014-2021. -}
+   Copyright (c) Groupoid Infinity, 2014-2022. -}
 
 module pi where
 import library/path

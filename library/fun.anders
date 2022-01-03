@@ -7,7 +7,7 @@
    HoTT 9.2 Functors and transformations
    HoTT 9.4 Equivalences
 
-   Copyright (c) Groupoid Infinity, 2014-2021. -}
+   Copyright (c) Groupoid Infinity, 2014-2022. -}
 
 module fun where
 import library/cat

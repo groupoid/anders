@@ -29,10 +29,5 @@ axiom lem3 (B: U) (F: B -> U) (y: B) (x: fiber₀ (Sigma B F) B (pr₁ B F) y)
 
 def Bundle=Pi (B: U) (F: B -> U) (y: B)
   : PathP (<_>U) (fiber₀ (Sigma B F) B (pr₁ B F) y) (F y)
- := isoPath
-    (fiber₀ (Sigma B F) B (pr₁ B F) y)
-    (F y)
-    (encode B F y)
-    (decode B F y)
-    (lem2 B F y)
-    (lem3 B F y)
+ := isoPath (fiber₀ (Sigma B F) B (pr₁ B F) y) (F y)
+    (encode B F y) (decode B F y) (lem2 B F y) (lem3 B F y)

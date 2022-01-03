@@ -1,0 +1,6 @@
+module sigma where
+
+def Sigma (A: U) (B: A → U) : U ≔ Σ (x: A), B x
+def pair (A: U) (B: A → U) (a: A) (b: B a) : Sigma A B ≔ (a, b)
+def pr₁ (A: U) (B: A → U) (x: Sigma A B) : A ≔ x.1
+def pr₂ (A: U) (B: A → U) (x: Sigma A B) : B (pr₁ A B x) ≔ x.2

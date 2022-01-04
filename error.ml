@@ -12,6 +12,7 @@ exception ExpectedPath of value
 exception ExpectedVSet of value
 exception Ineq of value * value
 exception ExpectedSubtype of exp
+exception ExpectedSubtypeV of value
 exception Parser of int * string * string
 exception ExpectedSystem of value
 exception UnknownOption of string
@@ -44,6 +45,7 @@ let prettyPrintError : exn -> unit = function
   | ExpectedNeutral x -> Printf.printf "  %s\nexpected to be neutral\n" (showValue x)
   | ExpectedSystem x -> Printf.printf "  %s\nexpected to be a system\n" (showValue x)
   | ExpectedSubtype x -> Printf.printf "  %s\nexpected to be a cubical subtype\n" (showExp x)
+  | ExpectedSubtypeV x -> Printf.printf "  %s\nexpected to be a cubical subtype\n" (showValue x)
   | UnknownCommand s -> Printf.printf "Unknown command “%s”\n" s
   | UnknownOption opt -> Printf.printf "Unknown option “%s”\n" opt
   | UnknownOptionValue (opt, value) -> Printf.printf "Unknown value “%s” of option “%s”\n" value opt

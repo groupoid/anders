@@ -281,7 +281,7 @@ and inferV v = traceInferV v; match v with
   | VOuc v                   ->
   begin match inferV v with
     | VSub (t, _, _) -> t
-    | _ -> raise (ExpectedSubtype (rbV v))
+    | _ -> raise (ExpectedSubtypeV v)
   end
   | VId v -> let n = extSet (inferV v) in implv v (implv v (VPre n))
   | VJ v -> inferJ v (inferV v)
@@ -405,58 +405,6 @@ and faceEnv alpha ctx =
   Env.map (fun (p, t, v) -> if p = Local then (p, updTerm alpha t, updTerm alpha v) else (p, t, v)) ctx
   |> Env.fold (fun p dir -> Env.add p (Local, Value VI, Value (VDir dir))) alpha
 
-(* Readback *)
-and rbV v : exp = traceRbV v; match v with
-  | VLam (t, g)          -> rbVTele eLam t g
-  | VPair (r, u, v)      -> EPair (r, rbV u, rbV v)
-  | VKan u               -> EKan u
-  | VPi (t, g)           -> rbVTele ePi t g
-  | VSig (t, g)          -> rbVTele eSig t g
-  | VPre u               -> EPre u
-  | VPLam f              -> EPLam (rbV f)
-  | Var (x, _)           -> EVar x
-  | VApp (f, x)          -> EApp (rbV f, rbV x)
-  | VFst k               -> EFst (rbV k)
-  | VSnd k               -> ESnd (rbV k)
-  | VHole                -> EHole
-  | VPathP v             -> EPathP (rbV v)
-  | VPartialP (t, r)     -> EPartialP (rbV t, rbV r)
-  | VSystem ts           -> ESystem (System.map rbV ts)
-  | VSub (a, i, u)       -> ESub (rbV a, rbV i, rbV u)
-  | VTransp (p, i)       -> ETransp (rbV p, rbV i)
-  | VHComp (t, r, u, u0) -> EHComp (rbV t, rbV r, rbV u, rbV u0)
-  | VAppFormula (f, x)   -> EAppFormula (rbV f, rbV x)
-  | VId v                -> EId (rbV v)
-  | VRef v               -> ERef (rbV v)
-  | VJ v                 -> EJ (rbV v)
-  | VI                   -> EI
-  | VDir d               -> EDir d
-  | VAnd (u, v)          -> EAnd (rbV u, rbV v)
-  | VOr (u, v)           -> EOr (rbV u, rbV v)
-  | VNeg u               -> ENeg (rbV u)
-  | VInc (t, r)          -> EInc (rbV t, rbV r)
-  | VOuc v               -> EOuc (rbV v)
-  | VGlue v              -> EGlue (rbV v)
-  | VEmpty               -> Empty
-  | VIndEmpty v          -> EIndEmpty (rbV v)
-  | VUnit                -> EUnit
-  | VStar                -> EStar
-  | VIndUnit v           -> EIndUnit (rbV v)
-  | VBool                -> EBool
-  | VFalse               -> EFalse
-  | VTrue                -> ETrue
-  | VIndBool v           -> EIndBool (rbV v)
-  | W (t, g)             -> rbVTele eW t g
-  | VSup (a, b)          -> ESup (rbV a, rbV b)
-  | VIndW (a, b, c)      -> EIndW (rbV a, rbV b, rbV c)
-
-and rbVTele ctor t (p, g) = let x = Var (p, t) in ctor p (rbV t) (rbV (g x))
-
-and prune ctx x = match Env.find_opt x ctx with
-  | Some (_, _, Exp e)   -> e
-  | Some (_, _, Value v) -> rbV v
-  | None                 -> raise (VariableNotFound x)
-
 (* Convertibility *)
 and conv v1 v2 : bool = traceConv v1 v2;
   v1 == v2 || begin match v1, v2 with
@@ -544,12 +492,11 @@ and check ctx (e0 : exp) (t0 : value) =
       | Irrefutable -> ()
     end
   | EHole, v -> traceHole v ctx
-  | e, VApp (VApp (VPathP p, u0), u1) ->
-    let v0 = act e ezero ctx in
-    let v1 = act e eone  ctx in
-    let (i, x, v) = freshDim () in let ctx' = upLocal ctx i VI v in
-    check ctx' (rbV (act e x ctx')) (appFormula p v);
-    eqNf v0 u0; eqNf v1 u1
+  | EPLam (ELam (EI, (i, e))), VApp (VApp (VPathP p, u0), u1) ->
+    let v = Var (i, VI) in let ctx' = upLocal ctx i VI v in
+    let v0 = eval e (upLocal ctx i VI vzero) in
+    let v1 = eval e (upLocal ctx i VI vone) in
+    check ctx' e (appFormula p v); eqNf v0 u0; eqNf v1 u1
   | e, VPre u -> begin
     match infer ctx e with
     | VKan v | VPre v -> if ieq u v then () else raise (Ineq (VPre u, VPre v))
@@ -593,7 +540,8 @@ and infer ctx e : value = traceInfer e; match e with
     | VPartialP (ts, r) -> eqNf r (eval r0 ctx); inferV (inferV ts)
     | _ -> failwith "Expected partial function into universe"
   end
-  | EAppFormula (f, x) -> check ctx x VI; let (p, _, _) = extPathP (infer ctx (rbV (eval f ctx))) in
+  | EAppFormula (f, x) -> check ctx x VI;
+    let (p, _, _) = extPathP (infer ctx f) in
     appFormula p (eval x ctx)
   | ETransp (p, i) -> inferTransport ctx p i
   | EHComp (e, i, u, u0) -> let t = eval e ctx in let r = eval i ctx in
@@ -657,10 +605,16 @@ and inferLam ctx p a e =
   ignore (infer (upLocal ctx p t (Var (p, t))) e);
   VPi (t, (p, fun x -> inferV (eval e (upLocal ctx p t x))))
 
-and inferPath (ctx : ctx) (p : exp) =
-  let (i, x, v) = freshDim () in let ctx' = upLocal ctx i VI v in
-  let t = infer ctx' (rbV (act p x ctx')) in ignore (extSet t);
-  let v0 = act p ezero ctx in let v1 = act p eone ctx in implv v0 (implv v1 t)
+and inferPath (ctx : ctx) = function
+  | EPLam (ELam (EI, (i, e))) ->
+    let v = Var (i, VI) in let ctx' = upLocal ctx i VI v in
+    let t0 = eval e (upLocal ctx i VI vzero) in
+    let t1 = eval e (upLocal ctx i VI vone) in
+    let k = extSet (infer ctx' e) in implv t0 (implv t1 (VKan k))
+  | p -> let (_, t0, t1) = extPathP (infer ctx p) in
+    (* path cannot connect different universes,
+       so if one endpoint is in U, then so other *)
+    let k = extSet (inferV t0) in implv t0 (implv t1 (VKan k))
 
 and inferInc t r = let a = freshName "a" in
   VPi (t, (a, fun v -> VSub (t, r, VSystem (border (solve r One) v))))
@@ -673,13 +627,21 @@ and inferTransport (ctx : ctx) (p : exp) (i : exp) =
   let u0 = act p ezero ctx in
   let u1 = act p eone  ctx in
 
-  let (j, x, v) = freshDim () in let ctx' = upLocal ctx j VI v in
-  ignore (extKan (infer ctx' (rbV (act p x ctx'))));
+  begin match p with
+  | EPLam (ELam (EI, (i, e))) ->
+    let ctx' = upLocal ctx i VI (Var (i, VI)) in
+    ignore (extKan (infer ctx' e))
+  | _ -> let (t, _, _) = extPathP (infer ctx p) in
+    let (_, _, i) = freshDim () in
+    ignore (extKan (appFormula t i))
+  end;
+
+  let (j, e, v) = freshDim () in let ctx' = upLocal ctx j VI v in
 
   (* Check that p is constant at i = 1 *)
   List.iter (fun phi ->
     let rho = faceEnv phi ctx' in
-    eqNf (act p ezero rho) (act p x rho))
+    eqNf (act p ezero rho) (act p e rho))
     (solve (eval i ctx) One);
   implv u0 u1
 
@@ -694,3 +656,49 @@ and inferJ v t =
               VPi (idv v x y, (p, fun p ->
                 app (app (app (pi, x), y), p))))))))))
 
+(* Readback *)
+let rec rbV v : exp = traceRbV v; match v with
+  | VLam (t, g)          -> rbVTele eLam t g
+  | VPair (r, u, v)      -> EPair (r, rbV u, rbV v)
+  | VKan u               -> EKan u
+  | VPi (t, g)           -> rbVTele ePi t g
+  | VSig (t, g)          -> rbVTele eSig t g
+  | VPre u               -> EPre u
+  | VPLam f              -> EPLam (rbV f)
+  | Var (x, _)           -> EVar x
+  | VApp (f, x)          -> EApp (rbV f, rbV x)
+  | VFst k               -> EFst (rbV k)
+  | VSnd k               -> ESnd (rbV k)
+  | VHole                -> EHole
+  | VPathP v             -> EPathP (rbV v)
+  | VPartialP (t, r)     -> EPartialP (rbV t, rbV r)
+  | VSystem ts           -> ESystem (System.map rbV ts)
+  | VSub (a, i, u)       -> ESub (rbV a, rbV i, rbV u)
+  | VTransp (p, i)       -> ETransp (rbV p, rbV i)
+  | VHComp (t, r, u, u0) -> EHComp (rbV t, rbV r, rbV u, rbV u0)
+  | VAppFormula (f, x)   -> EAppFormula (rbV f, rbV x)
+  | VId v                -> EId (rbV v)
+  | VRef v               -> ERef (rbV v)
+  | VJ v                 -> EJ (rbV v)
+  | VI                   -> EI
+  | VDir d               -> EDir d
+  | VAnd (u, v)          -> EAnd (rbV u, rbV v)
+  | VOr (u, v)           -> EOr (rbV u, rbV v)
+  | VNeg u               -> ENeg (rbV u)
+  | VInc (t, r)          -> EInc (rbV t, rbV r)
+  | VOuc v               -> EOuc (rbV v)
+  | VGlue v              -> EGlue (rbV v)
+  | VEmpty               -> Empty
+  | VIndEmpty v          -> EIndEmpty (rbV v)
+  | VUnit                -> EUnit
+  | VStar                -> EStar
+  | VIndUnit v           -> EIndUnit (rbV v)
+  | VBool                -> EBool
+  | VFalse               -> EFalse
+  | VTrue                -> ETrue
+  | VIndBool v           -> EIndBool (rbV v)
+  | W (t, g)             -> rbVTele eW t g
+  | VSup (a, b)          -> ESup (rbV a, rbV b)
+  | VIndW (a, b, c)      -> EIndW (rbV a, rbV b, rbV c)
+
+and rbVTele ctor t (p, g) = let x = Var (p, t) in ctor p (rbV t) (rbV (g x))

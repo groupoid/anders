@@ -37,15 +37,15 @@ def pure (μ : monad) : Π (α : U), α → μ.1 α ≔ μ.2.1
 def bind (μ : monad) : Π (α β : U), μ.1 α → (α → μ.1 β) → μ.1 β ≔ μ.2.2
 def map (μ : monad) (α β : U) (f : α → β) (x : μ.1 α) : μ.1 β ≔ bind μ α β x (∘ α β (μ.1 β) (pure μ β) f)
 
-def filterM (μ : monad) (α : U) (f : α → μ.1 bool) (lst : list α) : μ.1 (list α)
+def filterM (μ : monad) (α : U) (f : α → μ.1 bool′) (lst : list α) : μ.1 (list α)
  ≔ lst (μ.1 (list α)) (pure μ (list α) (nil α))
-    (λ (x : α) (xs : μ.1 (list α)), bind μ bool (list α) (f x)
-      (λ (b : bool), ite (μ.1 (list α))
+    (λ (x : α) (xs : μ.1 (list α)), bind μ bool′ (list α) (f x)
+      (λ (b : bool′), ite (μ.1 (list α))
         (map μ (list α) (list α) (∷ α x) xs) xs b))
 
 def List : monad ≔ (list, list-pure, list-bind)
-def true-false : list bool ≔ ∷ bool true (∷ bool false (nil bool))
-def powerset (α : U) : list α → list (list α) ≔ filterM List α (const (list bool) α true-false)
+def true-false : list bool′ ≔ ∷ bool′ true′ (∷ bool′ false′ (nil bool′))
+def powerset (α : U) : list α → list (list α) ≔ filterM List α (const (list bool′) α true-false)
 
 def lst₃-powerset : list (list N) ≔
 ∷ (list N) lst₃

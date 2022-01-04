@@ -260,8 +260,8 @@ and inferV v = traceInferV v; match v with
   | VPi (t, (x, f)) | VSig (t, (x, f)) | W (t, (x, f)) ->
     imax (inferV t) (inferV (f (Var (x, t))))
   | VLam (t, (x, f)) -> VPi (t, (x, fun x -> inferV (f x)))
-  | VPLam f -> let t = VLam (VI, (freshName "ι", fun i -> inferV (app (f, i)))) in
-    VApp (VApp (VPathP (VPLam t), app (f, vzero)), app (f, vone))
+  | VPLam (VLam (VI, (_, g))) -> let t = VLam (VI, (freshName "ι", g >> inferV)) in
+    VApp (VApp (VPathP (VPLam t), g vzero), g vone)
   | Var (_, t)               -> t
   | VFst e                   -> fst (extSigG (inferV e))
   | VSnd e                   -> let (_, (_, g)) = extSigG (inferV e) in g (vfst e)
@@ -524,6 +524,11 @@ and infer ctx e : value = traceInfer e; match e with
   | EKan u -> VKan (Z.succ u)
   | ESig (a, (p, b)) | EPi (a, (p, b)) | EW (a, (p, b)) -> inferTele ctx p a b
   | ELam (a, (p, b)) -> inferLam ctx p a b
+  | EPLam (ELam (EI, (i, e))) ->
+    let ctx' = upLocal ctx i VI (Var (i, VI)) in ignore (infer ctx' e);
+    let g = fun j -> eval e (upLocal ctx i VI j) in
+    let t = VLam (VI, (freshName "ι", g >> inferV)) in
+    VApp (VApp (VPathP (VPLam t), g vzero), g vone)
   | EApp (f, x) -> begin match infer ctx f with
     | VPartialP (t, i) -> check ctx x (isOne i); app (t, eval x ctx)
     | VPi (t, (_, g)) -> check ctx x t; g (eval x ctx)
@@ -605,16 +610,11 @@ and inferLam ctx p a e =
   ignore (infer (upLocal ctx p t (Var (p, t))) e);
   VPi (t, (p, fun x -> inferV (eval e (upLocal ctx p t x))))
 
-and inferPath (ctx : ctx) = function
-  | EPLam (ELam (EI, (i, e))) ->
-    let v = Var (i, VI) in let ctx' = upLocal ctx i VI v in
-    let t0 = eval e (upLocal ctx i VI vzero) in
-    let t1 = eval e (upLocal ctx i VI vone) in
-    let k = extSet (infer ctx' e) in implv t0 (implv t1 (VKan k))
-  | p -> let (_, t0, t1) = extPathP (infer ctx p) in
-    (* path cannot connect different universes,
-       so if one endpoint is in U, then so other *)
-    let k = extSet (inferV t0) in implv t0 (implv t1 (VKan k))
+and inferPath ctx p =
+  let (_, t0, t1) = extPathP (infer ctx p) in
+  (* path cannot connect different universes,
+     so if one endpoint is in U, then so other *)
+  let k = extSet (inferV t0) in implv t0 (implv t1 (VKan k))
 
 and inferInc t r = let a = freshName "a" in
   VPi (t, (a, fun v -> VSub (t, r, VSystem (border (solve r One) v))))
@@ -627,14 +627,8 @@ and inferTransport (ctx : ctx) (p : exp) (i : exp) =
   let u0 = appFormulaE ctx p ezero in
   let u1 = appFormulaE ctx p eone in
 
-  begin match p with
-  | EPLam (ELam (EI, (i, e))) ->
-    let ctx' = upLocal ctx i VI (Var (i, VI)) in
-    ignore (extKan (infer ctx' e))
-  | _ -> let (t, _, _) = extPathP (infer ctx p) in
-    let (_, _, i) = freshDim () in
-    ignore (extKan (appFormula t i))
-  end;
+  let (t, _, _) = extPathP (infer ctx p) in
+  ignore (extKan (inferV (appFormula t (Var (freshName "ι", VI)))));
 
   let (j, e, v) = freshDim () in let ctx' = upLocal ctx j VI v in
 

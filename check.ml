@@ -306,7 +306,7 @@ and inferV v = traceInferV v; match v with
   | VIndBool t -> recBool t
   | VSup (a, b) -> inferSup a b
   | VIndW (a, b, c) -> inferIndW a b c
-  | v -> raise (ExpectedNeutral v)
+  | VPLam _ | VPair _ | VHole -> raise (ExpectedNeutral v)
 
 and recUnit t = let x = freshName "x" in
   implv (app (t, VStar)) (VPi (VUnit, (x, fun x -> app (t, x))))

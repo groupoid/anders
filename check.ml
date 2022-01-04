@@ -253,7 +253,7 @@ and getRho ctx x = match Env.find_opt x ctx with
   | Some (_, _, Exp e)   -> eval e ctx
   | None                 -> raise (VariableNotFound x)
 
-and act e i ctx = eval (EAppFormula (e, i)) ctx
+and appFormulaE ctx e i = eval (EAppFormula (e, i)) ctx
 
 (* This is part of evaluator, not type checker *)
 and inferV v = traceInferV v; match v with
@@ -624,8 +624,8 @@ and inferGlue t = let (r, _, _) = freshDim () in let k = inferV t in
 
 and inferTransport (ctx : ctx) (p : exp) (i : exp) =
   check ctx i VI;
-  let u0 = act p ezero ctx in
-  let u1 = act p eone  ctx in
+  let u0 = appFormulaE ctx p ezero in
+  let u1 = appFormulaE ctx p eone in
 
   begin match p with
   | EPLam (ELam (EI, (i, e))) ->
@@ -639,9 +639,8 @@ and inferTransport (ctx : ctx) (p : exp) (i : exp) =
   let (j, e, v) = freshDim () in let ctx' = upLocal ctx j VI v in
 
   (* Check that p is constant at i = 1 *)
-  List.iter (fun phi ->
-    let rho = faceEnv phi ctx' in
-    eqNf (act p ezero rho) (act p e rho))
+  List.iter (fun phi -> let rho = faceEnv phi ctx' in
+    eqNf (appFormulaE rho p ezero) (appFormulaE rho p e))
     (solve (eval i ctx) One);
   implv u0 u1
 

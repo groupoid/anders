@@ -306,3 +306,6 @@ def Path-Path′ (A : U) (a b : A) (p : Path A a b) : Path′ A a b := λ (i : I
 def Path′-Path (A : U) (a b : A) (p : Path′ A a b) : Path A a b := <i> ouc (p i)
 def Path-Path′-Path (A : U) (a b : A) (p : Path A a b) : Path (Path A a b) (Path′-Path A a b (Path-Path′ A a b p)) p := <_> p
 def Path′-Path-Path′ (A : U) (a b : A) (p : Path′ A a b) : PathP (<_> Path′ A a b) (Path-Path′ A a b (Path′-Path A a b p)) p := <_> p
+
+def 𝟏-contr : Π (x : 𝟏), Path 𝟏 x ★ :=
+ind₁ (λ (x : 𝟏), Path 𝟏 x ★) (<_> ★)

@@ -589,7 +589,7 @@ and infer ctx e : value = traceInfer e; match e with
     ignore (extSet (h (Var (q, w'))));
 
     inferIndW t (eval b ctx) (eval c ctx)
-  | e -> raise (InferError e)
+  | EPLam _ | EPair _ | EHole -> raise (InferError e)
 
 and inferInd fibrant ctx t e f =
   let (t', (p, g)) = extPiG (infer ctx e) in eqNf t t'; let k = g (Var (p, t)) in

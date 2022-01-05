@@ -75,8 +75,7 @@ def isoPath (A B : U)
 def iso-Form (A B: U) : U₁ := iso A B -> PathP (<_>U) A B
 def iso-Intro (A B: U) : iso-Form A B := \ (x : iso A B), isoPath A B x.f x.g x.s x.t
 def iso-Elim (A B : U) : PathP (<_> U) A B -> iso A B
- := λ (p : PathP (<_> U) A B),
-    ( coerce A B p, coerce B A (<i> p @ -i), trans⁻¹-trans A B p, λ (a : A), <k> trans-trans⁻¹ A B p a @ -k, star)
+ := λ (p : PathP (<_> U) A B), ( coerce A B p, coerce B A (<i> p @ -i), trans⁻¹-trans A B p, λ (a : A), <k> trans-trans⁻¹ A B p a @ -k, star)
 
 -- The notion of Minivalence as forth-back map between fibrational equivalence
 -- and section/retract-based isomorphism is mentioned in Cubical Agda sources.

@@ -72,7 +72,7 @@ Anders was built by strictly following these publications:
 * <a href="https://staff.math.su.se/anders.mortberg/papers/cubicalagda.pdf">Cubical Agda: A Dependently Typed PL with Univalence and HITs</a> [Vezzosi, Mörtberg, Abel]
 * <a href="http://www.cse.chalmers.se/~simonhu/misc/hcomp.pdf">A Cubical Type Theory for Higher Inductive Types</a> [Huber]
 * <a href="http://www.cse.chalmers.se/~simonhu/papers/p.pdf">Gluing for type theory</a> [Kaposi, Huber, Sattler]
-* <a href="https://staff.math.su.se/anders.mortberg/papers/cubicalmethods.pdf">Cubical Methods in HoTT/UF</a> [Mörtberg]
+* <a href="https://doi.org/10.1017/S0960129521000311">Cubical Methods in HoTT/UF</a> [Mörtberg]
 
 We tried to bring in as little of ourselves as possible. 
 

@@ -341,6 +341,17 @@ and inferInc t r = let a = freshName "a" in
 and inferGlue t = let (r, _, _) = freshDim () in let k = inferV t in
   VPi (VI, (r, fun r -> implv (partialv (equivSingl t) r) k))
 
+and inferJ v t =
+  let x = freshName "x" in let y = freshName "y" in let pi = freshName "P" in let p = freshName "p" in
+  let k = extSet t in let t = VPi (v, (x, fun x -> VPi (v, (y, fun y -> implv (idv v x y) (VPre k))))) in
+
+  VPi (t, (pi, fun pi ->
+    VPi (v, (x, fun x ->
+      implv (app (app (app (pi, x), x), VRef x))
+            (VPi (v, (y, fun y ->
+              VPi (idv v x y, (p, fun p ->
+                app (app (app (pi, x), y), p))))))))))
+
 and evalField p v = match extByTag p v with
   | None   -> fst (getField p v (inferV v))
   | Some k -> k
@@ -632,14 +643,3 @@ and inferTransport ctx p i =
     eqNf (appFormulaE rho p ezero) (appFormulaE rho p e))
     (solve (eval i ctx) One);
   implv u0 u1
-
-and inferJ v t =
-  let x = freshName "x" in let y = freshName "y" in let pi = freshName "P" in let p = freshName "p" in
-  let k = extSet t in let t = VPi (v, (x, fun x -> VPi (v, (y, fun y -> implv (idv v x y) (VPre k))))) in
-
-  VPi (t, (pi, fun pi ->
-    VPi (v, (x, fun x ->
-      implv (app (app (app (pi, x), x), VRef x))
-            (VPi (v, (y, fun y ->
-              VPi (idv v x y, (p, fun p ->
-                app (app (app (pi, x), y), p))))))))))

@@ -57,6 +57,7 @@ def isoToEquiv (A B : U) (f : A -> B) (g : B -> A) (s : Π (y : B), Path B (f (g
 -- [Cohen, Coquand, Huber, Mörtberg] 2016
 
 def iso (A B: U) : U := Σ (f : A -> B) (g : B -> A) (s : section A B f g) (t : retract A B f g), unit
+
 def isoPath (A B : U)
     (f : A -> B) (g : B -> A)
     (s : Π (y : B), Path B (f (g y)) y)
@@ -68,7 +69,6 @@ def isoPath (A B : U)
 -- Similar to Fibrational Equivalence the notion of Retract/Section based Isomorphism could be introduced
 -- as forth-back transport between isomorphism and path equality. This notion is somehow cannonical to all
 -- cubical systems and is called Unimorphism here.
-
 
 -- Unimorphism Type (Iso -> Path)
 

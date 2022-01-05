@@ -1,5 +1,15 @@
+{- Isomorphisms:
+   - Unimorphism;
+   - Minivalence.
+
+   HoTT 2.4 Homotopies and equivalences
+
+   Copyright (c) Groupoid Infinity, 2014-2022. -}
+
 module iso where
 import library/equiv
+
+-- Post-Voevodsky CCHM/hcomp lemIso implementation
 
 def fill0 (A B : U) (f : A -> B) (g : B -> A) (x0 x1 : A) (y : B)
     (p0 : Path B (f x0) y) (p1 : Path B (f x1) y) (t : Π (x : A), Path A (g (f x)) x) (i : I) : I -> A

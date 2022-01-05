@@ -29,12 +29,12 @@ def ret-equiv (A B : U) (w : equiv A B) (y : B) : Path B (w.1 (inv-equiv A B w y
 def sec-equiv (A B : U) (w : equiv A B) (x : A) : Path A (inv-equiv A B w (w.1 x)) x := <i> ((w.2 (w.1 x)).2 (x, <j> w.1 x) @ i).1
 def Glue′ (A : U) (φ : I) (e : Partial (Σ (T : U), equiv T A) φ) : U := Glue A φ e
 
-{- The notion of Univalence was discovered by Vladimir Voevodsky
-   as forth and back transport between fibrational equivalence
-   as contractability of fibers and homotopical multi-dimentional
-   heterogeneous path equality. The Equiv -> Path type is called Univalence type,
-   where univalence intro is obtained by Glue type and elim (Path -> Equiv) is
-   obtained by sigma transport from constant map. -}
+-- The notion of Univalence was discovered by Vladimir Voevodsky
+-- as forth and back transport between fibrational equivalence
+-- as contractability of fibers and homotopical multi-dimentional
+-- heterogeneous path equality. The Equiv -> Path type is called Univalence type,
+-- where univalence intro is obtained by Glue type and elim (Path -> Equiv) is
+-- obtained by sigma transport from constant map.
 
 -- Univalence Type (Equiv -> Path)
 

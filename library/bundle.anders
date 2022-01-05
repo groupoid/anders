@@ -2,6 +2,9 @@
    - Fiber Bundle;
    - Trivial Fiber Bundle, Bundle=Pi;
    - Local F-Bundle (4 definitions).
+
+   HoTT 2.3 Type families are fibrations
+
    Copyright (c) Groupoid Infinity, 2014-2022. -}
 
 module bundle where

@@ -168,10 +168,9 @@ def Δ³-2-4 : PathP (<_> Δ³) Δ³-2 Δ³-4 := <i> (i, i, 1, ref i, ref i)
 def Δ³-3-4 : PathP (<_> Δ³) Δ³-3 Δ³-4 := <i> (i, 1, 1, ref i, ref 1)
 
 def ε (A : U) : Partial A 0 := []
-def ⊥ := Π (A : U), A
 
-def I-nontriv (p : Id I 0 1) : ⊥ := λ (A : U), ε A (rev I 0 1 p)
-def 0≥1-impl-absurd : (≥ 0 1) → ⊥ := I-nontriv
+def I-nontriv (p : Id I 0 1) : 𝟎 := ε 𝟎 (rev I 0 1 p)
+def 0≥1-impl-absurd : (≥ 0 1) → 𝟎 := I-nontriv
 
 -- Cubical Subtypes
 

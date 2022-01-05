@@ -18,6 +18,25 @@ let vsnd : value -> value = function
   | VPair (_, _, u) -> u
   | v               -> VSnd v
 
+let reduceSystem ts x =
+  match System.find_opt eps ts with
+  | Some v -> v
+  | None   -> VApp (VSystem ts, x)
+
+let rec extByTag p : value -> value option = function
+  | VPair (t, fst, snd) ->
+  begin match !t with
+    | Some q -> if p = q then Some fst else extByTag p snd
+    | _      -> extByTag p snd
+  end
+  | _ -> None
+
+let rec getField p v = function
+  | VSig (t, (q, g)) ->
+    if matchIdent p q then (vfst v, t)
+    else getField p (vsnd v) (g (vfst v))
+  | t -> raise (ExpectedSig t)
+
 (* Evaluator *)
 let rec eval (e0 : exp) (ctx : ctx) = traceEval e0; match e0 with
   | EPre u               -> VPre u
@@ -52,7 +71,7 @@ let rec eval (e0 : exp) (ctx : ctx) = traceEval e0; match e0 with
   | ESystem xs           -> VSystem (evalSystem ctx xs)
   | ESub (a, i, u)       -> VSub (eval a ctx, eval i ctx, eval u ctx)
   | EInc (t, r)          -> VInc (eval t ctx, eval r ctx)
-  | EOuc e               -> evalOuc (eval e ctx)
+  | EOuc e               -> ouc (eval e ctx)
   | EGlue e              -> VGlue (eval e ctx)
   | Empty                -> VEmpty
   | EIndEmpty e          -> VIndEmpty (eval e ctx)
@@ -168,7 +187,14 @@ and hcomp t r u u0 = match t, r with
           (appFormula u0 j))))
   | _, _ -> VHComp (t, r, u, u0)
 
-and inc t r v = app (VInc (t, r), v)
+and inc t r = function
+  | VOuc v -> v
+  | v      -> VApp (VInc (t, r), v)
+
+and ouc v = match v, inferV v with
+  | _, VSub (_, VDir One, u) -> app (u, VRef vone)
+  | VApp (VInc _, v), _ -> v
+  | _, _ -> VOuc v
 
 and comp t r u u0 =
   let (i, _, _) = freshDim () in let (j, _, _) = freshDim () in
@@ -214,7 +240,7 @@ and app : value * value -> value = function
   | VTransp (p, i), u0 -> transport p i u0
   | VSystem ts, x -> reduceSystem ts x
   | VLam (_, (_, f)), v -> f v
-  | VInc _, VOuc v -> v
+  | VInc (t, r), v -> inc t r v
   (* ind₁ C x ★ ~> x *)
   | VApp (VIndUnit _, x), VStar -> x
   (* ind₂ C a b 0₂ ~> a *)
@@ -228,29 +254,7 @@ and app : value * value -> value = function
         app (VApp (VIndW (a, b, c), g), app (f, b)))))
   | f, x -> VApp (f, x)
 
-and evalSystem ctx ts =
-  let ts' =
-    System.fold (fun alpha talpha ->
-      Env.bindings alpha
-      |> List.rev_map (fun (i, d) -> solve (getRho ctx i) d)
-      |> meetss
-      |> List.rev_map (fun beta -> (beta, eval talpha (faceEnv beta ctx)))
-      |> List.rev_append) ts [] in
-
-  (* ensure incomparability *)
-  List.filter (fun (alpha, _) ->
-    not (List.exists (fun (beta, _) -> lt beta alpha) ts')) ts'
-  |> mkSystem
-
-and reduceSystem ts x =
-  match System.find_opt eps ts with
-  | Some v -> v
-  | None   -> VApp (VSystem ts, x)
-
-and evalOuc v = match v, inferV v with
-  | _, VSub (_, VDir One, u) -> app (u, VRef vone)
-  | VApp (VInc _, v), _ -> v
-  | _, _ -> VOuc v
+and evalSystem ctx = bimap (getRho ctx) (fun beta t -> eval t (faceEnv beta ctx))
 
 and getRho ctx x = match Env.find_opt x ctx with
   | Some (_, _, Value v) -> v
@@ -331,20 +335,6 @@ and inferIndW a b c = let t = wtype a b in
         (app (c, VApp (VApp (VSup (a, b), x), f))))))))
     (VPi (t, (freshName "w", fun w -> app (c, w))))
 
-and extByTag p : value -> value option = function
-  | VPair (t, fst, snd) ->
-  begin match !t with
-    | Some q -> if p = q then Some fst else extByTag p snd
-    | _      -> extByTag p snd
-  end
-  | _ -> None
-
-and getField p v = function
-  | VSig (t, (q, g)) ->
-    if matchIdent p q then (vfst v, t)
-    else getField p (vsnd v) (g (vfst v))
-  | t -> raise (ExpectedSig t)
-
 and evalField p v = match extByTag p v with
   | None   -> fst (getField p v (inferV v))
   | Some k -> k
@@ -389,7 +379,7 @@ and upd e = function
   | VOr (u, v)           -> evalOr (upd e u) (upd e v)
   | VNeg u               -> negFormula (upd e u)
   | VInc (t, r)          -> VInc (upd e t, upd e r)
-  | VOuc v               -> evalOuc (upd e v)
+  | VOuc v               -> ouc (upd e v)
   | VGlue v              -> VGlue (upd e v)
   | VEmpty               -> VEmpty
   | VIndEmpty v          -> VIndEmpty (upd e v)

@@ -137,3 +137,17 @@ let rec solve k x = match k, x with
   | VOr (f, g), One  | VAnd (f, g), Zero -> union (solve f x) (solve g x)
   | VOr (f, g), Zero | VAnd (f, g), One  -> meets (solve f x) (solve g x)
   | _, _ -> failwith (Printf.sprintf "Cannot solve: %s = %s" (showValue k) (showDir x))
+
+let bimap f g ts =
+  let ts' =
+    System.fold (fun alpha t ->
+      Env.bindings alpha
+      |> List.rev_map (fun (i, d) -> solve (f i) d)
+      |> meetss
+      |> List.rev_map (fun beta -> (beta, g beta t))
+      |> List.rev_append) ts [] in
+
+  (* ensure incomparability *)
+  List.filter (fun (alpha, _) ->
+    not (List.exists (fun (beta, _) -> lt beta alpha) ts')) ts'
+  |> mkSystem

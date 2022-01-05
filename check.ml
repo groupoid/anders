@@ -335,6 +335,12 @@ and inferIndW a b c = let t = wtype a b in
         (app (c, VApp (VApp (VSup (a, b), x), f))))))))
     (VPi (t, (freshName "w", fun w -> app (c, w))))
 
+and inferInc t r = let a = freshName "a" in
+  VPi (t, (a, fun v -> VSub (t, r, VSystem (border (solve r One) v))))
+
+and inferGlue t = let (r, _, _) = freshDim () in let k = inferV t in
+  VPi (VI, (r, fun r -> implv (partialv (equivSingl t) r) k))
+
 and evalField p v = match extByTag p v with
   | None   -> fst (getField p v (inferV v))
   | Some k -> k
@@ -611,13 +617,7 @@ and inferPath ctx p =
      so if one endpoint is in U, then so other *)
   let k = extSet (inferV t0) in implv t0 (implv t1 (VKan k))
 
-and inferInc t r = let a = freshName "a" in
-  VPi (t, (a, fun v -> VSub (t, r, VSystem (border (solve r One) v))))
-
-and inferGlue t = let (r, _, _) = freshDim () in let k = inferV t in
-  VPi (VI, (r, fun r -> implv (partialv (equivSingl t) r) k))
-
-and inferTransport (ctx : ctx) (p : exp) (i : exp) =
+and inferTransport ctx p i =
   check ctx i VI;
   let u0 = appFormulaE ctx p ezero in
   let u1 = appFormulaE ctx p eone in

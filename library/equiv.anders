@@ -12,6 +12,8 @@
 module equiv where
 import library/path
 
+-- [Pelayo, Warren, Voevodsky] 2012
+
 def fiber (A B : U) (f: A -> B) (y : B): U := Σ (x : A), Path B y (f x)
 def isContr' (A: U) : U := Σ (x: A), Π (y: A), Path A x y
 def isEquiv (A B : U) (f : A -> B) : U := Π (y : B), isContr (fiber A B f y)

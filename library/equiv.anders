@@ -46,10 +46,8 @@ def univ-intro (A B : U) : univ-formation A B
 def univ-elim (A B : U) (p : PathP (<_> U) A B) : equiv A B
  := transp (<i> equiv A (p @ i)) 0 (idEquiv A)
 
-{-
 def univ-computation (A B : U) (p : PathP (<_>U) A B)
   : PathP (<_> PathP (<_> U) A B) (univ-intro A B (univ-elim A B p)) p
  := <j i> Glue B (j \/ ∂ i) [ (i = 0) → (A, univ-elim A B p),
-                              (i = 1) → (B, univ-elim B B (<k> B)),
+                              (i = 1) → (B, idEquiv B),
                               (j = 1) → (p @ i, univ-elim (p @ i) B (<k> p @ (i \/ k))) ]
--}

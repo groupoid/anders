@@ -149,6 +149,10 @@ and transport p phi u0 = let (_, _, v) = freshDim () in match appFormula p v, ph
                                  (border (solve j One) w)))))) uj)))
   | _, _ -> VApp (VTransp (p, phi), u0)
 
+and transFill p phi u0 j = let (i, _, _) = freshDim () in
+  transport (VPLam (VLam (VI, (i, fun i -> appFormula p (evalAnd i j)))))
+    (evalOr phi (negFormula j)) u0
+
 and hcomp t r u u0 = match t, r with
   (* hcomp A 1 u u₀ ~> u 1 1=1 *)
   | _, VDir One -> app (app (u, vone), VRef vone)
@@ -187,15 +191,6 @@ and hcomp t r u u0 = match t, r with
           (appFormula u0 j))))
   | _, _ -> VHComp (t, r, u, u0)
 
-and inc t r = function
-  | VOuc v -> v
-  | v      -> VApp (VInc (t, r), v)
-
-and ouc v = match v, inferV v with
-  | _, VSub (_, VDir One, u) -> app (u, VRef vone)
-  | VApp (VInc _, v), _ -> v
-  | _, _ -> VOuc v
-
 and comp t r u u0 =
   let (i, _, _) = freshDim () in let (j, _, _) = freshDim () in
   hcomp (t vone) r (VLam (VI, (i, fun i ->
@@ -211,9 +206,14 @@ and hfill t r u u0 j =
         (app (app (u, evalAnd i j), VRef vone)))
           (border (solve j Zero) u0))))) u0
 
-and transFill p phi u0 j = let (i, _, _) = freshDim () in
-  transport (VPLam (VLam (VI, (i, fun i -> appFormula p (evalAnd i j)))))
-    (evalOr phi (negFormula j)) u0
+and inc t r = function
+  | VOuc v -> v
+  | v      -> VApp (VInc (t, r), v)
+
+and ouc v = match v, inferV v with
+  | _, VSub (_, VDir One, u) -> app (u, VRef vone)
+  | VApp (VInc _, v), _ -> v
+  | _, _ -> VOuc v
 
 and fiber t1 t2 f y = VSig (t1, (freshName "a", fun x -> pathv (idp t2) y (app (f, x))))
 

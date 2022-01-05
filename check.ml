@@ -335,12 +335,15 @@ and extByTag p : value -> value option = function
   end
   | _ -> None
 
-and evalField p v =
-  match extByTag p v with
-  | Some k -> k | None -> begin match inferV v with
-    | VSig (_, (q, _)) -> if matchIdent p q then vfst v else evalField p (vsnd v)
-    | t -> raise (ExpectedSig t)
-  end
+and getField p v = function
+  | VSig (t, (q, g)) ->
+    if matchIdent p q then (vfst v, t)
+    else getField p (vsnd v) (g (vfst v))
+  | t -> raise (ExpectedSig t)
+
+and evalField p v = match extByTag p v with
+  | None   -> fst (getField p v (inferV v))
+  | Some k -> k
 
 and upd e = function
   | VLam (t, (x, g))     -> VLam (upd e t, (x, g >> upd e))
@@ -595,9 +598,7 @@ and inferInd fibrant ctx t e f =
   let (t', (p, g)) = extPiG (infer ctx e) in eqNf t t'; let k = g (Var (p, t)) in
   ignore (if fibrant then extKan k else extSet k); f (eval e ctx)
 
-and inferField ctx p e = match infer ctx e with
-  | VSig (t, (q, _)) -> if matchIdent p q then t else inferField ctx p (ESnd e)
-  | t                -> raise (ExpectedSig t)
+and inferField ctx p e = snd (getField p (eval e ctx) (infer ctx e))
 
 and inferTele ctx p a b =
   ignore (extSet (infer ctx a));

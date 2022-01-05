@@ -62,6 +62,8 @@ let eW   p a b = EW   (a, (p, b))
 
 let ezero = EDir Zero
 let eone  = EDir One
+
+let dir d = VDir d
 let vzero = VDir Zero
 let vone  = VDir One
 

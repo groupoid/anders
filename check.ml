@@ -356,61 +356,6 @@ and evalField p v = match extByTag p v with
   | None   -> fst (getField p v (inferV v))
   | Some k -> k
 
-and upd e = function
-  | VLam (t, (x, g))     -> VLam (upd e t, (x, g >> upd e))
-  | VPair (r, u, v)      -> VPair (r, upd e u, upd e v)
-  | VKan u               -> VKan u
-  | VPi (t, (x, g))      -> VPi (upd e t, (x, g >> upd e))
-  | VSig (t, (x, g))     -> VSig (upd e t, (x, g >> upd e))
-  | VPre u               -> VPre u
-  | VPLam f              -> VPLam (upd e f)
-  | Var (i, VI)          ->
-    begin match Env.find_opt i e with
-      | Some d -> VDir d
-      | None   -> Var (i, VI)
-    end
-  | Var (x, t)           -> Var (x, upd e t)
-  | VApp (f, x)          -> app (upd e f, upd e x)
-  | VFst k               -> vfst (upd e k)
-  | VSnd k               -> vsnd (upd e k)
-  | VHole                -> VHole
-  | VPathP v             -> VPathP (upd e v)
-  | VPartialP (t, r)     -> VPartialP (upd e t, upd e r)
-  | VSystem ts           ->
-    VSystem (System.bindings ts
-            |> List.filter_map (fun (e', v) ->
-              if compatible e e' then
-                Some (Env.filter (fun k _ -> not (Env.mem k e)) e', upd e v)
-              else None)
-            |> mkSystem)
-  | VSub (t, i, u)       -> VSub (upd e t, upd e i, upd e u)
-  | VTransp (p, i)       -> VTransp (upd e p, upd e i)
-  | VHComp (t, r, u, u0) -> hcomp (upd e t) (upd e r) (upd e u) (upd e u0)
-  | VAppFormula (f, x)   -> appFormula (upd e f) (upd e x)
-  | VId v                -> VId (upd e v)
-  | VRef v               -> VRef (upd e v)
-  | VJ v                 -> VJ (upd e v)
-  | VI                   -> VI
-  | VDir d               -> VDir d
-  | VAnd (u, v)          -> evalAnd (upd e u) (upd e v)
-  | VOr (u, v)           -> evalOr (upd e u) (upd e v)
-  | VNeg u               -> negFormula (upd e u)
-  | VInc (t, r)          -> VInc (upd e t, upd e r)
-  | VOuc v               -> ouc (upd e v)
-  | VGlue v              -> VGlue (upd e v)
-  | VEmpty               -> VEmpty
-  | VIndEmpty v          -> VIndEmpty (upd e v)
-  | VUnit                -> VUnit
-  | VStar                -> VStar
-  | VIndUnit v           -> VIndUnit (upd e v)
-  | VBool                -> VBool
-  | VFalse               -> VFalse
-  | VTrue                -> VTrue
-  | VIndBool v           -> VIndBool (upd e v)
-  | W (t, (x, g))        -> W (upd e t, (x, g >> upd e))
-  | VSup (a, b)          -> VSup (upd e a, upd e b)
-  | VIndW (a, b, c)      -> VIndW (upd e a, upd e b, upd e c)
-
 and updTerm alpha = function
   | Exp e   -> Exp e
   | Value v -> Value (upd alpha v)
@@ -418,6 +363,57 @@ and updTerm alpha = function
 and faceEnv alpha ctx =
   Env.map (fun (p, t, v) -> if p = Local then (p, updTerm alpha t, updTerm alpha v) else (p, t, v)) ctx
   |> Env.fold (fun p dir -> Env.add p (Local, Value VI, Value (VDir dir))) alpha
+
+and act rho = function
+  | VLam (t, (x, g))     -> VLam (act rho t, (x, g >> act rho))
+  | VPair (r, u, v)      -> VPair (r, act rho u, act rho v)
+  | VKan u               -> VKan u
+  | VPi (t, (x, g))      -> VPi (act rho t, (x, g >> act rho))
+  | VSig (t, (x, g))     -> VSig (act rho t, (x, g >> act rho))
+  | VPre u               -> VPre u
+  | VPLam f              -> VPLam (act rho f)
+  | Var (i, VI)          -> actVar rho i
+  | Var (x, t)           -> Var (x, act rho t)
+  | VApp (f, x)          -> app (act rho f, act rho x)
+  | VFst k               -> vfst (act rho k)
+  | VSnd k               -> vsnd (act rho k)
+  | VHole                -> VHole
+  | VPathP v             -> VPathP (act rho v)
+  | VPartialP (t, r)     -> VPartialP (act rho t, act rho r)
+  | VSystem ts           -> VSystem (bimap (actVar rho) upd ts)
+  | VSub (t, i, u)       -> VSub (act rho t, act rho i, act rho u)
+  | VTransp (p, i)       -> VTransp (act rho p, act rho i)
+  | VHComp (t, r, u, u0) -> hcomp (act rho t) (act rho r) (act rho u) (act rho u0)
+  | VAppFormula (f, x)   -> appFormula (act rho f) (act rho x)
+  | VId v                -> VId (act rho v)
+  | VRef v               -> VRef (act rho v)
+  | VJ v                 -> VJ (act rho v)
+  | VI                   -> VI
+  | VDir d               -> VDir d
+  | VAnd (u, v)          -> evalAnd (act rho u) (act rho v)
+  | VOr (u, v)           -> evalOr (act rho u) (act rho v)
+  | VNeg u               -> negFormula (act rho u)
+  | VInc (t, r)          -> VInc (act rho t, act rho r)
+  | VOuc v               -> ouc (act rho v)
+  | VGlue v              -> VGlue (act rho v)
+  | VEmpty               -> VEmpty
+  | VIndEmpty v          -> VIndEmpty (act rho v)
+  | VUnit                -> VUnit
+  | VStar                -> VStar
+  | VIndUnit v           -> VIndUnit (act rho v)
+  | VBool                -> VBool
+  | VFalse               -> VFalse
+  | VTrue                -> VTrue
+  | VIndBool v           -> VIndBool (act rho v)
+  | W (t, (x, g))        -> W (act rho t, (x, g >> act rho))
+  | VSup (a, b)          -> VSup (act rho a, act rho b)
+  | VIndW (a, b, c)      -> VIndW (act rho a, act rho b, act rho c)
+
+and actVar rho i = match Env.find_opt i rho with
+  | Some v -> v
+  | None   -> Var (i, VI)
+
+and upd mu = act (Env.map dir mu)
 
 (* Convertibility *)
 and conv v1 v2 : bool = traceConv v1 v2;

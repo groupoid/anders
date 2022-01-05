@@ -159,8 +159,12 @@ and hcomp t r u u0 = match t, r with
     VPLam (VLam (VI, (j, fun j ->
       hcomp (appFormula t j) (evalOr r (evalOr j (negFormula j)))
         (VLam (VI, (i, fun i ->
-          (VSystem (unionSystem (border (solve r One) (appFormula (app (app (u, i), VRef vone)) j))
-            (unionSystem (border (solve j Zero) v) (border (solve j One) w)))))))
+          let ts = border (solve r One) (app (app (u, i), VRef vone))
+                   |> System.map (fun v -> appFormula v j) in
+
+          (VSystem (unionSystem ts
+            (unionSystem (border (solve j Zero) v)
+                         (border (solve j One) w)))))))
           (appFormula u0 j))))
   | _, _ -> VHComp (t, r, u, u0)
 

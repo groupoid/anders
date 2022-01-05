@@ -268,6 +268,12 @@ def trans-Path (A B : I → U) (P : Π (i : I), PathP (<_> U) (A i) (B i)) (v : 
     (u₀ : PathP (<i> P 0 @ i) (v 0) (w 0)) : PathP (<i> P 1 @ i) (v 1) (w 1)
  := <j> comp (λ (i : I), P i @ j) (∂ j) (λ (i : I), [(j = 0) → v i, (j = 1) → w i]) (inc (P 0 @ j) (∂ j) (u₀ @ j))
 
+def hfill (A : U) (r : I) (u : I → Partial A r) (u₀ : A[r ↦ u 0]) (j : I)
+ := hcomp A (-j ∨ r) (λ (i : I), [(r = 1) → u (i ∧ j) 1=1, (j = 0) → ouc u₀]) (ouc u₀)
+
+def hfill′ (A : U) (r : I) (u : I → Partial A r) (u₀ : A[r ↦ u 0]) : Path A (ouc u₀) (hcomp A r u (ouc u₀))
+ := <j> hfill A r u u₀ j
+
 def hcomp-Path (A : U) (v w : A) (r : I) (u : I → Partial (Path A v w) r) (u₀ : (Path A v w)[r ↦ u 0]) : Path A v w
  := <j> hcomp A (r ∨ ∂ j) (λ (i : I), [(r = 1) → u i 1=1 @ j, (j = 0) → v, (j = 1) → w]) (ouc u₀ @ j)
 
@@ -279,12 +285,6 @@ def hcomp-Π (A : U) (B : A → U) (r : I) (u : I → Partial (Π (x : A), B x) 
 
 def hcomp-Π′ (A : U) (B : A → U) (r : I) (u : I → Partial (Π (x : A), B x) r) (u₀ : (Π (x : A), B x)[r ↦ u 0])
  := hcomp (Π (x : A), B x) r u (ouc u₀)
-
-def hfill (A : U) (r : I) (u : I → Partial A r) (u₀ : A[r ↦ u 0]) (j : I)
- := hcomp A (-j ∨ r) (λ (i : I), [(r = 1) → u (i ∧ j) 1=1, (j = 0) → ouc u₀]) (ouc u₀)
-
-def hfill′ (A : U) (r : I) (u : I → Partial A r) (u₀ : A[r ↦ u 0]) : Path A (ouc u₀) (hcomp A r u (ouc u₀))
- := <j> hfill A r u u₀ j
 
 def hcomp-Σ (A : U) (B : A → U) (r : I) (u : I → Partial (Σ (x : A), B x) r) (u₀ : (Σ (x : A), B x)[r ↦ u 0]) : Σ (x : A), B x
  := (hfill A r (λ (k : I), [(r = 1) → (u k 1=1).1]) (inc A r (ouc u₀).1) 1,

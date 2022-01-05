@@ -279,11 +279,19 @@ def hcomp-Path (A : U) (v w : A) (r : I) (u : I → Partial (Path A v w) r) (u�
 def hcomp-Path′ (A : U) (v w : A) (r : I) (u : I → Partial (Path A v w) r) (u₀ : (Path A v w)[r ↦ u 0])
  := hcomp (Path A v w) r u (ouc u₀)
 
+def hcomp-Path-is-correct (A : U) (v w : A) (r : I) (u : I → Partial (Path A v w) r) (u₀ : (Path A v w)[r ↦ u 0]) :
+   Path (Path A v w) (hcomp-Path A v w r u u₀) (hcomp-Path′ A v w r u u₀) :=
+<_> hcomp-Path A v w r u u₀
+
 def hcomp-Π (A : U) (B : A → U) (r : I) (u : I → Partial (Π (x : A), B x) r) (u₀ : (Π (x : A), B x)[r ↦ u 0])
  := λ (v : A), hcomp (B v) r (λ (k : I), [(r = 1) → u k 1=1 v]) ((ouc u₀) v)
 
 def hcomp-Π′ (A : U) (B : A → U) (r : I) (u : I → Partial (Π (x : A), B x) r) (u₀ : (Π (x : A), B x)[r ↦ u 0])
  := hcomp (Π (x : A), B x) r u (ouc u₀)
+
+def hcomp-Π-is-correct (A : U) (B : A → U) (r : I) (u : I → Partial (Π (x : A), B x) r) (u₀ : (Π (x : A), B x)[r ↦ u 0]) :
+   Path (Π (x : A), B x) (hcomp-Π A B r u u₀) (hcomp-Π′ A B r u u₀) :=
+<_> hcomp-Π A B r u u₀
 
 def hcomp-Σ (A : U) (B : A → U) (r : I) (u : I → Partial (Σ (x : A), B x) r) (u₀ : (Σ (x : A), B x)[r ↦ u 0]) : Σ (x : A), B x
  := (hfill A r (λ (k : I), [(r = 1) → (u k 1=1).1]) (inc A r (ouc u₀).1) 1,
@@ -292,6 +300,10 @@ def hcomp-Σ (A : U) (B : A → U) (r : I) (u : I → Partial (Σ (x : A), B x) 
 
 def hcomp-Σ′ (A : U) (B : A → U) (r : I) (u : I → Partial (Σ (x : A), B x) r) (u₀ : (Σ (x : A), B x)[r ↦ u 0]) : Σ (x : A), B x
  := hcomp (Σ (x : A), B x) r u (ouc u₀)
+
+def hcomp-Σ-is-correct (A : U) (B : A → U) (r : I) (u : I → Partial (Σ (x : A), B x) r) (u₀ : (Σ (x : A), B x)[r ↦ u 0]) :
+   Path (Σ (x : A), B x) (hcomp-Σ A B r u u₀) (hcomp-Σ′ A B r u u₀) :=
+<_> hcomp-Σ A B r u u₀
 
 -- Tests
 

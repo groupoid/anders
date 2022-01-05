@@ -64,6 +64,7 @@ let ezero = EDir Zero
 let eone  = EDir One
 
 let dir d = VDir d
+let dim i = Var (i, VI)
 let vzero = VDir Zero
 let vone  = VDir One
 

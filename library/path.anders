@@ -245,14 +245,9 @@ def comp-Path′ (A : U) (a b c : A) (p : Path A a b) (q : Path A b c) : Path A 
 
 -- Homogeneous Composition
 
-def hcomp′ (A : U) (r : I) (u : I → Partial A r) (u₀ : A[r ↦ u 0]) : A
- := hcomp A r u (ouc u₀)
-
-def hcomp-ε (A : U) (a : A)
- := hcomp A 0 (\(i : I), []) a
-
-def hcomp-ε→id (A : U) (a : A) : Path A (hcomp-ε A a) a
- := <i> hcomp A i (\(j : I), [(i = 1) → a]) a
+def hcomp′ (A : U) (r : I) (u : I → Partial A r) (u₀ : A[r ↦ u 0]) : A := hcomp A r u (ouc u₀)
+def hcomp-ε (A : U) (a : A) := hcomp A 0 (\(i : I), []) a
+def hcomp-ε→id (A : U) (a : A) : Path A (hcomp-ε A a) a := <i> hcomp A i (\(j : I), [(i = 1) → a]) a
 
 def comp-Path (A : U) (a b c : A) (p : Path A a b) (q : Path A b c) : Path A a c
  := <i> hcomp A (∂ i) (λ (j : I), [(i = 0) → a, (i = 1) → q @ j]) (p @ i)
@@ -307,5 +302,4 @@ def Path′-Path (A : U) (a b : A) (p : Path′ A a b) : Path A a b := <i> ouc (
 def Path-Path′-Path (A : U) (a b : A) (p : Path A a b) : Path (Path A a b) (Path′-Path A a b (Path-Path′ A a b p)) p := <_> p
 def Path′-Path-Path′ (A : U) (a b : A) (p : Path′ A a b) : PathP (<_> Path′ A a b) (Path-Path′ A a b (Path′-Path A a b p)) p := <_> p
 
-def 𝟏-contr : Π (x : 𝟏), Path 𝟏 x ★ :=
-ind₁ (λ (x : 𝟏), Path 𝟏 x ★) (<_> ★)
+def 𝟏-contr : Π (x : 𝟏), Path 𝟏 x ★ := ind₁ (λ (x : 𝟏), Path 𝟏 x ★) (<_> ★)

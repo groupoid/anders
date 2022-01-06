@@ -75,11 +75,11 @@ def isCatGroupoid (C: cat): U := Σ
     Π (x y z w: C.ob) (f: C.hom x y) (g: C.hom y z) (h: C.hom z w),
     Path (C.hom x w) (c x z w (c x y z f g) h) (c x y w f (c y z w g h))
 
-def CatGroupoid (X : U) (H : isGroupoid X)
+def CatGroupoid (X : U) (G : isGroupoid X)
   : isCatGroupoid (PathCat X)
- := ( \(x:X), <_>x,
+ := ( idp X,
       comp-Path X,
-      H,
+      G,
       sym X,
       comp-inv-Path⁻¹ X,
       comp-inv-Path X,

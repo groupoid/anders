@@ -7,7 +7,7 @@ type cmdline =
   | Parse     of string
   | Cubicaltt of string
   | Prim      of string * string
-  | Repl | Help | Trace | Indices | Girard | Silent
+  | Repl | Help | Trace | Indices | Girard | Silent | Irrelevance
 
 let help =
 "\n  invocation = anders | anders list
@@ -39,6 +39,7 @@ let cmd : cmdline -> unit = function
   | Indices -> Prefs.indices := true
   | Trace -> Prefs.indices := true; Prefs.trace := true
   | Girard -> Prefs.girard := true
+  | Irrelevance -> Prefs.irrelevance := true
 
 let rec parseArgs : string list -> cmdline list = function
   | [] -> []
@@ -52,6 +53,7 @@ let rec parseArgs : string list -> cmdline list = function
   | "indices"   :: rest             -> Indices :: parseArgs rest
   | "silent"    :: rest             -> Silent  :: parseArgs rest
   | "girard"    :: rest             -> Girard  :: parseArgs rest
+  | "irrelevance" :: rest           -> Irrelevance :: parseArgs rest
   | "repl"      :: rest             -> Repl    :: parseArgs rest
   | x :: xs -> Printf.printf "Unknown command “%s”\n" x; parseArgs xs
 

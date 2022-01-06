@@ -19,12 +19,6 @@ def catfunctor (A B: precategory): U := Σ
     (fcomp: Π (x y z: A.C.ob) (f: A.C.hom x y) (g: A.C.hom y z),
     Path (B.C.hom (ob x) (ob z)) (mor x z (A.P.∘ x y z f g)) (B.P.∘ (ob x) (ob y) (ob z) (mor x y f) (mor y z g))), unit
 
-def isHae (A B: U) (f: A -> B): U := Σ
-    (g: B -> A)
-    (eta: Path (idᵀ A) (∘ A B A g f) (id A))
-    (eps: Path (idᵀ B) (∘ B A B f g) (id B)),
-    Π (x: A), Path B (f ((eta @ 0) x)) ((eps @ 0) (f x))
-
 def idFunctor (A: precategory): catfunctor A A :=
     (λ (x: A.C.ob), x,
      λ (x y: A.C.ob) (h: A.C.hom x y), h,

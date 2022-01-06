@@ -291,9 +291,9 @@ def trans-Π (A : I -> U) (B : Π (i : I), A i -> U) (f : Π (x : A 0), B 0 x) :
 def trans-Π′ (A : I -> U) (B : Π (i : I), A i -> U) (f : Π (x : A 0), B 0 x) : Π (x : A 1), B 1 x
  := transp (<i> Π (x : A i), B i x) 0 f
 
-def trans-Π-is-correct (A : I -> U) (B : Π (i : I), A i -> U) (f : Π (x : A 0), B 0 x) :
-   Path (Π (x : A 1), B 1 x) (trans-Π A B f) (trans-Π′ A B f) :=
-<_> trans-Π A B f
+def trans-Π-is-correct (A : I -> U) (B : Π (i : I), A i -> U) (f : Π (x : A 0), B 0 x)
+  : Path (Π (x : A 1), B 1 x) (trans-Π A B f) (trans-Π′ A B f)
+ := <_> trans-Π A B f
 
 def trans-Σ (A : I -> U) (B : Π (i : I), A i -> U) (z : Σ (x : A 0), B 0 x) : Σ (x : A 1), B 1 x
  := (transp (<i> A i) 0 z.1, transp (<j> B j (transp (<i> A (i ∧ j)) -j z.1)) 0 z.2)
@@ -301,12 +301,12 @@ def trans-Σ (A : I -> U) (B : Π (i : I), A i -> U) (z : Σ (x : A 0), B 0 x) :
 def trans-Σ′ (A : I -> U) (B : Π (i : I), A i -> U) (z : Σ (x : A 0), B 0 x) : Σ (x : A 1), B 1 x
  := transp (<i> Σ (x : A i), B i x) 0 z
 
-def trans-Σ-is-correct (A : I -> U) (B : Π (i : I), A i -> U) (z : Σ (x : A 0), B 0 x) :
-   Path (Σ (x : A 1), B 1 x) (trans-Σ A B z) (trans-Σ′ A B z) :=
-<_> trans-Σ A B z
+def trans-Σ-is-correct (A : I -> U) (B : Π (i : I), A i -> U) (z : Σ (x : A 0), B 0 x)
+  : Path (Σ (x : A 1), B 1 x) (trans-Σ A B z) (trans-Σ′ A B z)
+ := <_> trans-Σ A B z
 
-def trans-Path (A B : I → U) (P : Π (i : I), PathP (<_> U) (A i) (B i)) (v : Π (i : I), P i @ 0) (w : Π (i : I), P i @ 1)
-    (u₀ : PathP (<i> P 0 @ i) (v 0) (w 0)) : PathP (<i> P 1 @ i) (v 1) (w 1)
+def trans-Path (A B : I → U) (P : Π (i : I), PathP (<_> U) (A i) (B i)) (v : Π (i : I), P i @ 0)
+    (w : Π (i : I), P i @ 1) (u₀ : PathP (<i> P 0 @ i) (v 0) (w 0)) : PathP (<i> P 1 @ i) (v 1) (w 1)
  := <j> comp (λ (i : I), P i @ j) (∂ j) (λ (i : I), [(j = 0) → v i, (j = 1) → w i]) (inc (P 0 @ j) (∂ j) (u₀ @ j))
 
 def trans-Path′ (A B : I → U) (P : Π (i : I), PathP (<_> U) (A i) (B i)) (v : Π (i : I), P i @ 0)
@@ -314,9 +314,9 @@ def trans-Path′ (A B : I → U) (P : Π (i : I), PathP (<_> U) (A i) (B i)) (v
  := transp (<i> PathP (P i) (v i) (w i)) 0 u₀
 
 def trans-Path-is-correct (A B : I → U) (P : Π (i : I), PathP (<_> U) (A i) (B i))
-   (v : Π (i : I), P i @ 0) (w : Π (i : I), P i @ 1) (u₀ : PathP (<i> P 0 @ i) (v 0) (w 0)) :
-   Path (PathP (<i> P 1 @ i) (v 1) (w 1)) (trans-Path A B P v w u₀) (trans-Path′ A B P v w u₀) :=
-<_> trans-Path A B P v w u₀
+    (v : Π (i : I), P i @ 0) (w : Π (i : I), P i @ 1) (u₀ : PathP (<i> P 0 @ i) (v 0) (w 0))
+  : Path (PathP (<i> P 1 @ i) (v 1) (w 1)) (trans-Path A B P v w u₀) (trans-Path′ A B P v w u₀)
+ := <_> trans-Path A B P v w u₀
 
 def hcomp-Path (A : U) (v w : A) (r : I) (u : I → Partial (Path A v w) r) (u₀ : (Path A v w)[r ↦ u 0]) : Path A v w
  := <j> hcomp A (r ∨ ∂ j) (λ (i : I), [(r = 1) → u i 1=1 @ j, (j = 0) → v, (j = 1) → w]) (ouc u₀ @ j)

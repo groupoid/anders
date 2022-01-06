@@ -1,3 +1,20 @@
+{- Path Type:
+   - Path Equality;
+   - Computational properties;
+   - Interval and De Morgan laws;
+   - Generalized Transport;
+   - Strict equality on partial and interval pretypes;
+   - Cubical subtypes;
+   - Generalized Homogeneous Composition;
+
+   HoTT 1.12 Identity types
+   HoTT 1.12.1 Path induction
+   HoTT 2.1 Types are higher groupoids
+   HoTT 2.11 Identity type
+   HoTT 3.11 Contractibility
+   HoTT 6.2 Induction principles and dependent paths.
+
+   Copyright (c) Groupoid Infinity, 2014-2022. -}
 
 module path where
 
@@ -303,20 +320,3 @@ def Path′-Path-Path′ (A : U) (a b : A) (p : Path′ A a b) : PathP (<_> Path
 
 def 𝟏-contr : Π (x : 𝟏), Path 𝟏 x ★ := ind₁ (λ (x : 𝟏), Path 𝟏 x ★) (<_> ★)
 
-{- Path Type:
-   - Path Equality;
-   - Computational properties;
-   - Interval and De Morgan laws;
-   - Generalized Transport;
-   - Strict equality on partial and interval pretypes;
-   - Cubical subtypes;
-   - Generalized Homogeneous Composition;
-
-   HoTT 1.12 Identity types
-   HoTT 1.12.1 Path induction
-   HoTT 2.1 Types are higher groupoids
-   HoTT 2.11 Identity type
-   HoTT 3.11 Contractibility
-   HoTT 6.2 Induction principles and dependent paths.
-
-   Copyright (c) Groupoid Infinity, 2014-2022. -}

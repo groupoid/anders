@@ -276,9 +276,6 @@ def hfill′ (A : U) (r : I) (u : I → Partial A r) (u₀ : A[r ↦ u 0]) : Pat
 def trans-filler (A : U) (x y z : A) (p : Path A x y) (q : Path A y z) : PathP (<i> Path A x (q @ i)) p (comp-Path A x y z p q)
  := <j i> hfill A (∂ i) (λ (k : I), [(i = 0) → x, (i = 1) → q @ k]) (inc A (∂ i) (p @ i)) j
 
---axiom trans-Fill2 (A : I -> U) (x : A 0) : PathP (<_>V) x (transp (<i> A i) 0 x)
--- := <i> hfill A i (\(k : I), []) (inc A i x) i
-
 def hcomp-Path (A : U) (v w : A) (r : I) (u : I → Partial (Path A v w) r) (u₀ : (Path A v w)[r ↦ u 0]) : Path A v w
  := <j> hcomp A (r ∨ ∂ j) (λ (i : I), [(r = 1) → u i 1=1 @ j, (j = 0) → v, (j = 1) → w]) (ouc u₀ @ j)
 

@@ -31,8 +31,8 @@ let bytes2 = ['\192'-'\223']['\128'-'\191']
 let bytes3 = ['\224'-'\239']['\128'-'\191']['\128'-'\191']
 let bytes4 = ['\240'-'\247']['\128'-'\191']['\128'-'\191']['\128'-'\191']
 
-let nl               = "\r\n"|"\r"|"\n"
-let inlineComment    = "--" [^ '\n' '\r']* (nl|eof)
+let nl            = "\r\n"|"\r"|"\n"
+let inlineComment = "--" [^ '\n' '\r']* (nl|eof)
 
 let utf8    = lat1|bytes2|bytes3|bytes4
 let ident   = beg utf8*

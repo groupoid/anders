@@ -257,23 +257,25 @@ def comp-inv-Path⁻¹ (A : U) (a b : A) (p : Path A a b) : Path (Path A a a) (c
 def comp-inv-Path (A : U) (a b : A) (p : Path A a b) : Path (Path A b b) (comp-Path A b a b (<i> p @ -i) p) (<_> b)
  := <j i> hcomp A (∂ i ∨ j) (λ (k : I), [(i = 0) → b, (j = 1) → b, (i = 1) → p @ j \/ k]) (p @ -i \/ j)
 
-def compPathL (A : U) (a b : A) (p: Path A a b) : Path (Path A a b) p (comp-Path A a a b (<_> a) p)
+def comp-Path-left (A : U) (a b : A) (p: Path A a b) : Path (Path A a b) p (comp-Path A a a b (<_> a) p)
  := <j i> hcomp A (∂ i ∨ -j) (λ (k : I), [(i = 0) → a, (i = 1) → p @ k,
                                           (j = 0) → p @ i /\ k]) a
 
+def comp-Path-right (A : U) (a b : A) (p: Path A a b) : Path (Path A a b) p (comp-Path A a b b p (<_> b))
+ := <j i> hcomp A (∂ i ∨ -j) (λ (k : I), [(i = 0) → a, (i = 1) → b,
+                                          (j = 0) → p @ i]) (p @ i)
+
 def comp-Path-assoc (A : U) (a b c d : A) (f : Path A a b) (g : Path A b c) (h : Path A c d)
- : Path (Path A a d) (comp-Path A a c d (comp-Path A a b c f g) h) (comp-Path A a b d f (comp-Path A b c d g h))
-:= J A a (λ (a : A) (b : A) (f : Path A a b), Π (c d : A) (g : Path A b c) (h : Path A c d),
-       Path (Path A a d) (comp-Path A a c d (comp-Path A a b c f g) h)
-                         (comp-Path A a b d f (comp-Path A b c d g h)))
-   (λ (c d : A) (g : Path A a c) (h : Path A c d),
+  : Path (Path A a d) (comp-Path A a c d (comp-Path A a b c f g) h) (comp-Path A a b d f (comp-Path A b c d g h))
+ := J A a (λ (a : A) (b : A) (f : Path A a b), Π (c d : A) (g : Path A b c) (h : Path A c d),
+    Path (Path A a d) (comp-Path A a c d (comp-Path A a b c f g) h) (comp-Path A a b d f (comp-Path A b c d g h)))
+    (λ (c d : A) (g : Path A a c) (h : Path A c d),
       comp-Path (Path A a d)
          (comp-Path A a c d (comp-Path A a a c (<_> a) g) h)
          (comp-Path A a c d g h)
          (comp-Path A a a d (<_> a) (comp-Path A a c d g h))
-         (<i> comp-Path A a c d (compPathL A a c g @ -i) h)
-         (compPathL A a d (comp-Path A a c d g h)))
-   b f c d g h
+         (<i> comp-Path A a c d (comp-Path-left A a c g @ -i) h)
+         (comp-Path-left A a d (comp-Path A a c d g h))) b f c d g h
 
 def kan (A : U) (a b c d : A) (p : Path A a c) (q : Path A b d) (r : Path A a b) : Path A c d
  := <i> hcomp A (∂ i) (λ (j : I), [(i = 0) → p @ j, (i = 1) → q @ j]) (r @ i)

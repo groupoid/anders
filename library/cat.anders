@@ -65,7 +65,7 @@ def PathCat (X: U): cat := (X, \ (x y : X), PathP (<_>X) x y, star)
 def isCatGroupoid (C: cat): U := Σ
     (id: Π (x: C.ob), C.hom x x)
     (c: Π (x y z:C.ob), C.hom x y -> C.hom y z -> C.hom x z)
---    (HomGrpd: Π (x y: C.ob), isGroupoid (C.hom x y))
+    (HomSet: Π (x y: C.ob), isSet (C.hom x y))
     (inv: Π (x y: C.ob), C.hom x y -> C.hom y x)
     (inv_left: Π (x y: C.ob) (p: C.hom x y), Path (C.hom x x) (c x y x p (inv x y p)) (id x))
     (inv_right: Π (x y: C.ob) (p: C.hom x y), Path (C.hom y y) (c y x y (inv x y p) p) (id y))
@@ -77,6 +77,7 @@ def isCatGroupoid (C: cat): U := Σ
 def CatGroupoid (X : U) : isCatGroupoid (PathCat X)
  := ( \(x:X), <_>x,
       comp-Path X,
+      ?,
       sym X,
       comp-inv-Path⁻¹ X,
       comp-inv-Path X,

@@ -349,6 +349,6 @@ def idfun  (A : U) : A → A := λ (a : A), a
 def idfun′ (A : U) : A → A := transp (<_> A) 0
 def idfun″ (A : U) : A → A := λ (a : A), hcomp A 0 (λ (i : I), []) a
 
-def idfun=idfun′ (A : U) : Path (A → A) (idfun A) (idfun′ A) := <i> transp (<_> A) -i
-def idfun=idfun″ (A : U) : Path (A → A) (idfun A) (idfun″ A) := <i> λ (a : A), hcomp A -i (λ (j : I), [(i = 0) → a]) a
+def idfun=idfun′  (A : U) : Path (A → A) (idfun A)  (idfun′ A) := <i> transp (<_> A) -i
+def idfun=idfun″  (A : U) : Path (A → A) (idfun A)  (idfun″ A) := <i> λ (a : A), hcomp A -i (λ (j : I), [(i = 0) → a]) a
 def idfun′=idfun″ (A : U) : Path (A → A) (idfun′ A) (idfun″ A) := comp-Path (A → A) (idfun′ A) (idfun A) (idfun″ A) (<i> idfun=idfun′ A @ -i) (idfun=idfun″ A)

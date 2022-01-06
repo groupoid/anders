@@ -8,7 +8,7 @@
     let xs = [(!intervalPrim, EI);
               (!zeroPrim, EDir Zero);
               (!onePrim, EDir One);
-              ("𝟎", Empty);      ("empty", Empty);
+              ("𝟎", EEmpty);     ("empty", EEmpty);
               ("𝟏", EUnit);      ("unit", EUnit);
               ("𝟐", EBool);      ("bool", EBool);
               ("★", EStar);      ("star", EStar);

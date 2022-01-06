@@ -49,7 +49,7 @@ let rec ppExp paren e = let x = match e with
   | EInc (t, r) -> Printf.sprintf "inc %s %s" (ppExp true t) (ppExp true r)
   | EOuc e -> Printf.sprintf "ouc %s" (ppExp true e)
   | EGlue e -> Printf.sprintf "Glue %s" (ppExp true e)
-  | Empty -> "𝟎" | EUnit -> "𝟏" | EBool -> "𝟐"
+  | EEmpty -> "𝟎" | EUnit -> "𝟏" | EBool -> "𝟐"
   | EStar -> "★" | EFalse -> "0₂" | ETrue -> "1₂"
   | EIndEmpty e -> Printf.sprintf "ind₀ %s" (ppExp true e)
   | EIndUnit e  -> Printf.sprintf "ind₁ %s" (ppExp true e)
@@ -60,7 +60,7 @@ let rec ppExp paren e = let x = match e with
   in match e with
   | EVar _ | EFst _ | ESnd _ | EI | EPre _ | ESystem _
   | EKan _ | EHole | EDir _ | EPair _ | ENeg _
-  | Empty | EUnit | EBool | EStar | EFalse | ETrue -> x
+  | EEmpty | EUnit | EBool | EStar | EFalse | ETrue -> x
   | _ -> parens paren x
 
 and showExp e = ppExp false e

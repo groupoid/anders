@@ -73,7 +73,7 @@ let rec eval (e0 : exp) (ctx : ctx) = traceEval e0; match e0 with
   | EInc (t, r)          -> VInc (eval t ctx, eval r ctx)
   | EOuc e               -> ouc (eval e ctx)
   | EGlue e              -> VGlue (eval e ctx)
-  | Empty                -> VEmpty
+  | EEmpty               -> VEmpty
   | EIndEmpty e          -> VIndEmpty (eval e ctx)
   | EUnit                -> VUnit
   | EStar                -> VStar
@@ -461,7 +461,9 @@ and convProofIrrel v1 v2 =
   (* Id A a b is proof-irrelevant *)
   try match inferV v1, inferV v2 with
     | VApp (VApp (VId t1, a1), b1), VApp (VApp (VId t2, a2), b2) -> conv t1 t2 && conv a1 a2 && conv b1 b2
+    | VEmpty, VEmpty -> !Prefs.irrelevance
     | VUnit, VUnit -> !Prefs.irrelevance
+    | VBool, VBool -> !Prefs.irrelevance
     | _, _ -> false
   with ExpectedNeutral _ -> false
 
@@ -566,7 +568,7 @@ and infer ctx e : value = traceInfer e; match e with
     VPartialP (VSystem (System.mapi (fun mu -> infer (faceEnv mu ctx)) ts),
                eval (getFormula ts) ctx)
   | EGlue e -> ignore (extKan (infer ctx e)); inferGlue (eval e ctx)
-  | Empty | EUnit | EBool -> VKan Z.zero
+  | EEmpty | EUnit | EBool -> VKan Z.zero
   | EStar -> VUnit | EFalse | ETrue -> VBool
   | EIndEmpty e -> ignore (extSet (infer ctx e)); implv VEmpty (eval e ctx)
   | EIndUnit e -> inferInd false ctx VUnit e recUnit

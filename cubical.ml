@@ -14,7 +14,7 @@ let rec extractExp : exp -> string = function
   | EI -> fail "cubicaltt does not support explicit interval"
   | EPre _ -> fail "cubicaltt does not support explicit pretypes"
   | EInc _ | EOuc _ | ESub _ -> fail "cubicaltt does not support explicit cubical subtypes"
-  | Empty | EIndEmpty _ -> fail "cubicaltt does not have built-in empty type"
+  | EEmpty | EIndEmpty _ -> fail "cubicaltt does not have built-in empty type"
   | EUnit | EStar | EIndUnit _ -> fail "cubicaltt does not have built-in unit type"
   | EBool | EFalse | ETrue | EIndBool _ -> fail "cubicaltt does not have built-in bool type"
   | EW _ | ESup _ | EIndW _ -> fail "cubicaltt does not have built-in W-types"

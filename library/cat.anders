@@ -31,7 +31,7 @@ def catᵒᵖ (P: precategory) : precategory :=
       (λ (A B: P.C.ob), P.P.homSet B A),
       (λ (A B: P.C.ob) (f: P.C.hom B A), P.P.∘-right B A f),
       (λ (A B: P.C.ob) (f: P.C.hom B A), P.P.∘-left B A f),
-      (λ (A B C D: P.C.ob) (f: P.C.hom B A) (g: P.C.hom C B) (h: P.C.hom D C), <i> (P.P.∘-assoc D C B A h g f) @ -i), P.P.2.2.2.2.2.2), P.2.2)
+      (λ (A B C D: P.C.ob) (f: P.C.hom B A) (g: P.C.hom C B) (h: P.C.hom D C), <i> (P.P.∘-assoc D C B A h g f) @ -i), star), star)
 
 def opPreserve (C: precategory) : PathP (<_>precategory) (catᵒᵖ (catᵒᵖ C)) C := <i> C
 
@@ -74,7 +74,8 @@ def isCatGroupoid (C: cat): U := Σ
     Π (x y z w: C.ob) (f: C.hom x y) (g: C.hom y z) (h: C.hom z w),
     Path (C.hom x w) (c x z w (c x y z f g) h) (c x y w f (c y z w g h))
 
-def CatGroupoid (X : U) (H : isGroupoid X) : isCatGroupoid (PathCat X)
+def CatGroupoid (X : U) (H : isGroupoid X)
+  : isCatGroupoid (PathCat X)
  := ( \(x:X), <_>x,
       comp-Path X,
       H,

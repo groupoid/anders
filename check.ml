@@ -120,18 +120,16 @@ and transport i p phi u0 = match p, phi with
   | VPi (t, (_, b)), _ -> let x = fresh (name "x") in
   let j = freshName "ι" in let k = freshName "κ" in
     VLam (act0 i vone t, (x, fun x ->
-      let v = transFill j (act0 i (negFormula (dim j)) t) phi x in
-      (* TODO: swap *)
-      transport k (act0 i (dim k) (b (v (negFormula (dim k)))))
+      let v = transFill j (act0 i (VNeg (dim j)) t) phi x in
+      transport k (swap i k (b (v (VNeg (dim k)))))
         phi (app (u0, v vone))))
   (* transp (<i> Σ (x : A i), B i x) φ u₀ ~>
     (transp (<j> A j) φ u₀.1,
      transp (<i> B i (transFill (<j> A j) φ u₀.1 i)) φ u₀.2) *)
   | VSig (t, (_, b)), _ ->
     let j = freshName "ι" in let k = freshName "κ" in
-    (* TODO: swap *)
-    let v1 = transFill j (act0 i (dim j) t) phi (vfst u0) in
-    let v2 = transport k (act0 i (dim k) (b (v1 (dim k)))) phi (vsnd u0) in
+    let v1 = transFill j (swap i j t) phi (vfst u0) in
+    let v2 = transport k (swap i k (b (v1 (dim k)))) phi (vsnd u0) in
     VPair (ref None, v1 vone, v2)
   (* transp (<i> PathP (P i) (v i) (w i)) φ u₀ ~>
      <j> comp (λ i, P i @ j) (φ ∨ j ∨ -j)
@@ -142,8 +140,8 @@ and transport i p phi u0 = match p, phi with
       let uj = appFormula u0 j in let r = evalOr phi (evalOr j (negFormula j)) in
       comp (fun k -> appFormula (act0 i k p) j) r k
         (VSystem (unionSystem (border (solve phi One) uj)
-                 (unionSystem (border (solve j Zero) (act0 i (dim k) v))
-                              (border (solve j One)  (act0 i (dim k) w))))) uj)))
+                 (unionSystem (border (solve j Zero) (swap i k v))
+                              (border (solve j One)  (swap i k w))))) uj)))
   | _, _ -> VApp (VTransp (VPLam (VLam (VI, (i, fun j -> act0 i j p))), phi), u0)
 
 and transFill i p phi u0 j = let (k, _, _) = freshDim () in

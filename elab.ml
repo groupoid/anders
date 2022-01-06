@@ -1,3 +1,4 @@
+open Prelude
 open Ident
 open Error
 open Expr
@@ -90,10 +91,56 @@ let rec salt (ns : name Env.t) : exp -> exp = function
   | ESup (a, b)          -> ESup (salt ns a, salt ns b)
   | EIndW (a, b, c)      -> EIndW (salt ns a, salt ns b, salt ns c)
 
-and freshFace ns phi =
-  Env.fold (fun k v -> Env.add (freshVar ns k) v) phi Env.empty
-
 and saltTele ctor ns p a b =
   let x = fresh p in ctor x (salt ns a) (salt (Env.add p x ns) b)
 
 let freshExp = salt Env.empty
+
+(* https://github.com/mortberg/cubicaltt/blob/hcomptrans/Eval.hs#L129
+   >This increases efficiency as it won’t trigger computation. *)
+let rec swap i j = function
+  | VLam (t, (x, g))     -> VLam (swap i j t, (x, g >> swap i j))
+  | VPair (r, u, v)      -> VPair (r, swap i j u, swap i j v)
+  | VKan u               -> VKan u
+  | VPi (t, (x, g))      -> VPi (swap i j t, (x, g >> swap i j))
+  | VSig (t, (x, g))     -> VSig (swap i j t, (x, g >> swap i j))
+  | VPre u               -> VPre u
+  | VPLam f              -> VPLam (swap i j f)
+  | Var (k, VI)          -> Var (swapVar i j k, VI)
+  | Var (x, t)           -> Var (x, swap i j t)
+  | VApp (f, x)          -> VApp (swap i j f, swap i j x)
+  | VFst k               -> VFst (swap i j k)
+  | VSnd k               -> VSnd (swap i j k)
+  | VHole                -> VHole
+  | VPathP v             -> VPathP (swap i j v)
+  | VPartialP (t, r)     -> VPartialP (swap i j t, swap i j r)
+  | VSystem ts           -> VSystem (System.fold (fun k v -> System.add (mapFace (swapVar i j) k) (swap i j v)) ts System.empty)
+  | VSub (t, r, u)       -> VSub (swap i j t, swap i j r, swap i j u)
+  | VTransp (p, r)       -> VTransp (swap i j p, swap i j r)
+  | VHComp (t, r, u, u0) -> VHComp (swap i j t, swap i j r, swap i j u, swap i j u0)
+  | VAppFormula (f, x)   -> VAppFormula (swap i j f, swap i j x)
+  | VId v                -> VId (swap i j v)
+  | VRef v               -> VRef (swap i j v)
+  | VJ v                 -> VJ (swap i j v)
+  | VI                   -> VI
+  | VDir d               -> VDir d
+  | VAnd (u, v)          -> VAnd (swap i j u, swap i j v)
+  | VOr (u, v)           -> VOr (swap i j u, swap i j v)
+  | VNeg u               -> VNeg (swap i j u)
+  | VInc (t, r)          -> VInc (swap i j t, swap i j r)
+  | VOuc v               -> VOuc (swap i j v)
+  | VGlue v              -> VGlue (swap i j v)
+  | VEmpty               -> VEmpty
+  | VIndEmpty v          -> VIndEmpty (swap i j v)
+  | VUnit                -> VUnit
+  | VStar                -> VStar
+  | VIndUnit v           -> VIndUnit (swap i j v)
+  | VBool                -> VBool
+  | VFalse               -> VFalse
+  | VTrue                -> VTrue
+  | VIndBool v           -> VIndBool (swap i j v)
+  | W (t, (x, g))        -> W (swap i j t, (x, g >> swap i j))
+  | VSup (a, b)          -> VSup (swap i j a, swap i j b)
+  | VIndW (a, b, c)      -> VIndW (swap i j a, swap i j b, swap i j c)
+
+and swapVar i j k = if i = k then j else k

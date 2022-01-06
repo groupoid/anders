@@ -36,9 +36,7 @@ def plam-elim (A : U) (f : I → A) : Id (I → A) (elim A (f 0) (f 1) (plam A f
 def elim-plam (A : U) (a b : A) (p : Path A a b) : Path (Path A a b) (plam A (elim A a b p)) p := <_> p
 def isProp (A : U) : U := Π (a b : A), Path A a b
 def isSet (A : U) : U := Π (a b : A) (a0 b0 : Path A a b), Path (Path A a b) a0 b0
-def isGroupoid (A : U) : U := Π (a b : A) (x y : Path A a b)
-               (i j : Path (Path A a b) x y), Path (Path (Path A a b) x y) i j
-
+def isGroupoid (A : U) : U := Π (a b : A) (x y : Path A a b) (i j : Path (Path A a b) x y), Path (Path (Path A a b) x y) i j
 def SET : U₁ := Σ (X : U), isSet X
 
 -- Computational Properties
@@ -55,8 +53,7 @@ def J-β (A : U) (a : A) (C : D A) (d: C a a (idp A a)) : Path (C a a (idp A a))
 
 -- (<i j> p @ i /\ j) @ 0 ≡ <j> p @ 0 /\ j ≡ <j> p @ 0 ≡ <_> a,
 -- (<i j> p @ i /\ j) @ 1 ≡ <j> p @ 1 /\ j ≡ <j> p @ j ≡ p,
--- but it doesn’t check since <j> p @ i /\ j : Path A (p @ i /\ 0) (p @ i /\ 1) ≡ Path A a (p @ i),
--- which is “Path A a a” only propositionally
+-- but it doesn’t check since <j> p @ i /\ j : Path A (p @ i /\ 0) (p @ i /\ 1) ≡ Path A a (p @ i), which is “Path A a a” only propositionally
 -- def K (A : U) (a : A) (p : Path A a a) : Path (Path A a a) (<_> a) p := <i j> p @ i /\ j
 
 -- DNF solver

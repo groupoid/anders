@@ -278,10 +278,10 @@ def trans-filler (A : U) (x y z : A) (p : Path A x y) (q : Path A y z) : PathP (
  := <j i> hfill A (∂ i) (λ (k : I), [(i = 0) → x, (i = 1) → q @ k]) (inc A (∂ i) (p @ i)) j
 
 def trans-filler-p (A : U) (x y z : A) (p : Path A x y) (q : Path A y z) : PathP (<i> Path A x (q @ i)) p (comp-Path A x y z p q)
- := <j> <i> hcomp A (-j ∨ ∂ i) (λ (k : I), [(i = 0) → x, (i = 1) → q @ (k ∧ j), (j = 0) → p @ i]) (p @ i)
+ := <j i> hcomp A (-j ∨ ∂ i) (λ (k : I), [(i = 0) → x, (i = 1) → q @ (k ∧ j), (j = 0) → p @ i]) (p @ i)
 
 def trans-filler-q (A : U) (x y z : A) (p : Path A x y) (q : Path A y z) : PathP (<i> Path A (p @ -i) z) q (comp-Path A x y z p q)
- := <j> <i> hcomp A (-j ∨ ∂ i) (λ (k : I), [(i = 0) → p @ -j, (i = 1) → q @ k, (j = 0) → q @ i /\ k]) (p @ i \/ -j)
+ := <j i> hcomp A (-j ∨ ∂ i) (λ (k : I), [(i = 0) → p @ -j, (i = 1) → q @ k, (j = 0) → q @ i /\ k]) (p @ i \/ -j)
 
 -- Tests
 

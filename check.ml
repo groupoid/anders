@@ -115,7 +115,7 @@ and transport i p phi u0 = match p, phi with
   (* transp (<_> 𝟐) i u₀ ~> u₀ *)
   | VBool, _ -> u0
   (* transp (<i> Π (x : A i), B i x) φ u₀ ~>
-     λ (x : A 1), transp (<i> B i (transFill (<j> A -j) φ x i)) φ
+     λ (x : A 1), transp (<i> B i (transFill (<j> A -j) φ x -i)) φ
       (u₀ (transFill (<j> A -j) φ x 1)) *)
   | VPi (t, (_, b)), _ -> let x = fresh (name "x") in
   let j = freshName "ι" in let k = freshName "κ" in
@@ -145,7 +145,7 @@ and transport i p phi u0 = match p, phi with
   | _, _ -> VApp (VTransp (VPLam (VLam (VI, (i, fun j -> act0 i j p))), phi), u0)
 
 and transFill i p phi u0 j = let (k, _, _) = freshDim () in
-  transport k (act0 i (evalAnd (Var (k, VI)) j) p) (evalOr phi (negFormula j)) u0
+  transport k (act0 i (evalAnd (dim k) j) p) (evalOr phi (negFormula j)) u0
 
 and hcomp t r u u0 = let i = freshName "ι" in kan t r i (app (u, dim i)) u0
 

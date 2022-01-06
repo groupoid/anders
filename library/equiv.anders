@@ -52,11 +52,3 @@ def univ-computation (A B : U) (p : PathP (<_> U) A B) : PathP (<_> PathP (<_> U
 def ua (A B : U) (p : equiv A B) : PathP (<_> U) A B := univ-intro A B p
 axiom ua-β (A B : U) (e : equiv A B) : Path (A -> B) (trans A B (ua A B e)) e.1
 -- := <i> λ (x : A), fill (λ (_ : I), B) (fill (λ (_ : I), B) (e.1 x) @ -i) @ -i
-
--- = <i> \(a: A) -> fill (<_> B) (fill (<_> B) (e.1 a) [] @ -i) [] @ -i
--- ua-β (A B : U) (w : equiv A B) : Path (A -> B) w.1 (pathToEquiv A B (equivToPath A B w)).1
---  = <i> \ (a:A) -> let b: B = w.1 a
---                       u: A = comp (<j>A) a []
---                       q: Path B (w.1 u) b = <i>w.1 (comp (<j>A) a [(i=1) -> <j>a])
---    in comp (<j> B) (comp (<j> B) (comp (<j> B) (comp (<j> B) (w.1 u)
---            [(i=0)->q]) [(i=0)-><k>b]) [(i=0)-><k>b]) [(i=0)-><k>b]

@@ -71,9 +71,9 @@ def isCatGroupoid (C: cat): U := Σ
     (inv-left: Π (x y: C.ob) (p: C.hom x y), Path (C.hom x x) (c x y x p (inv x y p)) (id x))
     (inv-right: Π (x y: C.ob) (p: C.hom x y), Path (C.hom y y) (c y x y (inv x y p) p) (id y))
     (left: Π (x y: C.ob) (f: C.hom x y), Path (C.hom x y) f (c x x y (id x) f))
-    (right: Π (x y: C.ob) (f: C.hom x y), Path (C.hom x y) f (c x y y f (id y))),
-    Π (x y z w: C.ob) (f: C.hom x y) (g: C.hom y z) (h: C.hom z w),
-    Path (C.hom x w) (c x z w (c x y z f g) h) (c x y w f (c y z w g h))
+    (right: Π (x y: C.ob) (f: C.hom x y), Path (C.hom x y) f (c x y y f (id y)))
+    (assoc: Π (x y z w: C.ob) (f: C.hom x y) (g: C.hom y z) (h: C.hom z w),
+      Path (C.hom x w) (c x z w (c x y z f g) h) (c x y w f (c y z w g h))), unit
 
 def CatGroupoid (X : U) (G : isGroupoid X)
   : isCatGroupoid (PathCat X)
@@ -85,5 +85,6 @@ def CatGroupoid (X : U) (G : isGroupoid X)
       comp-inv-Path X,
       comp-Path-left X,
       comp-Path-right X,
-      comp-Path-assoc X
+      comp-Path-assoc X,
+      star
     )

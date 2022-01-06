@@ -115,7 +115,7 @@ and transport i p phi u0 = match p, phi with
   (* transp (<_> 𝟐) i u₀ ~> u₀ *)
   | VBool, _ -> u0
   (* transp (<i> Π (x : A i), B i x) φ u₀ ~>
-     λ (x : A 1), transp (<i> B i (transFill (<j> A -j) φ x i)) φ
+     λ (x : A 1), transp (<i> B i (transFill (<j> A -j) φ x -i)) φ
       (u₀ (transFill (<j> A -j) φ x 1)) *)
   | VPi (t, (_, b)), _ -> let x = fresh (name "x") in
   let j = freshName "ι" in let k = freshName "κ" in

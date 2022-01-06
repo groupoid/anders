@@ -33,8 +33,6 @@ let bytes4 = ['\240'-'\247']['\128'-'\191']['\128'-'\191']['\128'-'\191']
 
 let nl               = "\r\n"|"\r"|"\n"
 let inlineComment    = "--" [^ '\n' '\r']* (nl|eof)
-let multilineComment = "{-" [^ '-']* '-' ([^ '-' '}'][^ '-']* '-' | '-')* '}'
-let comment          = inlineComment | multilineComment
 
 let utf8    = lat1|bytes2|bytes3|bytes4
 let ident   = beg utf8*
@@ -65,30 +63,37 @@ let indbool  = "ind-bool"  | "ind\xE2\x82\x82" (* ind₂ *)
 let indw = "ind-W" | "ind\xE1\xB5\x82" (* indᵂ *)
 
 rule main = parse
-| nl              { nextLine lexbuf; main lexbuf }
-| comment         { nextLine lexbuf; main lexbuf }
-| ws+             { main lexbuf }      | "."             { DOT }
-| "module"        { MODULE }           | "where"         { WHERE }
-| "import"        { IMPORT }           | "option"        { OPTION }
-| def             { DEF }              | colon           { COLON }
-| ','             { COMMA }            | '_'             { IRREF }
-| '('             { LPARENS }          | ')'             { RPARENS }
-| '['             { LSQ }              | ']'             { RSQ }
-| pi              { PI }               | sigma           { SIGMA }
-| "<"             { LT }               | ">"             { GT }
-| negFormula      { NEGATE }           | andFormula      { AND }
-| orFormula       { OR }               | "@"             { APPFORMULA }
-| axiom           { AXIOM }            | defeq           { DEFEQ }
-| lam             { LAM }              | arrow           { ARROW }
-| prod            { PROD }             | kan as s        { KAN (getLevel s) }
-| "PathP"         { PATHP }            | "transp"        { TRANSP }
-| "Id"            { ID }               | "ref"           { REF }
-| "idJ"           { IDJ }              | pre as s        { PRE (getLevel s) }
-| "Partial"       { PARTIAL }          | "PartialP"      { PARTIALP }
-| "?"             { HOLE }             | map             { MAP }
-| "inc"           { INC }              | "ouc"           { OUC }
-| "hcomp"         { HCOMP }            | "Glue"          { GLUE }
-| indempty        { INDEMPTY }         | indunit         { INDUNIT }
-| indbool         { INDBOOL }          | "W"             { W }
-| "sup"           { SUP }              | indw            { INDW }
-| ident as s      { IDENT s }          | eof             { EOF }
+| nl            { nextLine lexbuf; main lexbuf }
+| inlineComment { nextLine lexbuf; main lexbuf }
+| "{-"          { multiline lexbuf }
+| ws+           { main lexbuf }      | "."             { DOT }
+| "module"      { MODULE }           | "where"         { WHERE }
+| "import"      { IMPORT }           | "option"        { OPTION }
+| def           { DEF }              | colon           { COLON }
+| ','           { COMMA }            | '_'             { IRREF }
+| '('           { LPARENS }          | ')'             { RPARENS }
+| '['           { LSQ }              | ']'             { RSQ }
+| pi            { PI }               | sigma           { SIGMA }
+| "<"           { LT }               | ">"             { GT }
+| negFormula    { NEGATE }           | andFormula      { AND }
+| orFormula     { OR }               | "@"             { APPFORMULA }
+| axiom         { AXIOM }            | defeq           { DEFEQ }
+| lam           { LAM }              | arrow           { ARROW }
+| prod          { PROD }             | kan as s        { KAN (getLevel s) }
+| "PathP"       { PATHP }            | "transp"        { TRANSP }
+| "Id"          { ID }               | "ref"           { REF }
+| "idJ"         { IDJ }              | pre as s        { PRE (getLevel s) }
+| "Partial"     { PARTIAL }          | "PartialP"      { PARTIALP }
+| "?"           { HOLE }             | map             { MAP }
+| "inc"         { INC }              | "ouc"           { OUC }
+| "hcomp"       { HCOMP }            | "Glue"          { GLUE }
+| indempty      { INDEMPTY }         | indunit         { INDUNIT }
+| indbool       { INDBOOL }          | "W"             { W }
+| "sup"         { SUP }              | indw            { INDW }
+| ident as s    { IDENT s }          | eof             { EOF }
+
+and multiline = parse
+| "-}" { main lexbuf }
+| nl   { nextLine lexbuf; multiline lexbuf }
+| eof  { failwith "EOF in multiline comment" }
+| _    { multiline lexbuf }

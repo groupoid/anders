@@ -199,7 +199,7 @@ and ouc v = match v, inferV v with
   | VApp (VInc _, v), _ -> v
   | _, _ -> VOuc v
 
-and fiber t1 t2 f y = VSig (t1, (freshName "a", fun x -> pathv (idp t2) y (app (f, x))))
+and fiber t1 t2 f y = VSig (t1, (freshName "a", fun x -> pathv (idp t2) y (app (f, x)))) (* right fiber *)
 
 and isContr t = let x = freshName "x" in let y = freshName "y" in
   VSig (t, (x, fun x -> VPi (t, (y, fun y -> pathv (idp t) x y))))
@@ -209,8 +209,7 @@ and equiv t1 t2 = VSig (implv t1 t2, (freshName "f", isEquiv t1 t2))
 and equivSingl t0 = VSig (inferV t0, (freshName "T", fun t -> equiv t t0))
 
 and closByVal ctx p t e v = traceClos e p v;
-  (* dirty hack to handle free variables introduced by type checker,
-     for example, while checking terms like p : Path P a b *)
+  (* dirty hack to handle free variables introduced by type checker, for example, while checking terms like p : Path P a b *)
   let ctx' = match v with
   | Var (x, t) -> if Env.mem x ctx then ctx else upLocal ctx x t v
   | _          -> ctx in

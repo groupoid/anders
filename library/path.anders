@@ -273,6 +273,14 @@ def hfill (A : U) (r : I) (u : I → Partial A r) (u₀ : A[r ↦ u 0]) (j : I)
 def hfill′ (A : U) (r : I) (u : I → Partial A r) (u₀ : A[r ↦ u 0]) : Path A (ouc u₀) (hcomp A r u (ouc u₀))
  := <j> hfill A r u u₀ j
 
+--def trans-Filler (A : U) (x y z : A) (p : Path A x y) (q : Path A y z) : PathP (<i> Path A (p @ -i) z) q (pcomp A x y z p q)
+-- := <i j> hcomp A (∂ i \/ -j) (λ (k : I), [(i = 0) → p @ -j,
+--                                           (i = 1) → q @ k,
+--                                           (j = 0) → q @ i /\ k]) (inc A (∂ i \/ -j) (p @ i \/ -j))
+
+--axiom trans-Fill2 (A : I -> U) (x : A 0) : PathP (<_>V) x (transp (<i> A i) 0 x)
+-- := <i> hfill A i (\(k : I), []) (inc A i x) i
+
 def hcomp-Path (A : U) (v w : A) (r : I) (u : I → Partial (Path A v w) r) (u₀ : (Path A v w)[r ↦ u 0]) : Path A v w
  := <j> hcomp A (r ∨ ∂ j) (λ (i : I), [(r = 1) → u i 1=1 @ j, (j = 0) → v, (j = 1) → w]) (ouc u₀ @ j)
 
@@ -314,3 +322,4 @@ def Path-Path′-Path (A : U) (a b : A) (p : Path A a b) : Path (Path A a b) (Pa
 def Path′-Path-Path′ (A : U) (a b : A) (p : Path′ A a b) : PathP (<_> Path′ A a b) (Path-Path′ A a b (Path′-Path A a b p)) p := <_> p
 
 def 𝟏-contr : Π (x : 𝟏), Path 𝟏 x ★ := ind₁ (λ (x : 𝟏), Path 𝟏 x ★) (<_> ★)
+

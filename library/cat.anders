@@ -67,8 +67,8 @@ def isCatGroupoid (C: cat): U := Σ
     (c: Π (x y z:C.ob), C.hom x y -> C.hom y z -> C.hom x z)
     (HomSet: Π (x y: C.ob), isSet (C.hom x y))
     (inv: Π (x y: C.ob), C.hom x y -> C.hom y x)
-    (inv_left: Π (x y: C.ob) (p: C.hom x y), Path (C.hom x x) (c x y x p (inv x y p)) (id x))
-    (inv_right: Π (x y: C.ob) (p: C.hom x y), Path (C.hom y y) (c y x y (inv x y p) p) (id y))
+    (inv-left: Π (x y: C.ob) (p: C.hom x y), Path (C.hom x x) (c x y x p (inv x y p)) (id x))
+    (inv-right: Π (x y: C.ob) (p: C.hom x y), Path (C.hom y y) (c y x y (inv x y p) p) (id y))
     (left: Π (x y: C.ob) (f: C.hom x y), Path (C.hom x y) f (c x x y (id x) f))
     (right: Π (x y: C.ob) (f: C.hom x y), Path (C.hom x y) f (c x y y f (id y))),
     Π (x y z w: C.ob) (f: C.hom x y) (g: C.hom y z) (h: C.hom z w),

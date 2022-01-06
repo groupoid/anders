@@ -450,14 +450,14 @@ and conv v1 v2 : bool = traceConv v1 v2;
     | VSup (a1, b1), VSup (a2, b2) -> conv a1 a2 && conv b1 b2
     | VIndW (a1, b1, c1), VIndW (a2, b2, c2) -> conv a1 a2 && conv b1 b2 && conv c1 c2
     | _, _ -> false
-  end || convWithSystem (v1, v2) || convId v1 v2
+  end || convWithSystem (v1, v2) || convProofIrrel v1 v2
 
 and convWithSystem = function
   | v, VApp (VSystem ts, _) | VApp (VSystem ts, _), v ->
     System.for_all (fun mu -> conv (upd mu v)) ts
   | _, _ -> false
 
-and convId v1 v2 =
+and convProofIrrel v1 v2 =
   (* Id A a b is proof-irrelevant *)
   try match inferV v1, inferV v2 with
     | VApp (VApp (VId t1, a1), b1), VApp (VApp (VId t2, a2), b2) ->

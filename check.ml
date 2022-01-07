@@ -463,7 +463,6 @@ and convProofIrrel v1 v2 =
     | VApp (VApp (VId t1, a1), b1), VApp (VApp (VId t2, a2), b2) -> conv t1 t2 && conv a1 a2 && conv b1 b2
     | VEmpty, VEmpty -> !Prefs.irrelevance
     | VUnit, VUnit -> !Prefs.irrelevance
-    | VBool, VBool -> !Prefs.irrelevance
     | _, _ -> false
   with ExpectedNeutral _ -> false
 

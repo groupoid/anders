@@ -87,6 +87,7 @@ rule main = parse
 | "?"           { HOLE }             | map             { MAP }
 | "inc"         { INC }              | "ouc"           { OUC }
 | "hcomp"       { HCOMP }            | "Glue"          { GLUE }
+| "glue"        { GLUEELEM }         | "unglue"        { UNGLUE }
 | indempty      { INDEMPTY }         | indunit         { INDUNIT }
 | indbool       { INDBOOL }          | "W"             { W }
 | "sup"         { SUP }              | indw            { INDW }

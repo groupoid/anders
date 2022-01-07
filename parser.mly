@@ -56,7 +56,7 @@
 %token PARTIAL PARTIALP MAP INC OUC
 %token AND OR NEGATE
 %token ID REF IDJ
-%token GLUE
+%token GLUE GLUEELEM UNGLUE
 %token INDEMPTY INDUNIT INDBOOL
 %token W INDW SUP
 
@@ -116,6 +116,8 @@ exp4 :
   | PARTIAL exp6 { EPartial $2 }
   | PARTIALP exp6 exp6 { EPartialP ($2, $3) }
   | GLUE exp6 { EGlue $2 }
+  | GLUEELEM exp6 exp6 exp6 { EGlueElem ($2, $3, $4) }
+  | UNGLUE exp6 { EUnglue $2 }
   | INDEMPTY exp6 { EIndEmpty $2 }
   | INDUNIT exp6 { EIndUnit $2 }
   | INDBOOL exp6 { EIndBool $2 }

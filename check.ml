@@ -73,6 +73,8 @@ let rec eval (e0 : exp) (ctx : ctx) = traceEval e0; match e0 with
   | EInc (t, r)          -> VInc (eval t ctx, eval r ctx)
   | EOuc e               -> ouc (eval e ctx)
   | EGlue e              -> VGlue (eval e ctx)
+  | EGlueElem (r, u, a)  -> VGlueElem (eval r ctx, eval u ctx, eval a ctx)
+  | EUnglue e            -> VUnglue (eval e ctx)
   | EEmpty               -> VEmpty
   | EIndEmpty e          -> VIndEmpty (eval e ctx)
   | EUnit                -> VUnit
@@ -207,6 +209,7 @@ and isContr t = let x = freshName "x" in let y = freshName "y" in
 and isEquiv t1 t2 f = VPi (t2, (freshName "b", isContr << fiber t1 t2 f))
 and equiv t1 t2 = VSig (implv t1 t2, (freshName "f", isEquiv t1 t2))
 and equivSingl t0 = VSig (inferV t0, (freshName "T", fun t -> equiv t t0))
+and equivPtSingl t0 = VSig (inferV t0, (freshName "T", fun t -> prodv (equiv t t0) t))
 
 and closByVal ctx p t e v = traceClos e p v;
   (* dirty hack to handle free variables introduced by type checker, for example, while checking terms like p : Path P a b *)
@@ -290,6 +293,8 @@ and inferV v = traceInferV v; match v with
   | VPartialP (t, _) -> inferV (inferV t)
   | VSystem ts -> VPartialP (VSystem (System.map inferV ts), getFormulaV ts)
   | VGlue t -> inferGlue t
+  | VGlueElem (r, u, a) -> inferGlueElem r u (inferV a)
+  | VUnglue v -> let (t, _, _) = extGlue (inferV v) in t
   | VEmpty | VUnit | VBool -> VKan Z.zero
   | VStar -> VUnit | VFalse | VTrue -> VBool
   | VIndEmpty t -> implv VEmpty t
@@ -323,6 +328,9 @@ and inferInc t r = let a = freshName "a" in
 
 and inferGlue t = let (r, _, _) = freshDim () in let k = inferV t in
   VPi (VI, (r, fun r -> implv (partialv (equivSingl t) r) k))
+
+and inferGlueElem r u t =
+  VApp (VApp (VGlue t, r), VSystem (walk (fun v -> VPair (ref None, vfst v, vfst (vsnd v))) r u))
 
 and inferJ v t =
   let x = freshName "x" in let y = freshName "y" in let pi = freshName "P" in let p = freshName "p" in
@@ -379,6 +387,8 @@ and act rho = function
   | VInc (t, r)          -> VInc (act rho t, act rho r)
   | VOuc v               -> ouc (act rho v)
   | VGlue v              -> VGlue (act rho v)
+  | VGlueElem (r, u, a)  -> VGlueElem (act rho r, act rho u, act rho a)
+  | VUnglue v            -> VUnglue (act rho v)
   | VEmpty               -> VEmpty
   | VIndEmpty v          -> VIndEmpty (act rho v)
   | VUnit                -> VUnit
@@ -438,6 +448,8 @@ and conv v1 v2 : bool = traceConv v1 v2;
     | VInc (t1, r1), VInc (t2, r2) -> conv t1 t2 && conv r1 r2
     | VOuc u, VOuc v -> conv u v
     | VGlue v, VGlue u -> conv u v
+    | VGlueElem (r1, u1, a1), VGlueElem (r2, u2, a2) -> conv r1 r2 && conv u1 u2 && conv a1 a2
+    | VUnglue v, VUnglue u -> conv u v
     | VEmpty, VEmpty -> true
     | VIndEmpty u, VIndEmpty v -> conv u v
     | VUnit, VUnit -> true
@@ -567,6 +579,13 @@ and infer ctx e : value = traceInfer e; match e with
     VPartialP (VSystem (System.mapi (fun mu -> infer (faceEnv mu ctx)) ts),
                eval (getFormula ts) ctx)
   | EGlue e -> ignore (extKan (infer ctx e)); inferGlue (eval e ctx)
+  | EGlueElem (e, u0, a) -> check ctx e VI; let r = eval e ctx in let t = infer ctx a in
+    check ctx u0 (partialv (equivPtSingl t) r); let u = eval u0 ctx in
+    (* Γ, φ ⊢ a ≡ f t where u = [φ ↦ (T, (f, e), t)] *)
+    List.iter (fun mu -> let v = app (upd mu u, VRef vone) in let f = vfst (vfst (vsnd v)) in
+      eqNf (eval a (faceEnv mu ctx)) (app (f, vsnd (vsnd v)))) (solve r One);
+    inferGlueElem r u t
+  | EUnglue e -> let (t, _, _) = extGlue (infer ctx e) in t
   | EEmpty | EUnit | EBool -> VKan Z.zero
   | EStar -> VUnit | EFalse | ETrue -> VBool
   | EIndEmpty e -> ignore (extSet (infer ctx e)); implv VEmpty (eval e ctx)

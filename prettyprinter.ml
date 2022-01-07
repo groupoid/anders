@@ -49,6 +49,8 @@ let rec ppExp paren e = let x = match e with
   | EInc (t, r) -> Printf.sprintf "inc %s %s" (ppExp true t) (ppExp true r)
   | EOuc e -> Printf.sprintf "ouc %s" (ppExp true e)
   | EGlue e -> Printf.sprintf "Glue %s" (ppExp true e)
+  | EGlueElem (r, u, a) -> Printf.sprintf "glue %s %s %s" (ppExp true r) (ppExp true u) (ppExp true a)
+  | EUnglue e -> Printf.sprintf "unglue %s" (ppExp true e)
   | EEmpty -> "𝟎" | EUnit -> "𝟏" | EBool -> "𝟐"
   | EStar -> "★" | EFalse -> "0₂" | ETrue -> "1₂"
   | EIndEmpty e -> Printf.sprintf "ind₀ %s" (ppExp true e)
@@ -101,6 +103,8 @@ let rec ppValue paren v = let x = match v with
   | VInc (t, r) -> Printf.sprintf "inc %s %s" (ppValue true t) (ppValue true r)
   | VOuc v -> Printf.sprintf "ouc %s" (ppValue true v)
   | VGlue v -> Printf.sprintf "Glue %s" (ppValue true v)
+  | VGlueElem (r, u, a) -> Printf.sprintf "glue %s %s %s" (ppValue true r) (ppValue true u) (ppValue true a)
+  | VUnglue v -> Printf.sprintf "unglue %s" (ppValue true v)
   | VEmpty -> "𝟎" | VUnit -> "𝟏" | VBool -> "𝟐"
   | VStar -> "★" | VFalse -> "0₂" | VTrue -> "1₂"
   | VIndEmpty v -> Printf.sprintf "ind₀ %s" (ppValue true v)

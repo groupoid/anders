@@ -23,6 +23,10 @@ let extPathP = function
   | VApp (VApp (VPathP v, u0), u1) -> (v, u0, u1)
   | v                              -> raise (ExpectedPath v)
 
+let extGlue = function
+  | VApp (VApp (VGlue t, r), u) -> (t, r, u)
+  | v -> failwith (Printf.sprintf "“%s” expected to be a Glue-type" (Prettyprinter.showValue v))
+
 let extVar ctx x = match Env.find_opt x ctx with
   | Some (_, _, Value (Var (y, _))) -> y
   | Some (_, _, Exp (EVar y)) -> y
@@ -36,6 +40,7 @@ let imax a b = match a, b with
 
 let idv t x y = VApp (VApp (VId t, x), y)
 let implv a b = VPi (a, (Irrefutable, fun _ -> b))
+let prodv a b = VSig (a, (Irrefutable, fun _ -> b))
 
 let idp v = VPLam (VLam (VI, (Irrefutable, fun _ -> v)))
 let pathv v a b = VApp (VApp (VPathP v, a), b)
@@ -78,6 +83,8 @@ let rec salt (ns : name Env.t) : exp -> exp = function
   | EOr (a, b)           -> EOr (salt ns a, salt ns b)
   | ENeg e               -> ENeg (salt ns e)
   | EGlue e              -> EGlue (salt ns e)
+  | EGlueElem (r, u, a)  -> EGlueElem (salt ns r, salt ns u, salt ns a)
+  | EUnglue e            -> EUnglue (salt ns e)
   | EEmpty               -> EEmpty
   | EIndEmpty e          -> EIndEmpty (salt ns e)
   | EUnit                -> EUnit
@@ -130,6 +137,8 @@ let rec swap i j = function
   | VInc (t, r)          -> VInc (swap i j t, swap i j r)
   | VOuc v               -> VOuc (swap i j v)
   | VGlue v              -> VGlue (swap i j v)
+  | VGlueElem (r, u, a)  -> VGlueElem (swap i j r, swap i j u, swap i j a)
+  | VUnglue v            -> VUnglue (swap i j v)
   | VEmpty               -> VEmpty
   | VIndEmpty v          -> VIndEmpty (swap i j v)
   | VUnit                -> VUnit

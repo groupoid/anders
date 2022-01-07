@@ -458,8 +458,8 @@ and convWithSystem = function
   | _, _ -> false
 
 and convProofIrrel v1 v2 =
-  (* Id A a b is proof-irrelevant *)
   try match inferV v1, inferV v2 with
+    (* Id A a b is proof-irrelevant *)
     | VApp (VApp (VId t1, a1), b1), VApp (VApp (VId t2, a2), b2) -> conv t1 t2 && conv a1 a2 && conv b1 b2
     | VEmpty, VEmpty -> !Prefs.irrelevance
     | VUnit, VUnit -> !Prefs.irrelevance

@@ -44,17 +44,17 @@ let cmd : cmdline -> unit = function
 let rec parseArgs : string list -> cmdline list = function
   | [] -> []
   | "prim" :: prim :: value :: rest -> Prim (prim, value) :: parseArgs rest
-  | "check"     :: filename :: rest -> Check     filename :: parseArgs rest
-  | "lex"       :: filename :: rest -> Lex       filename :: parseArgs rest
-  | "parse"     :: filename :: rest -> Parse     filename :: parseArgs rest
-  | "cubicaltt" :: filename :: rest -> Cubicaltt filename :: parseArgs rest
-  | "help"      :: rest             -> Help    :: parseArgs rest
-  | "trace"     :: rest             -> Trace   :: parseArgs rest
-  | "indices"   :: rest             -> Indices :: parseArgs rest
-  | "silent"    :: rest             -> Silent  :: parseArgs rest
-  | "girard"    :: rest             -> Girard  :: parseArgs rest
-  | "irrelevance" :: rest           -> Irrelevance :: parseArgs rest
-  | "repl"      :: rest             -> Repl    :: parseArgs rest
+  | "check"       :: filename :: rest -> Check     filename :: parseArgs rest
+  | "lex"         :: filename :: rest -> Lex       filename :: parseArgs rest
+  | "parse"       :: filename :: rest -> Parse     filename :: parseArgs rest
+  | "cubicaltt"   :: filename :: rest -> Cubicaltt filename :: parseArgs rest
+  | "help"        :: rest             -> Help        :: parseArgs rest
+  | "trace"       :: rest             -> Trace       :: parseArgs rest
+  | "indices"     :: rest             -> Indices     :: parseArgs rest
+  | "silent"      :: rest             -> Silent      :: parseArgs rest
+  | "girard"      :: rest             -> Girard      :: parseArgs rest
+  | "irrelevance" :: rest             -> Irrelevance :: parseArgs rest
+  | "repl"        :: rest             -> Repl        :: parseArgs rest
   | x :: xs -> Printf.printf "Unknown command “%s”\n" x; parseArgs xs
 
 let defaults = function

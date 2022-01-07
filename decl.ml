@@ -41,11 +41,11 @@ let rec checkLine st : line -> state =
     end; (checkDecl ctx (freshDecl d), checked)
   | Option (opt, value) ->
     begin match opt with
-      | "girard"   -> Prefs.girard  := getBoolVal opt value
+      | "girard"      -> Prefs.girard      := getBoolVal opt value
       | "irrelevance" -> Prefs.irrelevance := getBoolVal opt value
-      | "verbose"  -> Prefs.verbose := getBoolVal opt value
-      | "pre-eval" -> Prefs.preeval := getBoolVal opt value
-      | _          -> raise (UnknownOption opt)
+      | "verbose"     -> Prefs.verbose     := getBoolVal opt value
+      | "pre-eval"    -> Prefs.preeval     := getBoolVal opt value
+      | _             -> raise (UnknownOption opt)
     end; st
   | Import xs -> List.fold_left (fun st x -> let path = ext x in
     if Files.mem path checked then st else checkFile st path) st xs

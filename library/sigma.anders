@@ -1,16 +1,7 @@
 module sigma where
-import library/path
 
 def Sigma (A: U) (B: A → U) : U ≔ sigma' (x: A), B x
 def pair (A: U) (B: A → U) (a: A) (b: B a) : Sigma A B ≔ (a, b)
 def pr₁ (A: U) (B: A → U) (x: Sigma A B) : A ≔ x.1
 def pr₂ (A: U) (B: A → U) (x: Sigma A B) : B (pr₁ A B x) ≔ x.2
-
-def lemPropF (A : U) (P : A -> U) (pP : Π (x : A), isProp (P x))
-    (a0 a1 : A) (p : PathP (<_> A) a0 a1) (b0 : P a0) (b1 : P a1) : PathP (<i>P (p @ i)) b0 b1
- := <i> pP (p @ i) (comp (\(j : I), P (p @ (i /\ j))) -i (\(k : I), [ (i = 0) → b0 ]) (inc (P (p @ 0)) -i b0))
-                   (comp (\(j : I), P (p @ (i \/ -j))) i (\(k : I), [ (i = 1) → b1 ]) (inc (P (p @ 1)) i b1)) @ i
-
-def lemSig (A : U) (B : A -> U) (pB : Π (x : A), isProp (B x)) (u v : Σ(x:A), B x) (p : Path A u.1 v.1) : Path (Σ(x:A), B x) u v
- := <i> (p @ i,(lemPropF A B pB u.1 v.1 p u.2 v.2) @ i)
 

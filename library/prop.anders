@@ -16,6 +16,6 @@ def propSig (A : U) (B : A -> U) (pA : isProp A) (pB : Π(x : A), isProp (B x)) 
 def propPi (A : U) (B: A -> U) (h: Π(x : A), isProp (B x)) (f0 f1: Π(x: A), B x) : Path (Π(x: A), B x) f0 f1
   := <i> \ (x : A), (h x (f0 x) (f1 x)) @ i
 
-axiom propPi2 (A: U) (B : A -> A -> U) (h: Π (x y: A), isProp (B x y)): isProp (Π(x y: A), B x y)
---  := propPi A (\(a: A), B a) (\(a : A), propPi A (B a) (h a))
+def propPi2 (A: U) (B : A -> A -> U) (h: Π (x y: A), isProp (B x y)): isProp (Π(x y: A), B x y)
+  := propPi A (\(a: A), Π (b : A), B a b) (\(x : A), propPi A (B x) (h x))
 

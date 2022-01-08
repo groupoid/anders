@@ -5,6 +5,8 @@ def Sigma (A: U) (B: A → U) : U ≔ sigma' (x: A), B x
 def pair (A: U) (B: A → U) (a: A) (b: B a) : Sigma A B ≔ (a, b)
 def pr₁ (A: U) (B: A → U) (x: Sigma A B) : A ≔ x.1
 def pr₂ (A: U) (B: A → U) (x: Sigma A B) : B (pr₁ A B x) ≔ x.2
+def ac (A B: U) (R: A -> B -> U) (g: Π (x: A), Σ (y: B), R x y) : Σ (f: A -> B), Π (x: A), R x (f x) := (\(i:A),(g i).1,\(j:A),(g j).2)
+def total (A:U) (B C : A -> U) (f : Π (x:A), B x -> C x) (w: Σ(x: A), B x) : Σ(x: A), C x := (w.1,f (w.1) (w.2))
 
 def funDepTr (A: U) (P: A -> U) (a0 a1: A) (p: PathP (<_>A) a0 a1) (u0: P a0) (u1: P a1)
   : PathP (<_>U) (PathP (<i> P (p @ i)) u0 u1) (PathP (<_>P a1) (hcomp (P a1) 0 (λ (k : I), []) (transp (<i> P (p @ i)) 0 u0)) u1)
@@ -13,3 +15,5 @@ def funDepTr (A: U) (P: A -> U) (a0 a1: A) (p: PathP (<_>A) a0 a1) (u0: P a0) (u
 def pathSig0 (A: U) (P: A -> U) (t u: Σ (x: A), P x) (p: PathP (<_>A) t.1 u.1)
   : PathP (<_>U) (PathP (<i>P (p @ i)) t.2 u.2) (PathP (<_>P u.1) (hcomp (P u.1) 0 (λ(k:I),[]) (transp (<i> P (p @ i)) 0 t.2)) u.2)
  := funDepTr A P t.1 u.1 p t.2 u.2
+
+

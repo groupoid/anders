@@ -31,4 +31,3 @@ def setFun' (X Y: U) (p: X → isSet Y) : isSet (X → Y) := setPi X (λ (x: X),
 def setFun (A B : U) (sB: isSet B) : isSet (A → B) := setPi A (λ (x: A), B) (λ (x: A), sB)
 def piIsContr (A: U) (B: A → U) (u: isContr A) (q: Π (x: A), isContr (B x)) : isContr (Pi A B)
  := ((\(x: A),(q x).1),(\(z: Π(x: A),B x),<i>\(a: A),(q a).2(z a)@ i))
-

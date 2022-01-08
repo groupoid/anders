@@ -1,7 +1,7 @@
 module buddhism where
 option girard true
 
--- The Theorem About Non-Duality of All Phenomenas
+-- [Favonia] The Theorem About Non-Duality of All Phenomenas
 
 def trans (A B : U) (p : PathP (<_> U) A B) : A → B := transp p 0
 def coe (A B: U) (p: PathP (<_> U) A B): A → B := λ (x : A), trans A B p x

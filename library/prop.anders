@@ -34,4 +34,8 @@ def lem1 (A : U) (t: isContr A) (x y : A) : Path A x y := comp-Path A x t.1 y (<
 def lem2 (A : U) (t: isContr A) (x : A) : isProp (T A x) := propPi A (\ (y : A), Path A x y) (propSet A (lem1 A t) x)
 
 def propIsContr (A : U) : isProp (isContr A) := lemProp (isContr A) (\(t: isContr A), propSig A (T A) (lem1 A t) (lem2 A t))
+def propIsProp (A : U) : isProp (isProp A) := \(f g : isProp A), <i> \(a b : A), propSet A f a b (f a b) (g a b) @ i
 
+axiom corSigProp (A: U) (B: A -> U) (pB : Π (x:A), isProp (B x)) (t u : Σ(x:A), B x) (p:PathP (<_>A) t.1 u.1)
+  : isProp (PathP (<i>B (p @ i)) t.2 u.2)
+-- := trans⁻¹ U isProp (PathP P t.2 u.2) (PathP (<_>B u.1) (trans P t.2) u.2) (pathSig0 A B t u p) (propSet (B u.1) (pB u.1) (trans P t.2) u.2)

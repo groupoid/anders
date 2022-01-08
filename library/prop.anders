@@ -12,3 +12,10 @@ def lemSig (A : U) (B : A -> U) (pB : Π (x : A), isProp (B x)) (u v : Σ(x:A), 
 def propSig (A : U) (B : A -> U) (pA : isProp A) (pB : Π(x : A), isProp (B x)) (t u : Σ(x:A), B x)
   : Path (Σ(x:A), B x) t u
  := lemSig A B pB t u (pA t.1 u.1)
+
+def propPi (A : U) (B: A -> U) (h: Π(x : A), isProp (B x)) (f0 f1: Π(x: A), B x) : Path (Π(x: A), B x) f0 f1
+  := <i> \ (x : A), (h x (f0 x) (f1 x)) @ i
+
+axiom propPi2 (A: U) (B : A -> A -> U) (h: Π (x y: A), isProp (B x y)): isProp (Π(x y: A), B x y)
+--  := propPi A (\(a: A), B a) (\(a : A), propPi A (B a) (h a))
+

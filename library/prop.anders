@@ -19,3 +19,5 @@ def propPi (A : U) (B: A -> U) (h: Π(x : A), isProp (B x)) (f0 f1: Π(x: A), B 
 axiom propPi2 (A: U) (B : A -> A -> U) (h: Π (x y: A), isProp (B x y)): isProp (Π(x y: A), B x y)
 --  := propPi A (\(a: A), B a) (\(a : A), propPi A (B a) (h a))
 
+def isContrProp (A : U) (h : isContr A) : isProp A
+ := \(a b : A), <i> comp (\(j: I), A) (∂ i) (\(k: I), [ (i = 0) -> h.2 a @ k, (i = 1) -> h.2 b @ k ]) (inc A (∂ i) h.1)

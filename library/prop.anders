@@ -1,5 +1,6 @@
 module prop where
 import library/path
+import library/sigma
 
 def lemPropF (A : U) (P : A -> U) (pP : Π (x : A), isProp (P x))
     (a0 a1 : A) (p : PathP (<_> A) a0 a1) (b0 : P a0) (b1 : P a1) : PathP (<i>P (p @ i)) b0 b1
@@ -36,6 +37,12 @@ def lem2 (A : U) (t: isContr A) (x : A) : isProp (T A x) := propPi A (\ (y : A),
 def propIsContr (A : U) : isProp (isContr A) := lemProp (isContr A) (\(t: isContr A), propSig A (T A) (lem1 A t) (lem2 A t))
 def propIsProp (A : U) : isProp (isProp A) := \(f g : isProp A), <i> \(a b : A), propSet A f a b (f a b) (g a b) @ i
 
-axiom corSigProp (A: U) (B: A -> U) (pB : Π (x:A), isProp (B x)) (t u : Σ(x:A), B x) (p:PathP (<_>A) t.1 u.1)
+{-
+def corSigProp (A: U) (B: A -> U) (pB : Π (x:A), isProp (B x)) (t u : Σ(x:A), B x) (p:PathP (<_>A) t.1 u.1)
   : isProp (PathP (<i>B (p @ i)) t.2 u.2)
--- := trans⁻¹ U isProp (PathP P t.2 u.2) (PathP (<_>B u.1) (trans P t.2) u.2) (pathSig0 A B t u p) (propSet (B u.1) (pB u.1) (trans P t.2) u.2)
+ := subst′ U isProp
+    (PathP (<i> B (p @ i)) t.2 u.2)
+    (Path (B u.1) (hcomp (B u.1) 0 (λ (r: I), []) (transp (<i> B (p @ i)) 0 t.2)) u.2)
+    (pathSig0 A B t u p)
+    (propSet (B u.1) (pB u.1) (hcomp (B u.1) 0 (λ (r: I), []) (transp (<i> B (p @ i)) 0 t.2)) u.2)
+-}

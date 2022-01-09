@@ -8,8 +8,11 @@
    Copyright (c) Groupoid Infinity, 2014-2022. -}
 
 module bundle where
+import library/path
 import library/sigma
 import library/iso
+import library/pullback
+option girard true
 
 def Family (B : U) : U₁ := B -> U
 def Fibration (B : U) : U₁ := Σ (X : U), X -> B
@@ -22,3 +25,21 @@ def encode-decode (B : U) (F : B -> U) (y : B) (x : fiber (Sigma B F) B (pr₁ B
 
 def Bundle=Pi (B : U) (F : B -> U) (y : B) : PathP (<_> U) (fiber (Sigma B F) B (pr₁ B F) y) (F y)
  := isoPath (fiber (Sigma B F) B (pr₁ B F) y) (F y) (encode B F y) (decode B F y) (decode-encode B F y) (encode-decode B F y)
+
+-- Definition (1) Dependent
+def isFBundle1 (B: U) (p: B -> U) (F: U): U₁ := Σ (_: Π (b: B), isContr (PathP (<_>U) (p b) F)), (Π (x: Sigma B p), B)
+
+-- Definition (2) Dependent
+def isFBundle2 (B: U) (p: B -> U) (F: U): U := Σ (v: U) (w: surjective v B), (Π (x: v), PathP (<_>U) (p (w.1 x)) F)
+
+-- Definition (3) Non-Dependent
+def im1 (A B: U) (f: A -> B): U := Σ (b: B), propTrunc (Π(a:A), Path B (f a) b)
+def BAut (F: U): U := im1 unit U (\(x: unit), F)
+def unitIm1 (A B: U) (f: A -> B): im1 A B f -> B := \(x: im1 A B f), x.1
+def unitBAut (F: U): BAut F -> U := unitIm1 unit U (\(x: unit), F)
+def classify (E: U) (A' A: U) (E': A' -> U) (E: A -> U) (f: A' -> A): U := Π(x: A'), Path U (E'(x)) (E(f(x)))
+def isFBundle3 (E B: U) (p: E -> B) (F: U): U₁ := Σ (X: B -> BAut F), classify E B (BAut F) (\(b: B), fiber E B p b) (unitBAut F) X
+
+-- Definition (4) Non-Dependent
+def isFBundle4 (E B: U) (p: E -> B) (F: U): U₁
+ := Σ (X: U) (v: surjective X B) (v': prod X F -> E), pullbackSq (prod X F) E X B p v.1 v' (\(x: prod X F), x.1)

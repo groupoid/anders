@@ -7,8 +7,11 @@ Changelog
 * 0, 1 with proof irrelevance (optional)
 * W types with composition structure (as HITs)
 * Univalence, Unimorphism, Minivalence
-* Fibre Bundle
+* Fibre Bundles
 * Hopf Fibrations
+* Pullbacks
+* Propositions
+* Etale/Infinitesimal
 
 11 DEC 2021 Version 0.12.1 Categorical Library:
 

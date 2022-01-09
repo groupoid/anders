@@ -1,0 +1,24 @@
+{- Étale Maps:
+   - Etale.
+
+   EGA4 4.1 Etale maps
+
+   Copyright (c) Groupoid Infinity, 2014-2022. -}
+
+module etale where
+import library/path
+import library/pullback
+import library/infinitesimal
+
+--        w
+--    A ----> Im A
+--  f |       | x
+--    V       V
+--    B ----> Im B
+--       y
+
+def isÉtaleMap (A B: U) (f: A -> B): U
+ := isPullbackSq A (Im A) B (Im B) (ImApp A B f) (ImUnit B) (ImUnit A) f (\(a : A), <i> ImNaturality A B f a @ -i)
+
+def EtaleMap (A B: U): U
+ := Σ (f: A -> B), isÉtaleMap A B f

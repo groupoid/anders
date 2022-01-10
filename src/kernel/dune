@@ -1,0 +1,3 @@
+(ocamllex lexer)
+(menhir (modules parser))
+(executable (name anders) (libraries zarith) (package anders) (public_name anders))

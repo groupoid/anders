@@ -22,10 +22,10 @@ def ℕ-ctor := ind₂ (λ (_ : 𝟐), U) 𝟎 𝟏
 def zero : ℕ := sup 𝟐 ℕ-ctor 0₂ (ind₀ ℕ)
 def succ (n : ℕ) : ℕ := sup 𝟐 ℕ-ctor 1₂ (λ (x : 𝟏), n)
 
-def Sum (A B: U) : U := Σ (x: bool), ind₂ (\(_ : bool), U) A B x
-def inl (A B: U) (a: A) : Sum A B := (0₂, a)
-def inr (A B: U) (b: B) : Sum A B := (1₂, b)
+def coproduct (A B: U) : U := Σ (x : 𝟐), ind₂ (λ (_ : 𝟐), U) A B x
+def inl (A B : U) (a : A) : coproduct A B := (0₂, a)
+def inr (A B : U) (b : B) : coproduct A B := (1₂, b)
 
-def Option (A : U) : U := Σ (x: bool), ind₂ (\(_ : bool), U) unit A x
-def none (A : U) : Option A := (0₂, star)
-def some (A : U) (a: A) : Option A := (1₂, a)
+def maybe (A : U) : U := coproduct 𝟏 A
+def nothing (A : U) : maybe A := (0₂, star)
+def just (A : U) (a : A) : maybe A := (1₂, a)

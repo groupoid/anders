@@ -1,5 +1,5 @@
 module N1000 where
-import library/church
+import experiments/church
 
 def N1 : N := succ N0
 def N2 : N := succ N1

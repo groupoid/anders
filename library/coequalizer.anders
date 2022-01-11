@@ -3,7 +3,7 @@ import library/path
 
 -- In Anders we take Coeq as core primitive and by using it with W-types
 -- we then express more ordinary Pushouts and more general HITs like Suspension and n-Sphere.
--- The motivation behind Coeq is Van-Kampen theorem as in [1].
+-- The motivation behind Coeq is van Kampen theorem as in [1].
 
 -- [1]. Nicolai Kraus, Jakob von Raumer.
 -- Path spaces of higher inductive types in homotopy type theory.

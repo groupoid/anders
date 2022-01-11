@@ -39,7 +39,6 @@ jobs:
       - run: opam exec -- dune exec anders silent check library/fun.anders
       - run: opam exec -- dune exec anders silent check library/impredicative.anders
       - run: opam exec -- dune exec anders silent check library/kraus.anders
-      - run: opam exec -- dune exec anders silent check library/leibniz.anders
       - run: opam exec -- dune exec anders silent check library/list.anders
       - run: opam exec -- dune exec anders silent check library/mltt.anders
       - run: opam exec -- dune exec anders silent check library/path.anders

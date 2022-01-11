@@ -1,9 +1,8 @@
 (env (dev (flags (:standard -warn-error -A))))
 
 (install (files library/buddhism.anders       library/cat.anders
-                library/church.anders         library/fun.anders
+                library/fun.anders            library/list.anders
                 library/impredicative.anders  library/kraus.anders
-                library/leibniz.anders        library/list.anders
                 library/mltt.anders           library/path.anders
                 library/equiv.anders          library/constcubes.anders
                 library/ab.anders             library/algebra.anders

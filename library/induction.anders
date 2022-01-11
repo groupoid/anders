@@ -21,6 +21,11 @@ def ℕ-ctor := ind₂ (λ (_ : 𝟐), U) 𝟎 𝟏
 def zero : ℕ := sup 𝟐 ℕ-ctor 0₂ (ind₀ ℕ)
 def succ (n : ℕ) : ℕ := sup 𝟐 ℕ-ctor 1₂ (λ (x : 𝟏), n)
 
+def Fin (n : ℕ) := W (x : 𝟐), ind₂ (λ (_ : 𝟐), U) 𝟎 𝟏 x
+def Fin-ctor (n : ℕ) := ind₂ (λ (_ : 𝟐), U) 𝟎 𝟏
+def fzero (n : ℕ) : Fin n := sup 𝟐 (Fin-ctor n) 0₂ (ind₀ (Fin n))
+def fsucc (n : ℕ) (p: Fin n): Fin (succ n) := sup 𝟐 (Fin-ctor n) 1₂ (λ (x : 𝟏), p)
+
 def + (A B: U) : U := Σ (x : 𝟐), ind₂ (λ (_ : 𝟐), U) A B x
 def inl (A B : U) (a : A) : + A B := (0₂, a)
 def inr (A B : U) (b : B) : + A B := (1₂, b)

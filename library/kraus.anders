@@ -6,14 +6,14 @@ import library/path
 -- https://arxiv.org/pdf/2009.01883.pdf
 -- https://arxiv.org/pdf/1604.03799.pdf
 -- https://ncatlab.org/nlab/show/two-level+type+theory
--- https://ncatlab.org/homotopytypetheory/show/Homotopy+Type+System
 
 def algebra : U₁ := Σ
     -- a semicategory of contexts and substitutions:
     (Con: U)
     (Sub: Con → Con → U)
     (◊: Π (Г Θ ∆ : Con), Sub Θ ∆ → Sub Г Θ → Sub Г ∆)
-    (◊-assoc: Π (Г Θ ∆ Ф : Con) (σ: Sub Г Θ) (δ: Sub Θ ∆) (ν: Sub ∆ Ф), Path (Sub Г Ф) (◊ Г ∆ Ф ν (◊ Г Θ ∆ δ σ)) (◊ Г Θ Ф (◊ Θ ∆ Ф ν δ) σ))
+    (◊-assoc: Π (Г Θ ∆ Ф : Con) (σ: Sub Г Θ) (δ: Sub Θ ∆) (ν: Sub ∆ Ф),
+        PathP (<_>Sub Г Ф) (◊ Г ∆ Ф ν (◊ Г Θ ∆ δ σ)) (◊ Г Θ Ф (◊ Θ ∆ Ф ν δ) σ))
     -- identity morphisms as identity substitutions:
     (id: Π (Г : Con), Sub Г Г)
     (id-left: Π (Θ ∆ : Con) (δ : Sub Θ ∆), Path (Sub Θ ∆) δ (◊ Θ ∆ ∆ (id ∆) δ))
@@ -26,7 +26,8 @@ def algebra : U₁ := Σ
     (Ty: Con → U)
     (_|_|ᵀ: Π (Г ∆ : Con), Ty ∆ → Sub Г ∆ → Ty Г)
     (|id|ᵀ: Π (∆ : Con) (A : Ty ∆), Path (Ty ∆) (_|_|ᵀ ∆ ∆ A (id ∆)) A)
-    (|◊|ᵀ: Π (Г ∆ Ф: Con) (A : Ty Ф) (σ : Sub Г ∆) (δ : Sub ∆ Ф), Path (Ty Г) (_|_|ᵀ Г Ф A (◊ Г ∆ Ф δ σ)) (_|_|ᵀ Г ∆ (_|_|ᵀ ∆ Ф A δ) σ))
+    (|◊|ᵀ: Π (Г ∆ Ф: Con) (A : Ty Ф) (σ : Sub Г ∆) (δ : Sub ∆ Ф),
+        PathP (<_>Ty Г) (_|_|ᵀ Г Ф A (◊ Г ∆ Ф δ σ)) (_|_|ᵀ Г ∆ (_|_|ᵀ ∆ Ф A δ) σ))
     -- a (covariant) presheaf on the category of elements as terms:
     (Tm: Π (Г : Con), Ty Г → U)
     (_|_|ᵗ: Π (Г ∆ : Con) (A : Ty ∆) (B : Tm ∆ A) (σ: Sub Г ∆), Tm Г (_|_|ᵀ Г ∆ A σ))

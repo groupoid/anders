@@ -5,7 +5,7 @@ option girard true
 
 def trans (A B : U) (p : PathP (<_> U) A B) : A → B := transp p 0
 def coe (A B: U) (p: PathP (<_> U) A B): A → B := λ (x : A), trans A B p x
-def cong' (A B : U) (f : A → B) (a b : A) (p : PathP (<_>A) a b) : PathP (<_>B) (f a) (f b) := <i> f (p @ i)
+def cong (A B : U) (f : A → B) (a b : A) (p : PathP (<_>A) a b) : PathP (<_>B) (f a) (f b) := <i> f (p @ i)
 def concept (o: U): U := o -> U
 def all-phenomenas (o: U): U := Π (x y: o), PathP (<_>o) x y
 def nondual (o: U) (p: concept o): U₁ := Π (x y: o), PathP (<_>U) (p x) (p y)
@@ -15,4 +15,4 @@ def encode (o: U): (Π (p: concept o), nondual o p) -> all-phenomenas o :=
       coe (PathP (<_>o) a a) (PathP (<_>o) a b) (nd (\ (z: o), PathP (<_>o) a z) a b) (<_>a)
 
 def decode (o: U): all-phenomenas o -> (Π (p: concept o), nondual o p) :=
-    \ (all: all-phenomenas o) (p: concept o)(x y: o), cong' o U p x y (all x y)
+    \ (all: all-phenomenas o) (p: concept o)(x y: o), cong o U p x y (all x y)

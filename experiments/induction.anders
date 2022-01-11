@@ -21,3 +21,7 @@ def succ (n : ℕ) : ℕ := sup 𝟐 ℕ-ctor 1₂ (λ (x : 𝟏), n)
 def Sum (A B: U) : U := Σ (x: bool), ind₂ (\(_ : bool), U) A B x
 def inl (A B: U) (a: A) : Sum A B := (0₂, a)
 def inr (A B: U) (b: B) : Sum A B := (1₂, b)
+
+def Option (A : U) : U := Σ (x: bool), ind₂ (\(_ : bool), U) unit A x
+def none (A : U) : Option A := (0₂, star)
+def some (A : U) (a: A) : Option A := (1₂, a)

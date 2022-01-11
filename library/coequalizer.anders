@@ -1,11 +1,18 @@
 module coequalizer where
 import library/path
 
+-- In Anders we take Coeq as core primitive and by using it with W-types
+-- we then express more ordinary Pushouts and more general HITs like Suspension and n-Sphere.
+-- The motivation behind Coeq is Van-Kampen theorem as in [1].
+
+-- [1]. Nicolai Kraus, Jakob von Raumer.
+-- Path spaces of higher inductive types in homotopy type theory.
+-- http://pure-oai.bham.ac.uk/ws/files/84880431/Path_Spaces.pdf
+
 axiom coequ (A B : U) (f g : A -> B) : U
 
 axiom ι (A B : U) (f g : A -> B) : B -> coequ A B f g
-axiom resp (A B : U) (f g : A -> B) (x : A) :
-  Path (coequ A B f g) (ι A B f g (f x)) (ι A B f g (g x))
+axiom resp (A B : U) (f g : A -> B) (x : A) : Path (coequ A B f g) (ι A B f g (f x)) (ι A B f g (g x))
 
 axiom coequ-ind (A B : U) (f g : A -> B) (X : coequ A B f g -> U) (i : Π (b : B), X (ι A B f g b)) :
   (Π (x : A), PathP (<i> X (resp A B f g x @ i)) (i (f x)) (i (g x))) → (Π (z : coequ A B f g), X z)

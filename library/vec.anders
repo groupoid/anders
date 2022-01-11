@@ -9,3 +9,5 @@ def vnil (α : U) : vec α N0
 
 def vcons (α : U) (n : N) (x : α) (xs : vec α n) : vec α (succ n)
  := λ (μ : N -> U) (s : μ N0) (c : Π (n : N), α → μ n → μ (succ n)), c n x (xs μ s c)
+
+axiom //~ : U

@@ -1,5 +1,9 @@
 module induction where
 
+-- Steve Awodey, Nicola Gambino, Kristina Sojakova
+-- Inductive Types in Homotopy Type Theory
+-- https://arxiv.org/pdf/1201.3898.pdf
+
 def indᵂ-β (A : U) (B : A → U) (C : (W (x : A), B x) → U)
     (g : Π (x : A) (f : B x → (W (x : A), B x)),
     (Π (b : B x), C (f b)) → C (sup A B x f))

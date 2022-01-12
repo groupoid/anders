@@ -4,8 +4,9 @@ Changelog
 20 JAN 2022 Version 1.1.1 Univalence:
 
 * Glue Types
-* 0, 1 with proof irrelevance (optional)
-* W types with composition structure (as HITs)
+* 0, 1, 2 Types
+* W types
+* Coequalizer Type
 * Univalence, Unimorphism, Minivalence
 * Fibre Bundles
 * Hopf Fibrations

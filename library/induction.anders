@@ -37,14 +37,17 @@ def ℕ-ind (C : ℕ → U) (z : C zero) (s : Π (n : ℕ), C n → C (succ n)) 
 def ℕ-rec (C : U) (z : C) (s : ℕ → C → C) : ℕ → C := ℕ-ind (λ (_ : ℕ), C) z s
 def ℕ-iter (C : U) (z : C) (s : C → C) : ℕ → C := ℕ-rec C z (λ (_ : ℕ), s)
 def ℕ-case (C : U) (z s : C) : ℕ → C := ℕ-iter C z (λ (_ : C), s)
+def N : U := ℕ
 
 def + (A B: U) : U := Σ (x : 𝟐), ind₂ (λ (_ : 𝟐), U) A B x
 def inl (A B : U) (a : A) : + A B := (0₂, a)
 def inr (A B : U) (b : B) : + A B := (1₂, b)
+
+def prod (A B: U) : U := Σ (x : A), B
 
 def maybe (A : U) : U := + 𝟏 A
 def nothing (A : U) : maybe A := (0₂, ★)
 def just (A : U) (a : A) : maybe A := (1₂, a)
 
 def Fin : ℕ → U := ℕ-ind (λ (_ : ℕ), U) 𝟎 (\(_: ℕ), + 𝟏)
-
+def Vec (A: U) : ℕ → U := ℕ-ind (λ (_ : ℕ), U) A (\(_: ℕ), prod A)

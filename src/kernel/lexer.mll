@@ -66,6 +66,7 @@ rule main = parse
 | nl            { nextLine lexbuf; main lexbuf }
 | inlineComment { nextLine lexbuf; main lexbuf }
 | "{-"          { multiline lexbuf }
+| "begin"       { ext "" lexbuf }
 | ws+           { main lexbuf }      | "."             { DOT }
 | "module"      { MODULE }           | "where"         { WHERE }
 | "import"      { IMPORT }           | "option"        { OPTION }
@@ -98,3 +99,9 @@ and multiline = parse
 | nl   { nextLine lexbuf; multiline lexbuf }
 | eof  { failwith "EOF in multiline comment" }
 | _    { multiline lexbuf }
+
+and ext buf = parse
+| "end" { EXT buf }
+| nl    { nextLine lexbuf; ext (buf ^ Lexing.lexeme lexbuf) lexbuf }
+| eof   { failwith "unterminated external code" }
+| _     { ext (buf ^ Lexing.lexeme lexbuf) lexbuf }

@@ -10,10 +10,13 @@ let ext x = x ^ ".anders"
 type state = ctx * Files.t
 let empty : state = (Env.empty, Files.empty)
 
-let getDeclName : decl -> string = function Def (p, _, _) | Axiom (p, _) -> p
+type plug = string -> exp -> string -> exp
+let plugin : (plug option) ref = ref None
+
+let getDeclName : decl -> string = function Def (p, _, _) | Ext (p, _, _) | Axiom (p, _) -> p
 let getTerm e ctx = if !Prefs.preeval then Value (eval e ctx) else Exp e
 
-let checkDecl ctx d : ctx =
+let rec checkDecl ctx d : ctx =
   let x = getDeclName d in if Env.mem (name x) ctx then
     raise (AlreadyDeclared x);
   match d with
@@ -22,6 +25,10 @@ let checkDecl ctx d : ctx =
     let t = eval a ctx in let v = name p in
     check (upGlobal ctx v t (Var (v, t))) e t;
     Env.add (name p) (Global, Value t, getTerm e ctx) ctx
+  | Ext (p, t, v) -> begin match !plugin with
+    | Some g -> checkDecl ctx (Def (p, Some t, g p t v))
+    | None -> failwith "external plugin isn’t loaded"
+  end
   | Def (p, None, e) ->
     Env.add (name p) (Global, Value (infer ctx e), getTerm e ctx) ctx
   | Axiom (p, a) ->

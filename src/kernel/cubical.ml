@@ -49,6 +49,7 @@ and extractTele p x = Printf.sprintf "(%s : %s)" (showName p) (extractExp x)
 let extractDecl : decl -> string = function
   | Def (p, Some t, e) -> Printf.sprintf "%s : %s = %s" p (extractExp t) (extractExp e)
   | Def (_, None, _) -> fail "cubicaltt does not support automatic type inference of declaration"
+  | Ext _ -> fail "cubicaltt does not support external plugins"
   | Axiom (p, t) -> Printf.sprintf "%s : %s = undefined" p (extractExp t)
 
 let extractLine : line -> string = function

@@ -12,6 +12,7 @@ type command =
 
 type decl =
   | Def of string * exp option * exp
+  | Ext of string * exp * string
   | Axiom of string * exp
 
 type line =
@@ -28,6 +29,7 @@ let getPath = String.split_on_char moduleSep >> String.concat Filename.dir_sep
 let showDecl : decl -> string = function
   | Def (p, Some exp1, exp2) -> Printf.sprintf "def %s : %s := %s" p (showExp exp1) (showExp exp2)
   | Def (p, None, exp) -> Printf.sprintf "def %s := %s" p (showExp exp)
+  | Ext (p, t, v) -> Printf.sprintf "def %s : %s :=\nbegin%send" p (showExp t) v
   | Axiom (p, exp) -> Printf.sprintf "axiom %s : %s" p (showExp exp)
 
 let showLine : line -> string = function
@@ -45,4 +47,5 @@ let freshTele ns : tele -> tele = fun (p, e) ->
 let freshDecl : decl -> decl = function
   | Def (p, Some exp1, exp2) -> Def (p, Some (freshExp exp1), freshExp exp2)
   | Def (p, None, exp) -> Def (p, None, freshExp exp)
+  | Ext (p, t, v) -> Ext (p, freshExp t, v)
   | Axiom (p, exp) -> Axiom (p, freshExp exp)

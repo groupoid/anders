@@ -47,6 +47,7 @@
 %token <string> IDENT
 %token <Z.t> KAN
 %token <Z.t> PRE
+%token <string> EXT
 %token LPARENS RPARENS LSQ RSQ
 %token COMMA COLON IRREF EOF HOLE
 %token DEFEQ PROD ARROW DOT LAM
@@ -141,5 +142,6 @@ exp6:
 
 declarations:
   | DEF IDENT params COLON exp2 DEFEQ exp2 { Def ($2, Some (telescope ePi $5 $3), telescope eLam $7 $3) }
+  | DEF IDENT params COLON exp2 DEFEQ EXT { Ext ($2, telescope ePi $5 $3, $7) }
   | DEF IDENT params DEFEQ exp2 { Def ($2, None, telescope eLam $5 $3) }
   | AXIOM IDENT params COLON exp2 { Axiom ($2, telescope ePi $5 $3) }

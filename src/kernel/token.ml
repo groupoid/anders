@@ -4,6 +4,7 @@ let tokenToString : token -> string = function
   | IDENT s    -> Printf.sprintf "IDENT %s" s
   | PRE u      -> Printf.sprintf "PRE %s" (Z.to_string u)
   | KAN u      -> Printf.sprintf "KAN %s" (Z.to_string u)
+  | EXT s      -> Printf.sprintf "EXT «%s»" s
   | DEF        -> "DEF"         | SIGMA      -> "SIGMA"
   | PI         -> "PI"          | HOLE       -> "HOLE"
   | RPARENS    -> "RPARENS"     | LPARENS    -> "LPARENS"

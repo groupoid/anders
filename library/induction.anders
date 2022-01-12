@@ -19,7 +19,10 @@ def ℕ := W (x : 𝟐), ind₂ (λ (_ : 𝟐), U) 𝟎 𝟏 x
 def ℕ-ctor := ind₂ (λ (_ : 𝟐), U) 𝟎 𝟏
 def zero : ℕ := sup 𝟐 ℕ-ctor 0₂ (ind₀ ℕ)
 def succ (n : ℕ) : ℕ := sup 𝟐 ℕ-ctor 1₂ (λ (x : 𝟏), n)
-axiom ℕ-ind (c: ℕ → U) (z: c zero) (s: Π (n: ℕ), c n -> c (succ n)) : Π (n : ℕ), c n
+
+axiom ℕ-case (c: U) (a b: c): ℕ → c
+axiom ℕ-rec (c: U) (z: c) (s: Π (n: ℕ), c → c) : Π (n : ℕ), c
+axiom ℕ-ind (c: ℕ → U) (z: c zero) (s: Π (n: ℕ), c n → c (succ n)) : Π (n : ℕ), c n
 
 def Fin (n : ℕ) := W (x : 𝟐), ind₂ (λ (_ : 𝟐), U) 𝟎 𝟏 x
 def Fin-ctor (n : ℕ) := ind₂ (λ (_ : 𝟐), U) 𝟎 𝟏

@@ -18,7 +18,7 @@
             "name": "keyword.other.anders"
         },
         {
-            "match": "(?<=^|[\\s(),\\[\\]])(λ|Σ|Π|Id|ref|idJ|forall|sigma'|Partial|PartialP|inc|ouc|PathP|hcomp|transp|Glue|glue|unglue)(?=$|[\\s(),\\[\\]])",
+            "match": "(?<=^|[\\s(),\\[\\]])(λ|Σ|Π|Id|W|indᵂ|ind₀|ind₁|ind₂|sup|ref|idJ|forall|sigma'|Partial|PartialP|inc|ouc|PathP|hcomp|transp|Glue|glue|unglue)(?=$|[\\s(),\\[\\]])",
             "name": "keyword.control.anders"
         },
         {
@@ -26,7 +26,7 @@
             "name": "keyword.other.anders"
         },
         {
-            "match": "(?<=^|[\\s()\\[\\]])(->|→|↦|\\|->|:=|≔|≜|≝|:|\\*|\\\\/|/\\\\|∧|∨|@)(?=$|[\\s()\\[\\]])",
+            "match": "(?<=^|[\\s()\\[\\]])(->|𝟎|𝟏|𝟐|→|↦|\\|->|:=|≔|≜|≝|:|\\*|\\\\/|/\\\\|∧|∨|@)(?=$|[\\s()\\[\\]])",
             "name": "keyword.other.anders"
         },
         {

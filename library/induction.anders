@@ -5,6 +5,12 @@ option girard true
 -- Inductive Types in Homotopy Type Theory
 -- https://arxiv.org/pdf/1201.3898.pdf
 
+-- Jasper Hugunin
+-- Why not W?
+-- https://jashug.github.io/papers/whynotw.pdf
+
+-- Primitives: 0, 1, 2, W
+
 def 0-ind (C: empty -> U) (z: empty) : C z := ind₀ (C z) z
 def 1-ind (C: unit -> U) (x: C star) (z: unit) : C z := ind₁ C x z
 def 2-ind (C: bool -> U) (x: C 0₂) (y: C 1₂) (z: bool) : C z := ind₂ C x y z
@@ -17,6 +23,8 @@ def indᵂ-β (A : U) (B : A → U) (C : (W (x : A), B x) → U)
          (indᵂ A B C g (sup A B a f))
          (g a f (λ (b : B a), indᵂ A B C g (f b)))
  := <_> g a f (λ (b : B a), indᵂ A B C g (f b))
+
+-- Derivables: N, +, Maybe, Fin, Vec, 3
 
 def ℕ := W (x : 𝟐), ind₂ (λ (_ : 𝟐), U) 𝟎 𝟏 x
 def ℕ-ctor := ind₂ (λ (_ : 𝟐), U) 𝟎 𝟏
@@ -52,7 +60,6 @@ def just (A : U) (a : A) : maybe A := (1₂, a)
 def maybe-ind (A : U) (P: maybe A -> U) (n: P (nothing A)) (j: Π (x: A), P (just A x)) : Π (a: maybe A), P a
  := +-ind 𝟏 A P (ind₁ (λ (x : 𝟏), P (0₂, x)) n) j
 
-def N : U := ℕ
 def Fin : ℕ → U := ℕ-iter U 𝟎 (+ 𝟏)
 def fzero (n : ℕ) : Fin (succ n) := (0₂, ★)
 def fsucc (n : ℕ) (m : Fin n) : Fin (succ n) := (1₂, m)
@@ -69,7 +76,6 @@ def 𝟑 : U := Fin (succ (succ (succ zero)))
 def 0₃ : 𝟑 := fzero (succ (succ zero))
 def 1₃ : 𝟑 := fsucc (succ (succ zero)) (fzero (succ zero))
 def 2₃ : 𝟑 := fsucc (succ (succ zero)) (fsucc (succ zero) (fzero zero))
-
 def ind₃ (C : 𝟑 → U) (a : C 0₃) (b : C 1₃) (c : C 2₃) : Π (x : 𝟑), C x
  := +-ind 𝟏 (+ 𝟏 (+ 𝟏 𝟎)) C (ind₁ (λ (x : 𝟏), C (0₂, x)) a)
             (+-ind 𝟏 (+ 𝟏 𝟎) (λ (y : + 𝟏 (+ 𝟏 𝟎)), C (1₂, y)) (ind₁ (λ (x : 𝟏), C (1₂, (0₂, x))) b)

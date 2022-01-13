@@ -1,4 +1,5 @@
 module induction where
+import library/sigma
 option girard true
 
 -- Steve Awodey, Nicola Gambino, Kristina Sojakova
@@ -11,24 +12,20 @@ option girard true
 
 -- Primitives: 0, 1, 2, W
 
-def 0-ind (C: empty -> U) (z: empty) : C z := ind₀ (C z) z
-def 1-ind (C: unit -> U) (x: C star) (z: unit) : C z := ind₁ C x z
-def 2-ind (C: bool -> U) (x: C 0₂) (y: C 1₂) (z: bool) : C z := ind₂ C x y z
+def 0-ind (C: 𝟎 → U) (z: 𝟎) : C z := ind₀ (C z) z
+def 1-ind (C: 𝟏 → U) (x: C ★) (z: 𝟏) : C z := ind₁ C x z
+def 2-ind (C: 𝟐 → U) (x: C 0₂) (y: C 1₂) (z: 𝟐) : C z := ind₂ C x y z
 
 def indᵂ-β (A : U) (B : A → U) (C : (W (x : A), B x) → U)
-   (g : Π (x : A) (f : B x → (W (x : A), B x)),
-   (Π (b : B x), C (f b)) → C (sup A B x f))
-   (a : A) (f : B a → (W (x : A), B x)) :
-   PathP (<_> C (sup A B a f))
-         (indᵂ A B C g (sup A B a f))
-         (g a f (λ (b : B a), indᵂ A B C g (f b)))
+    (g : Π (x : A) (f : B x → (W (x : A), B x)), (Π (b : B x), C (f b)) → C (sup A B x f))
+    (a : A) (f : B a → (W (x : A), B x))
+  : PathP (<_> C (sup A B a f)) (indᵂ A B C g (sup A B a f)) (g a f (λ (b : B a), indᵂ A B C g (f b)))
  := <_> g a f (λ (b : B a), indᵂ A B C g (f b))
 
 -- Derivables: N, +, Maybe, Fin, Vec, 3
 
 def ℕ := W (x : 𝟐), ind₂ (λ (_ : 𝟐), U) 𝟎 𝟏 x
 def ℕ-ctor := ind₂ (λ (_ : 𝟐), U) 𝟎 𝟏
-
 def zero : ℕ := sup 𝟐 ℕ-ctor 0₂ (ind₀ ℕ)
 def succ (n : ℕ) : ℕ := sup 𝟐 ℕ-ctor 1₂ (λ (x : 𝟏), n)
 
@@ -57,19 +54,21 @@ def +-ind (A B : U) (C : + A B → U) (f : Π (x : A), C (inl A B x)) (g : Π (y
 def maybe (A : U) : U := + 𝟏 A
 def nothing (A : U) : maybe A := (0₂, ★)
 def just (A : U) (a : A) : maybe A := (1₂, a)
-def maybe-ind (A : U) (P: maybe A -> U) (n: P (nothing A)) (j: Π (x: A), P (just A x)) : Π (a: maybe A), P a
+def maybe-ind (A : U) (P: maybe A -> U)
+    (n: P (nothing A)) (j: Π (x: A), P (just A x)) : Π (a: maybe A), P a
  := +-ind 𝟏 A P (ind₁ (λ (x : 𝟏), P (0₂, x)) n) j
 
 def Fin : ℕ → U := ℕ-iter U 𝟎 (+ 𝟏)
 def fzero (n : ℕ) : Fin (succ n) := (0₂, ★)
 def fsucc (n : ℕ) (m : Fin n) : Fin (succ n) := (1₂, m)
-def Fin-ind (T : ℕ → U) (m: ℕ) (z: Π (n: ℕ), T (succ n)) (s: Π (n: ℕ), T n → T (succ n)) : Fin m → T m
+def Fin-ind (m : ℕ) (T : Fin (succ m) → U) 
+    (z: T (fzero m)) (s: Π (x: Fin m), T (fsucc m x)) (x: Fin (succ m)) : T x
  := ?
 
 def Vec (A: U) : ℕ → U := ℕ-iter U 𝟏 (λ (X : U), A × X)
 def vzero (A: U) : Vec A zero := ★
 def vsucc (A: U) (n : ℕ) (head: A) (tail : Vec A n) : Vec A (succ n) := (head,tail)
-def Vec-ind (A: U) (B: ℕ → U) (m: ℕ) (z: B zero) (s: Π (n: ℕ), A → B n → B (succ n)) : Vec A m → B m
+def Vec-rec (A: U) (B: ℕ → U) (m: ℕ) (z: B zero) (s: Π (n: ℕ), A → B n → B (succ n)) : Vec A m → B m
  := ?
 
 def 𝟑 : U := Fin (succ (succ (succ zero)))

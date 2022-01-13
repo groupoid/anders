@@ -5,6 +5,10 @@ option girard true
 -- Inductive Types in Homotopy Type Theory
 -- https://arxiv.org/pdf/1201.3898.pdf
 
+def 0-ind (C: empty -> U) (z: empty) : C z := ind₀ (C z) z
+def 1-ind (C: unit -> U) (x: C star) (z: unit) : C z := ind₁ C x z
+def 2-ind (C: bool -> U) (x: C 0₂) (y: C 1₂) (z: bool) : C z := ind₂ C x y z
+
 def indᵂ-β (A : U) (B : A → U) (C : (W (x : A), B x) → U)
     (g : Π (x : A) (f : B x → (W (x : A), B x)),
     (Π (b : B x), C (f b)) → C (sup A B x f))
@@ -41,13 +45,14 @@ def ℕ-case (C : U) (z s : C) : ℕ → C := ℕ-iter C z (λ (_ : C), s)
 def + (A B: U) : U := Σ (x : 𝟐), ind₂ (λ (_ : 𝟐), U) A B x
 def inl (A B : U) (a : A) : + A B := (0₂, a)
 def inr (A B : U) (b : B) : + A B := (1₂, b)
-
-def +-ind (A B : U) (C : + A B → U) (f : Π (x : A), C (inl A B x)) (g : Π (y : B), C (inr A B y)) (w : + A B) : C w :=
-ind₂ (λ (x : 𝟐), Π (u : ind₂ (λ (_ : 𝟐), U) A B x), C (x, u)) f g w.1 w.2
+def +-ind (A B : U) (C : + A B → U) (f : Π (x : A), C (inl A B x)) (g : Π (y : B), C (inr A B y)) (w : + A B) : C w
+ := ind₂ (λ (x : 𝟐), Π (u : ind₂ (λ (_ : 𝟐), U) A B x), C (x, u)) f g w.1 w.2
 
 def maybe (A : U) : U := + 𝟏 A
 def nothing (A : U) : maybe A := (0₂, ★)
 def just (A : U) (a : A) : maybe A := (1₂, a)
+def maybe-ind (A : U) (P: maybe A -> U) (n: P (nothing A)) (j: Π (x: A), P (just A x)) : Π (a: maybe A), P a
+ := +-ind 𝟏 A P (1-ind (\(x : unit), P (0₂, x)) n) (\ (x : A),  j x)
 
 def N : U := ℕ
 def Fin : ℕ → U := ℕ-iter U 𝟎 (+ 𝟏)

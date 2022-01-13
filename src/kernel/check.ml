@@ -236,8 +236,8 @@ and app : value * value -> value = function
   (* indᵂ A B C g (sup A B x f) ~> g x f (λ (b : B x), indᵂ A B C g (f b)) *)
   | VApp (VIndW (a, b, c), g), VApp (VApp (VSup (_, _), x), f) ->
     app (app (app (g, x), f),
-      VLam (app (b, x), (freshName "b", fun b ->
-        app (VApp (VIndW (a, b, c), g), app (f, b)))))
+      VLam (app (b, x), (freshName "b", fun y ->
+        app (VApp (VIndW (a, b, c), g), app (f, y)))))
   | f, x -> VApp (f, x)
 
 and evalSystem ctx = bimap (getRho ctx) (fun beta t -> eval t (faceEnv beta ctx))

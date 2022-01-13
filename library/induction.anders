@@ -10,15 +10,13 @@ def 1-ind (C: unit -> U) (x: C star) (z: unit) : C z := ind₁ C x z
 def 2-ind (C: bool -> U) (x: C 0₂) (y: C 1₂) (z: bool) : C z := ind₂ C x y z
 
 def indᵂ-β (A : U) (B : A → U) (C : (W (x : A), B x) → U)
-    (g : Π (x : A) (f : B x → (W (x : A), B x)),
-    (Π (b : B x), C (f b)) → C (sup A B x f))
-    (a : A) (f : B a → (W (x : A), B x))
- := g a f (λ (b : B a), indᵂ A B C g (f b))
-
-def indᵂ-β′ (A : U) (B : A → U) (C : (W (x : A), B x) → U)
-    (g : Π (x : A) (f : B x → (W (x : A), B x)), (Π (b : B x), C (f b)) → C (sup A B x f))
-    (a : A) (f : B a → (W (x : A), B x))
- := indᵂ A B C g (sup A B a f)
+   (g : Π (x : A) (f : B x → (W (x : A), B x)),
+   (Π (b : B x), C (f b)) → C (sup A B x f))
+   (a : A) (f : B a → (W (x : A), B x)) :
+   PathP (<_> C (sup A B a f))
+         (indᵂ A B C g (sup A B a f))
+         (g a f (λ (b : B a), indᵂ A B C g (f b)))
+ := <_> g a f (λ (b : B a), indᵂ A B C g (f b))
 
 def ℕ := W (x : 𝟐), ind₂ (λ (_ : 𝟐), U) 𝟎 𝟏 x
 def ℕ-ctor := ind₂ (λ (_ : 𝟐), U) 𝟎 𝟏
@@ -52,7 +50,7 @@ def maybe (A : U) : U := + 𝟏 A
 def nothing (A : U) : maybe A := (0₂, ★)
 def just (A : U) (a : A) : maybe A := (1₂, a)
 def maybe-ind (A : U) (P: maybe A -> U) (n: P (nothing A)) (j: Π (x: A), P (just A x)) : Π (a: maybe A), P a
- := +-ind 𝟏 A P (1-ind (\(x : unit), P (0₂, x)) n) (\ (x : A),  j x)
+ := +-ind 𝟏 A P (ind₁ (λ (x : 𝟏), P (0₂, x)) n) j
 
 def N : U := ℕ
 def Fin : ℕ → U := ℕ-iter U 𝟎 (+ 𝟏)

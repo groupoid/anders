@@ -7,6 +7,10 @@ def prod (A B: U): U := sigma' (_:A), B
 def pair (A: U) (B: A → U) (a: A) (b: B a) : Sigma A B ≔ (a, b)
 def pr₁ (A: U) (B: A → U) (x: Sigma A B) : A ≔ x.1
 def pr₂ (A: U) (B: A → U) (x: Sigma A B) : B (pr₁ A B x) ≔ x.2
+def Sigma-rec (A: U) (B: A -> U) (C: U) (g: Π (x: A), B(x) -> C) (p: Σ (x: A), B x): C := g p.1 p.2
+def Sigma-ind (A : U) (B : A -> U) (C : Π (s: Σ (x: A), B x), U) 
+    (g: Π (x: A) (y: B x), C (x,y)) (p: Σ (x: A), B x) : C p := g p.1 p.2
+
 def ac (A B: U) (R: A -> B -> U) (g: Π (x: A), Σ (y: B), R x y) : Σ (f: A -> B), Π (x: A), R x (f x) := (\(i:A),(g i).1,\(j:A),(g j).2)
 def total (A:U) (B C : A -> U) (f : Π (x:A), B x -> C x) (w: Σ(x: A), B x) : Σ(x: A), C x := (w.1,f (w.1) (w.2))
 

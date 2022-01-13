@@ -66,7 +66,7 @@ rule main = parse
 | nl            { nextLine lexbuf; main lexbuf }
 | inlineComment { nextLine lexbuf; main lexbuf }
 | "{-"          { multiline lexbuf }
-| "begin"       { ext "" lexbuf }
+| "begin"       { ext "" lexbuf }    | "plugin"        { PLUGIN }
 | ws+           { main lexbuf }      | "."             { DOT }
 | "module"      { MODULE }           | "where"         { WHERE }
 | "import"      { IMPORT }           | "option"        { OPTION }

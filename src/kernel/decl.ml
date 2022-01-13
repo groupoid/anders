@@ -10,6 +10,8 @@ let ext x = x ^ ".anders"
 type state = ctx * Files.t
 let empty : state = (Env.empty, Files.empty)
 
+let plugExt x = x ^ ".cmxs"
+
 type plug = string -> exp -> string -> exp
 let plugin : (plug option) ref = ref None
 
@@ -22,8 +24,7 @@ let rec checkDecl ctx d : ctx =
   match d with
   | Def (p, Some a, e) ->
     ignore (extSet (infer ctx a));
-    let t = eval a ctx in let v = name p in
-    check (upGlobal ctx v t (Var (v, t))) e t;
+    let t = eval a ctx in check ctx e t;
     Env.add (name p) (Global, Value t, getTerm e ctx) ctx
   | Ext (p, t, v) -> begin match !plugin with
     | Some g -> checkDecl ctx (Def (p, Some t, g p t v))
@@ -46,6 +47,13 @@ let rec checkLine st : line -> state =
     if !Prefs.verbose then begin
       Printf.printf "Checking: %s\n" (getDeclName d); flush_all ()
     end; (checkDecl ctx (freshDecl d), checked)
+  | Plugin p ->
+    plugin := None;
+    Dynlink.loadfile (plugExt p);
+    begin match !plugin with
+      | Some _ -> ()
+      | None   -> failwith (Printf.sprintf "Module “%s” was not initialized." p)
+    end; st
   | Option (opt, value) ->
     begin match opt with
       | "girard"      -> Prefs.girard      := getBoolVal opt value

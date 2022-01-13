@@ -1,5 +1,7 @@
 module plugin-syntax where
 
+plugin _build/src/tactics/tactics
+
 def test (y : 𝟏) : 𝟐 → 𝟐 :=
 begin
   tac1 some args,

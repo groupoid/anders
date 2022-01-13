@@ -17,6 +17,7 @@ type decl =
 
 type line =
   | Import of string list
+  | Plugin of string
   | Option of string * string
   | Decl of decl
 
@@ -34,6 +35,7 @@ let showDecl : decl -> string = function
 
 let showLine : line -> string = function
   | Import p -> Printf.sprintf "import %s" (String.concat " " p)
+  | Plugin p -> Printf.sprintf "plugin %s" p
   | Option (opt, value) -> Printf.sprintf "option %s %s" opt value
   | Decl d -> showDecl d
 

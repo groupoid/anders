@@ -1,4 +1,4 @@
-FLAGS = -I src/kernel -pkgs 'zarith' -use-menhir -yaccflag "--explain" -ocamlc "ocamlc -w +a-4-29"
+FLAGS = -I src/kernel -pkgs 'zarith' -use-ocamlfind -use-menhir -yaccflag "--explain" -ocamlc "ocamlc -w +a-4-29"
 OPTFLAGS = -classic-display -ocamlopt "ocamlopt -O3"
 NATIVEFLAGS = -ocamlopt "ocamlopt -O3"
 
@@ -8,13 +8,13 @@ clean:
 	ocamlbuild -clean
 
 native:
-	ocamlbuild $(FLAGS) anders.native $(NATIVEFLAGS)
+	ocamlbuild $(FLAGS) -lib dynlink anders.native $(NATIVEFLAGS)
 
 release:
-	ocamlbuild $(FLAGS) anders.native $(OPTFLAGS)
+	ocamlbuild $(FLAGS) -lib dynlink anders.native $(OPTFLAGS)
 
 byte:
-	ocamlbuild $(FLAGS) anders.byte -tag 'debug'
+	ocamlbuild $(FLAGS) -lib dynlink anders.byte -tag 'debug'
 
-profiler:
-	ocamlbuild $(FLAGS) anders.d.byte
+tactics:
+	ocamlbuild $(FLAGS) -I src/tactics tactics.cmxs

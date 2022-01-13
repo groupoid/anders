@@ -54,6 +54,7 @@ let extractDecl : decl -> string = function
 
 let extractLine : line -> string = function
   | Import xs -> String.concat "\n" (List.map (Printf.sprintf "import %s") xs)
+  | Plugin _  -> fail "cubicaltt does not support external plugins"
   | Option _  -> fail "cubicaltt obviously does not support Anders-specific options"
   | Decl d    -> extractDecl d
 

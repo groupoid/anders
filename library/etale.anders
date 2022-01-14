@@ -11,14 +11,14 @@ import library/pullback
 import library/infinitesimal
 
 --        w
---    A ----> Im A
+--    A ----> ℑ A
 --  f |       | x
 --    V       V
---    B ----> Im B
+--    B ----> ℑ B
 --       y
 
 def isÉtaleMap (A B: U) (f: A -> B): U
- := isPullbackSq A (Im A) B (Im B) (ImApp A B f) (ImUnit B) (ImUnit A) f (\(a : A), <i> ImNaturality A B f a @ -i)
+ := isPullbackSq A (ℑ A) B (ℑ B) (ImApp A B f) (ι B) (ι A) f (\(a : A), <i> ImNaturality A B f a @ -i)
 
 def EtaleMap (A B: U): U
  := Σ (f: A -> B), isÉtaleMap A B f

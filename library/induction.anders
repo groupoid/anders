@@ -61,9 +61,7 @@ def maybe-ind (A : U) (P: maybe A -> U)
 def Fin : ℕ → U := ℕ-iter U 𝟎 (+ 𝟏)
 def fzero (n : ℕ) : Fin (succ n) := (0₂, ★)
 def fsucc (n : ℕ) (m : Fin n) : Fin (succ n) := (1₂, m)
-def Fin-ind (m : ℕ) (T : Fin (succ m) → U) 
-    (z: T (fzero m)) (s: Π (x: Fin m), T (fsucc m x)) (x: Fin (succ m)) : T x
- := ?
+def Fin-ind (m : ℕ) (T : Fin (succ m) → U) (z: T (fzero m)) (s: Π (x: Fin m), T (fsucc m x)) (x: Fin (succ m)) : T x := ?
 
 def Vec (A: U) : ℕ → U := ℕ-iter U 𝟏 (λ (X : U), A × X)
 def vzero (A: U) : Vec A zero := ★

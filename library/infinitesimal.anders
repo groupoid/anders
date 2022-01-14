@@ -2,6 +2,7 @@
    - \Im modality type.
 
    HoTT 7.7 Modalities
+   Felix Wellen PhD
 
    https://arxiv.org/pdf/1806.05966.pdf
 
@@ -11,7 +12,7 @@ module infinitesimal where
 import library/path
 import library/equiv
 
-axiom ℑ : U -> U
+axiom ℑ : U -> U -- de Rham Stack
 axiom ι (A: U) : A -> ℑ A
 def isCoreduced (A: U): U := isEquiv A (ℑ A) (ι A)
 axiom ImCoreduced (A: U): isCoreduced (ℑ A)

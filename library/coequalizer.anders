@@ -17,6 +17,8 @@ import library/path
 -- http://pure-oai.bham.ac.uk/ws/files/84880431/Path_Spaces.pdf
 
 -- [Bauer, Gross, Lumsdaine, Shulman, Sozeau, Spitters] 2016 Coequalizer (Coq HoTT)
+-- The HoTT Library: A formalization of homotopy type theory in Coq
+-- https://arxiv.org/pdf/1610.04591.pdf
 
 axiom //~ (A B : U) (f g : A -> B) : U
 axiom ι (A B : U) (f g : A -> B) : B -> //~ A B f g
@@ -61,5 +63,7 @@ def loop : Path S¹ base base := resp 𝟏 𝟏 (id 𝟏) (id 𝟏) ★
 def susp (A: U) : U := pushout 𝟏 𝟏 A (\(_: A), ★) (\(_: A), ★)
 def north (A: U): susp A := po₁ 𝟏 𝟏 A (\(_: A), ★) (\(_: A), ★) ★
 def south (A: U): susp A := po₂ 𝟏 𝟏 A (\(_: A), ★) (\(_: A), ★) ★
-def merid (A: U) (a: A): Path (susp A) (north A) (south A) := po₃ 𝟏 𝟏 A (\(_: A), ★) (\(_: A), ★) a
+def merid (A: U) (a: A)
+  : Path (susp A) (north A) (south A)
+ := po₃ 𝟏 𝟏 A (\(_: A), ★) (\(_: A), ★) a
 

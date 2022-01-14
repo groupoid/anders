@@ -27,7 +27,8 @@ def ImComputeRecursion (A B: U) (c: isCoreduced B) (f: A -> B) (a: A): PathP (<_
 ImComputeInduction A (λ (_ : Im A), B) (λ (_ : Im A), c) f a
 
 def ImApp (A B: U) (f: A -> B) : Im A -> Im B := ImRecursion A (Im B) (ImCoreduced B) (∘ A B (Im B) (ImUnit B) f)
-axiom ImNaturality (A B: U) (f: A -> B) : Π (a: A), Path (Im B) ((ImUnit B) (f a)) ((ImApp A B f) (ImUnit A a))
+def ImNaturality (A B: U) (f: A -> B) : Π (a: A), Path (Im B) ((ImUnit B) (f a)) ((ImApp A B f) (ImUnit A a)) :=
+ImComputeRecursion A (Im B) (ImCoreduced B) (∘ A B (Im B) (ImUnit B) f)
 
 def isInfinitesimalClose (X: U) (a x': X): U := Path (Im X) (ImUnit X a) (ImUnit X x')
 def formalDisc (X: U) (a: X): U := Σ (x': X), isInfinitesimalClose X a x'

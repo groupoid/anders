@@ -15,13 +15,19 @@ axiom Im : U -> U
 axiom ImUnit (A: U) : A -> Im A
 def isCoreduced (A: U): U := isEquiv A (Im A) (ImUnit A)
 axiom ImCoreduced (A: U): isCoreduced (Im A)
-axiom ImRecursion (A B: U) (c: isCoreduced B) (f: A -> B) : Im A -> B
-axiom ImComputeRecursion (A B: U) (c: isCoreduced B) (f: A -> B) (a: A): PathP (<i> B) ((ImRecursion A B c f) (ImUnit A a)) (f a)
-def ImApp (A B: U) (f: A -> B) : Im A -> Im B := ImRecursion A (Im B) (ImCoreduced B) (∘ A B (Im B) (ImUnit B) f)
-axiom ImNaturality (A B: U) (f: A -> B) : Π (a: A), Path (Im B) ((ImUnit B) (f a)) ((ImApp A B f) (ImUnit A a))
+
 axiom ImInduction (A: U) (B: Im A -> U) (x: Π (a: Im A), isCoreduced (B a)) (y: Π (a: A), B (ImUnit A a)) : Π (a: Im A), B a
 axiom ImComputeInduction (A: U) (B: Im A -> U) (c: Π (a: Im A), isCoreduced (B a)) (f: Π (a:A), B (ImUnit A a)) (a: A)
   : Path (B (ImUnit A a)) (f a) ((ImInduction A B c f) (ImUnit A a))
+
+def ImRecursion (A B: U) (c: isCoreduced B) (f: A -> B) : Im A -> B :=
+ImInduction A (λ (_ : Im A), B) (λ (_ : Im A), c) f
+
+def ImComputeRecursion (A B: U) (c: isCoreduced B) (f: A -> B) (a: A): PathP (<_> B) (f a) ((ImRecursion A B c f) (ImUnit A a)) :=
+ImComputeInduction A (λ (_ : Im A), B) (λ (_ : Im A), c) f a
+
+def ImApp (A B: U) (f: A -> B) : Im A -> Im B := ImRecursion A (Im B) (ImCoreduced B) (∘ A B (Im B) (ImUnit B) f)
+axiom ImNaturality (A B: U) (f: A -> B) : Π (a: A), Path (Im B) ((ImUnit B) (f a)) ((ImApp A B f) (ImUnit A a))
 
 def isInfinitesimalClose (X: U) (a x': X): U := Path (Im X) (ImUnit X a) (ImUnit X x')
 def formalDisc (X: U) (a: X): U := Σ (x': X), isInfinitesimalClose X a x'

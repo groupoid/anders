@@ -48,6 +48,16 @@ def ℕ-rec (C : U) (z : C) (s : ℕ → C → C) : ℕ → C := ℕ-ind (λ (_ 
 def ℕ-iter (C : U) (z : C) (s : C → C) : ℕ → C := ℕ-rec C z (λ (_ : ℕ), s)
 def ℕ-case (C : U) (z s : C) : ℕ → C := ℕ-iter C z (λ (_ : C), s)
 
+def plus : ℕ → ℕ → ℕ := ℕ-rec (ℕ → ℕ) (\(n: ℕ), n) (\(_: ℕ) (mult: ℕ → ℕ) (m: ℕ), succ m)
+def mult : ℕ → ℕ → ℕ := ℕ-rec (ℕ → ℕ) (\(_: ℕ), zero) (\(_: ℕ) (mult: ℕ → ℕ) (m: ℕ), plus m (mult m))
+
+def one : ℕ := succ zero
+def two : ℕ := succ one
+def three : ℕ := succ two
+def 5 : ℕ := plus two three
+def 10 : ℕ := mult 5 two
+def 55 : ℕ := plus (mult 5 10) 5
+                     
 def + (A B: U) : U := Σ (x : 𝟐), ind₂ (λ (_ : 𝟐), U) A B x
 def inl (A B : U) (a : A) : + A B := (0₂, a)
 def inr (A B : U) (b : B) : + A B := (1₂, b)

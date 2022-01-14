@@ -179,28 +179,6 @@ def sub (A : U) (i : I) (u : Partial A i) : V := A[i ↦ u]
 def inc′ (A : U) (i : I) (a : A) : sub A i [(i = 1) → a] := inc A i a
 def ouc′ (A : U) (i : I) (u : Partial A i) (a : A[i ↦ u]) : A := ouc a
 
--- Simon Huber equations: http://www.cse.chalmers.se/~simonhu/misc/hcomp.pdf
-
--- transpⁱ N φ u₀ = u₀
--- transpⁱ U φ A = A
--- transpⁱ (Π (x : A), B) φ u₀ v = transpⁱ B(x/w) φ (u₀ w(i/0)), where [ w = transpFill⁻ⁱ A φ v, v : A(i/1) ]
--- transpⁱ (Σ (x : A), B) φ u₀ = (transpⁱ A φ (u₀.1),transpⁱ B(x/v) φ(u₀.2)), where [ v = transpFillⁱ A φ u₀.1 ]
--- transpⁱ (Pathʲ A v w) φ u₀ = 〈j〉compⁱ A [φ ↦ u₀ j, (j=0) ↦ v, (j=1) ↦ w] (u₀ j), where [ u : A(j/0), v : A(j/1) ]
--- transpⁱ (Glue [φ ↦ (T,w)] A) ψ u₀ = glue [φ(i/1) ↦ t′₁] a′₁ : B(i/1)
-
--- hcompⁱ N [φ ↦ 0] 0 = 0
--- hcompⁱ N [φ ↦ S u] (S u₀) = S (hcompⁱ N [φ ↦ u] u₀)
--- hcompⁱ U [φ ↦ E] A = Glue [φ ↦ (E(i/1), equivⁱ E(i/1−i))] A
--- hcompⁱ (Π (x : A), B) [φ ↦ u] u₀ v = hcompⁱ B(x/v) [φ ↦ u v] (u₀ v)
--- hcompⁱ (Σ (x : A), B) [φ ↦ u] u₀ = (v(i/1), compⁱ B(x/v) [φ ↦ u.2] u₀.2), where [ v = hfillⁱ A [φ ↦ u.1] u₀.1 ]
--- hcompⁱ (Pathʲ A v w) [φ ↦ u] u₀ = 〈j〉 hcompⁱ A [ φ ↦ u j, (j = 0) ↦ v, (j = 1) ↦ w ] (u₀ j)
--- hcompⁱ (Glue [φ ↦ (T,w)] A) [ψ ↦ u] u₀ = glue [φ ↦ t₁] a₁ = glue [φ ↦ u(i/1)] (unglue u(i/1))
---   = u(i/1) : Glue [φ ↦ (T,w)] A, where [ t₁ = u(i/1) : T, a₁ = unglue u(i/1) : A, glue [φ ↦ t₁] a1 = t₁ : T ]
-
--- transp⁻ⁱ A φ u = (transpⁱ A(i/1−i) φ u)(i/1−i) : A(i/0)
--- transpFillⁱ A φ u₀ = transpʲ A(i/i∧j) (φ∨(i=0)) u₀ : A
--- hfillⁱ A [φ ↦ u] u₀ = hcompʲ A [φ ↦ u(i/i∧j), (i=0) ↦ u₀] u₀ : A
-
 -- Generalized Transport
 
 def transp′ (A : U) (j : I) (p : (I → U) [j ↦ [(j = 1) → λ (_ : I), A]]) := transp (<i> (ouc p) i) j
@@ -239,7 +217,7 @@ def comp-inv-Path⁻¹ (A : U) (a b : A) (p : Path A a b) : Path (Path A a a) (c
  := <k j> hcomp A (∂ j ∨ k) (λ (i : I), [(j = 0) → a, (j = 1) → p @ -i ∧ -k, (k = 1) → a]) (p @ j ∧ -k)
 
 def comp-inv-Path (A : U) (a b : A) (p : Path A a b) : Path (Path A b b) (comp-Path A b a b (<i> p @ -i) p) (<_> b)
- := <j i> hcomp A (∂ i ∨ j) (λ (k : I), [(i = 0) → b, (j = 1) → b, (i = 1) → p @ j \/ k]) (p @ -i \/ j)
+ := <j i> hcomp A (∂ i ∨ j) (λ (k : I), [(i = 0) → b, (j = 1) → b, (i = 1) → p @ j \/ k]) (p @ -i ∨ j)
 
 def comp-Path-left (A : U) (a b : A) (p: Path A a b) : Path (Path A a b) p (comp-Path A a a b (<_> a) p)
  := <j i> hcomp A (∂ i ∨ -j) (λ (k : I), [(i = 0) → a, (i = 1) → p @ k, (j = 0) → p @ i /\ k]) a
@@ -283,7 +261,30 @@ def trans-filler-p (A : U) (x y z : A) (p : Path A x y) (q : Path A y z) : PathP
 def trans-filler-q (A : U) (x y z : A) (p : Path A x y) (q : Path A y z) : PathP (<i> Path A (p @ -i) z) q (comp-Path A x y z p q)
  := <j i> hcomp A (-j ∨ ∂ i) (λ (k : I), [(i = 0) → p @ -j, (i = 1) → q @ k, (j = 0) → q @ i /\ k]) (p @ i \/ -j)
 
--- Tests
+-- Reality Check
+-- Simon Huber Equations: http://www.cse.chalmers.se/~simonhu/misc/hcomp.pdf
+
+{-
+   transpⁱ N φ u₀ = u₀
+   transpⁱ U φ A = A
+   transpⁱ (Π (x : A), B) φ u₀ v = transpⁱ B(x/w) φ (u₀ w(i/0)), where [ w = transpFill⁻ⁱ A φ v, v : A(i/1) ]
+   transpⁱ (Σ (x : A), B) φ u₀ = (transpⁱ A φ (u₀.1),transpⁱ B(x/v) φ(u₀.2)), where [ v = transpFillⁱ A φ u₀.1 ]
+   transpⁱ (Pathʲ A v w) φ u₀ = 〈j〉compⁱ A [φ ↦ u₀ j, (j=0) ↦ v, (j=1) ↦ w] (u₀ j), where [ u : A(j/0), v : A(j/1) ]
+   transpⁱ (Glue [φ ↦ (T,w)] A) ψ u₀ = glue [φ(i/1) ↦ t′₁] a′₁ : B(i/1)
+
+   hcompⁱ N [φ ↦ 0] 0 = 0
+   hcompⁱ N [φ ↦ S u] (S u₀) = S (hcompⁱ N [φ ↦ u] u₀)
+   hcompⁱ U [φ ↦ E] A = Glue [φ ↦ (E(i/1), equivⁱ E(i/1−i))] A
+   hcompⁱ (Π (x : A), B) [φ ↦ u] u₀ v = hcompⁱ B(x/v) [φ ↦ u v] (u₀ v)
+   hcompⁱ (Σ (x : A), B) [φ ↦ u] u₀ = (v(i/1), compⁱ B(x/v) [φ ↦ u.2] u₀.2), where [ v = hfillⁱ A [φ ↦ u.1] u₀.1 ]
+   hcompⁱ (Pathʲ A v w) [φ ↦ u] u₀ = 〈j〉 hcompⁱ A [ φ ↦ u j, (j = 0) ↦ v, (j = 1) ↦ w ] (u₀ j)
+   hcompⁱ (Glue [φ ↦ (T,w)] A) [ψ ↦ u] u₀ = glue [φ ↦ t₁] a₁ = glue [φ ↦ u(i/1)] (unglue u(i/1))
+    = u(i/1) : Glue [φ ↦ (T,w)] A, where [ t₁ = u(i/1) : T, a₁ = unglue u(i/1) : A, glue [φ ↦ t₁] a1 = t₁ : T ]
+
+   transp⁻ⁱ A φ u = (transpⁱ A(i/1−i) φ u)(i/1−i) : A(i/0)
+   transpFillⁱ A φ u₀ = transpʲ A(i/i∧j) (φ∨(i=0)) u₀ : A
+   hfillⁱ A [φ ↦ u] u₀ = hcompʲ A [φ ↦ u(i/i∧j), (i=0) ↦ u₀] u₀ : A
+-}
 
 def trans-Π (A : I -> U) (B : Π (i : I), A i -> U) (f : Π (x : A 0), B 0 x) : Π (x : A 1), B 1 x
  := λ (x : A 1), transp (<j> B j (transFill (A 1) (A 0) (<i> A -i) x @ -j)) 0 (f (transp (<i> A -i) 0 x))

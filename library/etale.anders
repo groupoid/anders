@@ -12,8 +12,8 @@ import library/infinitesimal
 
 --        w
 --    A ----> ℑ A
---  f |       | x
---    V       V
+--  f |        | x
+--    V        V
 --    B ----> ℑ B
 --       y
 

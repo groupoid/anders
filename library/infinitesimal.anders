@@ -11,36 +11,33 @@ module infinitesimal where
 import library/path
 import library/equiv
 
-axiom Im : U -> U
-axiom ImUnit (A: U) : A -> Im A
-def isCoreduced (A: U): U := isEquiv A (Im A) (ImUnit A)
-axiom ImCoreduced (A: U): isCoreduced (Im A)
+axiom ℑ : U -> U
+axiom ι (A: U) : A -> ℑ A
+def isCoreduced (A: U): U := isEquiv A (ℑ A) (ι A)
+axiom ImCoreduced (A: U): isCoreduced (ℑ A)
 
-axiom ImInduction (A: U) (B: Im A -> U) (x: Π (a: Im A), isCoreduced (B a)) (y: Π (a: A), B (ImUnit A a)) : Π (a: Im A), B a
-axiom ImComputeInduction (A: U) (B: Im A -> U) (c: Π (a: Im A), isCoreduced (B a)) (f: Π (a:A), B (ImUnit A a)) (a: A)
-  : Path (B (ImUnit A a)) (f a) ((ImInduction A B c f) (ImUnit A a))
+axiom ImInduction (A: U) (B: ℑ A -> U) (x: Π (a: ℑ A), isCoreduced (B a)) (y: Π (a: A), B (ι A a)) : Π (a: ℑ A), B a
+axiom ImComputeInduction (A: U) (B: ℑ A -> U) (c: Π (a: ℑ A), isCoreduced (B a)) (f: Π (a: A), B (ι A a)) (a: A)
+  : Path (B (ι A a)) (f a) ((ImInduction A B c f) (ι A a))
 
-def ImRecursion (A B: U) (c: isCoreduced B) (f: A -> B) : Im A -> B :=
-ImInduction A (λ (_ : Im A), B) (λ (_ : Im A), c) f
+def ImRecursion (A B: U) (c: isCoreduced B) (f: A -> B) : ℑ A -> B
+ := ImInduction A (λ (_ : ℑ A), B) (λ (_ : ℑ A), c) f
 
-def ImComputeRecursion (A B: U) (c: isCoreduced B) (f: A -> B) (a: A): PathP (<_> B) (f a) ((ImRecursion A B c f) (ImUnit A a)) :=
-ImComputeInduction A (λ (_ : Im A), B) (λ (_ : Im A), c) f a
+def ImComputeRecursion (A B: U) (c: isCoreduced B) (f: A -> B) (a: A): PathP (<_> B) (f a) ((ImRecursion A B c f) (ι A a))
+ := ImComputeInduction A (λ (_ : ℑ A), B) (λ (_ : ℑ A), c) f a
 
-def ImApp (A B: U) (f: A -> B) : Im A -> Im B := ImRecursion A (Im B) (ImCoreduced B) (∘ A B (Im B) (ImUnit B) f)
-def ImNaturality (A B: U) (f: A -> B) : Π (a: A), Path (Im B) ((ImUnit B) (f a)) ((ImApp A B f) (ImUnit A a)) :=
-ImComputeRecursion A (Im B) (ImCoreduced B) (∘ A B (Im B) (ImUnit B) f)
+def ImApp (A B: U) (f: A -> B) : ℑ A -> ℑ B := ImRecursion A (ℑ B) (ImCoreduced B) (∘ A B (ℑ B) (ι B) f)
+def ImNaturality (A B: U) (f: A -> B) : Π (a: A), Path (ℑ B) ((ι B) (f a)) ((ImApp A B f) (ι A a))
+ := ImComputeRecursion A (ℑ B) (ImCoreduced B) (∘ A B (ℑ B) (ι B) f)
 
-def isInfinitesimalClose (X: U) (a x': X): U := Path (Im X) (ImUnit X a) (ImUnit X x')
+def isInfinitesimalClose (X: U) (a x': X): U := Path (ℑ X) (ι X a) (ι X x')
 def formalDisc (X: U) (a: X): U := Σ (x': X), isInfinitesimalClose X a x'
-def unitDisc (X: U) (x: Im X): U := Σ(x': X), Path (Im X) x (ImUnit X x')
-def starDisc (X: U) (x: X): formalDisc X x := (x, idp (Im X) (ImUnit X x))
+def unitDisc (X: U) (x: ℑ X): U := Σ(x': X), Path (ℑ X) x (ι X x')
+def starDisc (X: U) (x: X): formalDisc X x := (x, idp (ℑ X) (ι X x))
 def formalDiscBundle (A: U): U := Σ (a: A), formalDisc A a
 
-def differential (X Y: U) (f: X -> Y) (x : X) (ε : formalDisc X x) : formalDisc Y (f x) :=
-(f ε.1, <i> hcomp (Im Y) (∂ i)
-                  (λ (j : I), [(i = 0) → ImNaturality X Y f x @ -j,
-                               (i = 1) → ImNaturality X Y f ε.1 @ -j])
-                  (ImApp X Y f (ε.2 @ i)))
+def differential (X Y: U) (f: X -> Y) (x : X) (ε : formalDisc X x) : formalDisc Y (f x)
+ := (f ε.1, <i> hcomp (ℑ Y) (∂ i) (λ (j : I), [(i = 0) → ImNaturality X Y f x @ -j, (i = 1) → ImNaturality X Y f ε.1 @ -j]) (ImApp X Y f (ε.2 @ i)))
 
 axiom preservesInifinitesimalProximity (X Y: U) (x x': X) (f: X -> Y) : isInfinitesimalClose X x x' -> isInfinitesimalClose Y (f x) (f x')
 

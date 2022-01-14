@@ -19,6 +19,14 @@ axiom //~-ind-β₁ (A B : U) (f g : A → B) (X : //~ A B f g -> U) (i : Π (b 
       (ρ : Π (x : A), PathP (<i> X (resp A B f g x @ i)) (i (f x)) (i (g x))) (b : B)
     : Path (X (ι A B f g b)) (//~-ind A B f g X i ρ (ι A B f g b)) (i b)
 
+-- //~-ind-β₁ need to be definitional to write this properly (i.e. without transp)
+{-
+axiom //~-ind-β₂ (A B : U) (f g : A → B) (X : //~ A B f g -> U) (i : Π (b : B), X (ι A B f g b))
+  (ρ : Π (x : A), PathP (<i> X (resp A B f g x @ i)) (i (f x)) (i (g x))) (x : A) :
+  Path (PathP (<j> X (resp A B f g x @ j)) (i (f x)) (i (g x)))
+       (<j> //~-ind A B f g X i ρ (resp A B f g x @ j)) (ρ x)
+-}
+
 -- [Siegment] 2022
 
 def pushout (A B C : U) (f : C → A) (g : C → B) : U
@@ -35,14 +43,6 @@ def po₂ (A B C: U) (f: C -> A) (g: C -> B) (b: B)
 def po₃ (A B C: U) (f: C -> A) (g: C -> B) (c: C)
   : Path (pushout A B C f g) (po₁ A B C f g (f c)) (po₂ A B C f g (g c))
  := resp C (+ A B) (∘ C A (+ A B) (inl A B) f) (∘ C B (+ A B) (inr A B) g) c
-
--- //~-ind-β₁ need to be definitional to write this properly (i.e. without transp)
-{-
-axiom //~-ind-β₂ (A B : U) (f g : A → B) (X : //~ A B f g -> U) (i : Π (b : B), X (ι A B f g b))
-  (ρ : Π (x : A), PathP (<i> X (resp A B f g x @ i)) (i (f x)) (i (g x))) (x : A) :
-  Path (PathP (<j> X (resp A B f g x @ j)) (i (f x)) (i (g x)))
-       (<j> //~-ind A B f g X i ρ (resp A B f g x @ j)) (ρ x)
--}
 
 -- [Shulman] 2015
 

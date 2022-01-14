@@ -34,7 +34,13 @@ def formalDisc (X: U) (a: X): U := Σ (x': X), isInfinitesimalClose X a x'
 def unitDisc (X: U) (x: Im X): U := Σ(x': X), Path (Im X) x (ImUnit X x')
 def starDisc (X: U) (x: X): formalDisc X x := (x, idp (Im X) (ImUnit X x))
 def formalDiscBundle (A: U): U := Σ (a: A), formalDisc A a
-axiom differential (X Y: U) (f: X -> Y) (x: X) : formalDisc X x -> formalDisc Y (f x)
+
+def differential (X Y: U) (f: X -> Y) (x : X) (ε : formalDisc X x) : formalDisc Y (f x) :=
+(f ε.1, <i> hcomp (Im Y) (∂ i)
+                  (λ (j : I), [(i = 0) → ImNaturality X Y f x @ -j,
+                               (i = 1) → ImNaturality X Y f ε.1 @ -j])
+                  (ImApp X Y f (ε.2 @ i)))
+
 axiom preservesInifinitesimalProximity (X Y: U) (x x': X) (f: X -> Y) : isInfinitesimalClose X x x' -> isInfinitesimalClose Y (f x) (f x')
 
 axiom lemma45 (A B C: U) (f: A -> B) (g: B -> C) (x: A)

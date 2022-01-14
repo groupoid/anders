@@ -54,8 +54,7 @@ def +-ind (A B : U) (C : + A B → U) (f : Π (x : A), C (inl A B x)) (g : Π (y
 def maybe (A : U) : U := + 𝟏 A
 def nothing (A : U) : maybe A := (0₂, ★)
 def just (A : U) (a : A) : maybe A := (1₂, a)
-def maybe-ind (A : U) (P: maybe A -> U)
-    (n: P (nothing A)) (j: Π (x: A), P (just A x)) : Π (a: maybe A), P a
+def maybe-ind (A : U) (P: maybe A -> U) (n: P (nothing A)) (j: Π (x: A), P (just A x)) : Π (a: maybe A), P a
  := +-ind 𝟏 A P (ind₁ (λ (x : 𝟏), P (0₂, x)) n) j
 
 def Fin : ℕ → U := ℕ-iter U 𝟎 (+ 𝟏)

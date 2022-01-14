@@ -10,7 +10,7 @@ Features
 --------
 
 * Homepage: https://groupoid.space/homotopy
-* Fibrant MLTT-style ΠΣ primitives with strict equality in 500 LOC
+* Fibrant MLTT-style 0-1-2-Π-Σ-W primitives with strict equality in 500 LOC
 * Cofibrant CHM-style I primitives with pretypes hierarchy Vₙ in 500 LOC
 * Generalized Transport and Homogeneous Composition core Kan operations
 * Partial Elements

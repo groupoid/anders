@@ -1,6 +1,8 @@
 {- Homotopy Type Theory:
    - Coequalizer.
    - S¹ sphere.
+   - Pushout.
+   - Suspension.
 
    Copyright (c) Groupoid Infinity, 2014-2022. -}
    

@@ -41,13 +41,10 @@ axiom //~-ind-β₂ (A B : U) (f g : A → B) (X : //~ A B f g -> U) (i : Π (b 
 
 def pushout (A B C : U) (f : C → A) (g : C → B) : U
  := //~ C (+ A B) (∘ C A (+ A B) (inl A B) f) (∘ C B (+ A B) (inr A B) g)
-
 def po₁ (A B C: U) (f: C -> A) (g: C -> B) (a: A) : pushout A B C f g
  := ι C (+ A B) (∘ C A (+ A B) (inl A B) f) (∘ C B (+ A B) (inr A B) g) (inl A B a)
-
 def po₂ (A B C: U) (f: C -> A) (g: C -> B) (b: B) : pushout A B C f g
  := ι C (+ A B) (∘ C A (+ A B) (inl A B) f) (∘ C B (+ A B) (inr A B) g) (inr A B b)
-
 def po₃ (A B C: U) (f: C -> A) (g: C -> B) (c: C)
   : Path (pushout A B C f g) (po₁ A B C f g (f c)) (po₂ A B C f g (g c))
  := resp C (+ A B) (∘ C A (+ A B) (inl A B) f) (∘ C B (+ A B) (inr A B) g) c

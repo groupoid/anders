@@ -5,6 +5,7 @@
    Copyright (c) Groupoid Infinity, 2014-2022. -}
    
 module coequalizer where
+import library/induction
 import library/path
 
 -- Coequalizer 
@@ -17,6 +18,9 @@ axiom //~-ind (A B : U) (f g : A -> B) (X : //~ A B f g -> U) (i : Π (b : B), X
 axiom //~-ind-β₁ (A B : U) (f g : A → B) (X : //~ A B f g -> U) (i : Π (b : B), X (ι A B f g b))
       (ρ : Π (x : A), PathP (<i> X (resp A B f g x @ i)) (i (f x)) (i (g x))) (b : B)
     : Path (X (ι A B f g b)) (//~-ind A B f g X i ρ (ι A B f g b)) (i b)
+
+def pushout (A B C : U) (f : C → A) (g : C → B) :=
+//~ C (+ A B) (∘ C A (+ A B) (inl A B) f) (∘ C B (+ A B) (inr A B) g)
 
 -- //~-ind-β₁ need to be definitional to write this properly (i.e. without transp)
 {-

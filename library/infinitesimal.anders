@@ -30,18 +30,18 @@ def ImApp (A B: U) (f: A -> B) : ℑ A -> ℑ B := ImRecursion A (ℑ B) (ImCore
 def ImNaturality (A B: U) (f: A -> B) : Π (a: A), Path (ℑ B) ((ι B) (f a)) ((ImApp A B f) (ι A a))
  := ImComputeRecursion A (ℑ B) (ImCoreduced B) (∘ A B (ℑ B) (ι B) f)
 
-def isInfinitesimalClose (X: U) (a x': X): U := Path (ℑ X) (ι X a) (ι X x')
-def formalDisc (X: U) (a: X): U := Σ (x': X), isInfinitesimalClose X a x'
+def 𝔻 (X: U) (a x': X): U := Path (ℑ X) (ι X a) (ι X x')
+def formalDisc (X: U) (a: X): U := Σ (x': X), 𝔻 X a x'
 def unitDisc (X: U) (x: ℑ X): U := Σ(x': X), Path (ℑ X) x (ι X x')
 def starDisc (X: U) (x: X): formalDisc X x := (x, idp (ℑ X) (ι X x))
 def formalDiscBundle (A: U): U := Σ (a: A), formalDisc A a
 
-def differential (X Y: U) (f: X -> Y) (x : X) (ε : formalDisc X x) : formalDisc Y (f x)
+def d (X Y: U) (f: X -> Y) (x : X) (ε : formalDisc X x) : formalDisc Y (f x)
  := (f ε.1, <i> hcomp (ℑ Y) (∂ i) (λ (j : I), [(i = 0) → ImNaturality X Y f x @ -j, (i = 1) → ImNaturality X Y f ε.1 @ -j]) (ImApp X Y f (ε.2 @ i)))
 
-axiom preservesInifinitesimalProximity (X Y: U) (x x': X) (f: X -> Y) : isInfinitesimalClose X x x' -> isInfinitesimalClose Y (f x) (f x')
+axiom preservesInifinitesimalProximity (X Y: U) (x x': X) (f: X -> Y) : 𝔻 X x x' -> 𝔻 Y (f x) (f x')
 
 axiom lemma45 (A B C: U) (f: A -> B) (g: B -> C) (x: A)
   : Path ((formalDisc A x -> formalDisc C ((∘ A B C g f) x)))
-         (differential A C (∘ A B C g f) x)
-         (∘ (formalDisc A x) (formalDisc B (f x)) (formalDisc C ((∘ A B C g f) x)) (differential B C g (f x)) (differential A B f x))
+         (d A C (∘ A B C g f) x)
+         (∘ (formalDisc A x) (formalDisc B (f x)) (formalDisc C ((∘ A B C g f) x)) (d B C g (f x)) (d A B f x))

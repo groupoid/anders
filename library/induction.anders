@@ -68,8 +68,8 @@ def Fin-ind (m : ℕ) (T : Fin (succ m) → U)
 def Vec (A: U) : ℕ → U := ℕ-iter U 𝟏 (λ (X : U), A × X)
 def vzero (A: U) : Vec A zero := ★
 def vsucc (A: U) (n : ℕ) (head: A) (tail : Vec A n) : Vec A (succ n) := (head,tail)
-def Vec-rec (A: U) (B: ℕ → U) (m: ℕ) (z: B zero) (s: Π (n: ℕ), A → B n → B (succ n)) : Vec A m → B m
- := ?
+def Vec-rec (A: U) (B: ℕ → U) (m: ℕ) (z: B zero) (s: Π (n: ℕ), A → B n → B (succ n)) : Vec A m → B m := ?
+def Vec-ind (A: U) (T: Π (n: ℕ), Vec A n → U) (z: Π (n: ℕ) (v: Vec A n), T n v) (m: ℕ) : Π (x: Vec A m), T m x := ?
 
 def 𝟑 : U := Fin (succ (succ (succ zero)))
 def 0₃ : 𝟑 := fzero (succ (succ zero))

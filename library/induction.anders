@@ -15,6 +15,9 @@ option girard true
 def 0-ind (C: 𝟎 → U) (z: 𝟎) : C z := ind₀ (C z) z
 def 1-ind (C: 𝟏 → U) (x: C ★) (z: 𝟏) : C z := ind₁ C x z
 def 2-ind (C: 𝟐 → U) (x: C 0₂) (y: C 1₂) (z: 𝟐) : C z := ind₂ C x y z
+def W-ind (A : U) (B : A → U) (C : (W (x : A), B x) → U)
+    (g : Π (x : A) (f : B x → (W (x : A), B x)), (Π (b : B x), C (f b)) → C (sup A B x f))
+    (a : A) (f : B a → (W (x : A), B x)) (b : B a) : C (f b) := indᵂ A B C g (f b)
 
 def indᵂ-β (A : U) (B : A → U) (C : (W (x : A), B x) → U)
     (g : Π (x : A) (f : B x → (W (x : A), B x)), (Π (b : B x), C (f b)) → C (sup A B x f))
@@ -22,7 +25,7 @@ def indᵂ-β (A : U) (B : A → U) (C : (W (x : A), B x) → U)
   : PathP (<_> C (sup A B a f)) (indᵂ A B C g (sup A B a f)) (g a f (λ (b : B a), indᵂ A B C g (f b)))
  := <_> g a f (λ (b : B a), indᵂ A B C g (f b))
 
--- Derivables: N, +, Maybe, Fin, Vec, 3
+-- Derivable Induction: N, +, Maybe, Fin, Vec, 3, 4
 
 def ℕ := W (x : 𝟐), ind₂ (λ (_ : 𝟐), U) 𝟎 𝟏 x
 def ℕ-ctor := ind₂ (λ (_ : 𝟐), U) 𝟎 𝟏

@@ -8,7 +8,15 @@ module coequalizer where
 import library/induction
 import library/path
 
--- Coequalizer 
+-- In Anders we take Coeq as core primitive and by using it with W-types
+-- we then express more ordinary Pushouts and more general HITs like Suspension and n-Sphere.
+-- The motivation behind Coeq is van Kampen theorem as in [1].
+
+-- [1]. Nicolai Kraus, Jakob von Raumer.
+-- Path spaces of higher inductive types in homotopy type theory.
+-- http://pure-oai.bham.ac.uk/ws/files/84880431/Path_Spaces.pdf
+
+-- [Bauer, Gross, Lumsdaine, Shulman, Sozeau, Spitters] 2016 Coequalizer (Coq HoTT)
 
 axiom //~ (A B : U) (f g : A -> B) : U
 axiom ι (A B : U) (f g : A -> B) : B -> //~ A B f g
@@ -27,7 +35,7 @@ axiom //~-ind-β₂ (A B : U) (f g : A → B) (X : //~ A B f g -> U) (i : Π (b 
        (<j> //~-ind A B f g X i ρ (resp A B f g x @ j)) (ρ x)
 -}
 
--- [Siegment] 2022
+-- [Caglayan] 2014
 
 def pushout (A B C : U) (f : C → A) (g : C → B) : U
  := //~ C (+ A B) (∘ C A (+ A B) (inl A B) f) (∘ C B (+ A B) (inr A B) g)
@@ -50,10 +58,10 @@ def S¹ : U := //~ 𝟏 𝟏 (id 𝟏) (id 𝟏)
 def base : S¹ := ι 𝟏 𝟏 (id 𝟏) (id 𝟏) ★
 def loop : Path S¹ base base := resp 𝟏 𝟏 (id 𝟏) (id 𝟏) ★ 
 
--- In Anders we take Coeq as core primitive and by using it with W-types
--- we then express more ordinary Pushouts and more general HITs like Suspension and n-Sphere.
--- The motivation behind Coeq is van Kampen theorem as in [1].
+-- [Caglayan] 2018
 
--- [1]. Nicolai Kraus, Jakob von Raumer.
--- Path spaces of higher inductive types in homotopy type theory.
--- http://pure-oai.bham.ac.uk/ws/files/84880431/Path_Spaces.pdf
+def susp (A: U) : U := pushout 𝟏 𝟏 A (\(_: A), ★) (\(_: A), ★)
+def north (A: U): susp A := po₁ 𝟏 𝟏 A (\(_: A), ★) (\(_: A), ★) ★
+def south (A: U): susp A := po₂ 𝟏 𝟏 A (\(_: A), ★) (\(_: A), ★) ★
+def merid (A: U) (a: A): Path (susp A) (north A) (south A) := po₃ 𝟏 𝟏 A (\(_: A), ★) (\(_: A), ★) a
+

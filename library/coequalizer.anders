@@ -7,7 +7,7 @@
 module coequalizer where
 import library/path
 
--- Coeqalizer 
+-- Coequalizer 
 
 axiom //~ (A B : U) (f g : A -> B) : U
 axiom ι (A B : U) (f g : A -> B) : B -> //~ A B f g

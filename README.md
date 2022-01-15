@@ -10,13 +10,14 @@ Features
 --------
 
 * Homepage: https://groupoid.space/homotopy
-* Fibrant MLTT-style 0-1-2-Π-Σ-W primitives with strict equality in 500 LOC
+* Fibrant MLTT-style 0-1-2-Π-Σ-W primitives with Uₙ hierarchy in 500 LOC
 * Cofibrant CHM-style I primitives with pretypes hierarchy Vₙ in 500 LOC
 * Generalized Transport and Homogeneous Composition core Kan operations
 * Partial Elements
 * Cubical Subtypes
 * Glue types
 * Strict Equality on pretypes
+* Coequalizer
 * Parser in 80 LOC
 * Lexer in 80 LOC
 * UTF-8 support including universe levels

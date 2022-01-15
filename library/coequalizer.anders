@@ -23,26 +23,26 @@ import library/induction
 -- The HoTT Library: A formalization of homotopy type theory in Coq
 -- https://arxiv.org/pdf/1610.04591.pdf
 
-axiom //~ (A B : U) (f g : A -> B) : U
-axiom ι (A B : U) (f g : A -> B) : B -> //~ A B f g
-axiom resp (A B : U) (f g : A -> B) (x : A) : Path (//~ A B f g) (ι A B f g (f x)) (ι A B f g (g x))
-axiom //~-ind (A B : U) (f g : A -> B) (X : //~ A B f g -> U) (i : Π (b : B), X (ι A B f g b))
-    : (Π (x : A), PathP (<i> X (resp A B f g x @ i)) (i (f x)) (i (g x))) → (Π (z : //~ A B f g), X z)
-axiom //~-ind-β₁ (A B : U) (f g : A → B) (X : //~ A B f g -> U) (i : Π (b : B), X (ι A B f g b))
+axiom coequ (A B : U) (f g : A -> B) : U
+axiom ι (A B : U) (f g : A -> B) : B -> coequ A B f g
+axiom resp (A B : U) (f g : A -> B) (x : A) : Path (coequ A B f g) (ι A B f g (f x)) (ι A B f g (g x))
+axiom coequ-ind (A B : U) (f g : A -> B) (X : coequ A B f g -> U) (i : Π (b : B), X (ι A B f g b))
+    : (Π (x : A), PathP (<i> X (resp A B f g x @ i)) (i (f x)) (i (g x))) → (Π (z : coequ A B f g), X z)
+axiom coequ-ind-β₁ (A B : U) (f g : A → B) (X : coequ A B f g -> U) (i : Π (b : B), X (ι A B f g b))
       (ρ : Π (x : A), PathP (<i> X (resp A B f g x @ i)) (i (f x)) (i (g x))) (b : B)
-    : Path (X (ι A B f g b)) (//~-ind A B f g X i ρ (ι A B f g b)) (i b)
+    : Path (X (ι A B f g b)) (coequ-ind A B f g X i ρ (ι A B f g b)) (i b)
 
--- //~-ind-β₁ need to be definitional to write this properly (i.e. without transp)
+-- coequ-ind-β₁ need to be definitional to write this properly (i.e. without transp)
 {-
-axiom //~-ind-β₂ (A B : U) (f g : A → B) (X : //~ A B f g -> U) (i : Π (b : B), X (ι A B f g b))
+axiom coequ-ind-β₂ (A B : U) (f g : A → B) (X : coequ A B f g -> U) (i : Π (b : B), X (ι A B f g b))
   (ρ : Π (x : A), PathP (<i> X (resp A B f g x @ i)) (i (f x)) (i (g x))) (x : A) :
   Path (PathP (<j> X (resp A B f g x @ j)) (i (f x)) (i (g x)))
-       (<j> //~-ind A B f g X i ρ (resp A B f g x @ j)) (ρ x)
+       (<j> coequ-ind A B f g X i ρ (resp A B f g x @ j)) (ρ x)
 -}
 
 -- [Caglayan] 2014
 
-def pushout (A B C : U) (f : C → A) (g : C → B) : U := //~ C (+ A B) (∘ C A (+ A B) (inl A B) f) (∘ C B (+ A B) (inr A B) g)
+def pushout (A B C : U) (f : C → A) (g : C → B) : U := coequ C (+ A B) (∘ C A (+ A B) (inl A B) f) (∘ C B (+ A B) (inr A B) g)
 def po₁ (A B C: U) (f: C -> A) (g: C -> B) (a: A) : pushout A B C f g := ι C (+ A B) (∘ C A (+ A B) (inl A B) f) (∘ C B (+ A B) (inr A B) g) (inl A B a)
 def po₂ (A B C: U) (f: C -> A) (g: C -> B) (b: B) : pushout A B C f g := ι C (+ A B) (∘ C A (+ A B) (inl A B) f) (∘ C B (+ A B) (inr A B) g) (inr A B b)
 def po₃ (A B C: U) (f: C -> A) (g: C -> B) (c: C) : Path (pushout A B C f g) (po₁ A B C f g (f c)) (po₂ A B C f g (g c))
@@ -50,7 +50,7 @@ def po₃ (A B C: U) (f: C -> A) (g: C -> B) (c: C) : Path (pushout A B C f g) (
 
 -- [Shulman] 2015
 
-def S¹ : U := //~ 𝟏 𝟏 (id 𝟏) (id 𝟏)
+def S¹ : U := coequ 𝟏 𝟏 (id 𝟏) (id 𝟏)
 def base : S¹ := ι 𝟏 𝟏 (id 𝟏) (id 𝟏) ★
 def loop : Path S¹ base base := resp 𝟏 𝟏 (id 𝟏) (id 𝟏) ★ 
 
@@ -64,8 +64,8 @@ def 𝜎₃ (A: U) (a: A) : Path (𝚺 A) (𝜎₁ A) (𝜎₂ A) := po₃ 𝟏 
 def sphere : ℕ -> U := ℕ-iter U 𝟐 𝚺
 
 def full (A : U) (R : A → A → U) := Σ (x y : A), R x y
-def quotient (A : U) (R : A → A → U) := //~ (full A R) A (λ (w : full A R), w.1) (λ (w : full A R), w.2.1)
-def quotient-elem (A : U) (R : A → A → U) : A → quotient A R := ι (full A R) A (λ (w : full A R), w.1) (λ (w : full A R), w.2.1)
-def quotient-glue (A : U) (R : A → A → U) (x y : A) (ρ : R x y)
-  : Path (quotient A R) (quotient-elem A R x) (quotient-elem A R y)
+def quot (A : U) (R : A → A → U) := coequ (full A R) A (λ (w : full A R), w.1) (λ (w : full A R), w.2.1)
+def quot-elem (A : U) (R : A → A → U) : A → quot A R := ι (full A R) A (λ (w : full A R), w.1) (λ (w : full A R), w.2.1)
+def quot-glue (A : U) (R : A → A → U) (x y : A) (ρ : R x y)
+  : Path (quot A R) (quot-elem A R x) (quot-elem A R y)
  := resp (full A R) A (λ (w : full A R), w.1) (λ (w : full A R), w.2.1) (x, y, ρ)

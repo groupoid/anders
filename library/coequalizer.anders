@@ -1,9 +1,11 @@
 {- Homotopy Type Theory:
    - Coequalizer.
-   - S¹ sphere.
+   - S¹ sphere and 𝑛-sphere.
    - Pushout.
    - Suspension.
 
+   HoTT 6.8 Pushouts
+   
    Copyright (c) Groupoid Infinity, 2014-2022. -}
    
 module coequalizer where

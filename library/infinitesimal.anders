@@ -14,8 +14,8 @@ import library/equiv
 
 axiom ℑ : U -> U -- de Rham Stack
 axiom ι (A: U) : A -> ℑ A
-def isCoreduced (A : U): U := isEquiv A (ℑ A) (ι A)
-axiom ImCoreduced (A : U): isCoreduced (ℑ A)
+def isCoreduced (A : U) : U := isEquiv A (ℑ A) (ι A)
+axiom ImCoreduced (A : U) : isCoreduced (ℑ A)
 
 axiom ImInduction (A : U) (B : ℑ A -> U) (x : Π (a : ℑ A), isCoreduced (B a)) (y : Π (a : A), B (ι A a)) : Π (a : ℑ A), B a
 axiom ImComputeInduction (A : U) (B : ℑ A -> U) (c : Π (a: ℑ A), isCoreduced (B a)) (f : Π (a : A), B (ι A a)) (a : A)

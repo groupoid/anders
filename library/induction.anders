@@ -1,6 +1,5 @@
 module induction where
 import library/sigma
-import library/path
 
 option girard true
 

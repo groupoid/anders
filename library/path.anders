@@ -179,6 +179,12 @@ def sub (A : U) (i : I) (u : Partial A i) : V := A[i ↦ u]
 def inc′ (A : U) (i : I) (a : A) : sub A i [(i = 1) → a] := inc A i a
 def ouc′ (A : U) (i : I) (u : Partial A i) (a : A[i ↦ u]) : A := ouc a
 
+def Path′ (A : U) (a b : A) := Π (i : I), A [∂ i ↦ [(i = 0) → a, (i = 1) → b]]
+def Path-Path′ (A : U) (a b : A) (p : Path A a b) : Path′ A a b := λ (i : I), inc A (∂ i) (p @ i)
+def Path′-Path (A : U) (a b : A) (p : Path′ A a b) : Path A a b := <i> ouc (p i)
+def Path-Path′-Path (A : U) (a b : A) (p : Path A a b) : Path (Path A a b) (Path′-Path A a b (Path-Path′ A a b p)) p := <_> p
+def Path′-Path-Path′ (A : U) (a b : A) (p : Path′ A a b) : PathP (<_> Path′ A a b) (Path-Path′ A a b (Path′-Path A a b p)) p := <_> p
+
 -- Generalized Transport
 
 def transp′ (A : U) (j : I) (p : (I → U) [j ↦ [(j = 1) → λ (_ : I), A]]) := transp (<i> (ouc p) i) j
@@ -352,13 +358,7 @@ def hcomp-Path-is-correct (A : U) (v w : A) (r : I) (u : I → Partial (Path A v
   : Path (Path A v w) (hcomp-Path A v w r u u₀) (hcomp-Path′ A v w r u u₀)
  := <_> hcomp-Path A v w r u u₀
 
-def Path′ (A : U) (a b : A) := Π (i : I), A [∂ i ↦ [(i = 0) → a, (i = 1) → b]]
-def Path-Path′ (A : U) (a b : A) (p : Path A a b) : Path′ A a b := λ (i : I), inc A (∂ i) (p @ i)
-def Path′-Path (A : U) (a b : A) (p : Path′ A a b) : Path A a b := <i> ouc (p i)
-def Path-Path′-Path (A : U) (a b : A) (p : Path A a b) : Path (Path A a b) (Path′-Path A a b (Path-Path′ A a b p)) p := <_> p
-def Path′-Path-Path′ (A : U) (a b : A) (p : Path′ A a b) : PathP (<_> Path′ A a b) (Path-Path′ A a b (Path′-Path A a b p)) p := <_> p
-
-def 𝟏-contr : Π (x : 𝟏), Path 𝟏 x ★ := ind₁ (λ (x : 𝟏), Path 𝟏 x ★) (<_> ★)
+-- id functions
 
 def idfun  (A : U) : A → A := λ (a : A), a
 def idfun′ (A : U) : A → A := transp (<_> A) 0
@@ -368,3 +368,5 @@ def idfun=idfun′  (A : U) : Path (A → A) (idfun A)  (idfun′ A) := <i> tran
 def idfun=idfun″  (A : U) : Path (A → A) (idfun A)  (idfun″ A) := <i> λ (a : A), hcomp A -i (λ (j : I), [(i = 0) → a]) a
 def idfun′=idfun″ (A : U) : Path (A → A) (idfun′ A) (idfun″ A)
  := comp-Path (A → A) (idfun′ A) (idfun A) (idfun″ A) (<i> idfun=idfun′ A @ -i) (idfun=idfun″ A)
+
+def 𝟏-contr : Π (x : 𝟏), Path 𝟏 x ★ := ind₁ (λ (x : 𝟏), Path 𝟏 x ★) (<_> ★)

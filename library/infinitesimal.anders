@@ -18,13 +18,13 @@ def isCoreduced (A : U) : U := isEquiv A (ℑ A) (ι A)
 axiom ImCoreduced (A : U) : isCoreduced (ℑ A)
 
 axiom ImInduction (A : U) (B : ℑ A -> U) (x : Π (a : ℑ A), isCoreduced (B a)) (y : Π (a : A), B (ι A a)) : Π (a : ℑ A), B a
-axiom ImComputeInduction (A : U) (B : ℑ A -> U) (c : Π (a: ℑ A), isCoreduced (B a)) (f : Π (a : A), B (ι A a)) (a : A)
+axiom ImComputeInduction (A : U) (B : ℑ A -> U) (c : Π (a : ℑ A), isCoreduced (B a)) (f : Π (a : A), B (ι A a)) (a : A)
   : Path (B (ι A a)) (f a) ((ImInduction A B c f) (ι A a))
 
 def ImRecursion (A B : U) (c : isCoreduced B) (f : A -> B) : ℑ A -> B
  := ImInduction A (λ (_ : ℑ A), B) (λ (_ : ℑ A), c) f
 
-def ImComputeRecursion (A B: U) (c: isCoreduced B) (f: A -> B) (a: A): PathP (<_> B) (f a) ((ImRecursion A B c f) (ι A a))
+def ImComputeRecursion (A B : U) (c : isCoreduced B) (f : A -> B) (a : A) : PathP (<_> B) (f a) ((ImRecursion A B c f) (ι A a))
  := ImComputeInduction A (λ (_ : ℑ A), B) (λ (_ : ℑ A), c) f a
 
 def ImApp (A B : U) (f : A -> B) : ℑ A -> ℑ B := ImRecursion A (ℑ B) (ImCoreduced B) (∘ A B (ℑ B) (ι B) f)

@@ -77,10 +77,8 @@ def J-β (A : U) (a : A) (C : D A) (d: C a a (idp A a)) : Path (C a a (idp A a))
 
 def ∂ (i : I) := i ∨ -i
 def ∂-eq-neg-∂ (i : I) : Id I (∂ i) (∂ -i) := ref (∂ i)
-
 def min (i j : I) := i ∧ j
 def max (i j : I) := i ∨ j
-
 def ⊕ (i j : I) : I := (i ∧ -j) ∨ (-i ∧ j)
 def ⊕-comm (i j : I) : Id I (⊕ i j) (⊕ j i) := ref (⊕ i j)
 def ∧-comm (i j : I) : Id I (i ∧ j) (j ∧ i) := ref (i ∧ j)
@@ -165,7 +163,6 @@ def Δ³-2-4 : PathP (<_> Δ³) Δ³-2 Δ³-4 := <i> (i, i, 1, ref i, ref i)
 def Δ³-3-4 : PathP (<_> Δ³) Δ³-3 Δ³-4 := <i> (i, 1, 1, ref i, ref 1)
 
 def ε (A : U) : Partial A 0 := []
-
 def I-nontriv (p : Id I 0 1) : 𝟎 := ε 𝟎 (rev I 0 1 p)
 def 0≥1-impl-absurd : (≥ 0 1) → 𝟎 := I-nontriv
 

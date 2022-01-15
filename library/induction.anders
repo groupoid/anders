@@ -1,5 +1,7 @@
 module induction where
 import library/sigma
+import library/path
+
 option girard true
 
 -- Steve Awodey, Nicola Gambino, Kristina Sojakova
@@ -25,6 +27,16 @@ def indᵂ-β (A : U) (B : A → U) (C : (W (x : A), B x) → U)
   : PathP (<_> C (sup A B a f)) (indᵂ A B C g (sup A B a f)) (g a f (λ (b : B a), indᵂ A B C g (f b)))
  := <_> g a f (λ (b : B a), indᵂ A B C g (f b))
 
+def trans-W (A : I → U) (B : Π (i : I), A i → U) (a : A 0) (f : B 0 a → (W (x : A 0), B 0 x)) : W (x : A 1), B 1 x :=
+sup (A 1) (B 1) (transp (<i> A i) 0 a) (transp (<i> B i (transFill (A 0) (A 1) (<j> A j) a @ i) → (W (x : A i), B i x)) 0 f)
+
+def trans-W′ (A : I → U) (B : Π (i : I), A i → U) (a : A 0) (f : B 0 a → (W (x : A 0), B 0 x)) : W (x : A 1), B 1 x :=
+transp (<i> W (x : A i), B i x) 0 (sup (A 0) (B 0) a f)
+
+def trans-W-is-correct (A : I → U) (B : Π (i : I), A i → U) (a : A 0) (f : B 0 a → (W (x : A 0), B 0 x)) :
+   Path (W (x : A 1), B 1 x) (trans-W A B a f) (trans-W′ A B a f) :=
+<_> trans-W A B a f
+
 -- Derivable Induction: N, +, Maybe, Fin, Vec, 3, 4
 
 def ℕ := W (x : 𝟐), ind₂ (λ (_ : 𝟐), U) 𝟎 𝟏 x
@@ -48,7 +60,7 @@ def ℕ-rec (C : U) (z : C) (s : ℕ → C → C) : ℕ → C := ℕ-ind (λ (_ 
 def ℕ-iter (C : U) (z : C) (s : C → C) : ℕ → C := ℕ-rec C z (λ (_ : ℕ), s)
 def ℕ-case (C : U) (z s : C) : ℕ → C := ℕ-iter C z (λ (_ : C), s)
 
-def plus : ℕ → ℕ → ℕ := ℕ-rec (ℕ → ℕ) (\(n: ℕ), n) (\(_: ℕ) (s: ℕ → ℕ) (m: ℕ), succ m)
+def plus : ℕ → ℕ → ℕ := ℕ-iter (ℕ → ℕ) (idfun ℕ) (∘ ℕ ℕ ℕ succ)
 def mult : ℕ → ℕ → ℕ := ℕ-rec (ℕ → ℕ) (\(_: ℕ), zero) (\(_: ℕ) (x: ℕ → ℕ) (m: ℕ), plus m (x m))
 
 def one : ℕ := succ zero
@@ -57,7 +69,7 @@ def three : ℕ := succ two
 def 5 : ℕ := plus two three
 def 10 : ℕ := mult 5 two
 def 55 : ℕ := plus (mult 5 10) 5
-                     
+
 def + (A B: U) : U := Σ (x : 𝟐), ind₂ (λ (_ : 𝟐), U) A B x
 def inl (A B : U) (a : A) : + A B := (0₂, a)
 def inr (A B : U) (b : B) : + A B := (1₂, b)

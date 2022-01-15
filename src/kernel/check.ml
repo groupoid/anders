@@ -105,21 +105,21 @@ and transp p phi u0 = match p with
   | VPLam (VLam (VI, (i, g))) -> transport i (g (Var (i, VI))) phi u0
   | _ -> VApp (VTransp (p, phi), u0)
 
-and transport i p phi u0 = match p, phi with
+and transport i p phi u0 = match p, phi, u0 with
   (* transp p 1 u₀ ~> u₀ *)
-  | _, VDir One -> u0
+  | _, VDir One, _ -> u0
   (* transp (<_> U) i A ~> A *)
-  | VKan _, _ -> u0
+  | VKan _, _, _ -> u0
   (* transp (<_> 𝟎) i u₀ ~> u₀ *)
-  | VEmpty, _ -> u0
+  | VEmpty, _, _ -> u0
   (* transp (<_> 𝟏) i u₀ ~> u₀ *)
-  | VUnit, _ -> u0
+  | VUnit, _, _ -> u0
   (* transp (<_> 𝟐) i u₀ ~> u₀ *)
-  | VBool, _ -> u0
+  | VBool, _, _ -> u0
   (* transp (<i> Π (x : A i), B i x) φ u₀ ~>
      λ (x : A 1), transp (<i> B i (transFill (<j> A -j) φ x -i)) φ
       (u₀ (transFill (<j> A -j) φ x 1)) *)
-  | VPi (t, (_, b)), _ -> let x = fresh (name "x") in
+  | VPi (t, (_, b)), _, _ -> let x = fresh (name "x") in
   let j = freshName "ι" in let k = freshName "κ" in
     VLam (act0 i vone t, (x, fun x ->
       let v = transFill j (act0 i (VNeg (dim j)) t) phi x in
@@ -128,7 +128,7 @@ and transport i p phi u0 = match p, phi with
   (* transp (<i> Σ (x : A i), B i x) φ u₀ ~>
     (transp (<j> A j) φ u₀.1,
      transp (<i> B i (transFill (<j> A j) φ u₀.1 i)) φ u₀.2) *)
-  | VSig (t, (_, b)), _ ->
+  | VSig (t, (_, b)), _, _ ->
     let j = freshName "ι" in let k = freshName "κ" in
     let v1 = transFill j (swap i j t) phi (vfst u0) in
     let v2 = transport k (swap i k (b (v1 (dim k)))) phi (vsnd u0) in
@@ -136,7 +136,7 @@ and transport i p phi u0 = match p, phi with
   (* transp (<i> PathP (P i) (v i) (w i)) φ u₀ ~>
      <j> comp (λ i, P i @ j) (φ ∨ j ∨ -j)
        (λ (i : I), [(φ = 1) → u₀ @ j, (j = 0) → v i, (j = 1) → w i]) (u₀ @ j) *)
-  | VApp (VApp (VPathP p, v), w), _ ->
+  | VApp (VApp (VPathP p, v), w), _, _ ->
     let j = freshName "ι" in let k = freshName "κ" in
     VPLam (VLam (VI, (j, fun j ->
       let uj = appFormula u0 j in let r = evalOr phi (evalOr j (negFormula j)) in
@@ -144,7 +144,14 @@ and transport i p phi u0 = match p, phi with
         (VSystem (unionSystem (border (solve phi One) uj)
                  (unionSystem (border (solve j Zero) (swap i k v))
                               (border (solve j One)  (swap i k w))))) uj)))
-  | _, _ -> VApp (VTransp (VPLam (VLam (VI, (i, fun j -> act0 i j p))), phi), u0)
+  (* transp (<i> W (x : A i), B i x) φ (sup (A 0) (B 0) a f) ~>
+     sup (A 1) (B 1) (transp (<i> A i) φ a)
+         (transp (<i> B i (transFill (<i> A i) φ a i) → (W (x : A i), B i x)) φ f) *)
+  | W (t, (x, b)), _, VApp (VApp (VSup _, a), f) ->
+    let j = freshName "ι" in let k = freshName "κ" in let v1 = transFill j (swap i j t) phi a in
+    let v2 = transport k (swap i k (implv (b (v1 (dim k))) (W (t, (x, b))))) phi f in let t' = act0 i vone t in
+    VApp (VApp (VSup (t', VLam (t', (fresh x, b >> act0 i vone))), v1 vone), v2)
+  | _, _, _ -> VApp (VTransp (VPLam (VLam (VI, (i, fun j -> act0 i j p))), phi), u0)
 
 and transFill i p phi u0 j = let (k, _, _) = freshDim () in
   transport k (act0 i (evalAnd (dim k) j) p) (evalOr phi (negFormula j)) u0

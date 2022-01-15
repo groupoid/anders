@@ -40,7 +40,7 @@ def formalDiscBundle (A : U) : U := Σ (a : A), 𝔻 A a
 def preservesInifinitesimalProximity (X Y: U) (x x' : X) (f : X -> Y) (p : ~ X x x') : ~ Y (f x) (f x') :=
 <i> hcomp (ℑ Y) (∂ i) (λ (j : I), [(i = 0) → ImNaturality X Y f x @ -j, (i = 1) → ImNaturality X Y f x' @ -j]) (ImApp X Y f (p @ i))
 
-def d (X Y: U) (f: X -> Y) (x : X) (ε : 𝔻 X x) : 𝔻 Y (f x)
+def d (X Y : U) (f : X -> Y) (x : X) (ε : 𝔻 X x) : 𝔻 Y (f x)
  := (f ε.1, preservesInifinitesimalProximity X Y x ε.1 f ε.2)
 
 axiom lemma45 (A B C : U) (f : A -> B) (g : B -> C) (x : A)

@@ -31,8 +31,8 @@ def ImApp (A B : U) (f : A -> B) : ℑ A -> ℑ B := ImRecursion A (ℑ B) (ImCo
 def ImNaturality (A B : U) (f : A -> B) : Π (a: A), Path (ℑ B) ((ι B) (f a)) ((ImApp A B f) (ι A a))
  := ImComputeRecursion A (ℑ B) (ImCoreduced B) (∘ A B (ℑ B) (ι B) f)
 
-def ~ (X: U) (a x' : X): U := Path (ℑ X) (ι X a) (ι X x')
-def 𝔻 (X: U) (a : X): U := Σ (x' : X), ~ X a x'
+def ~ (X : U) (a x' : X): U := Path (ℑ X) (ι X a) (ι X x')
+def 𝔻 (X : U) (a : X): U := Σ (x' : X), ~ X a x'
 def unitDisc (X : U) (x : ℑ X) : U := Σ(x' : X), Path (ℑ X) x (ι X x')
 def starDisc (X : U) (x : X) : 𝔻 X x := (x, idp (ℑ X) (ι X x))
 def formalDiscBundle (A : U) : U := Σ (a : A), 𝔻 A a

@@ -10,7 +10,6 @@
    
 module coequalizer where
 import library/induction
-import library/path
 
 -- In Anders we take Coeq as core primitive and by using it with W-types
 -- we then express more ordinary Pushouts and more general HITs like Suspension and n-Sphere.
@@ -63,3 +62,16 @@ def 𝜎₂ (A: U): 𝚺 A := po₂ 𝟏 𝟏 A (\(_: A), ★) (\(_: A), ★) �
 def 𝜎₃ (A: U) (a: A) : Path (𝚺 A) (𝜎₁ A) (𝜎₂ A) := po₃ 𝟏 𝟏 A (\(_: A), ★) (\(_: A), ★) a
 
 def sphere : ℕ -> U := ℕ-iter U 𝟐 𝚺
+
+def full (A : U) (R : A → A → U) :=
+Σ (x y : A), R x y
+
+def quotient (A : U) (R : A → A → U) :=
+//~ (full A R) A (λ (w : full A R), w.1) (λ (w : full A R), w.2.1)
+
+def quotient-elem (A : U) (R : A → A → U) : A → quotient A R :=
+ι (full A R) A (λ (w : full A R), w.1) (λ (w : full A R), w.2.1)
+
+def quotient-glue (A : U) (R : A → A → U) (x y : A) (ρ : R x y) :
+  Path (quotient A R) (quotient-elem A R x) (quotient-elem A R y) :=
+resp (full A R) A (λ (w : full A R), w.1) (λ (w : full A R), w.2.1) (x, y, ρ)

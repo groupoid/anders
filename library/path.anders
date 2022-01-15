@@ -367,3 +367,8 @@ def idfun′=idfun″ (A : U) : Path (A → A) (idfun′ A) (idfun″ A)
  := comp-Path (A → A) (idfun′ A) (idfun A) (idfun″ A) (<i> idfun=idfun′ A @ -i) (idfun=idfun″ A)
 
 def 𝟏-contr : Π (x : 𝟏), Path 𝟏 x ★ := ind₁ (λ (x : 𝟏), Path 𝟏 x ★) (<_> ★)
+
+-- lemmas
+
+def contr-impl-prop (A : U) (H : isContr A) : isProp A :=
+λ (a b : A), <i> hcomp A (∂ i) (λ (j : I), [(i = 0) → H.2 a @ j, (i = 1) → H.2 b @ j]) H.1

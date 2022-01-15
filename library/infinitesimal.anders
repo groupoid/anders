@@ -28,7 +28,7 @@ def ImComputeRecursion (A B: U) (c: isCoreduced B) (f: A -> B) (a: A): PathP (<_
  := ImComputeInduction A (λ (_ : ℑ A), B) (λ (_ : ℑ A), c) f a
 
 def ImApp (A B : U) (f : A -> B) : ℑ A -> ℑ B := ImRecursion A (ℑ B) (ImCoreduced B) (∘ A B (ℑ B) (ι B) f)
-def ImNaturality (A B : U) (f : A -> B) : Π (a: A), Path (ℑ B) ((ι B) (f a)) ((ImApp A B f) (ι A a))
+def ImNaturality (A B : U) (f : A -> B) : Π (a : A), Path (ℑ B) ((ι B) (f a)) ((ImApp A B f) (ι A a))
  := ImComputeRecursion A (ℑ B) (ImCoreduced B) (∘ A B (ℑ B) (ι B) f)
 
 def ~ (X : U) (a x' : X) : U := Path (ℑ X) (ι X a) (ι X x')

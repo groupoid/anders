@@ -22,6 +22,10 @@ type exp =
   | EBool | EFalse | ETrue | EIndBool of exp                                                (* 𝟐 *)
   | EW of exp * (name * exp) | ESup of exp * exp | EIndW of exp * exp * exp                 (* W *)
 
+type extension =
+  | EIm of exp | EInf of exp | EIndIm of exp                           (* Infinitesimal Modality *)
+  | ECoeq of exp | ECoeqI of exp | EIndCoeq of exp                                (* Coequalizer *)
+
 type tele = name * exp
 
 type scope = Local | Global

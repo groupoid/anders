@@ -148,6 +148,7 @@ and transport i p phi u0 = match p, phi, u0 with
      sup (A 1) (B 1) (transp (<i> A i) φ a)
          (transp (<i> B i (transFill (<i> A i) φ a i) → (W (x : A i), B i x)) φ f) *)
   | W (t, (x, b)), _, VApp (VApp (VSup _, a), f) ->
+    (* if conv (act0 i vone p) p then u0 else ??? *)
     let j = freshName "ι" in let k = freshName "κ" in let v1 = transFill j (swap i j t) phi a in
     let v2 = transport k (swap i k (implv (b (v1 (dim k))) (W (t, (x, b))))) phi f in let t' = act0 i vone t in
     VApp (VApp (VSup (t', VLam (t', (fresh x, b >> act0 i vone))), v1 vone), v2)

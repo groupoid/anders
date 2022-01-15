@@ -66,4 +66,4 @@ def 𝜎₃ (A: U) (a: A) : Path (𝚺 A) (𝜎₁ A) (𝜎₂ A) := po₃ 𝟏 
 
 -- [Siegment] 2022
 
-def 𝑛-sphere : ℕ -> U := ℕ-iter U 𝟐 𝚺
+def sphere : ℕ -> U := ℕ-iter U 𝟐 𝚺

@@ -39,8 +39,8 @@ def ℑ-recβ (A B : U) (c : isCoreduced B) (f : A -> B) (a : A) : PathP (<_> B)
  := ℑ-indβ A (λ (_ : ℑ A), B) (λ (_ : ℑ A), c) f a
 
 def ℑ-app (A B : U) (f : A -> B) : ℑ A -> ℑ B := ℑ-rec A (ℑ B) (ℑ-coreduced B) (∘ A B (ℑ B) (ι B) f)
-def ℑ-naturality (A B : U) (f : A -> B) : Π (a : A), Path (ℑ B) ((ι B) (f a)) ((ℑ-app A B f) (ι A a))
- := ℑ-recβ A (ℑ B) (ℑ-coreduced B) (∘ A B (ℑ B) (ι B) f)
+def ℑ-naturality (A B : U) (f : A -> B) (a : A) : Path (ℑ B) ((ι B) (f a)) ((ℑ-app A B f) (ι A a))
+ := <_> ℑ-unit (f a) -- slightly surprisingly, but it computes
 
 def ~ (X : U) (a x' : X) : U := Path (ℑ X) (ι X a) (ι X x')
 def 𝔻 (X : U) (a : X) : U := Σ (x' : X), ~ X a x'
@@ -49,7 +49,7 @@ def starDisc (X : U) (x : X) : 𝔻 X x := (x, idp (ℑ X) (ι X x))
 def formalDiscBundle (A : U) : U := Σ (a : A), 𝔻 A a
 
 def preservesInifinitesimalProximity (X Y : U) (x x' : X) (f : X -> Y) (p : ~ X x x') : ~ Y (f x) (f x') :=
-<i> hcomp (ℑ Y) (∂ i) (λ (j : I), [(i = 0) → ℑ-naturality X Y f x @ -j, (i = 1) → ℑ-naturality X Y f x' @ -j]) (ℑ-app X Y f (p @ i))
+<i> ℑ-app X Y f (p @ i)
 
 def d (X Y : U) (f : X -> Y) (x : X) (ε : 𝔻 X x) : 𝔻 Y (f x)
  := (f ε.1, preservesInifinitesimalProximity X Y x ε.1 f ε.2)

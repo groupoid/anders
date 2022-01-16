@@ -38,9 +38,9 @@ def ImInduction (A : U) (B : ℑ A -> U) (c : Π (a : ℑ A), isCoreduced (B a))
   (f : Π (a : A), B (ι A a)) (a : ℑ A) : B a :=
 (c a (ind-ℑ A B (λ (x : A), ι (B (ι A x)) (f x)) a)).1.1
 
-axiom ImComputeInduction (A : U) (B : ℑ A -> U) (c : Π (a : ℑ A), isCoreduced (B a))
-  (f : Π (a : A), B (ι A a)) (a : A) : Path (B (ι A a)) (f a) ((ImInduction A B c f) (ι A a))
---<i> ℑ-join ((c (ℑ-unit a) (ℑ-unit (f a))).1.2 @ i)
+def ImComputeInduction (A : U) (B : ℑ A -> U) (c : Π (a : ℑ A), isCoreduced (B a))
+  (f : Π (a : A), B (ι A a)) (a : A) : Path (B (ι A a)) (f a) ((ImInduction A B c f) (ι A a)) :=
+<i> sec-equiv (B (ι A a)) (ℑ (B (ι A a))) (ι (B (ι A a)), c (ι A a)) (f a) @ -i
 
 def ImRecursion (A B : U) (c : isCoreduced B) (f : A -> B) : ℑ A -> B
  := ImInduction A (λ (_ : ℑ A), B) (λ (_ : ℑ A), c) f

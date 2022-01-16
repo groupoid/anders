@@ -59,20 +59,10 @@ def loop : Path S¹ base base := resp 𝟏 𝟏 (id 𝟏) (id 𝟏) ★
 
 -- [Caglayan] 2018
 
-def 𝚺 (A: U) : U := pushout 𝟏 𝟏 A (λ (_: A), ★) (λ (_: A), ★)
-def 𝜎₁ (A: U): 𝚺 A   := po₁ 𝟏 𝟏 A (λ (_: A), ★) (λ (_: A), ★) ★
-def 𝜎₂ (A: U): 𝚺 A   := po₂ 𝟏 𝟏 A (λ (_: A), ★) (λ (_: A), ★) ★
-def 𝜎₃ (A: U) (a: A) : Path (𝚺 A) (𝜎₁ A) (𝜎₂ A) := po₃ 𝟏 𝟏 A (λ (_: A), ★) (λ (_: A), ★) a
-
-def sphere : ℕ → U := ℕ-iter U 𝟐 𝚺
-def 𝚺ₓ (A: U) : ℕ → U := ℕ-iter U A 𝚺
-
-def full (A : U) (R : A → A → U) := Σ (x y : A), R x y
-def quot (A : U) (R : A → A → U) := coequ (full A R) A (λ (w : full A R), w.1) (λ (w : full A R), w.2.1)
-def quot-elem (A : U) (R : A → A → U) : A → quot A R := ι (full A R) A (λ (w : full A R), w.1) (λ (w : full A R), w.2.1)
-def quot-glue (A : U) (R : A → A → U) (x y : A) (ρ : R x y)
-  : Path (quot A R) (quot-elem A R x) (quot-elem A R y)
- := resp (full A R) A (λ (w : full A R), w.1) (λ (w : full A R), w.2.1) (x, y, ρ)
+def 𝚺 (A: U) : U := pushout 𝟏 𝟏 A (const₁ A) (const₁ A)
+def 𝜎₁ (A: U): 𝚺 A := po₁ 𝟏 𝟏 A (const₁ A) (const₁ A) ★
+def 𝜎₂ (A: U): 𝚺 A := po₂ 𝟏 𝟏 A (const₁ A) (const₁ A) ★
+def 𝜎₃ (A: U) (a: A) : Path (𝚺 A) (𝜎₁ A) (𝜎₂ A) := po₃ 𝟏 𝟏 A (const₁ A) (const₁ A) a
 
 {- Hub and Spoke Primitive -}
 
@@ -89,6 +79,8 @@ axiom hs-ind (S A : U) (B : hs S A → U) (nB : Π (x : hs S A), isNull S (B x))
 
 {- Generic ℕ-indexed Truncations -}
 
+def sphere : ℕ → U := ℕ-iter U 𝟐 𝚺
+
 def trunc (A : U) (n : ℕ) : U := hs (sphere n) A
 def trunc₁ (A : U) (n : ℕ) (x : A) : trunc A n := center (sphere n) A x
 def trunc₂ (A : U) (n : ℕ) (f : sphere n → trunc A n) : trunc A n := hub (sphere n) A f
@@ -97,16 +89,29 @@ def trunc₃ (A : U) (n : ℕ) (f : sphere n → trunc A n) (s : sphere n)
 
 {- Trancation Instances for ₋₁,₀,₁ truncation levels -}
 
-def ‖_‖₋₁ (A : U) := trunc A zero -- Propositional Truncation ||A|| or |A|₋₁
-def ‖_‖₀  (A : U) := trunc A one  -- Set Truncation |A|₀
-def ‖_‖₁  (A : U) := trunc A two  -- Groupoid Truncation |A|₁
+def ‖_‖₋₁ (A : U) : U := trunc A zero -- Propositional Truncation ‖A‖₋₁
+def ‖_‖₀ (A : U) : U := trunc A one   -- Set Truncation ‖A‖₀
+def ‖_‖₁ (A : U) : U := trunc A two   -- Groupoid Truncation ‖A‖₁
 def ‖_‖ (A : U) : ℕ → U := trunc A
+
+def full (A : U) (R : A → A → U) := Σ (x y : A), R x y
+def quot (A : U) (R : A → A → U)
+ := coequ (full A R) A (λ (w : full A R), w.1) (λ (w : full A R), w.2.1)
+def quot-elem (A : U) (R : A → A → U) : A → quot A R
+ := ι (full A R) A (λ (w : full A R), w.1) (λ (w : full A R), w.2.1)
+def quot-glue (A : U) (R : A → A → U) (x y : A) (ρ : R x y)
+  : Path (quot A R) (quot-elem A R x) (quot-elem A R y)
+ := resp (full A R) A (λ (w : full A R), w.1) (λ (w : full A R), w.2.1) (x, y, ρ)
 
 -- [van Doorn] 2016 2-quotient
 
-axiom 2-quot (A : U) (R : A → A → U) (x y : A) (Q : R x y) : U
+def 2-quot (A : U) (R : A → A → U) (x y : A) (Q : R x y) : U := ?
+def 𝚺ₓ (A: U) : ℕ → U := ℕ-iter U A 𝚺
 
 def discreteTopology (G : abgroup) : U := group
-def K⦅G‚1⦆ (G : group) : U := ‖_‖₁ (2-quot 𝟏 (λ (x y : 𝟏), group) ★ ★ G)
-def K⦅G‚n⦆ (G : abgroup) (n: ℕ) : U := ℕ-iter U (discreteTopology G) (λ (_: U), ‖_‖ (𝚺ₓ (K⦅G‚1⦆ (G.X,G.2.g)) n) n) n
 
+def K⦅G‚1⦆ (G : group) : U
+ := ‖_‖₁ (2-quot 𝟏 (λ (x y : 𝟏), group) ★ ★ G)
+
+def K⦅G‚n⦆ (G : abgroup) (n: ℕ) : U
+ := ℕ-iter U (discreteTopology G) (λ (_: U), ‖_‖ (𝚺ₓ (K⦅G‚1⦆ (G.X,G.2.g)) n) n) n

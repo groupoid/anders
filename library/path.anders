@@ -25,6 +25,7 @@ def ∘ (α β γ : U) : ∘ᵀ α β γ := λ (g: β → γ) (f: α → β) (x:
 def idᵀ (α: U): U := α → α
 def id (α : U) (a : α) : α := a
 def const (α β : U) : α → β → α := λ (a : α) (b : β), a
+def const₁ (A: U) : A → 𝟏 := const 𝟏 A ★
 def LineP (A : I → U) : V := Π (i : I), A i
 
 -- Path Equality

@@ -265,10 +265,12 @@ def trans-filler-p (A : U) (x y z : A) (p : Path A x y) (q : Path A y z) : PathP
 def trans-filler-q (A : U) (x y z : A) (p : Path A x y) (q : Path A y z) : PathP (<i> Path A (p @ -i) z) q (comp-Path A x y z p q)
  := <j i> hcomp A (-j ∨ ∂ i) (λ (k : I), [(i = 0) → p @ -j, (i = 1) → q @ k, (j = 0) → q @ i /\ k]) (p @ i \/ -j)
 
--- Reality Check
--- Simon Huber Equations: http://www.cse.chalmers.se/~simonhu/misc/hcomp.pdf
+-- Reviewers of Prover's consistency should revise following rules of Reality Checking (Internalizing of transp and hcomp)
+-- also known as Simon Huber Equations: http://www.cse.chalmers.se/~simonhu/misc/hcomp.pdf
 
 {-
+   Part A:
+
    transpⁱ N φ u₀ = u₀
    transpⁱ U φ A = A
    transpⁱ (Π (x : A), B) φ u₀ v = transpⁱ B(x/w) φ (u₀ w(i/0)), where [ w = transpFill⁻ⁱ A φ v, v : A(i/1) ]
@@ -313,6 +315,8 @@ def trans-Path-is-correct (A B : I → U) (P : Π (i : I), PathP (<_> U) (A i) (
  := <_> trans-Path A B P v w u₀
 
 {-
+   Part B:
+
    hcompⁱ N [φ ↦ 0] 0 = 0
    hcompⁱ N [φ ↦ S u] (S u₀) = S (hcompⁱ N [φ ↦ u] u₀)
    hcompⁱ U [φ ↦ E] A = Glue [φ ↦ (E(i/1), equivⁱ E(i/1−i))] A

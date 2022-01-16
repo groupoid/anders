@@ -101,11 +101,13 @@ def ‖_‖₀  (A : U) := trunc A one  -- Set Truncation |A|₀
 def ‖_‖₁  (A : U) := trunc A two  -- Groupoid Truncation |A|₁
 def ‖_‖ (A : U) : ℕ → U := trunc A
 
+-- [van Doorn] 2016 2-quotient
+
 axiom 2-quot (A : U) (R : A → A → U) (x y : A) (Q : R x y) : U
 
 def discreteTopology (G : abgroup) : U := group
 def 𝚺ₓ (A: U) : ℕ → U := ℕ-iter U A 𝚺
 
-def K₁ (G : group) : U := ‖_‖₁ (2-quot 𝟏 (λ (x y : 𝟏), group) ★ ★ G)
-def Kₓ (G : abgroup) (n: ℕ) : U := ℕ-iter U (discreteTopology G) (λ (_: U), ‖_‖ (𝚺ₓ (K₁ (G.X,G.2.g)) n) n) n
+def K⦅G‚1⦆ (G : group) : U := ‖_‖₁ (2-quot 𝟏 (λ (x y : 𝟏), group) ★ ★ G)
+def K⦅G‚n⦆ (G : abgroup) (n: ℕ) : U := ℕ-iter U (discreteTopology G) (λ (_: U), ‖_‖ (𝚺ₓ (K⦅G‚1⦆ (G.X,G.2.g)) n) n) n
 

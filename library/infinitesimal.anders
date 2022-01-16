@@ -17,40 +17,29 @@ def ι (A : U) (a : A) : ℑ A := ℑ-unit a
 def μ (A : U) (a : ℑ (ℑ A)) := ℑ-join a
 
 def isCoreduced (A : U) : U := isEquiv A (ℑ A) (ι A)
-def ImCoreduced (A : U) : isCoreduced (ℑ A) :=
-isoToEquiv (ℑ A) (ℑ (ℑ A)) (ι (ℑ A)) (μ A) (λ (x : ℑ (ℑ A)), <_> x) (λ (y : ℑ A), <_> y)
+def ℑ-coreduced (A : U) : isCoreduced (ℑ A) := isoToEquiv (ℑ A) (ℑ (ℑ A)) (ι (ℑ A)) (μ A) (λ (x : ℑ (ℑ A)), <_> x) (λ (y : ℑ A), <_> y)
+def ind-ℑβ (A : U) (B : ℑ A -> U) (f : Π (a : A), ℑ (B (ι A a))) (a : A) : Path (ℑ (B (ι A a))) (ind-ℑ A B f (ι A a)) (f a) := <_> f a
 
-def ind-ℑβ (A : U) (B : ℑ A -> U) (f : Π (a : A), ℑ (B (ι A a))) (a : A) :
-  Path (ℑ (B (ι A a))) (ind-ℑ A B f (ι A a)) (f a) :=
-<_> f a
+def trans-ℑ (A : I → U) (a : A 0) : ℑ (A 1) := ℑ-unit (transp (<i> A i) 0 a)
+def trans-ℑ′ (A : I → U) (a : A 0) : ℑ (A 1) := transp (<i> ℑ (A i)) 0 (ℑ-unit a)
+def trans-ℑ-is-correct (A : I → U) (a : A 0) : Path (ℑ (A 1)) (trans-ℑ A a) (trans-ℑ′ A a) := <_> trans-ℑ A a
 
-def trans-ℑ (A : I → U) (a : A 0) : ℑ (A 1) :=
-ℑ-unit (transp (<i> A i) 0 a)
+def ℑ-ind (A : U) (B : ℑ A -> U) (c : Π (a : ℑ A), isCoreduced (B a)) (f : Π (a : A), B (ι A a)) (a : ℑ A) : B a
+ := (c a (ind-ℑ A B (λ (x : A), ι (B (ι A x)) (f x)) a)).1.1
 
-def trans-ℑ′ (A : I → U) (a : A 0) : ℑ (A 1) :=
-transp (<i> ℑ (A i)) 0 (ℑ-unit a)
+def ℑ-indη (A : U) (B : ℑ A -> U) (c : Π (a : ℑ A), isCoreduced (B a)) (f : Π (a : A), B (ι A a)) (a : A)
+  : Path (B (ι A a)) (f a) ((ℑ-ind A B c f) (ι A a))
+ := <i> sec-equiv (B (ι A a)) (ℑ (B (ι A a))) (ι (B (ι A a)), c (ι A a)) (f a) @ -i
 
-def trans-ℑ-is-correct (A : I → U) (a : A 0) :
-  Path (ℑ (A 1)) (trans-ℑ A a) (trans-ℑ′ A a) :=
-<_> trans-ℑ A a
+def ℑ-rec (A B : U) (c : isCoreduced B) (f : A -> B) : ℑ A -> B
+ := ℑ-ind A (λ (_ : ℑ A), B) (λ (_ : ℑ A), c) f
 
-def ImInduction (A : U) (B : ℑ A -> U) (c : Π (a : ℑ A), isCoreduced (B a))
-  (f : Π (a : A), B (ι A a)) (a : ℑ A) : B a :=
-(c a (ind-ℑ A B (λ (x : A), ι (B (ι A x)) (f x)) a)).1.1
+def ℑ-recη (A B : U) (c : isCoreduced B) (f : A -> B) (a : A) : PathP (<_> B) (f a) ((ℑ-rec A B c f) (ι A a))
+ := ℑ-indη A (λ (_ : ℑ A), B) (λ (_ : ℑ A), c) f a
 
-def ImComputeInduction (A : U) (B : ℑ A -> U) (c : Π (a : ℑ A), isCoreduced (B a))
-  (f : Π (a : A), B (ι A a)) (a : A) : Path (B (ι A a)) (f a) ((ImInduction A B c f) (ι A a)) :=
-<i> sec-equiv (B (ι A a)) (ℑ (B (ι A a))) (ι (B (ι A a)), c (ι A a)) (f a) @ -i
-
-def ImRecursion (A B : U) (c : isCoreduced B) (f : A -> B) : ℑ A -> B
- := ImInduction A (λ (_ : ℑ A), B) (λ (_ : ℑ A), c) f
-
-def ImComputeRecursion (A B : U) (c : isCoreduced B) (f : A -> B) (a : A) : PathP (<_> B) (f a) ((ImRecursion A B c f) (ι A a))
- := ImComputeInduction A (λ (_ : ℑ A), B) (λ (_ : ℑ A), c) f a
-
-def ImApp (A B : U) (f : A -> B) : ℑ A -> ℑ B := ImRecursion A (ℑ B) (ImCoreduced B) (∘ A B (ℑ B) (ι B) f)
-def ImNaturality (A B : U) (f : A -> B) : Π (a : A), Path (ℑ B) ((ι B) (f a)) ((ImApp A B f) (ι A a))
- := ImComputeRecursion A (ℑ B) (ImCoreduced B) (∘ A B (ℑ B) (ι B) f)
+def ℑ-app (A B : U) (f : A -> B) : ℑ A -> ℑ B := ℑ-rec A (ℑ B) (ℑ-coreduced B) (∘ A B (ℑ B) (ι B) f)
+def ℑ-naturality (A B : U) (f : A -> B) : Π (a : A), Path (ℑ B) ((ι B) (f a)) ((ℑ-app A B f) (ι A a))
+ := ℑ-recη A (ℑ B) (ℑ-coreduced B) (∘ A B (ℑ B) (ι B) f)
 
 def ~ (X : U) (a x' : X) : U := Path (ℑ X) (ι X a) (ι X x')
 def 𝔻 (X : U) (a : X) : U := Σ (x' : X), ~ X a x'
@@ -59,7 +48,7 @@ def starDisc (X : U) (x : X) : 𝔻 X x := (x, idp (ℑ X) (ι X x))
 def formalDiscBundle (A : U) : U := Σ (a : A), 𝔻 A a
 
 def preservesInifinitesimalProximity (X Y : U) (x x' : X) (f : X -> Y) (p : ~ X x x') : ~ Y (f x) (f x') :=
-<i> hcomp (ℑ Y) (∂ i) (λ (j : I), [(i = 0) → ImNaturality X Y f x @ -j, (i = 1) → ImNaturality X Y f x' @ -j]) (ImApp X Y f (p @ i))
+<i> hcomp (ℑ Y) (∂ i) (λ (j : I), [(i = 0) → ℑ-naturality X Y f x @ -j, (i = 1) → ℑ-naturality X Y f x' @ -j]) (ℑ-app X Y f (p @ i))
 
 def d (X Y : U) (f : X -> Y) (x : X) (ε : 𝔻 X x) : 𝔻 Y (f x)
  := (f ε.1, preservesInifinitesimalProximity X Y x ε.1 f ε.2)

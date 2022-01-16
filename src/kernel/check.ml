@@ -155,6 +155,8 @@ and transport i p phi u0 = match p, phi, u0 with
     let j = freshName "ι" in let k = freshName "κ" in let v1 = transFill j (swap i j t) phi a in
     let v2 = transport k (swap i k (implv (b (v1 (dim k))) (W (t, (x, b))))) phi f in let t' = act0 i vone t in
     VApp (VApp (VSup (t', VLam (t', (fresh x, b >> act0 i vone))), v1 vone), v2)
+  (* transp (<i> ℑ (A i)) 0 (ℑ-unit a) ~> ℑ-unit (transp (<i> A i) 0 a) *)
+  | VIm t, _, VInf a -> VInf (transport i t phi a)
   | _, _, _ -> VApp (VTransp (VPLam (VLam (VI, (i, fun j -> act0 i j p))), phi), u0)
 
 and transFill i p phi u0 j = let (k, _, _) = freshDim () in

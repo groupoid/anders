@@ -22,6 +22,16 @@ def ind-ℑβ (A : U) (B : ℑ A -> U) (f : Π (a : A), ℑ (B (ι A a))) (a : A
   Path (ℑ (B (ι A a))) (ind-ℑ A B f (ι A a)) (f a) :=
 <_> f a
 
+def trans-ℑ (A : I → U) (a : A 0) : ℑ (A 1) :=
+ℑ-unit (transp (<i> A i) 0 a)
+
+def trans-ℑ′ (A : I → U) (a : A 0) : ℑ (A 1) :=
+transp (<i> ℑ (A i)) 0 (ℑ-unit a)
+
+def trans-ℑ-is-correct (A : I → U) (a : A 0) :
+  Path (ℑ (A 1)) (trans-ℑ A a) (trans-ℑ′ A a) :=
+<_> trans-ℑ A a
+
 def ImInduction (A : U) (B : ℑ A -> U) (c : Π (a : ℑ A), isCoreduced (B a))
   (f : Π (a : A), B (ι A a)) (a : ℑ A) : B a :=
 (c a (ind-ℑ A B (λ (x : A), ι (B (ι A x)) (f x)) a)).1.1

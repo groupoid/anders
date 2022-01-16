@@ -104,6 +104,8 @@ def quot₂ (A : U) (R : A → A → U) (x y : A) (ρ : R x y)
  := resp (full A R) A (λ (w : full A R), w.1) (λ (w : full A R), w.2.1) (x, y, ρ)
 
 -- [van Doorn] 2016 2-quotient
+-- Reducing higher inductive types to quotients
+-- https://florisvandoorn.com/talks/Toronto2016hits.pdf
 
 axiom R¯ (A: U) (R : A → A → U) : A → A → U
 axiom |-| (A : U) (R : A → A → U) (x y : A) (_ : R x y) : R¯ A R x y

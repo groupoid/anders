@@ -97,10 +97,10 @@ def ‖_‖ (A : U) : ℕ → U := trunc A
 def full (A : U) (R : A → A → U) := Σ (x y : A), R x y
 def quot (A : U) (R : A → A → U)
  := coequ (full A R) A (λ (w : full A R), w.1) (λ (w : full A R), w.2.1)
-def quot-elem (A : U) (R : A → A → U) : A → quot A R
+def quot₁ (A : U) (R : A → A → U) : A → quot A R
  := ι (full A R) A (λ (w : full A R), w.1) (λ (w : full A R), w.2.1)
-def quot-glue (A : U) (R : A → A → U) (x y : A) (ρ : R x y)
-  : Path (quot A R) (quot-elem A R x) (quot-elem A R y)
+def quot₂ (A : U) (R : A → A → U) (x y : A) (ρ : R x y)
+  : Path (quot A R) (quot₁ A R x) (quot₁ A R y)
  := resp (full A R) A (λ (w : full A R), w.1) (λ (w : full A R), w.2.1) (x, y, ρ)
 
 -- [van Doorn] 2016 2-quotient

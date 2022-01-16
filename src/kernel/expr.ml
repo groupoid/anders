@@ -25,6 +25,7 @@ type exp =
 
 type extension =
   | ECoeq of exp | ECoeqI of exp | EIndCoeq of exp                                (* Coequalizer *)
+  | EDisc of exp | EBase of exp | EHub of exp | ESpoke of exp | EIndDisc of exp          (* Disc *)
 
 type tele = name * exp
 

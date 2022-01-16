@@ -112,6 +112,11 @@ axiom −¹ (A : U) (R : A → A → U) (x y : A) (r : R¯ A R x y) : R¯ A R y 
 axiom −·− (A : U) (R : A → A → U) (x y z : A) (r : R¯ A R x y) (r' : R¯ A R y z ) : R¯ A R x z
 
 axiom 2-quot (A : U) (R : A → A → U) (Q : Π (x y : A), R¯ A R x y → R¯ A R y x → U) : U
+axiom 2-quot₁ (A : U) (R : A → A → U) (Q : Π (x y : A), R¯ A R x y → R¯ A R y x → U) (a: A) : 2-quot A R Q
+axiom 2-quot₂ (A : U) (R : A → A → U) (Q : Π (x y : A), R¯ A R x y → R¯ A R y x → U) (x y : A) (r : R x y)
+    : Path (2-quot A R Q) (2-quot₁ A R Q x) (2-quot₁ A R Q y)
+axiom 2-quot₃ (A : U) (R : A → A → U) (Q : Π (x y : A), R¯ A R x y → R¯ A R y x → U) (x y : A) (r1 r2 : R x y) 
+    : Path (Path (2-quot A R Q) (2-quot₁ A R Q x) (2-quot₁ A R Q y)) (2-quot₂ A R Q x y r1) (2-quot₂ A R Q x y r2)
 
 def 𝚺ₓ (A: U) : ℕ → U := ℕ-iter U A 𝚺
 

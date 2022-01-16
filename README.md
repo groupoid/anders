@@ -64,6 +64,8 @@ $ anders check library/path.anders
 MLTT
 ----
 
+Type Checker is based on MLTT.
+
 * <a href="https://raw.githubusercontent.com/michaelt/martin-lof/master/pdfs/Bibliopolis-Book-retypeset-1984.pdf">Intuitionistic Type Theory</a> [Martin-Löf]
 
 CCHM
@@ -95,6 +97,8 @@ Type system with two identities.
 
 de Rham
 -------
+
+Infinitesimal Modality was added to support Synthetic Differential Geometry:
 
 * <a href="https://arxiv.org/pdf/1310.7930v1.pdf">Differential cohomology in a cohesive ∞-topos</a> [Schreiber]
 * <a href="https://arxiv.org/pdf/1806.05966.pdf">Cartan Geometry in Modal Homotopy Type Theory</a> [Wellen]

@@ -30,7 +30,7 @@ let main ctx : command -> unit = function
 let check filename =
   st := handleErrors (checkFile !st) filename !st
 
-let banner = "Anders theorem prover [MLTT][CCHM][HTS] version 1.1.1"
+let banner = "Anders theorem prover [MLTT][CCHM][HTS][deRham] version 1.1.1"
 
 let repl () =
   print_endline ("\n" ^ banner) ;

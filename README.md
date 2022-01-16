@@ -4,7 +4,7 @@ Anders
 [![OPAM](https://img.shields.io/github/v/release/groupoid/anders.svg)](https://opam.ocaml.org/packages/anders/)
 [![Actions](https://github.com/groupoid/anders/workflows/opam/badge.svg)](https://github.com/groupoid/anders/actions)
 
-Homotopy Type System with Strict Equality.
+Modal Homotopy Type System.
 
 Features
 --------
@@ -18,6 +18,8 @@ Features
 * Glue types
 * Strict Equality on pretypes
 * Coequalizer
+* Hub Spokes Disc
+* Infinitesimal Modality (de Rham Stack)
 * Parser in 80 LOC
 * Lexer in 80 LOC
 * UTF-8 support including universe levels

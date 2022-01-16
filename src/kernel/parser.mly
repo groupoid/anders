@@ -60,7 +60,7 @@
 %token GLUE GLUEELEM UNGLUE
 %token INDEMPTY INDUNIT INDBOOL
 %token W INDW SUP
-%token IM INF INDIM
+%token IM INF INDIM JOIN
 
 %left APPFORMULA
 %left OR
@@ -128,6 +128,7 @@ exp4 :
   | IM exp6 { EIm $2 }
   | INF exp6 { EInf $2 }
   | INDIM exp6 exp6 { EIndIm ($2, $3) }
+  | JOIN exp6 { EJoin $2 }
   | exp5 { $1 }
 
 exp5:

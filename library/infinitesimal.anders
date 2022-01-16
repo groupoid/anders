@@ -10,13 +10,15 @@
 
 module infinitesimal where
 import library/path
-import library/equiv
+import library/iso
 
 -- de Rham Stack
 def ι (A : U) (a : A) : ℑ A := ℑ-unit a
+def μ (A : U) (a : ℑ (ℑ A)) := ℑ-join a
 
 def isCoreduced (A : U) : U := isEquiv A (ℑ A) (ι A)
-axiom ImCoreduced (A : U) : isCoreduced (ℑ A)
+def ImCoreduced (A : U) : isCoreduced (ℑ A) :=
+isoToEquiv (ℑ A) (ℑ (ℑ A)) (ι (ℑ A)) (μ A) (λ (x : ℑ (ℑ A)), <_> x) (λ (y : ℑ A), <_> y)
 
 def ind-ℑβ (A : U) (B : ℑ A -> U) (f : Π (a : A), ℑ (B (ι A a))) (a : A) :
   Path (ℑ (B (ι A a))) (ind-ℑ A B f (ι A a)) (f a) :=
@@ -38,7 +40,7 @@ def ImInduction (A : U) (B : ℑ A -> U) (c : Π (a : ℑ A), isCoreduced (B a))
 
 axiom ImComputeInduction (A : U) (B : ℑ A -> U) (c : Π (a : ℑ A), isCoreduced (B a))
   (f : Π (a : A), B (ι A a)) (a : A) : Path (B (ι A a)) (f a) ((ImInduction A B c f) (ι A a))
---(c (ℑ-unit a) (ℑ-unit (f a))).1.2
+--<i> ℑ-join ((c (ℑ-unit a) (ℑ-unit (f a))).1.2 @ i)
 
 def ImRecursion (A B : U) (c : isCoreduced B) (f : A -> B) : ℑ A -> B
  := ImInduction A (λ (_ : ℑ A), B) (λ (_ : ℑ A), c) f

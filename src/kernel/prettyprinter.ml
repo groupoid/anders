@@ -61,6 +61,7 @@ let rec ppExp paren e = let x = match e with
   | EIndW (a, b, c) -> Printf.sprintf "indᵂ %s %s %s" (showExp a) (showExp b) (showExp c)
   | EIm e -> Printf.sprintf "ℑ %s" (ppExp true e)
   | EInf e -> Printf.sprintf "ℑ-unit %s" (ppExp true e)
+  | EJoin e -> Printf.sprintf "ℑ-join %s" (ppExp true e)
   | EIndIm (a, b) -> Printf.sprintf "ind-ℑ %s %s" (ppExp true a) (ppExp true b)
   in match e with
   | EVar _ | EFst _ | ESnd _ | EI | EPre _ | ESystem _
@@ -118,6 +119,7 @@ let rec ppValue paren v = let x = match v with
   | VIndW (a, b, c) -> Printf.sprintf "indᵂ %s %s %s" (ppValue true a) (ppValue true b) (ppValue true c)
   | VIm v -> Printf.sprintf "ℑ %s" (ppValue true v)
   | VInf v -> Printf.sprintf "ℑ-unit %s" (ppValue true v)
+  | VJoin v -> Printf.sprintf "ℑ-join %s" (ppValue true v)
   | VIndIm (a, b) -> Printf.sprintf "ind-ℑ %s %s" (ppValue true a) (ppValue true b)
   in match v with
   | Var _ | VFst _ | VSnd _ | VI | VPre _ | VSystem _

@@ -53,6 +53,7 @@ let indbool  = "ind-bool"  | "ind\xE2\x82\x82" (* ind₂ *)
 
 let im    = "\xE2\x84\x91" (* ℑ *)
 let inf   = im "-unit" (* ℑ-unit *)
+let join  = im "-join" (* ℑ-join *)
 let indim = "ind-" im (* ind-ℑ *)
 
 rule main = parse
@@ -72,7 +73,8 @@ rule main = parse
 | indempty      { INDEMPTY }         | indunit       { INDUNIT }
 | indbool       { INDBOOL }          | indim         { INDIM }
 | im            { IM }               | inf           { INF }
-| eof           { EOF }              | ident as s    {
+| join          { JOIN }             | eof           { EOF }
+| ident as s    {
   match s with
   | "/\\"                    | "\xE2\x88\xA7"    -> AND    (* ∧ *)
   | "\\/"                    | "\xE2\x88\xA8"    -> OR     (* ∨ *)

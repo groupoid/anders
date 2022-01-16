@@ -88,7 +88,8 @@ let rec eval (e0 : exp) (ctx : ctx) = traceEval e0; match e0 with
   | ESup (a, b)          -> VSup (eval a ctx, eval b ctx)
   | EIndW (a, b, c)      -> VIndW (eval a ctx, eval b ctx, eval c ctx)
   | EIm e                -> VIm (eval e ctx)
-  | EInf e               -> VInf (eval e ctx)
+  | EInf e               -> inf (eval e ctx)
+  | EJoin e              -> join (eval e ctx)
   | EIndIm (a, b)        -> VIndIm (eval a ctx, eval b ctx)
 
 and appFormula v x = match v with
@@ -107,6 +108,14 @@ and partialv t r = VPartialP (VSystem (border (solve r One) t) , r)
 and transp p phi u0 = match p with
   | VPLam (VLam (VI, (i, g))) -> transport i (g (Var (i, VI))) phi u0
   | _ -> VApp (VTransp (p, phi), u0)
+
+and join = function
+  | VInf v -> v
+  | v      -> VJoin v
+
+and inf = function
+  | VJoin v -> v
+  | v       -> VInf v
 
 and transport i p phi u0 = match p, phi, u0 with
   (* transp p 1 u₀ ~> u₀ *)
@@ -156,7 +165,7 @@ and transport i p phi u0 = match p, phi, u0 with
     let v2 = transport k (swap i k (implv (b (v1 (dim k))) (W (t, (x, b))))) phi f in let t' = act0 i vone t in
     VApp (VApp (VSup (t', VLam (t', (fresh x, b >> act0 i vone))), v1 vone), v2)
   (* transp (<i> ℑ (A i)) 0 (ℑ-unit a) ~> ℑ-unit (transp (<i> A i) 0 a) *)
-  | VIm t, _, VInf a -> VInf (transport i t phi a)
+  | VIm t, _, VInf a -> inf (transport i t phi a)
   | _, _, _ -> VApp (VTransp (VPLam (VLam (VI, (i, fun j -> act0 i j p))), phi), u0)
 
 and transFill i p phi u0 j = let (k, _, _) = freshDim () in
@@ -319,6 +328,7 @@ and inferV v = traceInferV v; match v with
   | VIndW (a, b, c) -> inferIndW a b c
   | VIm t -> inferV t
   | VInf v -> VIm (inferV v)
+  | VJoin v -> extIm (inferV v)
   | VIndIm (a, b) -> inferIndIm a b
   | VPLam _ | VPair _ | VHole -> raise (ExpectedNeutral v)
 
@@ -342,7 +352,7 @@ and inferIndW a b c = let t = wtype a b in
     (VPi (t, (freshName "w", fun w -> app (c, w))))
 
 and inferIndIm a b =
-  implv (VPi (a, (freshName "a", fun x -> VIm (app (b, VInf x)))))
+  implv (VPi (a, (freshName "a", fun x -> VIm (app (b, inf x)))))
         (VPi (VIm a, (freshName "a", fun x -> VIm (app (b, x)))))
 
 and inferInc t r = let a = freshName "a" in
@@ -424,7 +434,8 @@ and act rho = function
   | VSup (a, b)          -> VSup (act rho a, act rho b)
   | VIndW (a, b, c)      -> VIndW (act rho a, act rho b, act rho c)
   | VIm t                -> VIm (act rho t)
-  | VInf v               -> VInf (act rho v)
+  | VInf v               -> inf (act rho v)
+  | VJoin v              -> join (act rho v)
   | VIndIm (a, b)        -> VIndIm (act rho a, act rho b)
 
 and actVar rho i = match Env.find_opt i rho with
@@ -488,6 +499,7 @@ and conv v1 v2 : bool = traceConv v1 v2;
     | VIndW (a1, b1, c1), VIndW (a2, b2, c2) -> conv a1 a2 && conv b1 b2 && conv c1 c2
     | VIm u, VIm v -> conv u v
     | VInf u, VInf v -> conv u v
+    | VJoin u, VJoin v -> conv u v
     | VIndIm (a1, b1), VIndIm (a2, b2) -> conv a1 a2 && conv b1 b2
     | _, _ -> false
   end || convWithSystem (v1, v2) || convProofIrrel v1 v2
@@ -634,6 +646,7 @@ and infer ctx e : value = traceInfer e; match e with
     inferIndW t (eval b ctx) (eval c ctx)
   | EIm e -> let t = infer ctx e in ignore (extSet t); t
   | EInf e -> VIm (infer ctx e)
+  | EJoin e -> let t = extIm (infer ctx e) in ignore (extIm t); t
   | EIndIm (a, b) -> ignore (extSet (infer ctx a)); let t = eval a ctx in
     let (c, (x, g)) = extPiG (infer ctx b) in eqNf (VIm t) c;
     ignore (extSet (g (Var (x, c)))); inferIndIm t (eval b ctx)

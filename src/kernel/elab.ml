@@ -19,6 +19,10 @@ let extKan : value -> Z.t = function
   | VKan n -> n
   | v      -> raise (ExpectedFibrant v)
 
+let extIm : value -> value = function
+  | VIm v -> v
+  | v -> failwith (Printf.sprintf "“%s” expected to be a modality" (Prettyprinter.showValue v))
+
 let extPathP = function
   | VApp (VApp (VPathP v, u0), u1) -> (v, u0, u1)
   | v                              -> raise (ExpectedPath v)
@@ -100,6 +104,7 @@ let rec salt (ns : name Env.t) : exp -> exp = function
   | EIm e                -> EIm (salt ns e)
   | EInf e               -> EInf (salt ns e)
   | EIndIm (a, b)        -> EIndIm (salt ns a, salt ns b)
+  | EJoin e              -> EJoin (salt ns e)
 
 and saltTele ctor ns p a b =
   let x = fresh p in ctor x (salt ns a) (salt (Env.add p x ns) b)
@@ -157,5 +162,6 @@ let rec swap i j = function
   | VIm v                -> VIm (swap i j v)
   | VInf v               -> VInf (swap i j v)
   | VIndIm (a, b)        -> VIndIm (swap i j a, swap i j b)
+  | VJoin v              -> VJoin (swap i j v)
 
 and swapVar i j k = if i = k then j else k

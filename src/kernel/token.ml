@@ -31,3 +31,4 @@ let tokenToString : token -> string = function
   | INDBOOL    -> "INDBOOL"     | INDW       -> "W"
   | PLUGIN     -> "PLUGIN"      | IM         -> "IM"
   | INF        -> "INF"         | INDIM      -> "INDIM"
+  | JOIN       -> "JOIN"

@@ -27,19 +27,19 @@ def trans-ℑ-is-correct (A : I → U) (a : A 0) : Path (ℑ (A 1)) (trans-ℑ A
 def ℑ-ind (A : U) (B : ℑ A -> U) (c : Π (a : ℑ A), isCoreduced (B a)) (f : Π (a : A), B (ι A a)) (a : ℑ A) : B a
  := (c a (ind-ℑ A B (λ (x : A), ι (B (ι A x)) (f x)) a)).1.1
 
-def ℑ-indη (A : U) (B : ℑ A -> U) (c : Π (a : ℑ A), isCoreduced (B a)) (f : Π (a : A), B (ι A a)) (a : A)
+def ℑ-indβ (A : U) (B : ℑ A -> U) (c : Π (a : ℑ A), isCoreduced (B a)) (f : Π (a : A), B (ι A a)) (a : A)
   : Path (B (ι A a)) (f a) ((ℑ-ind A B c f) (ι A a))
  := <i> sec-equiv (B (ι A a)) (ℑ (B (ι A a))) (ι (B (ι A a)), c (ι A a)) (f a) @ -i
 
 def ℑ-rec (A B : U) (c : isCoreduced B) (f : A -> B) : ℑ A -> B
  := ℑ-ind A (λ (_ : ℑ A), B) (λ (_ : ℑ A), c) f
 
-def ℑ-recη (A B : U) (c : isCoreduced B) (f : A -> B) (a : A) : PathP (<_> B) (f a) ((ℑ-rec A B c f) (ι A a))
- := ℑ-indη A (λ (_ : ℑ A), B) (λ (_ : ℑ A), c) f a
+def ℑ-recβ (A B : U) (c : isCoreduced B) (f : A -> B) (a : A) : PathP (<_> B) (f a) ((ℑ-rec A B c f) (ι A a))
+ := ℑ-indβ A (λ (_ : ℑ A), B) (λ (_ : ℑ A), c) f a
 
 def ℑ-app (A B : U) (f : A -> B) : ℑ A -> ℑ B := ℑ-rec A (ℑ B) (ℑ-coreduced B) (∘ A B (ℑ B) (ι B) f)
 def ℑ-naturality (A B : U) (f : A -> B) : Π (a : A), Path (ℑ B) ((ι B) (f a)) ((ℑ-app A B f) (ι A a))
- := ℑ-recη A (ℑ B) (ℑ-coreduced B) (∘ A B (ℑ B) (ι B) f)
+ := ℑ-recβ A (ℑ B) (ℑ-coreduced B) (∘ A B (ℑ B) (ι B) f)
 
 def ~ (X : U) (a x' : X) : U := Path (ℑ X) (ι X a) (ι X x')
 def 𝔻 (X : U) (a : X) : U := Σ (x' : X), ~ X a x'

@@ -1,11 +1,15 @@
 {- Homotopy Type Theory:
-   - Coequalizer.
+   - Coequalizer and Hubs/Spokes as primitives.
    - S¹ sphere and 𝑛-sphere.
    - Pushout.
    - Suspension.
+   - 𝑛-Truncation.
 
    HoTT 6.8 Pushouts
-
+   HoTT 6.10 Quotients
+   HoTT 6.7 Hubs and Spokes
+   HoTT 6.9 Truncations
+   
    Copyright (c) Groupoid Infinity, 2014-2022. -}
    
 module coequalizer where
@@ -15,9 +19,11 @@ import library/induction
 -- Path spaces of higher inductive types in homotopy type theory.
 -- http://pure-oai.bham.ac.uk/ws/files/84880431/Path_Spaces.pdf
 
--- [Bauer, Gross, Lumsdaine, Shulman, Sozeau, Spitters] 2016 Coequalizer (Coq HoTT)
+-- [Bauer, Gross, Lumsdaine, Shulman, Sozeau, Spitters] Coq HoTT
 -- The HoTT Library: A formalization of homotopy type theory in Coq
 -- https://arxiv.org/pdf/1610.04591.pdf
+
+{- Coequalizer Primitive -}
 
 axiom coequ (A B : U) (f g : A → B) : U
 axiom ι (A B : U) (f g : A → B) : B → coequ A B f g
@@ -66,17 +72,28 @@ def quot-glue (A : U) (R : A → A → U) (x y : A) (ρ : R x y)
   : Path (quot A R) (quot-elem A R x) (quot-elem A R y)
  := resp (full A R) A (λ (w : full A R), w.1) (λ (w : full A R), w.2.1) (x, y, ρ)
 
+{- Hub and Spoke Primitive -}
+
 axiom hs (S A : U) : U
 axiom center (S A : U) (x : A) : hs S A
 axiom hub (S A : U) (f : S → hs S A) : hs S A
 axiom spoke (S A : U) (f : S → hs S A) (s : S) : Path (hs S A) (hub S A f) (f s)
-axiom =-hub (S A : U) (x y : A) (p : S → Path A x y) : Path (hs S A) (center S A x) (center S A y)
-axiom =-spoke (S A : U) (x y : A) (p : S → Path A x y) (s : S) : Path (hs S A) (=-hub S A x y p @ 0) (center S A (p s @ 1))
+axiom hub₋₂ (S A : U) (x y : A) (p : S → Path A x y) : Path (hs S A) (center S A x) (center S A y)
+axiom spoke₋₂ (S A : U) (x y : A) (p : S → Path A x y) (s : S) : Path (hs S A) (hub₋₂ S A x y p @ 0) (center S A (p s @ 1))
+
+axiom isNull (S A : U) : U
+axiom hs-ind (S A : U) (B : hs S A → U) (nB : Π (x : hs S A), isNull S (B x))
+      (nC : Π (a : A), B (center S A a)) (x : hs S A) : B x
+
+{- Generic ℕ-indexed Truncations -}
 
 def trunc (A : U) (n : ℕ) : U := hs (sphere n) A
 def trunc₁ (A : U) (n : ℕ) (x : A) : trunc A n := center (sphere n) A x
 def trunc₂ (A : U) (n : ℕ) (f : sphere n → trunc A n) : trunc A n := hub (sphere n) A f
-def trunc₃ (A : U) (n : ℕ) (f : sphere n → trunc A n) (s : sphere n) : Path (trunc A n) (hub (sphere n) A f) (f s) := spoke (sphere n) A f s
+def trunc₃ (A : U) (n : ℕ) (f : sphere n → trunc A n) (s : sphere n)
+  : Path (trunc A n) (hub (sphere n) A f) (f s) := spoke (sphere n) A f s
+
+{- Trancation Instances for ₋₁,₀,₁ truncation levels -}
 
 def ||₋₁ (A : U) := trunc A zero -- Propositional Truncation ||A|| or |A|₋₁
 def ||₀  (A : U) := trunc A one  -- Set Truncation |A|₀

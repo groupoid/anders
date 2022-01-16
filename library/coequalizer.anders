@@ -113,23 +113,23 @@ axiom ro (A : U) (R : A → A → U) (x y : A) (p : Path A x y) : R¯ A R x y
 axiom −¹ (A : U) (R : A → A → U) (x y : A) (r : R¯ A R x y) : R¯ A R y x
 axiom −·− (A : U) (R : A → A → U) (x y z : A) (r : R¯ A R x y) (r' : R¯ A R y z ) : R¯ A R x z
 
-axiom 2-quot (A : U) (R : A → A → U) (Q : Π (x y : A), R¯ A R x y → R¯ A R y x → U) : U
-axiom 2-quot₁ (A : U) (R : A → A → U) (Q : Π (x y : A), R¯ A R x y → R¯ A R y x → U) (a: A) : 2-quot A R Q
-axiom 2-quot₂ (A : U) (R : A → A → U) (Q : Π (x y : A), R¯ A R x y → R¯ A R y x → U) (x y : A) (r : R x y)
+axiom 2-quot (A : U) (R : A → A → U) (Q : Π (x y : A), R¯ A R x y → R¯ A R x y → U) : U
+axiom 2-quot₁ (A : U) (R : A → A → U) (Q : Π (x y : A), R¯ A R x y → R¯ A R x y → U) (a: A) : 2-quot A R Q
+axiom 2-quot₂ (A : U) (R : A → A → U) (Q : Π (x y : A), R¯ A R x y → R¯ A R x y → U) (x y : A) (r : R x y)
     : Path (2-quot A R Q) (2-quot₁ A R Q x) (2-quot₁ A R Q y)
-axiom 2-quot₃ (A : U) (R : A → A → U) (Q : Π (x y : A), R¯ A R x y → R¯ A R y x → U) (x y : A) (r1 r2 : R x y) 
+axiom 2-quot₃ (A : U) (R : A → A → U) (Q : Π (x y : A), R¯ A R x y → R¯ A R x y → U) (x y : A) (r1 r2 : R x y)
     : Path (Path (2-quot A R Q) (2-quot₁ A R Q x) (2-quot₁ A R Q y)) (2-quot₂ A R Q x y r1) (2-quot₂ A R Q x y r2)
 
 def 𝚺ₓ (A: U) : ℕ → U := ℕ-iter U A 𝚺
 
-def discreteTopology (G : abgroup) : U := group
-def const-group : 𝟏 → 𝟏 → U := λ (x y : 𝟏), group
-def const-rel : Π (x y: 𝟏), R¯ 𝟏 const-group x y → R¯ 𝟏 const-group y x → U
- := λ (x y: 𝟏) (z: R¯ 𝟏 const-group x y) (w: R¯ 𝟏 const-group y x), group
+def discreteTopology (G : abgroup) : U := G.1.1
 
-def K⦅G‚1⦆ (G : group) : U
- := ‖_‖₁ (2-quot 𝟏 const-group const-rel)
+def R-K1 (G : group) : 𝟏 → 𝟏 → U := λ (x y : 𝟏), G.1.1
+axiom Q-K1 (G : group) (x y : 𝟏) (u w : R¯ 𝟏 (R-K1 G) x y) : U
 
-def K⦅G‚n⦆ (G : abgroup) (n: ℕ) : U
- := ℕ-iter U (discreteTopology G) (λ (_: U), ‖_‖ (𝚺ₓ (K⦅G‚1⦆ (G.X,G.2.g)) n) n) n
+def K1 (G : group) : U
+ := ‖_‖₁ (2-quot 𝟏 (R-K1 G) (Q-K1 G))
+
+def K (G : abgroup) (n: ℕ) : U
+ := ℕ-iter U (discreteTopology G) (λ (_: U), ‖_‖ (𝚺ₓ (K1 (G.X, G.2.g)) n) n) n
 

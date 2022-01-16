@@ -105,13 +105,20 @@ def quot-glue (A : U) (R : A → A → U) (x y : A) (ρ : R x y)
 
 -- [van Doorn] 2016 2-quotient
 
-def 2-quot (A : U) (R : A → A → U) (x y : A) (Q : R x y) : U := ?
+axiom R¯ (A: U) (R : A → A → U) : A → A → U
+axiom |-| (A : U) (R : A → A → U) (x y : A) (_ : R x y) : R¯ A R x y
+axiom ro (A : U) (R : A → A → U) (x y : A) (p : Path A x y) : R¯ A R x y
+axiom −¹ (A : U) (R : A → A → U) (x y : A) (r : R¯ A R x y) : R¯ A R y x
+axiom −·− (A : U) (R : A → A → U) (x y z : A) (r : R¯ A R x y) (r' : R¯ A R y z ) : R¯ A R x z
+
+axiom 2-quot (A : U) (R : A → A → U) (Q : Π (x y : A), R¯ A R x y → R¯ A R y x → U) : U
+
 def 𝚺ₓ (A: U) : ℕ → U := ℕ-iter U A 𝚺
 
 def discreteTopology (G : abgroup) : U := group
+def const-group : 𝟏 → 𝟏 → U := λ (x y : 𝟏), group
+def const-rel : Π (x y: 𝟏), R¯ 𝟏 const-group x y → R¯ 𝟏 const-group y x → U
+ := λ (x y: 𝟏) (z: R¯ 𝟏 const-group x y) (w: R¯ 𝟏 const-group y x), group
 
-def K⦅G‚1⦆ (G : group) : U
- := ‖_‖₁ (2-quot 𝟏 (λ (x y : 𝟏), group) ★ ★ G)
-
-def K⦅G‚n⦆ (G : abgroup) (n: ℕ) : U
- := ℕ-iter U (discreteTopology G) (λ (_: U), ‖_‖ (𝚺ₓ (K⦅G‚1⦆ (G.X,G.2.g)) n) n) n
+def K⦅G‚1⦆ (G : group) : U := ‖_‖₁ (2-quot 𝟏 const-group const-rel)
+def K⦅G‚n⦆ (G : abgroup) (n: ℕ) : U := ℕ-iter U (discreteTopology G) (λ (_: U), ‖_‖ (𝚺ₓ (K⦅G‚1⦆ (G.X,G.2.g)) n) n) n

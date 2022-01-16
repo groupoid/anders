@@ -12,7 +12,8 @@ module infinitesimal where
 import library/path
 import library/iso
 
--- de Rham Stack
+{- de Rham Stack -}
+
 def ι (A : U) (a : A) : ℑ A := ℑ-unit a
 def μ (A : U) (a : ℑ (ℑ A)) := ℑ-join a
 

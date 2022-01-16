@@ -110,16 +110,16 @@ Benchmarks
 
 ```
 $ time make
-real    0m1.254s
-user    0m0.981s
-sys     0m0.183s
+real    0m4.936s
+user    0m1.874s
+sys     0m0.670s
 ```
 
 ```
 $ time for i in library/* ; do ./anders.native check $i ; done
-real    0m0.257s
-user    0m0.231s
-sys     0m0.028s
+real    0m2.085s
+user    0m1.982s
+sys     0m0.105s
 ```
 
 Acknowledgements

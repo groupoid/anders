@@ -315,6 +315,7 @@ and inferV v = traceInferV v; match v with
   | VIndW (a, b, c) -> inferIndW a b c
   | VIm t -> inferV t
   | VInf v -> VIm (inferV v)
+  | VIndIm (a, b) -> inferIndIm a b
   | VPLam _ | VPair _ | VHole -> raise (ExpectedNeutral v)
 
 and recUnit t = let x = freshName "x" in
@@ -335,6 +336,10 @@ and inferIndW a b c = let t = wtype a b in
       implv (VPi (app (b, x), (freshName "b", fun b -> app (c, (app (f, b))))))
         (app (c, VApp (VApp (VSup (a, b), x), f))))))))
     (VPi (t, (freshName "w", fun w -> app (c, w))))
+
+and inferIndIm a b =
+  implv (VPi (a, (freshName "a", fun x -> VIm (app (b, VInf x)))))
+        (VPi (VIm a, (freshName "a", fun x -> VIm (app (b, x)))))
 
 and inferInc t r = let a = freshName "a" in
   VPi (t, (a, fun v -> VSub (t, r, VSystem (border (solve r One) v))))
@@ -625,6 +630,9 @@ and infer ctx e : value = traceInfer e; match e with
     inferIndW t (eval b ctx) (eval c ctx)
   | EIm e -> let t = infer ctx e in ignore (extSet t); t
   | EInf e -> VIm (infer ctx e)
+  | EIndIm (a, b) -> ignore (extSet (infer ctx a)); let t = eval a ctx in
+    let (c, (x, g)) = extPiG (infer ctx b) in eqNf (VIm t) c;
+    ignore (extSet (g (Var (x, c)))); inferIndIm t (eval b ctx)
   | EPLam _ | EPair _ | EHole -> raise (InferError e)
 
 and inferInd fibrant ctx t e f =

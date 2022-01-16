@@ -18,6 +18,8 @@ Features
 * Glue types
 * Strict Equality on pretypes
 * Coequalizer
+* Hub Spokes Disc
+* Infinitesimal Modality (de Rham Stack)
 * Parser in 80 LOC
 * Lexer in 80 LOC
 * UTF-8 support including universe levels

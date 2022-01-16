@@ -11,10 +11,6 @@
 module coequalizer where
 import library/induction
 
--- In Anders we take Coeq as core primitive and by using it with W-types
--- we then express more ordinary Pushouts and more general HITs like Suspension and n-Sphere.
--- The motivation behind Coeq is van Kampen theorem as in [1].
-
 -- [1]. Nicolai Kraus, Jakob von Raumer.
 -- Path spaces of higher inductive types in homotopy type theory.
 -- http://pure-oai.bham.ac.uk/ws/files/84880431/Path_Spaces.pdf
@@ -23,18 +19,18 @@ import library/induction
 -- The HoTT Library: A formalization of homotopy type theory in Coq
 -- https://arxiv.org/pdf/1610.04591.pdf
 
-axiom coequ (A B : U) (f g : A -> B) : U
-axiom ι (A B : U) (f g : A -> B) : B -> coequ A B f g
-axiom resp (A B : U) (f g : A -> B) (x : A) : Path (coequ A B f g) (ι A B f g (f x)) (ι A B f g (g x))
-axiom coequ-ind (A B : U) (f g : A -> B) (X : coequ A B f g -> U) (i : Π (b : B), X (ι A B f g b))
+axiom coequ (A B : U) (f g : A → B) : U
+axiom ι (A B : U) (f g : A → B) : B → coequ A B f g
+axiom resp (A B : U) (f g : A → B) (x : A) : Path (coequ A B f g) (ι A B f g (f x)) (ι A B f g (g x))
+axiom coequ-ind (A B : U) (f g : A → B) (X : coequ A B f g → U) (i : Π (b : B), X (ι A B f g b))
     : (Π (x : A), PathP (<i> X (resp A B f g x @ i)) (i (f x)) (i (g x))) → (Π (z : coequ A B f g), X z)
-axiom coequ-ind-β₁ (A B : U) (f g : A → B) (X : coequ A B f g -> U) (i : Π (b : B), X (ι A B f g b))
+axiom coequ-ind-β₁ (A B : U) (f g : A → B) (X : coequ A B f g → U) (i : Π (b : B), X (ι A B f g b))
       (ρ : Π (x : A), PathP (<i> X (resp A B f g x @ i)) (i (f x)) (i (g x))) (b : B)
     : Path (X (ι A B f g b)) (coequ-ind A B f g X i ρ (ι A B f g b)) (i b)
 
 -- coequ-ind-β₁ need to be definitional to write this properly (i.e. without transp)
 {-
-axiom coequ-ind-β₂ (A B : U) (f g : A → B) (X : coequ A B f g -> U) (i : Π (b : B), X (ι A B f g b))
+axiom coequ-ind-β₂ (A B : U) (f g : A → B) (X : coequ A B f g → U) (i : Π (b : B), X (ι A B f g b))
   (ρ : Π (x : A), PathP (<i> X (resp A B f g x @ i)) (i (f x)) (i (g x))) (x : A) :
   Path (PathP (<j> X (resp A B f g x @ j)) (i (f x)) (i (g x)))
        (<j> coequ-ind A B f g X i ρ (resp A B f g x @ j)) (ρ x)
@@ -43,9 +39,9 @@ axiom coequ-ind-β₂ (A B : U) (f g : A → B) (X : coequ A B f g -> U) (i : Π
 -- [Caglayan] 2014
 
 def pushout (A B C : U) (f : C → A) (g : C → B) : U := coequ C (+ A B) (∘ C A (+ A B) (inl A B) f) (∘ C B (+ A B) (inr A B) g)
-def po₁ (A B C: U) (f: C -> A) (g: C -> B) (a: A) : pushout A B C f g := ι C (+ A B) (∘ C A (+ A B) (inl A B) f) (∘ C B (+ A B) (inr A B) g) (inl A B a)
-def po₂ (A B C: U) (f: C -> A) (g: C -> B) (b: B) : pushout A B C f g := ι C (+ A B) (∘ C A (+ A B) (inl A B) f) (∘ C B (+ A B) (inr A B) g) (inr A B b)
-def po₃ (A B C: U) (f: C -> A) (g: C -> B) (c: C) : Path (pushout A B C f g) (po₁ A B C f g (f c)) (po₂ A B C f g (g c))
+def po₁ (A B C: U) (f: C → A) (g: C → B) (a: A) : pushout A B C f g := ι C (+ A B) (∘ C A (+ A B) (inl A B) f) (∘ C B (+ A B) (inr A B) g) (inl A B a)
+def po₂ (A B C: U) (f: C → A) (g: C → B) (b: B) : pushout A B C f g := ι C (+ A B) (∘ C A (+ A B) (inl A B) f) (∘ C B (+ A B) (inr A B) g) (inr A B b)
+def po₃ (A B C: U) (f: C → A) (g: C → B) (c: C) : Path (pushout A B C f g) (po₁ A B C f g (f c)) (po₂ A B C f g (g c))
  := resp C (+ A B) (∘ C A (+ A B) (inl A B) f) (∘ C B (+ A B) (inr A B) g) c
 
 -- [Shulman] 2015
@@ -61,7 +57,7 @@ def 𝜎₁ (A: U): 𝚺 A := po₁ 𝟏 𝟏 A (\(_: A), ★) (\(_: A), ★) �
 def 𝜎₂ (A: U): 𝚺 A := po₂ 𝟏 𝟏 A (\(_: A), ★) (\(_: A), ★) ★
 def 𝜎₃ (A: U) (a: A) : Path (𝚺 A) (𝜎₁ A) (𝜎₂ A) := po₃ 𝟏 𝟏 A (\(_: A), ★) (\(_: A), ★) a
 
-def sphere : ℕ -> U := ℕ-iter U 𝟐 𝚺
+def sphere : ℕ → U := ℕ-iter U 𝟐 𝚺
 
 def full (A : U) (R : A → A → U) := Σ (x y : A), R x y
 def quot (A : U) (R : A → A → U) := coequ (full A R) A (λ (w : full A R), w.1) (λ (w : full A R), w.2.1)
@@ -69,3 +65,19 @@ def quot-elem (A : U) (R : A → A → U) : A → quot A R := ι (full A R) A (�
 def quot-glue (A : U) (R : A → A → U) (x y : A) (ρ : R x y)
   : Path (quot A R) (quot-elem A R x) (quot-elem A R y)
  := resp (full A R) A (λ (w : full A R), w.1) (λ (w : full A R), w.2.1) (x, y, ρ)
+
+axiom hs (S A : U) : U
+axiom center (S A : U) (x : A) : hs S A
+axiom hub (S A : U) (f : S → hs S A) : hs S A
+axiom spoke (S A : U) (f : S → hs S A) (s : S) : Path (hs S A) (hub S A f) (f s)
+axiom =-hub (S A : U) (x y : A) (p : S → Path A x y) : Path (hs S A) (center S A x) (center S A y)
+axiom =-spoke (S A : U) (x y : A) (p : S → Path A x y) (s : S) : Path (hs S A) (=-hub S A x y p @ 0) (center S A (p s @ 1))
+
+def trunc (A : U) (n : ℕ) : U := hs (sphere n) A
+def trunc₁ (A : U) (n : ℕ) (x : A) : trunc A n := center (sphere n) A x
+def trunc₂ (A : U) (n : ℕ) (f : sphere n → trunc A n) : trunc A n := hub (sphere n) A f
+def trunc₃ (A : U) (n : ℕ) (f : sphere n → trunc A n) (s : sphere n) : Path (trunc A n) (hub (sphere n) A f) (f s) := spoke (sphere n) A f s
+
+def ||₋₁ (A : U) := trunc A zero -- Propositional Truncation ||A|| or |A|₋₁
+def ||₀  (A : U) := trunc A one  -- Set Truncation |A|₀
+def ||₁  (A : U) := trunc A two  -- Groupoid Truncation |A|₁

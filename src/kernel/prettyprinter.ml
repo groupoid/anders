@@ -59,6 +59,9 @@ let rec ppExp paren e = let x = match e with
   | EW (a, (p, b)) -> Printf.sprintf "W %s, %s" (showTeleExp (p, a)) (showExp b)
   | ESup (a, b) -> Printf.sprintf "sup %s %s" (showExp a) (showExp b)
   | EIndW (a, b, c) -> Printf.sprintf "indᵂ %s %s %s" (showExp a) (showExp b) (showExp c)
+  | EIm e -> Printf.sprintf "ℑ %s" (ppExp true e)
+  | EInf e -> Printf.sprintf "ℑ-unit %s" (ppExp true e)
+  | EIndIm (a, b) -> Printf.sprintf "ind-ℑ %s %s" (ppExp true a) (ppExp true b)
   in match e with
   | EVar _ | EFst _ | ESnd _ | EI | EPre _ | ESystem _
   | EKan _ | EHole | EDir _ | EPair _ | ENeg _
@@ -113,6 +116,9 @@ let rec ppValue paren v = let x = match v with
   | W (x, (p, clos)) -> Printf.sprintf "W %s, %s" (showTele p x) (showClos p x clos)
   | VSup (a, b) -> Printf.sprintf "sup %s %s" (ppValue true a) (ppValue true b)
   | VIndW (a, b, c) -> Printf.sprintf "indᵂ %s %s %s" (ppValue true a) (ppValue true b) (ppValue true c)
+  | VIm v -> Printf.sprintf "ℑ %s" (ppValue true v)
+  | VInf v -> Printf.sprintf "ℑ-unit %s" (ppValue true v)
+  | VIndIm (a, b) -> Printf.sprintf "ind-ℑ %s %s" (ppValue true a) (ppValue true b)
   in match v with
   | Var _ | VFst _ | VSnd _ | VI | VPre _ | VSystem _
   | VKan _ | VHole | VDir _ | VPair _ | VNeg _

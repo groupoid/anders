@@ -12,14 +12,22 @@ module infinitesimal where
 import library/path
 import library/equiv
 
-axiom ℑ : U -> U -- de Rham Stack
-axiom ι (A: U) : A -> ℑ A
+-- de Rham Stack
+def ι (A : U) (a : A) : ℑ A := ℑ-unit a
+
 def isCoreduced (A : U) : U := isEquiv A (ℑ A) (ι A)
 axiom ImCoreduced (A : U) : isCoreduced (ℑ A)
 
-axiom ImInduction (A : U) (B : ℑ A -> U) (x : Π (a : ℑ A), isCoreduced (B a)) (y : Π (a : A), B (ι A a)) : Π (a : ℑ A), B a
-axiom ImComputeInduction (A : U) (B : ℑ A -> U) (c : Π (a : ℑ A), isCoreduced (B a)) (f : Π (a : A), B (ι A a)) (a : A)
-  : Path (B (ι A a)) (f a) ((ImInduction A B c f) (ι A a))
+axiom ℑ-ind (A : U) (B : ℑ A -> U) (f : Π (a : A), ℑ (B (ι A a))) : Π (a : ℑ A), ℑ (B a)
+axiom ℑ-indβ (A : U) (B : ℑ A -> U) (f : Π (a : A), ℑ (B (ι A a))) (a : A) :
+  Path (ℑ (B (ι A a))) (ℑ-ind A B f (ι A a)) (f a)
+
+def ImInduction (A : U) (B : ℑ A -> U) (H : Π (a : ℑ A), isCoreduced (B a))
+  (f : Π (a : A), B (ι A a)) (a : ℑ A) : B a :=
+(H a (ℑ-ind A B (λ (x : A), ι (B (ι A x)) (f x)) a)).1.1
+
+axiom ImComputeInduction (A : U) (B : ℑ A -> U) (c : Π (a : ℑ A), isCoreduced (B a))
+  (f : Π (a : A), B (ι A a)) (a : A) : Path (B (ι A a)) (f a) ((ImInduction A B c f) (ι A a))
 
 def ImRecursion (A B : U) (c : isCoreduced B) (f : A -> B) : ℑ A -> B
  := ImInduction A (λ (_ : ℑ A), B) (λ (_ : ℑ A), c) f

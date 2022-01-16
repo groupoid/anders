@@ -1,9 +1,9 @@
 module sigma where
 import library/path
 
-def Sigma (A: U) (B: A → U) : U ≔ sigma' (x: A), B x
+def Sigma (A : U) (B : A → U) : U := summa (x: A), B x
 def fiber' (A B : U) (f: A -> B) (y : B): U := Σ (x : A), Path B y (f x)
-def prod (A B: U): U := sigma' (_:A), B
+def prod (A B : U) : U := summa (_ : A), B
 def pair (A: U) (B: A → U) (a: A) (b: B a) : Sigma A B ≔ (a, b)
 def pr₁ (A: U) (B: A → U) (x: Sigma A B) : A ≔ x.1
 def pr₂ (A: U) (B: A → U) (x: Sigma A B) : B (pr₁ A B x) ≔ x.2
@@ -23,5 +23,5 @@ def pathSig0 (A: U) (P: A -> U) (t u: Σ (x: A), P x) (p: PathP (<_>A) t.1 u.1)
  := funDepTr A P t.1 u.1 p t.2 u.2
 
 axiom propTrunc (A: U) : U
-def isSurjective (A B: U) (f: A -> B): U := sigma' (b: B), propTrunc (fiber' A B f b)
-def surjective (A B: U): U := sigma' (f: A -> B), isSurjective A B f
+def isSurjective (A B: U) (f: A -> B): U := summa (b: B), propTrunc (fiber' A B f b)
+def surjective (A B: U): U := summa (f: A -> B), isSurjective A B f

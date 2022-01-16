@@ -60,6 +60,7 @@
 %token GLUE GLUEELEM UNGLUE
 %token INDEMPTY INDUNIT INDBOOL
 %token W INDW SUP
+%token IM INF INDIM
 
 %left APPFORMULA
 %left OR
@@ -124,6 +125,9 @@ exp4 :
   | INDBOOL exp6 { EIndBool $2 }
   | SUP exp6 exp6 { ESup ($2, $3) }
   | INDW exp6 exp6 exp6 { EIndW ($2, $3, $4) }
+  | IM exp6 { EIm $2 }
+  | INF exp6 { EInf $2 }
+  | INDIM exp6 exp6 { EIndIm ($2, $3) }
   | exp5 { $1 }
 
 exp5:

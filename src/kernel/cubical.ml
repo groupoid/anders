@@ -18,6 +18,7 @@ let rec extractExp : exp -> string = function
   | EUnit | EStar | EIndUnit _ -> fail "cubicaltt does not have built-in unit type"
   | EBool | EFalse | ETrue | EIndBool _ -> fail "cubicaltt does not have built-in bool type"
   | EW _ | ESup _ | EIndW _ -> fail "cubicaltt does not have built-in W-types"
+  | EIm _ | EInf _ | EIndIm _ -> fail "cubicaltt does not have built-in modality"
   | EGlueElem _ | EUnglue _ -> fail "not implemented yet"
   | EGlue _ -> fail "cubicaltt does not support currying of Glue"
   | EPathP _ -> fail "cubicaltt does not support (partial) currying of PathP"

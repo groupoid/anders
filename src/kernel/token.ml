@@ -29,4 +29,5 @@ let tokenToString : token -> string = function
   | W          -> "W"           | SUP        -> "SUP"
   | INDEMPTY   -> "INDEMPTY"    | INDUNIT    -> "INDUNIT"
   | INDBOOL    -> "INDBOOL"     | INDW       -> "W"
-  | PLUGIN     -> "PLUGIN"
+  | PLUGIN     -> "PLUGIN"      | IM         -> "IM"
+  | INF        -> "INF"         | INDIM      -> "INDIM"

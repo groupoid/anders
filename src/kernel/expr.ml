@@ -21,9 +21,9 @@ type exp =
   | EUnit | EStar | EIndUnit of exp                                                         (* 𝟏 *)
   | EBool | EFalse | ETrue | EIndBool of exp                                                (* 𝟐 *)
   | EW of exp * (name * exp) | ESup of exp * exp | EIndW of exp * exp * exp                 (* W *)
+  | EIm of exp | EInf of exp | EIndIm of exp * exp                     (* Infinitesimal Modality *)
 
 type extension =
-  | EIm of exp | EInf of exp | EIndIm of exp                           (* Infinitesimal Modality *)
   | ECoeq of exp | ECoeqI of exp | EIndCoeq of exp                                (* Coequalizer *)
 
 type tele = name * exp
@@ -48,6 +48,7 @@ type value =
   | VUnit | VStar | VIndUnit of value
   | VBool | VFalse | VTrue | VIndBool of value
   | W of value * clos | VSup of value * value | VIndW of value * value * value
+  | VIm of value | VInf of value | VIndIm of value * value
 
 and clos = name * (value -> value)
 

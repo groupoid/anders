@@ -97,6 +97,9 @@ let rec salt (ns : name Env.t) : exp -> exp = function
   | EW (a, (p, b))       -> saltTele eW ns p a b
   | ESup (a, b)          -> ESup (salt ns a, salt ns b)
   | EIndW (a, b, c)      -> EIndW (salt ns a, salt ns b, salt ns c)
+  | EIm e                -> EIm (salt ns e)
+  | EInf e               -> EInf (salt ns e)
+  | EIndIm (a, b)        -> EIndIm (salt ns a, salt ns b)
 
 and saltTele ctor ns p a b =
   let x = fresh p in ctor x (salt ns a) (salt (Env.add p x ns) b)
@@ -151,5 +154,8 @@ let rec swap i j = function
   | W (t, (x, g))        -> W (swap i j t, (x, g >> swap i j))
   | VSup (a, b)          -> VSup (swap i j a, swap i j b)
   | VIndW (a, b, c)      -> VIndW (swap i j a, swap i j b, swap i j c)
+  | VIm v                -> VIm (swap i j v)
+  | VInf v               -> VInf (swap i j v)
+  | VIndIm (a, b)        -> VIndIm (swap i j a, swap i j b)
 
 and swapVar i j k = if i = k then j else k

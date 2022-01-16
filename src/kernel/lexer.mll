@@ -37,20 +37,11 @@ let inlineComment = "--" [^ '\n' '\r']* (nl|eof)
 let utf8    = lat1|bytes2|bytes3|bytes4
 let ident   = beg utf8*
 let ws      = ['\t' ' ']
-let colon   = ':'
-let defeq   = ":="     | "\xE2\x89\x94" | "\xE2\x89\x9C" | "\xE2\x89\x9D" (* ≔ | ≜ | ≝ *)
-let arrow   = "->"     | "\xE2\x86\x92" (* → *)
-let prod    = "*"      | "\xC3\x97"     (* × *)
-let lam     = "\\"     | "\xCE\xBB"     (* λ *)
-let pi      = "forall" | "\xCE\xA0"     (* Π *)
-let sigma   = "sigma'" | "\xCE\xA3"     (* Σ *)
-let map     = "|->"    | "\xE2\x86\xA6" (* ↦ *)
-let def     = "definition" | "def" | "theorem" | "lemma" | "corollary" | "proposition"
-let axiom   = "axiom"|"postulate"
 
-let negFormula = "-"
-let andFormula = "/\\"|"\xE2\x88\xA7" (* ∧ *)
-let orFormula  = "\\/"|"\xE2\x88\xA8" (* ∨ *)
+let defeq = ":="  | "\xE2\x89\x94" | "\xE2\x89\x9C" (* ≜ *) | "\xE2\x89\x9D" (* ≔ | ≜ | ≝ *)
+let map   = "|->" | "\xE2\x86\xA6" (* ↦ *)
+let arrow = "->"  | "\xE2\x86\x92" (* → *)
+let prod  = "*"   | "\xC3\x97" (* × *)
 
 let subscript = '\xE2' '\x82' ['\x80'-'\x89']
 let kan       = 'U' subscript*
@@ -60,39 +51,52 @@ let indempty = "ind-empty" | "ind\xE2\x82\x80" (* ind₀ *)
 let indunit  = "ind-unit"  | "ind\xE2\x82\x81" (* ind₁ *)
 let indbool  = "ind-bool"  | "ind\xE2\x82\x82" (* ind₂ *)
 
-let indw = "ind-W" | "ind\xE1\xB5\x82" (* indᵂ *)
+let im    = "\xE2\x84\x91" (* ℑ *)
+let inf   = im "-unit" (* ℑ-unit *)
+let indim = "ind-" im (* ind-ℑ *)
 
 rule main = parse
 | nl            { nextLine lexbuf; main lexbuf }
 | inlineComment { nextLine lexbuf; main lexbuf }
 | "{-"          { multiline lexbuf }
-| "begin"       { ext "" lexbuf }    | "plugin"        { PLUGIN }
-| ws+           { main lexbuf }      | "."             { DOT }
-| "module"      { MODULE }           | "where"         { WHERE }
-| "import"      { IMPORT }           | "option"        { OPTION }
-| def           { DEF }              | colon           { COLON }
-| ','           { COMMA }            | '_'             { IRREF }
-| '('           { LPARENS }          | ')'             { RPARENS }
-| '['           { LSQ }              | ']'             { RSQ }
-| pi            { PI }               | sigma           { SIGMA }
-| "<"           { LT }               | ">"             { GT }
-| negFormula    { NEGATE }           | andFormula      { AND }
-| orFormula     { OR }               | "@"             { APPFORMULA }
-| axiom         { AXIOM }            | defeq           { DEFEQ }
-| lam           { LAM }              | arrow           { ARROW }
-| prod          { PROD }             | kan as s        { KAN (getLevel s) }
-| "PathP"       { PATHP }            | "transp"        { TRANSP }
-| "Id"          { ID }               | "ref"           { REF }
-| "idJ"         { IDJ }              | pre as s        { PRE (getLevel s) }
-| "Partial"     { PARTIAL }          | "PartialP"      { PARTIALP }
-| "?"           { HOLE }             | map             { MAP }
-| "inc"         { INC }              | "ouc"           { OUC }
-| "hcomp"       { HCOMP }            | "Glue"          { GLUE }
-| "glue"        { GLUEELEM }         | "unglue"        { UNGLUE }
-| indempty      { INDEMPTY }         | indunit         { INDUNIT }
-| indbool       { INDBOOL }          | "W"             { W }
-| "sup"         { SUP }              | indw            { INDW }
-| ident as s    { IDENT s }          | eof             { EOF }
+| "begin"       { ext "" lexbuf }
+| ws+           { main lexbuf }
+| kan as s      { KAN (getLevel s) } | pre as s      { PRE (getLevel s) }
+| ":"           { COLON }            | ","           { COMMA }
+| "("           { LPARENS }          | ")"           { RPARENS }
+| "["           { LSQ }              | "]"           { RSQ }
+| "<"           { LT }               | ">"           { GT }
+| "."           { DOT }              | "-"           { NEGATE }
+| defeq         { DEFEQ }            | map           { MAP }
+| arrow         { ARROW }            | prod          { PROD }
+| indempty      { INDEMPTY }         | indunit       { INDUNIT }
+| indbool       { INDBOOL }          | indim         { INDIM }
+| im            { IM }               | inf           { INF }
+| eof           { EOF }              | ident as s    {
+  match s with
+  | "/\\"                    | "\xE2\x88\xA7"    -> AND    (* ∧ *)
+  | "\\/"                    | "\xE2\x88\xA8"    -> OR     (* ∨ *)
+  | "forall"                 | "\xCE\xA0"        -> PI     (* Π *)
+  | "summa"                  | "\xCE\xA3"        -> SIGMA  (* Σ *)
+  | "\\"                     | "\xCE\xBB"        -> LAM    (* λ *)
+  | "ind-W"                  | "ind\xE1\xB5\x82" -> INDW   (* indᵂ *)
+  | "module"     -> MODULE   | "where"           -> WHERE
+  | "import"     -> IMPORT   | "option"          -> OPTION
+  | "PathP"      -> PATHP    | "transp"          -> TRANSP
+  | "_"          -> IRREF    | "@"               -> APPFORMULA
+  | "plugin"     -> PLUGIN   | "?"               -> HOLE
+  | "Partial"    -> PARTIAL  | "PartialP"        -> PARTIALP
+  | "inc"        -> INC      | "ouc"             -> OUC
+  | "hcomp"      -> HCOMP    | "Glue"            -> GLUE
+  | "glue"       -> GLUEELEM | "unglue"          -> UNGLUE
+  | "W"          -> W        | "sup"             -> SUP
+  | "definition"             | "def"
+  | "theorem"                | "lemma"
+  | "corollary"              | "proposition"     -> DEF
+  | "axiom"                  | "postulate"       -> AXIOM
+  | "Id"         -> ID       | "ref"             -> REF
+  | "idJ"        -> IDJ      | _                 -> IDENT s
+}
 
 and multiline = parse
 | "-}" { main lexbuf }

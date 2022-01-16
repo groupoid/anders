@@ -87,6 +87,9 @@ let rec eval (e0 : exp) (ctx : ctx) = traceEval e0; match e0 with
   | EW (a, (p, b))       -> let t = eval a ctx in W (t, (fresh p, closByVal ctx p t b))
   | ESup (a, b)          -> VSup (eval a ctx, eval b ctx)
   | EIndW (a, b, c)      -> VIndW (eval a ctx, eval b ctx, eval c ctx)
+  | EIm e                -> VIm (eval e ctx)
+  | EInf e               -> VInf (eval e ctx)
+  | EIndIm (a, b)        -> VIndIm (eval a ctx, eval b ctx)
 
 and appFormula v x = match v with
   | VPLam f -> app (f, x)
@@ -310,6 +313,8 @@ and inferV v = traceInferV v; match v with
   | VIndBool t -> recBool t
   | VSup (a, b) -> inferSup a b
   | VIndW (a, b, c) -> inferIndW a b c
+  | VIm t -> inferV t
+  | VInf v -> VIm (inferV v)
   | VPLam _ | VPair _ | VHole -> raise (ExpectedNeutral v)
 
 and recUnit t = let x = freshName "x" in
@@ -409,6 +414,9 @@ and act rho = function
   | W (t, (x, g))        -> W (act rho t, (x, g >> act rho))
   | VSup (a, b)          -> VSup (act rho a, act rho b)
   | VIndW (a, b, c)      -> VIndW (act rho a, act rho b, act rho c)
+  | VIm t                -> VIm (act rho t)
+  | VInf v               -> VInf (act rho v)
+  | VIndIm (a, b)        -> VIndIm (act rho a, act rho b)
 
 and actVar rho i = match Env.find_opt i rho with
   | Some v -> v
@@ -469,6 +477,9 @@ and conv v1 v2 : bool = traceConv v1 v2;
     | VIndBool u, VIndBool v -> conv u v
     | VSup (a1, b1), VSup (a2, b2) -> conv a1 a2 && conv b1 b2
     | VIndW (a1, b1, c1), VIndW (a2, b2, c2) -> conv a1 a2 && conv b1 b2 && conv c1 c2
+    | VIm u, VIm v -> conv u v
+    | VInf u, VInf v -> conv u v
+    | VIndIm (a1, b1), VIndIm (a2, b2) -> conv a1 a2 && conv b1 b2
     | _, _ -> false
   end || convWithSystem (v1, v2) || convProofIrrel v1 v2
 
@@ -612,6 +623,8 @@ and infer ctx e : value = traceInfer e; match e with
     ignore (extSet (h (Var (q, w'))));
 
     inferIndW t (eval b ctx) (eval c ctx)
+  | EIm e -> let t = infer ctx e in ignore (extSet t); t
+  | EInf e -> VIm (infer ctx e)
   | EPLam _ | EPair _ | EHole -> raise (InferError e)
 
 and inferInd fibrant ctx t e f =

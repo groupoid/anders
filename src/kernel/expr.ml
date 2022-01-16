@@ -24,7 +24,7 @@ type exp =
   | EIm of exp | EInf of exp | EIndIm of exp * exp | EJoin of exp      (* Infinitesimal Modality *)
 
 type extension =
-  | ECoeq of exp | ECoeqI of exp | EIndCoeq of exp                                (* Coequalizer *)
+  | ECoeq of exp | EIota of exp | EResp of exp | EIndCoeq of exp                  (* Coequalizer *)
   | EDisc of exp | EBase of exp | EHub of exp | ESpoke of exp | EIndDisc of exp          (* Disc *)
 
 type tele = name * exp

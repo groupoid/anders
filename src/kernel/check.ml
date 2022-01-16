@@ -249,6 +249,8 @@ and app : value * value -> value = function
     app (app (app (g, x), f),
       VLam (app (b, x), (freshName "b", fun y ->
         app (VApp (VIndW (a, b, c), g), app (f, y)))))
+  (* ind-ℑ A B f (ℑ-unit a) ~> f a *)
+  | VApp (VIndIm _, f), VInf a -> app (f, a)
   | f, x -> VApp (f, x)
 
 and evalSystem ctx = bimap (getRho ctx) (fun beta t -> eval t (faceEnv beta ctx))

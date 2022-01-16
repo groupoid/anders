@@ -18,15 +18,17 @@ def ι (A : U) (a : A) : ℑ A := ℑ-unit a
 def isCoreduced (A : U) : U := isEquiv A (ℑ A) (ι A)
 axiom ImCoreduced (A : U) : isCoreduced (ℑ A)
 
-axiom ind-ℑβ (A : U) (B : ℑ A -> U) (f : Π (a : A), ℑ (B (ι A a))) (a : A) :
-  Path (ℑ (B (ι A a))) (ind-ℑ A B f (ι A a)) (f a)
+def ind-ℑβ (A : U) (B : ℑ A -> U) (f : Π (a : A), ℑ (B (ι A a))) (a : A) :
+  Path (ℑ (B (ι A a))) (ind-ℑ A B f (ι A a)) (f a) :=
+<_> f a
 
-def ImInduction (A : U) (B : ℑ A -> U) (H : Π (a : ℑ A), isCoreduced (B a))
+def ImInduction (A : U) (B : ℑ A -> U) (c : Π (a : ℑ A), isCoreduced (B a))
   (f : Π (a : A), B (ι A a)) (a : ℑ A) : B a :=
-(H a (ind-ℑ A B (λ (x : A), ι (B (ι A x)) (f x)) a)).1.1
+(c a (ind-ℑ A B (λ (x : A), ι (B (ι A x)) (f x)) a)).1.1
 
 axiom ImComputeInduction (A : U) (B : ℑ A -> U) (c : Π (a : ℑ A), isCoreduced (B a))
   (f : Π (a : A), B (ι A a)) (a : A) : Path (B (ι A a)) (f a) ((ImInduction A B c f) (ι A a))
+--(c (ℑ-unit a) (ℑ-unit (f a))).1.2
 
 def ImRecursion (A B : U) (c : isCoreduced B) (f : A -> B) : ℑ A -> B
  := ImInduction A (λ (_ : ℑ A), B) (λ (_ : ℑ A), c) f

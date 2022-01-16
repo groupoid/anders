@@ -120,5 +120,9 @@ def const-group : 𝟏 → 𝟏 → U := λ (x y : 𝟏), group
 def const-rel : Π (x y: 𝟏), R¯ 𝟏 const-group x y → R¯ 𝟏 const-group y x → U
  := λ (x y: 𝟏) (z: R¯ 𝟏 const-group x y) (w: R¯ 𝟏 const-group y x), group
 
-def K⦅G‚1⦆ (G : group) : U := ‖_‖₁ (2-quot 𝟏 const-group const-rel)
-def K⦅G‚n⦆ (G : abgroup) (n: ℕ) : U := ℕ-iter U (discreteTopology G) (λ (_: U), ‖_‖ (𝚺ₓ (K⦅G‚1⦆ (G.X,G.2.g)) n) n) n
+def K⦅G‚1⦆ (G : group) : U
+ := ‖_‖₁ (2-quot 𝟏 const-group const-rel)
+
+def K⦅G‚n⦆ (G : abgroup) (n: ℕ) : U
+ := ℕ-iter U (discreteTopology G) (λ (_: U), ‖_‖ (𝚺ₓ (K⦅G‚1⦆ (G.X,G.2.g)) n) n) n
+

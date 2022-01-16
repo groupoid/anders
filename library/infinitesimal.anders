@@ -17,25 +17,25 @@ import library/iso
 def ι (A : U) (a : A) : ℑ A := ℑ-unit a
 def μ (A : U) (a : ℑ (ℑ A)) := ℑ-join a
 
-def isCoreduced (A : U) : U := isEquiv A (ℑ A) (ι A)
-def ℑ-coreduced (A : U) : isCoreduced (ℑ A) := isoToEquiv (ℑ A) (ℑ (ℑ A)) (ι (ℑ A)) (μ A) (λ (x : ℑ (ℑ A)), <_> x) (λ (y : ℑ A), <_> y)
+def is-coreduced (A : U) : U := isEquiv A (ℑ A) (ι A)
+def ℑ-coreduced (A : U) : is-coreduced (ℑ A) := isoToEquiv (ℑ A) (ℑ (ℑ A)) (ι (ℑ A)) (μ A) (λ (x : ℑ (ℑ A)), <_> x) (λ (y : ℑ A), <_> y)
 def ind-ℑβ (A : U) (B : ℑ A → U) (f : Π (a : A), ℑ (B (ι A a))) (a : A) : Path (ℑ (B (ι A a))) (ind-ℑ A B f (ι A a)) (f a) := <_> f a
 
 def trans-ℑ (A : I → U) (a : A 0) : ℑ (A 1) := ℑ-unit (transp (<i> A i) 0 a)
 def trans-ℑ′ (A : I → U) (a : A 0) : ℑ (A 1) := transp (<i> ℑ (A i)) 0 (ℑ-unit a)
 def trans-ℑ-is-correct (A : I → U) (a : A 0) : Path (ℑ (A 1)) (trans-ℑ A a) (trans-ℑ′ A a) := <_> trans-ℑ A a
 
-def ℑ-ind (A : U) (B : ℑ A → U) (c : Π (a : ℑ A), isCoreduced (B a)) (f : Π (a : A), B (ι A a)) (a : ℑ A) : B a
+def ℑ-ind (A : U) (B : ℑ A → U) (c : Π (a : ℑ A), is-coreduced (B a)) (f : Π (a : A), B (ι A a)) (a : ℑ A) : B a
  := (c a (ind-ℑ A B (λ (x : A), ι (B (ι A x)) (f x)) a)).1.1
 
-def ℑ-indβ (A : U) (B : ℑ A → U) (c : Π (a : ℑ A), isCoreduced (B a)) (f : Π (a : A), B (ι A a)) (a : A)
+def ℑ-indβ (A : U) (B : ℑ A → U) (c : Π (a : ℑ A), is-coreduced (B a)) (f : Π (a : A), B (ι A a)) (a : A)
   : Path (B (ι A a)) (f a) ((ℑ-ind A B c f) (ι A a))
  := <i> sec-equiv (B (ι A a)) (ℑ (B (ι A a))) (ι (B (ι A a)), c (ι A a)) (f a) @ -i
 
-def ℑ-rec (A B : U) (c : isCoreduced B) (f : A → B) : ℑ A → B
+def ℑ-rec (A B : U) (c : is-coreduced B) (f : A → B) : ℑ A → B
  := ℑ-ind A (λ (_ : ℑ A), B) (λ (_ : ℑ A), c) f
 
-def ℑ-recβ (A B : U) (c : isCoreduced B) (f : A → B) (a : A) : PathP (<_> B) (f a) ((ℑ-rec A B c f) (ι A a))
+def ℑ-recβ (A B : U) (c : is-coreduced B) (f : A → B) (a : A) : PathP (<_> B) (f a) ((ℑ-rec A B c f) (ι A a))
  := ℑ-indβ A (λ (_ : ℑ A), B) (λ (_ : ℑ A), c) f a
 
 def ℑ-rec′ (A B : U) (f : A → ℑ B) : ℑ A → ℑ B := ind-ℑ A (λ (x : ℑ A), B) f
@@ -51,12 +51,17 @@ def unitDisc (X : U) (x : ℑ X) : U := Σ (x′ : X), Path (ℑ X) x (ι X x′
 def starDisc (X : U) (x : X) : 𝔻 X x := (x, idp (ℑ X) (ι X x))
 def formalDiscBundle (A : U) : U := Σ (a : A), 𝔻 A a
 
-def preservesInifinitesimalProximity (X Y : U) (x x′ : X) (f : X → Y) (p : ~ X x x′) : ~ Y (f x) (f x′) :=
+def inf-prox-ap (X Y : U) (f : X → Y) (x x′ : X) (p : ~ X x x′) : ~ Y (f x) (f x′) :=
 <i> ℑ-app X Y f (p @ i)
 
-def d (X Y : U) (f : X → Y) (x : X) (ε : 𝔻 X x) : 𝔻 Y (f x)
- := (f ε.1, preservesInifinitesimalProximity X Y x ε.1 f ε.2)
+axiom inf-prox-comp (X Y Z : U) (f : Y → Z) (g : X → Y) (x x′ : X) (p : ~ X x x′) :
+  Path (~ Z (f (g x)) (f (g x′))) (inf-prox-ap X Z (∘ X Y Z f g) x x′ p)
+       (inf-prox-ap Y Z f (g x) (g x′) (inf-prox-ap X Y g x x′ p))
 
-axiom lemma45 (A B C : U) (f : A → B) (g : B → C) (x : A)
+def d (X Y : U) (f : X → Y) (x : X) (ε : 𝔻 X x) : 𝔻 Y (f x)
+ := (f ε.1, inf-prox-ap X Y f x ε.1 ε.2)
+
+theorem diff-comp (A B C : U) (f : A → B) (g : B → C) (x : A)
   : Path ((𝔻 A x → 𝔻 C ((∘ A B C g f) x))) (d A C (∘ A B C g f) x)
-         (∘ (𝔻 A x) (𝔻 B (f x)) (𝔻 C ((∘ A B C g f) x)) (d B C g (f x)) (d A B f x))
+         (∘ (𝔻 A x) (𝔻 B (f x)) (𝔻 C ((∘ A B C g f) x)) (d B C g (f x)) (d A B f x)) :=
+<i> λ (ε : 𝔻 A x), (g (f ε.1), inf-prox-comp A B C g f x ε.1 ε.2 @ i)

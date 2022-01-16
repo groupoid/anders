@@ -32,19 +32,12 @@
 
 module real where
 import library/path
+import library/induction
 
-axiom ℕ : U
-axiom zero : ℕ
-axiom succ : ℕ → ℕ
-
-axiom 2 : U
-axiom ₀ : 2
-axiom ₁ : 2
-
-def ≤₂ (a b : 2) : U := Path 2 a ₁ → Path 2 b ₁
-def is-decreasing (α : ℕ → 2) : U := Π (i : ℕ), ≤₂ (α (succ i)) (α i)
-def ℕ∞ : U := Σ (α : ℕ → 2), is-decreasing α
-def incl (α : ℕ∞) : ℕ → 2 := α.1
+def ≤₂ (a b : 𝟐) : U := Path 𝟐 a 0₂ → Path 𝟐 b 1₂
+def is-decreasing (α : ℕ → 𝟐) : U := Π (i : ℕ), ≤₂ (α (succ i)) (α i)
+def ℕ∞ : U := Σ (α : ℕ → 𝟐), is-decreasing α
+def incl (α : ℕ∞) : ℕ → 𝟐 := α.1
 def tail (A : U) (a : ℕ → A) : ℕ → A := \ (n : ℕ), a (succ n)
 
 def midpoint-alg (A : U) (O : A → A → A) : U₁ :=

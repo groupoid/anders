@@ -99,11 +99,18 @@ def Fin-ind (T : Π (n : ℕ), Fin n → U) (z : Π (n : ℕ), T (succ n) (fzero
    (s : Π (n : ℕ) (x : Fin n), T n x → T (succ n) (fsucc n x)) (m : ℕ) (x : Fin m) : T m x :=
 ℕ-ind (λ (k : ℕ), Π (x : Fin k), T k x) ? ? m x
 
-def Vec (A: U) : ℕ → U := ℕ-iter U 𝟏 (λ (X : U), A × X)
-def vzero (A: U) : Vec A zero := ★
-def vsucc (A: U) (n : ℕ) (head: A) (tail : Vec A n) : Vec A (succ n) := (head,tail)
-def Vec-rec (A: U) (B: ℕ → U) (m: ℕ) (z: B zero) (s: Π (n: ℕ), A → B n → B (succ n)) : Vec A m → B m := ?
-def Vec-ind (A: U) (T: Π (n: ℕ), Vec A n → U) (z: Π (n: ℕ) (v: Vec A n), T n v) (m: ℕ) : Π (x: Vec A m), T m x := ?
+def Vec (A : U) : ℕ → U := ℕ-iter U 𝟏 (λ (X : U), A × X)
+def vzero (A : U) : Vec A zero := ★
+def vsucc (A : U) (n : ℕ) (head : A) (tail : Vec A n) : Vec A (succ n) := (head, tail)
+def Vec-ind (A : U) (T : Π (n : ℕ), Vec A n → U) (z : T zero (vzero A))
+   (s : Π (n : ℕ) (x : A) (v : Vec A n), T n v → T (succ n) (vsucc A n x v))
+   (m : ℕ) : Π (x : Vec A m), T m x :=
+ℕ-ind (λ (k : ℕ), Π (x : Vec A k), T k x) (ind₁ (T zero) z)
+   (λ (k : ℕ) (f : Π (x : Vec A k), T k x) (y : Vec A (succ k)),
+      s k y.1 y.2 (f y.2)) m
+
+def Vec-rec (A B : U) (z : B) (s : Π (n : ℕ), A → Vec A n → B → B) (m : ℕ) : Vec A m → B :=
+Vec-ind A (λ (n : ℕ) (_ : Vec A n), B) z s m
 
 def 𝟑 : U := + 𝟏 𝟐
 def 0₃ : 𝟑 := inl 𝟏 𝟐 ★

@@ -12,7 +12,7 @@ module infinitesimal where
 import library/path
 import library/iso
 
--- [Cherubini] 2019 de Rham Stack
+-- [Cherubini] 2018 de Rham Stack
 
 def ι (A : U) (a : A) : ℑ A := ℑ-unit a
 def μ (A : U) (a : ℑ (ℑ A)) := ℑ-join a

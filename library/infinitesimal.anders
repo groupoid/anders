@@ -63,5 +63,5 @@ def d (X Y : U) (f : X → Y) (x : X) (ε : 𝔻 X x) : 𝔻 Y (f x)
 
 theorem diff-comp (A B C : U) (f : A → B) (g : B → C) (x : A)
   : Path ((𝔻 A x → 𝔻 C ((∘ A B C g f) x))) (d A C (∘ A B C g f) x)
-         (∘ (𝔻 A x) (𝔻 B (f x)) (𝔻 C ((∘ A B C g f) x)) (d B C g (f x)) (d A B f x)) :=
+         (∘ (𝔻 A x) (𝔻 B (f x)) (𝔻 C (g (f x))) (d B C g (f x)) (d A B f x)) :=
 <i> λ (ε : 𝔻 A x), (g (f ε.1), inf-prox-comp A B C g f x ε.1 ε.2 @ i)

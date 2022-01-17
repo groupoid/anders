@@ -21,31 +21,31 @@ def W-ind (A : U) (B : A → U) (C : (W (x : A), B x) → U)
     (a : A) (f : B a → (W (x : A), B x)) (b : B a) : C (f b) := indᵂ A B C g (f b)
 
 def indᵂ-β (A : U) (B : A → U) (C : (W (x : A), B x) → U)
-    (g : Π (x : A) (f : B x → (W (x : A), B x)), (Π (b : B x), C (f b)) → C (sup A B x f))
-    (a : A) (f : B a → (W (x : A), B x))
+    (g : Π (x : A) (f : B x → (W (x : A), B x)), (Π (b : B x), C (f b)) → C (sup A B x f)) (a : A) (f : B a → (W (x : A), B x))
   : PathP (<_> C (sup A B a f)) (indᵂ A B C g (sup A B a f)) (g a f (λ (b : B a), indᵂ A B C g (f b)))
  := <_> g a f (λ (b : B a), indᵂ A B C g (f b))
 
-def trans-W (A : I → U) (B : Π (i : I), A i → U) (a : A 0) (f : B 0 a → (W (x : A 0), B 0 x)) : W (x : A 1), B 1 x :=
-sup (A 1) (B 1) (transp (<i> A i) 0 a) (transp (<i> B i (transFill (A 0) (A 1) (<j> A j) a @ i) → (W (x : A i), B i x)) 0 f)
+def trans-W (A : I → U) (B : Π (i : I), A i → U) (a : A 0) (f : B 0 a → (W (x : A 0), B 0 x)) : W (x : A 1), B 1 x
+ := sup (A 1) (B 1) (transp (<i> A i) 0 a) (transp (<i> B i (transFill (A 0) (A 1) (<j> A j) a @ i) → (W (x : A i), B i x)) 0 f)
 
-def trans-W′ (A : I → U) (B : Π (i : I), A i → U) (a : A 0) (f : B 0 a → (W (x : A 0), B 0 x)) : W (x : A 1), B 1 x :=
-transp (<i> W (x : A i), B i x) 0 (sup (A 0) (B 0) a f)
+def trans-W′ (A : I → U) (B : Π (i : I), A i → U) (a : A 0) (f : B 0 a → (W (x : A 0), B 0 x)) : W (x : A 1), B 1 x
+ := transp (<i> W (x : A i), B i x) 0 (sup (A 0) (B 0) a f)
 
-def trans-W-is-correct (A : I → U) (B : Π (i : I), A i → U) (a : A 0) (f : B 0 a → (W (x : A 0), B 0 x)) :
-   Path (W (x : A 1), B 1 x) (trans-W A B a f) (trans-W′ A B a f) :=
-<_> trans-W A B a f
+def trans-W-is-correct (A : I → U) (B : Π (i : I), A i → U) (a : A 0) (f : B 0 a → (W (x : A 0), B 0 x))
+  : Path (W (x : A 1), B 1 x) (trans-W A B a f) (trans-W′ A B a f)
+ := <_> trans-W A B a f
 
---def hcomp-W (A : U) (B : A → U) (r : I) (a : I → Partial A r)
---   (f : Π (i : I), PartialP [(r = 1) → B (a i 1=1) → (W (x : A), B x)] r)
---   (a₀ : A[r ↦ a 0]) (f₀ : (B (ouc a₀) → (W (x : A), B x))[r ↦ f 0]) : W (x : A), B x :=
---sup A B (hcomp A r a (ouc a₀)) (hcomp (B (hcomp A r a (ouc a₀)) → (W (x : A), B x)) r
---   (λ (i : I), [(r = 1) → λ (b : B (a 1 1=1)), (f i 1=1) (transp (<j> B (a (-j ∨ i) 1=1)) 0 b)]) ?)
+-- def hcomp-W (A : U) (B : A → U) (r : I) (a : I → Partial A r)
+--     (f : Π (i : I), PartialP [(r = 1) → B (a i 1=1) → (W (x : A), B x)] r)
+--     (a₀ : A[r ↦ a 0]) (f₀ : (B (ouc a₀) → (W (x : A), B x))[r ↦ f 0]) : W (x : A), B x
+--  := sup A B (hcomp A r a (ouc a₀))
+--             (hcomp (B (hcomp A r a (ouc a₀)) → (W (x : A), B x)) r
+--                    (λ (i : I), [(r = 1) → λ (b : B (a 1 1=1)), (f i 1=1) (transp (<j> B (a (-j ∨ i) 1=1)) 0 b)]) ?)
 
 def hcomp-W′ (A : U) (B : A → U) (r : I) (a : I → Partial A r)
-   (f : Π (i : I), PartialP [(r = 1) → B (a i 1=1) → (W (x : A), B x)] r)
-   (a₀ : A[r ↦ a 0]) (f₀ : (B (ouc a₀) → (W (x : A), B x))[r ↦ f 0]) : W (x : A), B x :=
-hcomp (W (x : A), B x) r (λ (i : I), [(r = 1) → sup A B (a i 1=1) (f i 1=1)]) (sup A B (ouc a₀) (ouc f₀))
+    (f : Π (i : I), PartialP [(r = 1) → B (a i 1=1) → (W (x : A), B x)] r)
+    (a₀ : A[r ↦ a 0]) (f₀ : (B (ouc a₀) → (W (x : A), B x))[r ↦ f 0]) : W (x : A), B x
+ := hcomp (W (x : A), B x) r (λ (i : I), [(r = 1) → sup A B (a i 1=1) (f i 1=1)]) (sup A B (ouc a₀) (ouc f₀))
 
 -- Derivable Induction: N, +, Maybe, Fin, Vec, 3, 4
 
@@ -96,25 +96,23 @@ def Fin : ℕ → U := ℕ-iter U 𝟎 (+ 𝟏)
 def fzero (n : ℕ) : Fin (succ n) := (0₂, ★)
 def fsucc (n : ℕ) (m : Fin n) : Fin (succ n) := (1₂, m)
 def Fin-ind (T : Π (n : ℕ), Fin n → U) (z : Π (n : ℕ), T (succ n) (fzero n))
-   (s : Π (n : ℕ) (x : Fin n), T n x → T (succ n) (fsucc n x)) (m : ℕ) (x : Fin m) : T m x :=
-ℕ-ind (λ (k : ℕ), Π (x : Fin k), T k x) (λ (x : 𝟎), ind₀ (T zero x) x)
-   (λ (k : ℕ) (f : Π (x : Fin k), T k x),
-      +-ind 𝟏 (Fin k) (T (succ k))
-         (ind₁ (λ (w : 𝟏), T (succ k) (0₂, w)) (z k))
-         (λ (w : Fin k), s k w (f w))) m x
+    (s : Π (n : ℕ) (x : Fin n), T n x → T (succ n) (fsucc n x)) (m : ℕ) (x : Fin m) : T m x
+ := ℕ-ind (λ (k : ℕ), Π (x : Fin k), T k x)
+          (λ (x : 𝟎), ind₀ (T zero x) x)
+          (λ (k : ℕ) (f : Π (x : Fin k), T k x),
+              +-ind 𝟏 (Fin k) (T (succ k)) (ind₁ (λ (w : 𝟏), T (succ k) (0₂, w)) (z k)) (λ (w : Fin k), s k w (f w))) m x
 
 def Vec (A : U) : ℕ → U := ℕ-iter U 𝟏 (λ (X : U), A × X)
 def vzero (A : U) : Vec A zero := ★
 def vsucc (A : U) (n : ℕ) (head : A) (tail : Vec A n) : Vec A (succ n) := (head, tail)
 def Vec-ind (A : U) (T : Π (n : ℕ), Vec A n → U) (z : T zero (vzero A))
-   (s : Π (n : ℕ) (x : A) (v : Vec A n), T n v → T (succ n) (vsucc A n x v))
-   (m : ℕ) : Π (x : Vec A m), T m x :=
-ℕ-ind (λ (k : ℕ), Π (x : Vec A k), T k x) (ind₁ (T zero) z)
-   (λ (k : ℕ) (f : Π (x : Vec A k), T k x) (y : Vec A (succ k)),
-      s k y.1 y.2 (f y.2)) m
+    (s : Π (n : ℕ) (x : A) (v : Vec A n), T n v → T (succ n) (vsucc A n x v)) (m : ℕ) : Π (x : Vec A m), T m x
+ := ℕ-ind (λ (k : ℕ), Π (x : Vec A k), T k x)
+          (ind₁ (T zero) z)
+          (λ (k : ℕ) (f : Π (x : Vec A k), T k x) (y : Vec A (succ k)), s k y.1 y.2 (f y.2)) m
 
-def Vec-rec (A B : U) (z : B) (s : Π (n : ℕ), A → Vec A n → B → B) (m : ℕ) : Vec A m → B :=
-Vec-ind A (λ (n : ℕ) (_ : Vec A n), B) z s m
+def Vec-rec (A B : U) (z : B) (s : Π (n : ℕ), A → Vec A n → B → B) (m : ℕ) : Vec A m → B
+ := Vec-ind A (λ (n : ℕ) (_ : Vec A n), B) z s m
 
 def Vec-map (A B : U) (f : A → B) (n : ℕ) : Vec A n → Vec B n :=
 Vec-ind A (λ (k : ℕ) (_ : Vec A k), Vec B k) ★

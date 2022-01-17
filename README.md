@@ -95,8 +95,8 @@ Anders supports classical Homotopy Type System with two identities.
 * <a href="https://arxiv.org/pdf/1705.03307.pdf">Two-level type theory and applications</a> [Annenkov, Capriotti, Kraus, Sattler]
 * <a href="https://types21.liacs.nl/download/syntax-for-two-level-type-theory/">Syntax for two-level type theory</a> [Bonacina, Ahrens]
 
-de Rham
--------
+Modalities
+----------
 
 Infinitesimal Modality was added for direct support of Synthetic Differential Geometry.
 

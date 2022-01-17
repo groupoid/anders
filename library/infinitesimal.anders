@@ -25,6 +25,10 @@ def trans-ℑ (A : I → U) (a : A 0) : ℑ (A 1) := ℑ-unit (transp (<i> A i) 
 def trans-ℑ′ (A : I → U) (a : A 0) : ℑ (A 1) := transp (<i> ℑ (A i)) 0 (ℑ-unit a)
 def trans-ℑ-is-correct (A : I → U) (a : A 0) : Path (ℑ (A 1)) (trans-ℑ A a) (trans-ℑ′ A a) := <_> trans-ℑ A a
 
+def hcomp-ℑ (A : U) (r : I) (u : I → Partial A r) (u₀ : A[r ↦ u 0]) : ℑ A := ℑ-unit (hcomp A r u (ouc u₀))
+def hcomp-ℑ′ (A : U) (r : I) (u : I → Partial A r) (u₀ : A[r ↦ u 0]) : ℑ A := hcomp (ℑ A) r (λ (i : I), [(r = 1) → ℑ-unit (u i 1=1)]) (ℑ-unit (ouc u₀))
+def hcomp-ℑ-is-correct (A : U) (r : I) (u : I → Partial A r) (u₀ : A[r ↦ u 0]) : Path (ℑ A) (hcomp-ℑ A r u u₀) (hcomp-ℑ′ A r u u₀) := <_> hcomp-ℑ A r u u₀
+
 def ℑ-ind (A : U) (B : ℑ A → U) (c : Π (a : ℑ A), is-coreduced (B a)) (f : Π (a : A), B (ι A a)) (a : ℑ A) : B a
  := (c a (ind-ℑ A B (λ (x : A), ι (B (ι A x)) (f x)) a)).1.1
 

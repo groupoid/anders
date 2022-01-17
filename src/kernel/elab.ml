@@ -23,6 +23,13 @@ let extIm : value -> value = function
   | VIm v -> v
   | v -> failwith (Printf.sprintf "“%s” expected to be a modality" (Prettyprinter.showValue v))
 
+let extInf : value -> value = function
+  | VInf v -> v
+  | v -> failwith (Printf.sprintf "“%s” expected to be a unit of modality" (Prettyprinter.showValue v))
+
+let isInf : value -> bool = function
+  | VInf _ -> true | _ -> false
+
 let extPathP = function
   | VApp (VApp (VPathP v, u0), u1) -> (v, u0, u1)
   | v                              -> raise (ExpectedPath v)

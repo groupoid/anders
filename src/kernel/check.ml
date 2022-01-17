@@ -178,24 +178,24 @@ and walk f r = function
   | t          -> mkSystem (List.map (fun mu -> (mu,
     upd mu (f (app (upd mu t, VRef vone))))) (solve r One))
 
-and kan t r i u u0 = match t, r with
+and kan t r i u u0 = match t, r, u, u0 with
   (* hcomp A 1 u u₀ ~> u 1 1=1 *)
-  | _, VDir One -> app (act0 i vone u, VRef vone)
+  | _, VDir One, _, _ -> app (act0 i vone u, VRef vone)
   (* hcomp (Π (x : A), B x) φ u u₀ ~> λ (x : A), hcomp (B x) φ (λ (i : I), [φ → u i 1=1 x]) (u₀ x) *)
-  | VPi (t, (x, b)), _ -> VLam (t, (fresh x, fun y -> kan (b y) r i
+  | VPi (t, (x, b)), _, _, _ -> VLam (t, (fresh x, fun y -> kan (b y) r i
     (VSystem (walk (fun v -> app (v, y)) r u)) (app (u0, y))))
    (* hcomp (Σ (x : A), B x) φ u u₀ ~>
      (hfill A φ (λ (k : I), [(r = 1) → (u k 1=1).1]) u₀.1 1,
       comp (λ i, B (hfill A φ (λ (k : I), [(r = 1) → (u k 1=1).1]) u₀.1 i)) φ
         (λ (k : I), [(r = 1) → (u k 1=1).2]) u₀.2) *)
-  | VSig (t, (_, b)), _ -> let k = freshName "κ" in
+  | VSig (t, (_, b)), _, _, _ -> let k = freshName "κ" in
     (* TODO: swap *)
     let v1 = hfill t r k (VSystem (walk (vfst >> act0 i (dim k)) r u)) (vfst u0) in
     let v2 = comp (v1 >> b) r i (VSystem (walk vsnd r u)) (vsnd u0) in
     VPair (ref None, v1 vone, v2)
   (* hcomp (PathP A v w) φ u u₀ ~> <j> hcomp (A @ j) (λ (i : I),
       [(r = 1) → u i 1=1 @ j, (j = 0) → v, (j = 1) → w]) (u₀ @ j) *)
-  | VApp (VApp (VPathP t, v), w), _ ->
+  | VApp (VApp (VPathP t, v), w), _, _, _ ->
     let j = freshName "ι" in
     VPLam (VLam (VI, (j, fun j ->
       kan (appFormula t j) (evalOr r (evalOr j (negFormula j))) i
@@ -203,7 +203,11 @@ and kan t r i u u0 = match t, r with
                    (unionSystem (border (solve j One)  w)
                                 (border (solve j Zero) v))))
           (appFormula u0 j))))
-  | _, _ -> VHComp (t, r, VLam (VI, (i, fun j -> VSystem (walk (act0 i j) r u))), u0)
+  (* hcomp (ℑ A) r (λ (i : I), [(r = 1) → ℑ-unit (u i 1=1)]) (ℑ-unit (ouc u₀)) ~>
+       ℑ-unit (hcomp A r u (ouc u₀)) *)
+  | VIm t, _, VSystem u, VInf u0 when System.for_all (fun _ -> isInf) u ->
+    VInf (kan t r i (VSystem (System.map extInf u)) u0)
+  | _, _, _, _ -> VHComp (t, r, VLam (VI, (i, fun j -> VSystem (walk (act0 i j) r u))), u0)
 
 and comp t r i u u0 = let j = freshName "ι" in
   kan (t vone) r i (VSystem (walk (transport j (t (evalOr (dim i) (dim j))) (dim i)) r u))

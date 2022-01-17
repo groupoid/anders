@@ -65,7 +65,7 @@ def 𝜎₁ (A: U): 𝚺 A := po₁ 𝟏 𝟏 A (const₁ A) (const₁ A) ★
 def 𝜎₂ (A: U): 𝚺 A := po₂ 𝟏 𝟏 A (const₁ A) (const₁ A) ★
 def 𝜎₃ (A: U) (a: A) : Path (𝚺 A) (𝜎₁ A) (𝜎₂ A) := po₃ 𝟏 𝟏 A (const₁ A) (const₁ A) a
 
-{- Hub and Spoke Primitive -}
+-- [Lumsdaine] 2012 Hubs and Spokes Disc
 
 axiom hs (S A : U) : U
 axiom center (S A : U) (x : A) : hs S A

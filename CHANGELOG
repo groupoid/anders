@@ -1,16 +1,18 @@
 Changelog
 =========
 
-20 JAN 2022 Version 1.1.1 Univalence:
+17 JAN 2022 Version 1.1.1 Univalence:
 
 * Glue Types
-* Fibrant 0, 1, 2, W Types
+* 0, 1, 2, W Types
 * Coequalizer Type
-* Etale/Infinitesimal
+* Hub-Spokes Disc Type
+* Infinitesimal Shape Modality
 * Univalence, Unimorphism, Minivalence
 * Fibre Bundles
-* Homotopy (Co)Limits, Suspension, Sphere
+* Homotopy (Co)Limits, Suspension, Sphere, Truncations, Quotients
 * Propositions
+* K(G,n)
 
 11 DEC 2021 Version 0.12.1 Categorical Library:
 

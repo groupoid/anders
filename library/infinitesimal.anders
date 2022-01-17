@@ -49,7 +49,7 @@ def ~ (X : U) (a x′ : X) : U := Path (ℑ X) (ι X a) (ι X x′)
 def 𝔻 (X : U) (a : X) : U := Σ (x′ : X), ~ X a x′
 def unitDisc (X : U) (x : ℑ X) : U := Σ (x′ : X), Path (ℑ X) x (ι X x′)
 def starDisc (X : U) (x : X) : 𝔻 X x := (x, idp (ℑ X) (ι X x))
-def formalDiscBundle (A : U) : U := Σ (a : A), 𝔻 A a
+def T∞ (A : U) : U := Σ (a : A), 𝔻 A a
 
 def inf-prox-ap (X Y : U) (f : X → Y) (x x′ : X) (p : ~ X x x′) : ~ Y (f x) (f x′) :=
 <i> ℑ-app X Y f (p @ i)

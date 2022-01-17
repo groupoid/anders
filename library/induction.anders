@@ -97,7 +97,11 @@ def fzero (n : ℕ) : Fin (succ n) := (0₂, ★)
 def fsucc (n : ℕ) (m : Fin n) : Fin (succ n) := (1₂, m)
 def Fin-ind (T : Π (n : ℕ), Fin n → U) (z : Π (n : ℕ), T (succ n) (fzero n))
    (s : Π (n : ℕ) (x : Fin n), T n x → T (succ n) (fsucc n x)) (m : ℕ) (x : Fin m) : T m x :=
-ℕ-ind (λ (k : ℕ), Π (x : Fin k), T k x) ? ? m x
+ℕ-ind (λ (k : ℕ), Π (x : Fin k), T k x) (λ (x : 𝟎), ind₀ (T zero x) x)
+   (λ (k : ℕ) (f : Π (x : Fin k), T k x),
+      +-ind 𝟏 (Fin k) (T (succ k))
+         (ind₁ (λ (w : 𝟏), T (succ k) (0₂, w)) (z k))
+         (λ (w : Fin k), s k w (f w))) m x
 
 def Vec (A : U) : ℕ → U := ℕ-iter U 𝟏 (λ (X : U), A × X)
 def vzero (A : U) : Vec A zero := ★

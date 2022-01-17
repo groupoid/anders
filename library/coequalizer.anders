@@ -13,6 +13,7 @@
    Copyright (c) Groupoid Infinity, 2014-2022. -}
    
 module coequalizer where
+import library/equiv
 import library/induction
 import library/algebra
 
@@ -93,6 +94,9 @@ def ‖_‖₋₁ (A : U) : U := trunc A zero -- Propositional Truncation ‖A�
 def ‖_‖₀ (A : U) : U := trunc A one   -- Set Truncation ‖A‖₀
 def ‖_‖₁ (A : U) : U := trunc A two   -- Groupoid Truncation ‖A‖₁
 def ‖_‖ (A : U) : ℕ → U := trunc A
+
+def isSurjective (A B: U) (f: A -> B): U := summa (b: B), ‖_‖₋₁ (fiber A B f b)
+def surjective (A B: U): U := summa (f: A -> B), isSurjective A B f
 
 def full (A : U) (R : A → A → U) := Σ (x y : A), R x y
 def quot (A : U) (R : A → A → U)

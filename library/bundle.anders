@@ -37,6 +37,8 @@ def encode-decode (B : U) (F : B → U) (y : B) (x : fiber (Sigma B F) B (pr₁ 
 def Bundle=Pi (B : U) (F : B → U) (y : B) : PathP (<_> U) (fiber (Sigma B F) B (pr₁ B F) y) (F y)
  := isoPath (fiber (Sigma B F) B (pr₁ B F) y) (F y) (encode B F y) (decode B F y) (decode-encode B F y) (encode-decode B F y)
 
+-- [Cherubini] 2018 Four Fiber Bundles
+
 -- Definition (1) Dependent
 def isFBundle1 (B: U) (p: B → U) (F: U): U₁
  := Σ (_: Π (b: B), isContr (PathP (<_>U) (p b) F)), (Π (x: Sigma B p), B)

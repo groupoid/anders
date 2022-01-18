@@ -127,6 +127,11 @@ Acknowledgements
 
 * Univalent People
 
+Mentions
+--------
+
+* <a href="https://tonpa.guru/stream/2022/2022-01-17%20Anders.htm">Anders: верификатор математики</a> 2022-01-17
+
 Authors
 -------
 

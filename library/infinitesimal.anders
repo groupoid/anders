@@ -21,6 +21,9 @@ def is-coreduced (A : U) : U := isEquiv A (ℑ A) (ι A)
 def ℑ-coreduced (A : U) : is-coreduced (ℑ A) := isoToEquiv (ℑ A) (ℑ (ℑ A)) (ι (ℑ A)) (μ A) (λ (x : ℑ (ℑ A)), <_> x) (λ (y : ℑ A), <_> y)
 def ind-ℑβ (A : U) (B : ℑ A → U) (f : Π (a : A), ℑ (B (ι A a))) (a : A) : Path (ℑ (B (ι A a))) (ind-ℑ A B f (ι A a)) (f a) := <_> f a
 
+-- this seems as natural way to obtain coreduceness of paths in “ℑ A”
+def ind-ℑ-const (A B : U) (b : ℑ B) (x : ℑ A) : Path (ℑ B) (ind-ℑ A (λ (_ : ℑ A), B) (λ (_ : A), b) x) b := <_> b
+
 def trans-ℑ (A : I → U) (a : A 0) : ℑ (A 1) := ℑ-unit (transp (<i> A i) 0 a)
 def trans-ℑ′ (A : I → U) (a : A 0) : ℑ (A 1) := transp (<i> ℑ (A i)) 0 (ℑ-unit a)
 def trans-ℑ-is-correct (A : I → U) (a : A 0) : Path (ℑ (A 1)) (trans-ℑ A a) (trans-ℑ′ A a) := <_> trans-ℑ A a
@@ -48,13 +51,13 @@ def ℑ-rec (A B : U) (c : is-coreduced B) (f : A → B) : ℑ A → B
 def ℑ-recβ (A B : U) (c : is-coreduced B) (f : A → B) (a : A) : PathP (<_> B) (f a) ((ℑ-rec A B c f) (ι A a))
  := ℑ-indβ A (λ (_ : ℑ A), B) (λ (_ : ℑ A), c) f a
 
-def ℑ-rec′ (A B : V) (f : A → ℑ B) : ℑ A → ℑ B := ind-ℑ A (λ (x : ℑ A), B) f
+def ℑ-rec′ (A B : U) (f : A → ℑ B) : ℑ A → ℑ B := ind-ℑ A (λ (x : ℑ A), B) f
 def ℑ-rec′-β (A B : U) (f : A → ℑ B) (x : A) : Path (ℑ B) (ℑ-rec′ A B f (ℑ-unit x)) (f x) := <_> f x
 
-def ℑ-Π-comm (A : V) (B : A → V) (φ : ℑ (Π (x : A), B x)) (y : A) : ℑ (B y) :=
+def ℑ-Π-comm (A : U) (B : A → U) (φ : ℑ (Π (x : A), B x)) (y : A) : ℑ (B y) :=
 ℑ-rec′ (Π (x : A), B x) (B y) (λ (f : Π (x : A), B x), ℑ-unit (f y)) φ
 
-def ℑ-→-comm (A B : V) : ℑ (A → B) → (A → ℑ B) := ℑ-Π-comm A (λ (_ : A), B)
+def ℑ-→-comm (A B : U) : ℑ (A → B) → (A → ℑ B) := ℑ-Π-comm A (λ (_ : A), B)
 
 def ind-ℑ₂ (A : U) (B : ℑ A → ℑ A → U) (f : Π (a b : A), ℑ (B (ℑ-unit a) (ℑ-unit b))) (x y : ℑ A) : ℑ (B x y) :=
 ℑ-join (ℑ-Π-comm (ℑ A) (λ (y : ℑ A), ℑ (B x y))
@@ -66,7 +69,26 @@ def ℑ-naturality (A B : U) (f : A → B) (a : A) : Path (ℑ B) ((ι B) (f a))
  := <_> ℑ-unit (f a) -- slightly surprisingly, but it computes
 
 -- more direct derivation of ℑ-app
-def ℑ-lift (A B : V) (f : A → B) : ℑ A → ℑ B := ℑ-rec′ A B (λ (a : A), ℑ-unit (f a))
+def ℑ-lift (A B : U) (f : A → B) : ℑ A → ℑ B := ℑ-rec′ A B (λ (a : A), ℑ-unit (f a))
+
+def ℑ-idfun (A : U) : ℑ A → ℑ A := ℑ-rec′ A A (ι A)
+
+def ℑ-Ω-elim (A : U) (a b : ℑ A) (ρ : ℑ (Path (ℑ A) a b)) : Path (ℑ A) a b :=
+<i> ℑ-rec′ (Path (ℑ A) a b) A (λ (p : Path (ℑ A) a b), p @ i) ρ
+
+def ℑ-path-coreduced (A : U) (a b : ℑ A) : is-coreduced (Path (ℑ A) a b) :=
+isoToEquiv (Path (ℑ A) a b) (ℑ (Path (ℑ A) a b)) (ι (Path (ℑ A) a b)) (ℑ-Ω-elim A a b)
+  (λ (ρ : ℑ (Path (ℑ A) a b)),
+    ℑ-Ω-elim (Path (ℑ A) a b) (ℑ-unit (ℑ-Ω-elim A a b ρ)) ρ
+      (ind-ℑ (Path (ℑ A) a b)
+        (λ (μ : ℑ (Path (ℑ A) a b)),
+          Path (ℑ (Path (ℑ A) a b))
+               (ℑ-unit (ℑ-Ω-elim A a b μ)) μ)
+        (λ (p : Path (ℑ A) a b), ℑ-unit (<_> ℑ-unit p)) ρ))
+  (λ (p : Path (ℑ A) a b), <_> p)
+
+axiom ℑ-app-comp (A B C : U) (f : B → C) (g : A → B) (x : ℑ A) :
+  Path (ℑ C) (ℑ-app A C (∘ A B C f g) x) (ℑ-app B C f (ℑ-app A B g x))
 
 def ~ (X : U) (a x′ : X) : U := Path (ℑ X) (ι X a) (ι X x′)
 def 𝔻 (X : U) (a : X) : U := Σ (x′ : X), ~ X a x′

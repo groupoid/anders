@@ -266,6 +266,8 @@ and app : value * value -> value = function
         app (VApp (VIndW (a, b, c), g), app (f, y)))))
   (* ind-ℑ A B f (ℑ-unit a) ~> f a *)
   | VApp (VIndIm _, f), VInf a -> app (f, a)
+  | VApp (VIndIm (a, b), VLam (t, (x, g))), v -> let u = g (Var (x, t)) in
+    if mem x u then VApp (VApp (VIndIm (a, b), VLam (t, (x, g))), v) else u
   | f, x -> VApp (f, x)
 
 and evalSystem ctx = bimap (getRho ctx) (fun beta t -> eval t (faceEnv beta ctx))

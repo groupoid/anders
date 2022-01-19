@@ -48,12 +48,25 @@ def ℑ-rec (A B : U) (c : is-coreduced B) (f : A → B) : ℑ A → B
 def ℑ-recβ (A B : U) (c : is-coreduced B) (f : A → B) (a : A) : PathP (<_> B) (f a) ((ℑ-rec A B c f) (ι A a))
  := ℑ-indβ A (λ (_ : ℑ A), B) (λ (_ : ℑ A), c) f a
 
-def ℑ-rec′ (A B : U) (f : A → ℑ B) : ℑ A → ℑ B := ind-ℑ A (λ (x : ℑ A), B) f
+def ℑ-rec′ (A B : V) (f : A → ℑ B) : ℑ A → ℑ B := ind-ℑ A (λ (x : ℑ A), B) f
 def ℑ-rec′-β (A B : U) (f : A → ℑ B) (x : A) : Path (ℑ B) (ℑ-rec′ A B f (ℑ-unit x)) (f x) := <_> f x
+
+def ℑ-Π-comm (A : V) (B : A → V) (φ : ℑ (Π (x : A), B x)) (y : A) : ℑ (B y) :=
+ℑ-rec′ (Π (x : A), B x) (B y) (λ (f : Π (x : A), B x), ℑ-unit (f y)) φ
+
+def ℑ-→-comm (A B : V) : ℑ (A → B) → (A → ℑ B) := ℑ-Π-comm A (λ (_ : A), B)
+
+def ind-ℑ₂ (A : U) (B : ℑ A → ℑ A → U) (f : Π (a b : A), ℑ (B (ℑ-unit a) (ℑ-unit b))) (x y : ℑ A) : ℑ (B x y) :=
+ℑ-join (ℑ-Π-comm (ℑ A) (λ (y : ℑ A), ℑ (B x y))
+  (ind-ℑ A (λ (x : ℑ A), Π (y : ℑ A), ℑ (B x y))
+    (λ (a : A), ℑ-unit (ind-ℑ A (B (ℑ-unit a)) (f a))) x) y)
 
 def ℑ-app (A B : U) (f : A → B) : ℑ A → ℑ B := ℑ-rec A (ℑ B) (ℑ-coreduced B) (∘ A B (ℑ B) (ι B) f)
 def ℑ-naturality (A B : U) (f : A → B) (a : A) : Path (ℑ B) ((ι B) (f a)) ((ℑ-app A B f) (ι A a))
  := <_> ℑ-unit (f a) -- slightly surprisingly, but it computes
+
+-- more direct derivation of ℑ-app
+def ℑ-lift (A B : V) (f : A → B) : ℑ A → ℑ B := ℑ-rec′ A B (λ (a : A), ℑ-unit (f a))
 
 def ~ (X : U) (a x′ : X) : U := Path (ℑ X) (ι X a) (ι X x′)
 def 𝔻 (X : U) (a : X) : U := Σ (x′ : X), ~ X a x′

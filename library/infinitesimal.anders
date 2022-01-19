@@ -87,8 +87,11 @@ isoToEquiv (Path (ℑ A) a b) (ℑ (Path (ℑ A) a b)) (ι (Path (ℑ A) a b)) (
         (λ (p : Path (ℑ A) a b), ℑ-unit (<_> ℑ-unit p)) ρ))
   (λ (p : Path (ℑ A) a b), <_> p)
 
-axiom ℑ-app-comp (A B C : U) (f : B → C) (g : A → B) (x : ℑ A) :
-  Path (ℑ C) (ℑ-app A C (∘ A B C f g) x) (ℑ-app B C f (ℑ-app A B g x))
+def ℑ-app-comp (A B C : U) (f : B → C) (g : A → B) :
+  Π (x : ℑ A), Path (ℑ C) (ℑ-app A C (∘ A B C f g) x) (ℑ-app B C f (ℑ-app A B g x)) :=
+ℑ-ind A (λ (x : ℑ A), Path (ℑ C) (ℑ-app A C (∘ A B C f g) x) (ℑ-app B C f (ℑ-app A B g x)))
+  (λ (x : ℑ A), ℑ-path-coreduced C (ℑ-app A C (∘ A B C f g) x) (ℑ-app B C f (ℑ-app A B g x)))
+  (λ (a : A), <_> ℑ-unit (f (g a)))
 
 def ~ (X : U) (a x′ : X) : U := Path (ℑ X) (ι X a) (ι X x′)
 def 𝔻 (X : U) (a : X) : U := Σ (x′ : X), ~ X a x′
@@ -98,10 +101,11 @@ def T∞ (A : U) : U := Σ (a : A), 𝔻 A a
 
 def inf-prox-ap (X Y : U) (f : X → Y) (x x′ : X) (p : ~ X x x′) : ~ Y (f x) (f x′) := <i> ℑ-app X Y f (p @ i)
 
-axiom inf-prox-comp (X Y Z : U) (f : Y → Z) (g : X → Y) (x x′ : X) (p : ~ X x x′)
+def inf-prox-comp (X Y Z : U) (f : Y → Z) (g : X → Y) (x x′ : X) (p : ~ X x x′)
     : Path (~ Z (f (g x)) (f (g x′)))
            (inf-prox-ap X Z (∘ X Y Z f g) x x′ p)
-           (inf-prox-ap Y Z f (g x) (g x′) (inf-prox-ap X Y g x x′ p))
+           (inf-prox-ap Y Z f (g x) (g x′) (inf-prox-ap X Y g x x′ p)) :=
+<i j> ℑ-app-comp X Y Z f g (p @ j) @ i
 
 def d (X Y : U) (f : X → Y) (x : X) (ε : 𝔻 X x) : 𝔻 Y (f x) := (f ε.1, inf-prox-ap X Y f x ε.1 ε.2)
 def T∞-map (X Y : U) (f : X → Y) (τ : T∞ X) : T∞ Y := (f τ.1, d X Y f τ.1 τ.2)

@@ -101,7 +101,7 @@ def T∞ (A : U) : U := Σ (a : A), 𝔻 A a
 
 def inf-prox-ap (X Y : U) (f : X → Y) (x x′ : X) (p : ~ X x x′) : ~ Y (f x) (f x′) := <i> ℑ-app X Y f (p @ i)
 
-def inf-prox-comp (X Y Z : U) (f : Y → Z) (g : X → Y) (x x′ : X) (p : ~ X x x′)
+lemma inf-prox-comp (X Y Z : U) (f : Y → Z) (g : X → Y) (x x′ : X) (p : ~ X x x′)
     : Path (~ Z (f (g x)) (f (g x′)))
            (inf-prox-ap X Z (∘ X Y Z f g) x x′ p)
            (inf-prox-ap Y Z f (g x) (g x′) (inf-prox-ap X Y g x x′ p)) :=

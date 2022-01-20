@@ -208,11 +208,14 @@ def fill (A : I → U) (x : A 0) : PathP (<i> A i) x (transp (<i> A i) 0 x)
 def comp-Path′ (A : U) (a b c : A) (p : Path A a b) (q : Path A b c) : Path A a c
  := transp (<i> Path A a (q @ i)) 0 p
 
+def inv′ (A : U) (a b : A) (p : Path A a b) : Path A b a
+ := <i> hcomp A (∂ i) (λ (j : I), [(i = 0) → p @ j, (i = 1) → a]) a
+
 -- Homogeneous Composition
 
 def hcomp′ (A : U) (r : I) (u : I → Partial A r) (u₀ : A[r ↦ u 0]) : A := hcomp A r u (ouc u₀)
-def hcomp-ε (A : U) (a : A) := hcomp A 0 (\(i : I), []) a
-def hcomp-ε→id (A : U) (a : A) : Path A (hcomp-ε A a) a := <i> hcomp A i (\(j : I), [(i = 1) → a]) a
+def hcomp-ε (A : U) (a : A) := hcomp A 0 (λ (i : I), []) a
+def hcomp-ε→id (A : U) (a : A) : Path A (hcomp-ε A a) a := <i> hcomp A i (λ (j : I), [(i = 1) → a]) a
 
 def comp-Path (A : U) (a b c : A) (p : Path A a b) (q : Path A b c) : Path A a c
  := <i> hcomp A (∂ i) (λ (j : I), [(i = 0) → a, (i = 1) → q @ j]) (p @ i)

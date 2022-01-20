@@ -1,5 +1,5 @@
-Anders
-======
+🧊 Anders
+=========
 
 [![OPAM](https://img.shields.io/github/v/release/groupoid/anders.svg)](https://opam.ocaml.org/packages/anders/)
 [![Actions](https://github.com/groupoid/anders/workflows/opam/badge.svg)](https://github.com/groupoid/anders/actions)

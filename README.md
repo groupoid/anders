@@ -135,5 +135,5 @@ Mentions
 Authors
 -------
 
-* Siegmentation Fault
-* 5HT
+* <a href="https://twitter.com/siegment">@siegment</a>
+* <a href="https://twitter.com/5HT">@5HT</a>

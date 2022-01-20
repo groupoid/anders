@@ -95,6 +95,8 @@ let meetss = List.fold_left meets [eps]
 
 let union xs ys = nubRev (List.rev_append xs ys)
 
+let forall i : face -> face = Env.remove i
+
 let mkSystem xs = System.of_seq (List.to_seq xs)
 let unionSystem xs ys = System.union (fun _ _ _ -> raise (Failure "unionSystem")) xs ys
 

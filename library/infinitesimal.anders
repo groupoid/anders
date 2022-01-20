@@ -82,7 +82,7 @@ def ℑ-path-coreduced (A : U) (a b : ℑ A)
               (ind-ℑ (Path (ℑ A) a b)
                      (λ (μ : ℑ (Path (ℑ A) a b)), Path (ℑ (Path (ℑ A) a b)) (ℑ-unit (ℑ-Ω-elim A a b μ)) μ)
                      (λ (p : Path (ℑ A) a b), ℑ-unit (<_> ℑ-unit p)) ρ))
-        (λ (p : Path (ℑ A) a b), <_> p)
+    (λ (p : Path (ℑ A) a b), <_> p)
 
 def ℑ-app-comp (A B C : U) (f : B → C) (g : A → B)
   : Π (x : ℑ A), Path (ℑ C) (ℑ-app A C (∘ A B C f g) x) (ℑ-app B C f (ℑ-app A B g x))

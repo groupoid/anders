@@ -21,7 +21,7 @@ import library/algebra
 -- Path spaces of higher inductive types in homotopy type theory.
 -- http://pure-oai.bham.ac.uk/ws/files/84880431/Path_Spaces.pdf
 
--- [2]. Bauer, Gross, Lumsdaine, Shulman, Sozeau, Spitters [Coq-HoTT]
+-- [2]. Bauer, Gross, Lumsdaine, Shulman, Sozeau, Spitters [HoTT/Coq]
 -- The HoTT Library: A formalization of homotopy type theory in Coq
 -- https://arxiv.org/pdf/1610.04591.pdf
 

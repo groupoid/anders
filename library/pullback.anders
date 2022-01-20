@@ -18,7 +18,7 @@ import library/equiv
 
 def pullback (A B C : U) (f : A → C) (g : B → C) : U := Σ (a : A) (b : B), Path C (f a) (g b)
 def kernel  (A B : U) (f : A → B) : U := pullback A A B f f
-def hofiber (A B : U) (f : A → B) (y : B): U := pullback A unit B f (\(x: unit), y)
+def hofiber (A B : U) (f : A → B) (y : B): U := pullback A 𝟏 B f (λ (x : 𝟏), y)
 
 def pb₁ (A B C : U) (f : A → C) (g : B → C) : pullback A B C f g → A := λ (x : pullback A B C f g), x.1
 def pb₂ (A B C : U) (f : A → C) (g : B → C) : pullback A B C f g → B := λ (x : pullback A B C f g), x.2.1
@@ -38,5 +38,5 @@ def isPullbackSq (Z A B C : U) (f : A → C) (g : B → C) (z₁ : Z → A) (z�
 axiom completePullback (A B C : U) (f : A → C) (g : B → C) : pullbackSq (pullback A B C f g) A B C f g (pb₁ A B C f g) (pb₂ A B C f g)
 
 def fiberPullback (A B : U) (f : A → B) (y : B)
-  : pullbackSq (hofiber A B f y) A unit B f (\(x: unit), y) (pb₁ A unit B f (\(x: unit), y)) (pb₂ A unit B f (\(x: unit), y))
- := completePullback A unit B f (\(x: unit), y)
+  : pullbackSq (hofiber A B f y) A 𝟏 B f (λ (x : 𝟏), y) (pb₁ A 𝟏 B f (λ (x : 𝟏), y)) (pb₂ A 𝟏 B f (λ (x : 𝟏), y))
+ := completePullback A 𝟏 B f (λ (x : 𝟏), y)

@@ -73,8 +73,8 @@ let rec eval (e0 : exp) (ctx : ctx) = traceEval e0; match e0 with
   | EInc (t, r)          -> VInc (eval t ctx, eval r ctx)
   | EOuc e               -> ouc (eval e ctx)
   | EGlue e              -> VGlue (eval e ctx)
-  | EGlueElem (r, u, a)  -> VGlueElem (eval r ctx, eval u ctx, eval a ctx)
-  | EUnglue e            -> VUnglue (eval e ctx)
+  | EGlueElem (r, u, a)  -> glue (eval r ctx) (eval u ctx) (eval a ctx)
+  | EUnglue e            -> unglue (eval e ctx)
   | EEmpty               -> VEmpty
   | EIndEmpty e          -> VIndEmpty (eval e ctx)
   | EUnit                -> VUnit
@@ -108,6 +108,15 @@ and partialv t r = VPartialP (VSystem (border (solve r One) t) , r)
 and transp p phi u0 = match p with
   | VPLam (VLam (VI, (i, g))) -> transport i (g (Var (i, VI))) phi u0
   | _ -> VApp (VTransp (p, phi), u0)
+
+and glue r u a = match r, a with
+  | VDir One, _  -> app (u, VRef vone)
+  | _, VUnglue b -> b
+  | _, _         -> VGlueElem (r, u, a)
+
+and unglue = function
+  | VGlueElem (_, _, a) -> ouc a
+  | v -> VUnglue v
 
 and join = function
   | VInf v -> v
@@ -426,8 +435,8 @@ and act rho = function
   | VInc (t, r)          -> VInc (act rho t, act rho r)
   | VOuc v               -> ouc (act rho v)
   | VGlue v              -> VGlue (act rho v)
-  | VGlueElem (r, u, a)  -> VGlueElem (act rho r, act rho u, act rho a)
-  | VUnglue v            -> VUnglue (act rho v)
+  | VGlueElem (r, u, a)  -> glue (act rho r) (act rho u) (act rho a)
+  | VUnglue v            -> unglue (act rho v)
   | VEmpty               -> VEmpty
   | VIndEmpty v          -> VIndEmpty (act rho v)
   | VUnit                -> VUnit

@@ -120,7 +120,7 @@ def is-left-invertible (X : U) (M : ∞-unital-magma X) :=
 def is-right-invertible (X : U) (M : ∞-unital-magma X) :=
 Π (a : X), isEquiv X X (M.μ a)
 
-def H-space    := Σ (X : U), ∞-unital-magma X
+def H-space  := Σ (X : U), ∞-unital-magma X
 -- left invertible H-space
 def LH-space := Σ (X : U) (M : ∞-unital-magma X), is-left-invertible X M
 -- right invertible H-space

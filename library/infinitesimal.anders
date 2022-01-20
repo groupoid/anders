@@ -24,96 +24,90 @@ def ind-ℑβ (A : U) (B : ℑ A → U) (f : Π (a : A), ℑ (B (ι A a))) (a : 
 -- this seems as natural way to obtain coreduceness of paths in “ℑ A”
 def ind-ℑ-const (A B : U) (b : ℑ B) (x : ℑ A) : Path (ℑ B) (ind-ℑ A (λ (_ : ℑ A), B) (λ (_ : A), b) x) b := <_> b
 
+-- Simon Huber Equations
+
 def trans-ℑ (A : I → U) (a : A 0) : ℑ (A 1) := ℑ-unit (transp (<i> A i) 0 a)
 def trans-ℑ′ (A : I → U) (a : A 0) : ℑ (A 1) := transp (<i> ℑ (A i)) 0 (ℑ-unit a)
 def trans-ℑ-is-correct (A : I → U) (a : A 0) : Path (ℑ (A 1)) (trans-ℑ A a) (trans-ℑ′ A a) := <_> trans-ℑ A a
 
 def hcomp-ℑ (A : U) (r : I) (u : I → Partial A r) (u₀ : A[r ↦ u 0]) : ℑ A
  := ℑ-unit (hcomp A r u (ouc u₀))
-
 def hcomp-ℑ′ (A : U) (r : I) (u : I → Partial A r) (u₀ : A[r ↦ u 0]) : ℑ A
  := hcomp (ℑ A) r (λ (i : I), [(r = 1) → ℑ-unit (u i 1=1)]) (ℑ-unit (ouc u₀))
-
 def hcomp-ℑ-is-correct (A : U) (r : I) (u : I → Partial A r) (u₀ : A[r ↦ u 0])
   : Path (ℑ A) (hcomp-ℑ A r u u₀) (hcomp-ℑ′ A r u u₀)
  := <_> hcomp-ℑ A r u u₀
 
+-- Induction Principle #1
+
 def ℑ-ind (A : U) (B : ℑ A → U) (c : Π (a : ℑ A), is-coreduced (B a)) (f : Π (a : A), B (ι A a)) (a : ℑ A) : B a
  := (c a (ind-ℑ A B (λ (x : A), ι (B (ι A x)) (f x)) a)).1.1
-
 def ℑ-indβ (A : U) (B : ℑ A → U) (c : Π (a : ℑ A), is-coreduced (B a)) (f : Π (a : A), B (ι A a)) (a : A)
   : Path (B (ι A a)) (f a) ((ℑ-ind A B c f) (ι A a))
  := <i> sec-equiv (B (ι A a)) (ℑ (B (ι A a))) (ι (B (ι A a)), c (ι A a)) (f a) @ -i
 
 def ℑ-rec (A B : U) (c : is-coreduced B) (f : A → B) : ℑ A → B
  := ℑ-ind A (λ (_ : ℑ A), B) (λ (_ : ℑ A), c) f
-
 def ℑ-recβ (A B : U) (c : is-coreduced B) (f : A → B) (a : A) : PathP (<_> B) (f a) ((ℑ-rec A B c f) (ι A a))
  := ℑ-indβ A (λ (_ : ℑ A), B) (λ (_ : ℑ A), c) f a
 
 def ℑ-rec′ (A B : U) (f : A → ℑ B) : ℑ A → ℑ B := ind-ℑ A (λ (x : ℑ A), B) f
 def ℑ-rec′-β (A B : U) (f : A → ℑ B) (x : A) : Path (ℑ B) (ℑ-rec′ A B f (ℑ-unit x)) (f x) := <_> f x
-
-def ℑ-Π-comm (A : U) (B : A → U) (φ : ℑ (Π (x : A), B x)) (y : A) : ℑ (B y) :=
-ℑ-rec′ (Π (x : A), B x) (B y) (λ (f : Π (x : A), B x), ℑ-unit (f y)) φ
-
+def ℑ-Π-comm (A : U) (B : A → U) (φ : ℑ (Π (x : A), B x)) (y : A) : ℑ (B y)
+ := ℑ-rec′ (Π (x : A), B x) (B y) (λ (f : Π (x : A), B x), ℑ-unit (f y)) φ
 def ℑ-→-comm (A B : U) : ℑ (A → B) → (A → ℑ B) := ℑ-Π-comm A (λ (_ : A), B)
-
-def ind-ℑ₂ (A : U) (B : ℑ A → ℑ A → U) (f : Π (a b : A), ℑ (B (ℑ-unit a) (ℑ-unit b))) (x y : ℑ A) : ℑ (B x y) :=
-ℑ-join (ℑ-Π-comm (ℑ A) (λ (y : ℑ A), ℑ (B x y))
-  (ind-ℑ A (λ (x : ℑ A), Π (y : ℑ A), ℑ (B x y))
-    (λ (a : A), ℑ-unit (ind-ℑ A (B (ℑ-unit a)) (f a))) x) y)
-
 def ℑ-app (A B : U) (f : A → B) : ℑ A → ℑ B := ℑ-rec A (ℑ B) (ℑ-coreduced B) (∘ A B (ℑ B) (ι B) f)
 def ℑ-naturality (A B : U) (f : A → B) (a : A) : Path (ℑ B) ((ι B) (f a)) ((ℑ-app A B f) (ι A a))
  := <_> ℑ-unit (f a) -- slightly surprisingly, but it computes
 
+-- Induction Principle #2
+
+def ind-ℑ₂ (A : U) (B : ℑ A → ℑ A → U) (f : Π (a b : A), ℑ (B (ℑ-unit a) (ℑ-unit b))) (x y : ℑ A) : ℑ (B x y)
+ := ℑ-join (ℑ-Π-comm (ℑ A) (λ (y : ℑ A), ℑ (B x y))
+                     (ind-ℑ A (λ (x : ℑ A), Π (y : ℑ A), ℑ (B x y))
+                     (λ (a : A), ℑ-unit (ind-ℑ A (B (ℑ-unit a)) (f a))) x) y)
+
 -- more direct derivation of ℑ-app
+
 def ℑ-lift (A B : U) (f : A → B) : ℑ A → ℑ B := ℑ-rec′ A B (λ (a : A), ℑ-unit (f a))
-
 def ℑ-idfun (A : U) : ℑ A → ℑ A := ℑ-rec′ A A (ι A)
+def ℑ-Ω-elim (A : U) (a b : ℑ A) (ρ : ℑ (Path (ℑ A) a b)) : Path (ℑ A) a b
+ := <i> ℑ-rec′ (Path (ℑ A) a b) A (λ (p : Path (ℑ A) a b), p @ i) ρ
 
-def ℑ-Ω-elim (A : U) (a b : ℑ A) (ρ : ℑ (Path (ℑ A) a b)) : Path (ℑ A) a b :=
-<i> ℑ-rec′ (Path (ℑ A) a b) A (λ (p : Path (ℑ A) a b), p @ i) ρ
+def ℑ-path-coreduced (A : U) (a b : ℑ A)
+  : is-coreduced (Path (ℑ A) a b)
+ := isoToEquiv (Path (ℑ A) a b) (ℑ (Path (ℑ A) a b)) (ι (Path (ℑ A) a b)) (ℑ-Ω-elim A a b)
+    (λ (ρ : ℑ (Path (ℑ A) a b)),
+     ℑ-Ω-elim (Path (ℑ A) a b) (ℑ-unit (ℑ-Ω-elim A a b ρ)) ρ
+              (ind-ℑ (Path (ℑ A) a b)
+                     (λ (μ : ℑ (Path (ℑ A) a b)), Path (ℑ (Path (ℑ A) a b)) (ℑ-unit (ℑ-Ω-elim A a b μ)) μ)
+                     (λ (p : Path (ℑ A) a b), ℑ-unit (<_> ℑ-unit p)) ρ))
+        (λ (p : Path (ℑ A) a b), <_> p)
 
-def ℑ-path-coreduced (A : U) (a b : ℑ A) : is-coreduced (Path (ℑ A) a b) :=
-isoToEquiv (Path (ℑ A) a b) (ℑ (Path (ℑ A) a b)) (ι (Path (ℑ A) a b)) (ℑ-Ω-elim A a b)
-  (λ (ρ : ℑ (Path (ℑ A) a b)),
-    ℑ-Ω-elim (Path (ℑ A) a b) (ℑ-unit (ℑ-Ω-elim A a b ρ)) ρ
-      (ind-ℑ (Path (ℑ A) a b)
-        (λ (μ : ℑ (Path (ℑ A) a b)),
-          Path (ℑ (Path (ℑ A) a b))
-               (ℑ-unit (ℑ-Ω-elim A a b μ)) μ)
-        (λ (p : Path (ℑ A) a b), ℑ-unit (<_> ℑ-unit p)) ρ))
-  (λ (p : Path (ℑ A) a b), <_> p)
-
-def ℑ-app-comp (A B C : U) (f : B → C) (g : A → B) :
-  Π (x : ℑ A), Path (ℑ C) (ℑ-app A C (∘ A B C f g) x) (ℑ-app B C f (ℑ-app A B g x)) :=
-ℑ-ind A (λ (x : ℑ A), Path (ℑ C) (ℑ-app A C (∘ A B C f g) x) (ℑ-app B C f (ℑ-app A B g x)))
-  (λ (x : ℑ A), ℑ-path-coreduced C (ℑ-app A C (∘ A B C f g) x) (ℑ-app B C f (ℑ-app A B g x)))
-  (λ (a : A), <_> ℑ-unit (f (g a)))
+def ℑ-app-comp (A B C : U) (f : B → C) (g : A → B)
+  : Π (x : ℑ A), Path (ℑ C) (ℑ-app A C (∘ A B C f g) x) (ℑ-app B C f (ℑ-app A B g x))
+ := ℑ-ind A (λ (x : ℑ A), Path (ℑ C) (ℑ-app A C (∘ A B C f g) x) (ℑ-app B C f (ℑ-app A B g x)))
+            (λ (x : ℑ A), ℑ-path-coreduced C (ℑ-app A C (∘ A B C f g) x) (ℑ-app B C f (ℑ-app A B g x)))
+            (λ (a : A), <_> ℑ-unit (f (g a)))
 
 def ~ (X : U) (a x′ : X) : U := Path (ℑ X) (ι X a) (ι X x′)
 def 𝔻 (X : U) (a : X) : U := Σ (x′ : X), ~ X a x′
 def unitDisc (X : U) (x : ℑ X) : U := Σ (x′ : X), Path (ℑ X) x (ι X x′)
 def starDisc (X : U) (x : X) : 𝔻 X x := (x, idp (ℑ X) (ι X x))
 def T∞ (A : U) : U := Σ (a : A), 𝔻 A a
-
 def inf-prox-ap (X Y : U) (f : X → Y) (x x′ : X) (p : ~ X x x′) : ~ Y (f x) (f x′) := <i> ℑ-app X Y f (p @ i)
+def d (X Y : U) (f : X → Y) (x : X) (ε : 𝔻 X x) : 𝔻 Y (f x) := (f ε.1, inf-prox-ap X Y f x ε.1 ε.2)
+def T∞-map (X Y : U) (f : X → Y) (τ : T∞ X) : T∞ Y := (f τ.1, d X Y f τ.1 τ.2)
+def is-homogeneous (A : U) := Σ (e : A) (t : A → equiv A A), Π (x : A), Path A ((t x).1 e) x
 
 lemma inf-prox-comp (X Y Z : U) (f : Y → Z) (g : X → Y) (x x′ : X) (p : ~ X x x′)
     : Path (~ Z (f (g x)) (f (g x′)))
            (inf-prox-ap X Z (∘ X Y Z f g) x x′ p)
-           (inf-prox-ap Y Z f (g x) (g x′) (inf-prox-ap X Y g x x′ p)) :=
-<i j> ℑ-app-comp X Y Z f g (p @ j) @ i
-
-def d (X Y : U) (f : X → Y) (x : X) (ε : 𝔻 X x) : 𝔻 Y (f x) := (f ε.1, inf-prox-ap X Y f x ε.1 ε.2)
-def T∞-map (X Y : U) (f : X → Y) (τ : T∞ X) : T∞ Y := (f τ.1, d X Y f τ.1 τ.2)
+           (inf-prox-ap Y Z f (g x) (g x′) (inf-prox-ap X Y g x x′ p))
+   := <i j> ℑ-app-comp X Y Z f g (p @ j) @ i
 
 theorem diff-comp (A B C : U) (f : A → B) (g : B → C) (x : A)
-  : Path ((𝔻 A x → 𝔻 C ((∘ A B C g f) x))) (d A C (∘ A B C g f) x)
-         (∘ (𝔻 A x) (𝔻 B (f x)) (𝔻 C (g (f x))) (d B C g (f x)) (d A B f x))
- := <i> λ (ε : 𝔻 A x), (g (f ε.1), inf-prox-comp A B C g f x ε.1 ε.2 @ i)
+      : Path ((𝔻 A x → 𝔻 C ((∘ A B C g f) x))) (d A C (∘ A B C g f) x)
+             (∘ (𝔻 A x) (𝔻 B (f x)) (𝔻 C (g (f x))) (d B C g (f x)) (d A B f x))
+     := <i> λ (ε : 𝔻 A x), (g (f ε.1), inf-prox-comp A B C g f x ε.1 ε.2 @ i)
 
-def is-homogeneous (A : U) :=
-Σ (e : A) (t : A → equiv A A), Π (x : A), Path A ((t x).1 e) x

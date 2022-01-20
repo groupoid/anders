@@ -110,7 +110,7 @@ and transp p phi u0 = match p with
   | _ -> VApp (VTransp (p, phi), u0)
 
 and glue r u a = match r, a with
-  | VDir One, _  -> app (u, VRef vone)
+  | VDir One, _  -> vsnd (vsnd (app (u, VRef vone)))
   | _, VUnglue b -> b
   | _, _         -> VGlueElem (r, u, a)
 

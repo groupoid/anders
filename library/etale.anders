@@ -10,15 +10,16 @@ import library/path
 import library/pullback
 import library/infinitesimal
 
---        w
---    A ----> ℑ A
---  f |        | x
---    V        V
---    B ----> ℑ B
---       y
+--       ι A
+--    A ――――→ ℑ A
+--    |        |
+--  f |        | ℑ f
+--    ↓        ↓
+--    B ―――――→ ℑ B
+--       ι B
 
-def isÉtaleMap (A B : U) (f : A -> B) : U
+def isÉtaleMap (A B : U) (f : A → B) : U
  := isPullbackSq A (ℑ A) B (ℑ B) (ℑ-app A B f) (ι B) (ι A) f (λ (a : A), <_> ℑ-unit (f a))
 
 def ÉtaleMap (A B: U): U
- := Σ (f : A -> B), isÉtaleMap A B f
+ := Σ (f : A → B), isÉtaleMap A B f

@@ -170,7 +170,7 @@ and transport i p phi u0 = match p, phi, u0 with
     let u' = System.map eta (forall i u) in let psi' = getFormulaV u' in
 
     let t1 = System.map (fun u -> transFill i (fst u) phi u0 vone) u' in
-    let ts = System.map (fun u -> app (snd u, transFill i (fst u) phi u0 (dim i))) u' in
+    let ts = System.map (fun u -> app (vfst (snd u), transFill i (fst u) phi u0 (dim i))) u' in
 
     let uj k = bimap (fun j -> if i = j then k else dim j) upd u in
     let uzero = uj vzero in let a0 = unglue (getFormulaV uzero) (VSystem uzero) u0 in
@@ -181,14 +181,15 @@ and transport i p phi u0 = match p, phi, u0 with
     let fib = System.map (fun x -> VPair (ref None, x, idp a1))
       (unionSystem (border phi1 u0) t1) in
 
-    let u1 = System.map eta (uj vone) in let b = act0 i vone a in
+    let b = act0 i vone a in
+    let u1 = System.map eta (uj vone) in
     let fib' = System.map (fun (t, w) ->
       (t, w, contr (fiber b t (vfst w) a1) (app (vsnd w, a1)) ksi fib)) u1 in
 
     let chi = getFormulaV u1 in
     let a1' = homcom b (evalOr chi phi) i
-      (VSystem (unionSystem (System.map (fun (_, _, u) ->
-        appFormula (vsnd u) (dim i)) fib') (border phi1 a1))) a1 in
+      (VSystem (unionSystem (System.map (fun (_, _, p) ->
+        appFormula (vsnd p) (dim i)) fib') (border phi1 a1))) a1 in
 
     glue chi (VSystem (System.map (fun p -> let (t, w, u) = p in
       VPair (ref None, t, VPair (ref None, w, vfst u))) fib')) a1'

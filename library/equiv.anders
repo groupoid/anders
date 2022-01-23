@@ -51,5 +51,6 @@ def univ-computation (A B : U) (p : PathP (<_> U) A B) : PathP (<_> PathP (<_> U
 -- [Orton, Pitts] 2017
 
 def ua (A B : U) (p : equiv A B) : PathP (<_> U) A B := univ-intro A B p
-axiom ua-β (A B : U) (e : equiv A B) : Path (A -> B) (trans A B (ua A B e)) e.1
--- := <i> λ (x : A), fill (λ (_ : I), B) (fill (λ (_ : I), B) (e.1 x) @ -i) @ -i
+
+def ua-β (A B : U) (e : equiv A B) : Path (A -> B) (trans A B (ua A B e)) e.1
+ := <i> λ (x : A), (idfun=idfun″ B @ -i) ((idfun=idfun″ B @ -i) ((idfun=idfun′ B @ -i) (e.1 x)))

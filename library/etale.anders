@@ -23,3 +23,6 @@ def isÉtaleMap (A B : U) (f : A → B) : U
 
 def ÉtaleMap (A B: U): U
  := Σ (f : A → B), isÉtaleMap A B f
+
+def isÉtale (A : U)
+ := isÉtaleMap A 𝟏 (λ (_ : A), ★)

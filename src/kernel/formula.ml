@@ -95,7 +95,7 @@ let meetss = List.fold_left meets [eps]
 
 let union xs ys = nubRev (List.rev_append xs ys)
 
-let forall i : face -> face = Env.remove i
+let forall i = System.filter (fun mu _ -> not (Env.mem i mu))
 
 let mkSystem xs = System.of_seq (List.to_seq xs)
 let unionSystem xs ys = System.union (fun _ _ _ -> raise (Failure "unionSystem")) xs ys
@@ -142,11 +142,11 @@ let rec solve k x = match k, x with
 
 let bimap f g ts =
   let ts' =
-    System.fold (fun alpha t ->
-      Env.bindings alpha
+    System.fold (fun mu t ->
+      Env.bindings mu
       |> List.rev_map (fun (i, d) -> solve (f i) d)
       |> meetss
-      |> List.rev_map (fun beta -> (beta, g beta t))
+      |> List.rev_map (fun nu -> (nu, g nu t))
       |> List.rev_append) ts [] in
 
   (* ensure incomparability *)

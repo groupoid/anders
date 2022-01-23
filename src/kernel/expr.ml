@@ -16,7 +16,7 @@ type exp =
   | ETransp of exp * exp | EHComp of exp * exp * exp * exp                     (* Kan operations *)
   | EPartial of exp | EPartialP of exp * exp | ESystem of exp System.t      (* partial functions *)
   | ESub of exp * exp * exp | EInc of exp * exp | EOuc of exp                (* cubical subtypes *)
-  | EGlue of exp | EGlueElem of exp * exp * exp | EUnglue of exp                      (* glueing *)
+  | EGlue of exp | EGlueElem of exp * exp * exp | EUnglue of exp * exp * exp          (* glueing *)
   | EEmpty | EIndEmpty of exp                                                               (* 𝟎 *)
   | EUnit | EStar | EIndUnit of exp                                                         (* 𝟏 *)
   | EBool | EFalse | ETrue | EIndBool of exp                                                (* 𝟐 *)
@@ -44,7 +44,7 @@ type value =
   | VTransp of value * value | VHComp of value * value * value * value
   | VPartialP of value * value | VSystem of value System.t
   | VSub of value * value * value | VInc of value * value | VOuc of value
-  | VGlue of value | VGlueElem of value * value * value | VUnglue of value
+  | VGlue of value | VGlueElem of value * value * value | VUnglue of value * value * value
   | VEmpty | VIndEmpty of value
   | VUnit | VStar | VIndUnit of value
   | VBool | VFalse | VTrue | VIndBool of value

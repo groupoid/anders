@@ -74,7 +74,7 @@ let rec eval (e0 : exp) (ctx : ctx) = traceEval e0; match e0 with
   | EOuc e               -> ouc (eval e ctx)
   | EGlue e              -> VGlue (eval e ctx)
   | EGlueElem (r, u, a)  -> glue (eval r ctx) (eval u ctx) (eval a ctx)
-  | EUnglue e            -> unglue (eval e ctx)
+  | EUnglue (r, u, e)    -> unglue (eval r ctx) (eval u ctx) (eval e ctx)
   | EEmpty               -> VEmpty
   | EIndEmpty e          -> VIndEmpty (eval e ctx)
   | EUnit                -> VUnit
@@ -110,13 +110,14 @@ and transp p phi u0 = match p with
   | _ -> VApp (VTransp (p, phi), u0)
 
 and glue r u a = match r, a with
-  | VDir One, _  -> vsnd (vsnd (app (u, VRef vone)))
-  | _, VUnglue b -> b
-  | _, _         -> VGlueElem (r, u, a)
+  | VDir One, _ -> vsnd (vsnd (app (u, VRef vone)))
+  | _, VUnglue (_, _, b) -> b
+  | _, _ -> VGlueElem (r, u, a)
 
-and unglue = function
-  | VGlueElem (_, _, a) -> ouc a
-  | v -> VUnglue v
+and unglue r u b = match r, u, b with
+  | VDir One, _, _ -> app (vfst (vsnd (app (u, VRef vone))), b)
+  | _, _, VGlueElem (_, _, a) -> ouc a
+  | _, _, _ -> VUnglue (r, u, b)
 
 and join = function
   | VInf v -> v
@@ -165,6 +166,32 @@ and transport i p phi u0 = match p, phi, u0 with
         (VSystem (unionSystem (border (solve phi One) uj)
                  (unionSystem (border (solve j Zero) (swap i k v))
                               (border (solve j One)  (swap i k w))))) uj)))
+  | VApp (VApp (VGlue a, _), VSystem u), _, _ ->
+    let u' = System.map eta (forall i u) in let psi' = getFormulaV u' in
+
+    let t1 = System.map (fun u -> transFill i (fst u) phi u0 vone) u' in
+    let ts = System.map (fun u -> app (snd u, transFill i (fst u) phi u0 (dim i))) u' in
+
+    let uj k = bimap (fun j -> if i = j then k else dim j) upd u in
+    let uzero = uj vzero in let a0 = unglue (getFormulaV uzero) (VSystem uzero) u0 in
+
+    let phi1 = solve phi One in let ksi = evalOr phi psi' in
+    let a1 = comp (fun j -> act0 i j a) ksi i (VSystem (unionSystem (border phi1 a0) ts)) a0 in
+
+    let fib = System.map (fun x -> VPair (ref None, x, idp a1))
+      (unionSystem (border phi1 u0) t1) in
+
+    let u1 = System.map eta (uj vone) in let b = act0 i vone a in
+    let fib' = System.map (fun (t, w) ->
+      (t, w, contr (fiber b t (vfst w) a1) (app (vsnd w, a1)) ksi fib)) u1 in
+
+    let chi = getFormulaV u1 in
+    let a1' = homcom b (evalOr chi phi) i
+      (VSystem (unionSystem (System.map (fun (_, _, u) ->
+        appFormula (vsnd u) (dim i)) fib') (border phi1 a1))) a1 in
+
+    glue chi (VSystem (System.map (fun p -> let (t, w, u) = p in
+      VPair (ref None, t, VPair (ref None, w, vfst u))) fib')) a1'
   (* transp (<i> W (x : A i), B i x) φ (sup (A 0) (B 0) a f) ~>
      sup (A 1) (B 1) (transp (<i> A i) φ a)
          (transp (<i> B i (transFill (<i> A i) φ a i) → (W (x : A i), B i x)) φ f) *)
@@ -180,18 +207,24 @@ and transport i p phi u0 = match p, phi, u0 with
 and transFill i p phi u0 j = let (k, _, _) = freshDim () in
   transport k (act0 i (evalAnd (dim k) j) p) (evalOr phi (negFormula j)) u0
 
-and hcomp t r u u0 = let i = freshName "ι" in kan t r i (app (u, dim i)) u0
+and hcomp t r u u0 = let i = freshName "ι" in homcom t r i (app (u, dim i)) u0
+
+and contr t p r ts = let i = freshName "ι" in let g = vsnd p in
+  let ts' = System.mapi (fun mu u -> appFormula (app (upd mu g, u)) (dim i)) ts in
+  homcom t r i (VSystem ts') (vfst p)
+
+and eta v = (vfst v, vsnd v)
 
 and walk f r = function
   | VSystem ts -> System.mapi (fun mu -> f >> upd mu) ts
-  | t          -> mkSystem (List.map (fun mu -> (mu,
-    upd mu (f (app (upd mu t, VRef vone))))) (solve r One))
+  | t          -> mkSystem (List.map (fun mu ->
+    (mu, upd mu (f (app (upd mu t, VRef vone))))) (solve r One))
 
-and kan t r i u u0 = match t, r, u, u0 with
+and homcom t r i u u0 = match t, r, u, u0 with
   (* hcomp A 1 u u₀ ~> u 1 1=1 *)
   | _, VDir One, _, _ -> app (act0 i vone u, VRef vone)
   (* hcomp (Π (x : A), B x) φ u u₀ ~> λ (x : A), hcomp (B x) φ (λ (i : I), [φ → u i 1=1 x]) (u₀ x) *)
-  | VPi (t, (x, b)), _, _, _ -> VLam (t, (fresh x, fun y -> kan (b y) r i
+  | VPi (t, (x, b)), _, _, _ -> VLam (t, (fresh x, fun y -> homcom (b y) r i
     (VSystem (walk (fun v -> app (v, y)) r u)) (app (u0, y))))
    (* hcomp (Σ (x : A), B x) φ u u₀ ~>
      (hfill A φ (λ (k : I), [(r = 1) → (u k 1=1).1]) u₀.1 1,
@@ -207,7 +240,7 @@ and kan t r i u u0 = match t, r, u, u0 with
   | VApp (VApp (VPathP t, v), w), _, _, _ ->
     let j = freshName "ι" in
     VPLam (VLam (VI, (j, fun j ->
-      kan (appFormula t j) (evalOr r (evalOr j (negFormula j))) i
+      homcom (appFormula t j) (evalOr r (evalOr j (negFormula j))) i
           (VSystem (unionSystem (walk (flip appFormula j) r u)
                    (unionSystem (border (solve j One)  w)
                                 (border (solve j Zero) v))))
@@ -215,15 +248,15 @@ and kan t r i u u0 = match t, r, u, u0 with
   (* hcomp (ℑ A) r (λ (i : I), [(r = 1) → ℑ-unit (u i 1=1)]) (ℑ-unit (ouc u₀)) ~>
        ℑ-unit (hcomp A r u (ouc u₀)) *)
   | VIm t, _, VSystem u, VInf u0 when System.for_all (fun _ -> isInf) u ->
-    VInf (kan t r i (VSystem (System.map extInf u)) u0)
+    VInf (homcom t r i (VSystem (System.map extInf u)) u0)
   | _, _, _, _ -> VHComp (t, r, VLam (VI, (i, fun j -> VSystem (walk (act0 i j) r u))), u0)
 
 and comp t r i u u0 = let j = freshName "ι" in
-  kan (t vone) r i (VSystem (walk (transport j (t (evalOr (dim i) (dim j))) (dim i)) r u))
+  homcom (t vone) r i (VSystem (walk (transport j (t (evalOr (dim i) (dim j))) (dim i)) r u))
     (transport j (t (dim j)) vzero u0)
 
 and hfill t r i u u0 j = let k = freshName "κ" in
-  kan t (evalOr (negFormula j) r) k
+  homcom t (evalOr (negFormula j) r) k
     (VSystem (unionSystem (walk (act0 i (evalAnd (dim k) j)) r u)
       (border (solve j Zero) u0))) u0
 
@@ -280,7 +313,7 @@ and app : value * value -> value = function
     if mem x u then VApp (VApp (VIndIm (a, b), VLam (t, (x, g))), v) else u
   | f, x -> VApp (f, x)
 
-and evalSystem ctx = bimap (getRho ctx) (fun beta t -> eval t (faceEnv beta ctx))
+and evalSystem ctx = bimap (getRho ctx) (fun mu t -> eval t (faceEnv mu ctx))
 
 and getRho ctx x = match Env.find_opt x ctx with
   | Some (_, _, Value v) -> v
@@ -334,7 +367,7 @@ and inferV v = traceInferV v; match v with
   | VSystem ts -> VPartialP (VSystem (System.map inferV ts), getFormulaV ts)
   | VGlue t -> inferGlue t
   | VGlueElem (r, u, a) -> inferGlueElem r u (inferV a)
-  | VUnglue v -> let (t, _, _) = extGlue (inferV v) in t
+  | VUnglue (_, _, b) -> let (t, _, _) = extGlue (inferV b) in t
   | VEmpty | VUnit | VBool -> VKan Z.zero
   | VStar -> VUnit | VFalse | VTrue -> VBool
   | VIndEmpty t -> implv VEmpty t
@@ -419,7 +452,7 @@ and act rho = function
   | VHole                -> VHole
   | VPathP v             -> VPathP (act rho v)
   | VPartialP (t, r)     -> VPartialP (act rho t, act rho r)
-  | VSystem ts           -> VSystem (bimap (actVar rho) (fun beta -> upd beta >> act rho) ts)
+  | VSystem ts           -> VSystem (bimap (actVar rho) (fun mu -> upd mu >> act rho) ts)
   | VSub (t, i, u)       -> VSub (act rho t, act rho i, act rho u)
   | VTransp (p, i)       -> VTransp (act rho p, act rho i)
   | VHComp (t, r, u, u0) -> hcomp (act rho t) (act rho r) (act rho u) (act rho u0)
@@ -436,7 +469,7 @@ and act rho = function
   | VOuc v               -> ouc (act rho v)
   | VGlue v              -> VGlue (act rho v)
   | VGlueElem (r, u, a)  -> glue (act rho r) (act rho u) (act rho a)
-  | VUnglue v            -> unglue (act rho v)
+  | VUnglue (r, u, b)    -> unglue (act rho r) (act rho u) (act rho b)
   | VEmpty               -> VEmpty
   | VIndEmpty v          -> VIndEmpty (act rho v)
   | VUnit                -> VUnit
@@ -501,7 +534,7 @@ and conv v1 v2 : bool = traceConv v1 v2;
     | VOuc u, VOuc v -> conv u v
     | VGlue v, VGlue u -> conv u v
     | VGlueElem (r1, u1, a1), VGlueElem (r2, u2, a2) -> conv r1 r2 && conv u1 u2 && conv a1 a2
-    | VUnglue v, VUnglue u -> conv u v
+    | VUnglue (r1, u1, b1), VUnglue (r2, u2, b2) -> conv r1 r2 && conv u1 u2 && conv b1 b2
     | VEmpty, VEmpty -> true
     | VIndEmpty u, VIndEmpty v -> conv u v
     | VUnit, VUnit -> true
@@ -641,7 +674,8 @@ and infer ctx e : value = traceInfer e; match e with
     List.iter (fun mu -> let v = app (upd mu u, VRef vone) in let f = vfst (vfst (vsnd v)) in
       eqNf (eval a (faceEnv mu ctx)) (app (f, vsnd (vsnd v)))) (solve r One);
     inferGlueElem r u t
-  | EUnglue e -> let (t, _, _) = extGlue (infer ctx e) in t
+  | EUnglue (r, u, e) -> let (t, r', u') = extGlue (infer ctx e) in
+    eqNf (eval r ctx) r'; eqNf (eval u ctx) u'; t
   | EEmpty | EUnit | EBool -> VKan Z.zero
   | EStar -> VUnit | EFalse | ETrue -> VBool
   | EIndEmpty e -> ignore (extSet (infer ctx e)); implv VEmpty (eval e ctx)

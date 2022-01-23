@@ -95,7 +95,7 @@ let rec salt (ns : name Env.t) : exp -> exp = function
   | ENeg e               -> ENeg (salt ns e)
   | EGlue e              -> EGlue (salt ns e)
   | EGlueElem (r, u, a)  -> EGlueElem (salt ns r, salt ns u, salt ns a)
-  | EUnglue e            -> EUnglue (salt ns e)
+  | EUnglue (r, u, e)    -> EUnglue (salt ns r, salt ns u, salt ns e)
   | EEmpty               -> EEmpty
   | EIndEmpty e          -> EIndEmpty (salt ns e)
   | EUnit                -> EUnit
@@ -153,7 +153,7 @@ let rec swap i j = function
   | VOuc v               -> VOuc (swap i j v)
   | VGlue v              -> VGlue (swap i j v)
   | VGlueElem (r, u, a)  -> VGlueElem (swap i j r, swap i j u, swap i j a)
-  | VUnglue v            -> VUnglue (swap i j v)
+  | VUnglue (r, u, v)    -> VUnglue (swap i j r, swap i j u, swap i j v)
   | VEmpty               -> VEmpty
   | VIndEmpty v          -> VIndEmpty (swap i j v)
   | VUnit                -> VUnit
@@ -174,19 +174,20 @@ let rec swap i j = function
 and swapVar i j k = if i = k then j else k
 
 let rec mem y = function
-  | Var (x, t) -> x = y
+  | Var (x, _) -> x = y
   | VLam (t, (x, g)) | VPi (t, (x, g))
   | VSig (t, (x, g)) | W (t, (x, g)) -> memClos y t x g
   | VSystem ts -> System.exists (fun mu v -> Env.mem y mu || mem y v) ts
   | VKan _ | VPre _ | VHole | VI | VEmpty | VUnit
   | VStar | VBool | VFalse | VTrue | VDir _ -> false
   | VPLam a | VFst a | VSnd a | VPathP a | VId a | VRef a
-  | VJ a | VNeg a | VOuc a | VGlue a | VUnglue a | VIndEmpty a
+  | VJ a | VNeg a | VOuc a | VGlue a | VIndEmpty a
   | VIndUnit a | VIndBool a | VIm a | VInf a | VJoin a -> mem y a
   | VApp (a, b) | VPartialP (a, b) | VAppFormula (a, b)
   | VTransp (a, b) | VAnd (a, b) | VOr (a, b) | VInc (a, b)
   | VSup (a, b) | VIndIm (a, b) | VPair (_, a, b) -> mem y a || mem y b
-  | VSub (a, b, c) | VGlueElem (a, b, c) | VIndW (a, b, c) -> mem y a || mem y b || mem y c
+  | VSub (a, b, c) | VGlueElem (a, b, c) | VUnglue (a, b, c)
+  | VIndW (a, b, c) -> mem y a || mem y b || mem y c
   | VHComp (a, b, c, d) -> mem y a || mem y b || mem y c || mem y d
 
 and memClos y t x g = if x = y then false else mem y (g (Var (x, t)))

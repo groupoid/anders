@@ -15,7 +15,6 @@ import library/path
 -- [Pelayo, Warren, Voevodsky] 2012
 
 def fiber (A B : U) (f: A -> B) (y : B): U := Σ (x : A), Path B y (f x)
-def isContr' (A: U) : U := Σ (x: A), Π (y: A), Path A x y
 def isEquiv (A B : U) (f : A -> B) : U := Π (y : B), isContr (fiber A B f y)
 def equiv (A B : U) : U := Σ (f : A -> B), isEquiv A B f
 def contrSingl (A : U) (a b : A) (p : Path A a b) : Path (Σ (x : A), Path A a x) (a,<_>a) (b,p) := <i> (p @ i, <j> p @ i /\ j)
@@ -31,7 +30,7 @@ def ret-equiv (A B : U) (w : equiv A B) (y : B) : Path B (w.1 (inv-equiv A B w y
 def sec-equiv (A B : U) (w : equiv A B) (x : A) : Path A (inv-equiv A B w (w.1 x)) x := <i> ((w.2 (w.1 x)).2 (x, <j> w.1 x) @ i).1
 def Glue′ (A : U) (φ : I) (e : Partial (Σ (T : U), equiv T A) φ) : U := Glue A φ e
 def glue′ (A : U) (φ : I) (u : Partial (Σ (T : U), equiv T A × T) φ) (a : A[φ ↦ [(φ = 1) → (u 1=1).2.1.1 (u 1=1).2.2]]) := glue φ u (ouc a)
-def unglue′ (A : U) (φ : I) (e : Partial (Σ (T : U), equiv T A) φ) (b : Glue A φ e) : A := unglue b
+def unglue′ (A : U) (φ : I) (e : Partial (Σ (T : U), equiv T A) φ) (b : Glue A φ e) : A := unglue φ e b
 
 -- The notion of Univalence was discovered by Vladimir Voevodsky
 -- as forth and back transport between fibrational equivalence

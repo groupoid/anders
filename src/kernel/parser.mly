@@ -119,7 +119,7 @@ exp4 :
   | PARTIALP exp6 exp6 { EPartialP ($2, $3) }
   | GLUE exp6 { EGlue $2 }
   | GLUEELEM exp6 exp6 exp6 { EGlueElem ($2, $3, $4) }
-  | UNGLUE exp6 { EUnglue $2 }
+  | UNGLUE exp6 exp6 exp6 { EUnglue ($2, $3, $4) }
   | INDEMPTY exp6 { EIndEmpty $2 }
   | INDUNIT exp6 { EIndUnit $2 }
   | INDBOOL exp6 { EIndBool $2 }

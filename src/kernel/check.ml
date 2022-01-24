@@ -9,6 +9,8 @@ open Expr
 
 let freshDim () = let i = freshName "ι" in (i, EVar i, Var (i, VI))
 
+let idfun t = VLam (t, (freshName "x", fun x -> x))
+
 let ieq u v : bool = !Prefs.girard || u = v
 let vfst : value -> value = function
   | VPair (_, u, _) -> u
@@ -214,6 +216,19 @@ and contr t p r ts = let i = freshName "ι" in let g = vsnd p in
   let ts' = System.mapi (fun mu u -> appFormula (app (upd mu g, u)) (dim i)) ts in
   homcom t r i (VSystem ts') (vfst p)
 
+and idEquiv t =
+  pairv (idfun t) (VLam (t, (freshName "x", fun x ->
+    pairv (pairv x (idp x))
+      (VLam (VSig (t, (freshName "y", pathv (idp t) x)),
+        (freshName "u", fun u ->
+          VPLam (VLam (VI, (freshName "i", fun i ->
+            let p = vsnd u in pairv (appFormula p i)
+              (VPLam (VLam (VI, (freshName "j", fun j ->
+                appFormula p (evalAnd i j))))))))))))))
+
+and idtoeqv i e = let a = act0 i vzero e in
+  transport i (equiv a e) vzero (idEquiv a)
+
 and eta v = (vfst v, vsnd v)
 
 and walk f r = function
@@ -246,6 +261,10 @@ and homcom t r i u u0 = match t, r, u, u0 with
                    (unionSystem (border (solve j One)  w)
                                 (border (solve j Zero) v))))
           (appFormula u0 j))))
+  (* hcomp U φ E A ~> Glue A φ [(φ = 1) → (E 1 1=1, idtoeqvⁱ (E -i 1=1))] *)
+  | VKan _, _, _, _ ->
+    app (app (VGlue u0, r), VSystem (walk (fun e ->
+      pairv (act0 i vone e) (idtoeqv i (act0 i (VNeg (dim i)) e))) r u))
   (* hcomp (ℑ A) r (λ (i : I), [(r = 1) → ℑ-unit (u i 1=1)]) (ℑ-unit (ouc u₀)) ~>
        ℑ-unit (hcomp A r u (ouc u₀)) *)
   | VIm t, _, VSystem u, VInf u0 when System.for_all (fun _ -> isInf) u ->

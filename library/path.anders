@@ -365,6 +365,8 @@ def hcomp-Path-is-correct (A : U) (v w : A) (r : I) (u : I → Partial (Path A v
   : Path (Path A v w) (hcomp-Path A v w r u u₀) (hcomp-Path′ A v w r u u₀)
  := <_> hcomp-Path A v w r u u₀
 
+def hcomp-U (r : I) (E : I → Partial U r) (A : U[r ↦ E 0]) := hcomp U r E (ouc A)
+
 -- id functions
 
 def idfun  (A : U) : A → A := λ (a : A), a

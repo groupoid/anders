@@ -52,6 +52,7 @@ let imax a b = match a, b with
 let idv t x y = VApp (VApp (VId t, x), y)
 let implv a b = VPi (a, (Irrefutable, fun _ -> b))
 let prodv a b = VSig (a, (Irrefutable, fun _ -> b))
+let pairv a b = VPair (ref None, a, b)
 
 let idp v = VPLam (VLam (VI, (Irrefutable, fun _ -> v)))
 let pathv v a b = VApp (VApp (VPathP v, a), b)

@@ -328,6 +328,11 @@ and app : value * value -> value = function
         app (VApp (VIndW (a, b, c), g), app (f, y)))))
   (* ind-ℑ A B f (ℑ-unit a) ~> f a *)
   | VApp (VIndIm _, f), VInf a -> app (f, a)
+  | VApp (VIndIm (a, b), f), VHComp (_, r, u, u0) ->
+    let g x = app (VApp (VIndIm (a, b), f), x) in
+    let i = freshName "ι" in let k = freshName "κ" in
+    comp (fun j -> VIm (app (b, hfill (VIm a) r i (app (u, dim i)) u0 j))) r k
+      (VSystem (walk g r (app (u, dim k)))) (g u0)
   (* ind-ℑ A B (λ _, b) x ~> b *)
   | VApp (VIndIm (a, b), VLam (t, (x, g))), v -> let u = g (Var (x, t)) in
     if mem x u then VApp (VApp (VIndIm (a, b), VLam (t, (x, g))), v) else u

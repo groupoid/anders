@@ -263,7 +263,7 @@ and homcom t r i u u0 = match t, r, u, u0 with
           (appFormula u0 j))))
   (* hcomp U φ E A ~> Glue A φ [(φ = 1) → (E 1 1=1, idtoeqvⁱ (E -i 1=1))] *)
   | VKan _, _, _, _ ->
-    app (app (VGlue u0, r), VSystem (walk (fun e ->
+    app (VApp (VGlue u0, r), VSystem (walk (fun e ->
       pairv (act0 i vone e) (idtoeqv i (act0 i (VNeg (dim i)) e))) r u))
   (* hcomp (ℑ A) r (λ (i : I), [(r = 1) → ℑ-unit (u i 1=1)]) (ℑ-unit (ouc u₀)) ~>
        ℑ-unit (hcomp A r u (ouc u₀)) *)

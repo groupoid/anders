@@ -53,7 +53,7 @@ type value =
 
 and clos = name * (value -> value)
 
-and term = Exp of exp | Value of value
+type term = Exp of exp | Value of value
 
 and record = scope * term * term
 

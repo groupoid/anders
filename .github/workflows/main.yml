@@ -33,5 +33,5 @@ jobs:
       - run: opam install . --deps-only
       - run: opam exec -- dune build
       - run: opam install .
-      - run: opam exec -- dune exec anders silent check experiments/root.anders
+      - run: opam exec -- dune exec anders silent check library/library.anders
 

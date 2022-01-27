@@ -1,4 +1,4 @@
-module root where
+module library where
 import library/foundations/mltt/bool
 import library/foundations/mltt/induction
 import library/foundations/mltt/list

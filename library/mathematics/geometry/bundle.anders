@@ -12,7 +12,7 @@ import library/foundations/univalent/path
 import library/foundations/mltt/sigma
 import library/foundations/univalent/iso
 import library/mathematics/homotopy/pullback
-import library/mathematics/homotopy/coequalizer
+import library/mathematics/homotopy/truncation
 option girard true
 
 def Family (B : U) : U₁ := B → U

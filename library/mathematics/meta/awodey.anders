@@ -2,7 +2,7 @@
    - Unit.
    Copyright (c) Groupoid Infinity, 2014-2022. -}
 
-module impredicative where
+module awodey where
 -- option impredicative true
 option girard true
 import library/foundations/univalent/path

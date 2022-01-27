@@ -16,8 +16,8 @@ import library/mathematics/categories/functor
 import library/mathematics/categories/abelian
 import library/mathematics/categories/groupoid
 import library/mathematics/topoi/topos
-import library/mathematics/meta/buddhism
-import library/mathematics/meta/impredicative
+import library/mathematics/meta/favonia
+import library/mathematics/meta/awodey
 import library/mathematics/meta/kraus
 import library/mathematics/geometry/bundle
 import library/mathematics/geometry/etale
@@ -25,3 +25,11 @@ import library/mathematics/geometry/formalDisc
 import library/mathematics/homotopy/coequalizer
 import library/mathematics/homotopy/constcubes
 import library/mathematics/homotopy/pullback
+import library/mathematics/homotopy/pushout
+import library/mathematics/homotopy/hubSpokes
+import library/mathematics/homotopy/quotient
+import library/mathematics/homotopy/truncation
+import library/mathematics/homotopy/suspension
+import library/mathematics/homotopy/S1
+import library/mathematics/homotopy/Sn
+import library/mathematics/homotopy/KGn

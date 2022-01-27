@@ -7,38 +7,6 @@ open Ident
 open Elab
 open Expr
 
-let freshDim () = let i = freshName "ι" in (i, EVar i, Var (i, VI))
-
-let idfun t = VLam (t, (freshName "x", fun x -> x))
-
-let ieq u v : bool = !Prefs.girard || u = v
-let vfst : value -> value = function
-  | VPair (_, u, _) -> u
-  | v               -> VFst v
-
-let vsnd : value -> value = function
-  | VPair (_, _, u) -> u
-  | v               -> VSnd v
-
-let reduceSystem ts x =
-  match System.find_opt eps ts with
-  | Some v -> v
-  | None   -> VApp (VSystem ts, x)
-
-let rec extByTag p : value -> value option = function
-  | VPair (t, fst, snd) ->
-  begin match !t with
-    | Some q -> if p = q then Some fst else extByTag p snd
-    | _      -> extByTag p snd
-  end
-  | _ -> None
-
-let rec getField p v = function
-  | VSig (t, (q, g)) ->
-    if matchIdent p q then (vfst v, t)
-    else getField p (vsnd v) (g (vfst v))
-  | t -> raise (ExpectedSig t)
-
 (* Evaluator *)
 let rec eval ctx e0 = traceEval e0; match e0 with
   | EPre u               -> VPre u
@@ -120,14 +88,6 @@ and unglue r u b = match r, u, b with
   | VDir One, _, _ -> app (vfst (vsnd (app (u, VRef vone))), b)
   | _, _, VGlueElem (_, _, a) -> ouc a
   | _, _, _ -> VUnglue (r, u, b)
-
-and join = function
-  | VInf v -> v
-  | v      -> VJoin v
-
-and inf = function
-  | VJoin v -> v
-  | v       -> VInf v
 
 and transport i p phi u0 = match p, phi, u0 with
   (* transp p 1 u₀ ~> u₀ *)
@@ -229,8 +189,6 @@ and idEquiv t =
 and idtoeqv i e = let a = act0 i vzero e in
   transport i (equiv a e) vzero (idEquiv a)
 
-and eta v = (vfst v, vsnd v)
-
 and walk f r = function
   | VSystem ts -> System.mapi (fun mu -> f >> upd mu) ts
   | t          -> mkSystem (List.map (fun mu ->
@@ -279,10 +237,6 @@ and hfill t r i u u0 j = let k = freshName "κ" in
   homcom t (evalOr (negFormula j) r) k
     (VSystem (unionSystem (walk (act0 i (evalAnd (dim k) j)) r u)
       (border (solve j Zero) u0))) u0
-
-and inc t r = function
-  | VOuc v -> v
-  | v      -> VApp (VInc (t, r), v)
 
 and ouc v = match v, inferV v with
   | _, VSub (_, VDir One, u) -> app (u, VRef vone)

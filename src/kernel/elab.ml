@@ -30,6 +30,18 @@ let extInf : value -> value = function
 let isInf : value -> bool = function
   | VInf _ -> true | _ -> false
 
+let join = function
+  | VInf v -> v
+  | v      -> VJoin v
+
+let inf = function
+  | VJoin v -> v
+  | v       -> VInf v
+
+let inc t r = function
+  | VOuc v -> v
+  | v      -> VApp (VInc (t, r), v)
+
 let extPathP = function
   | VApp (VApp (VPathP v, u0), u1) -> (v, u0, u1)
   | v                              -> raise (ExpectedPath v)
@@ -55,12 +67,40 @@ let prodv a b = VSig (a, (Irrefutable, fun _ -> b))
 let pairv a b = VPair (ref None, a, b)
 
 let idp v = VPLam (VLam (VI, (Irrefutable, fun _ -> v)))
+let idfun t = VLam (t, (freshName "x", fun x -> x))
 let pathv v a b = VApp (VApp (VPathP v, a), b)
 
 let impl a b = EPi (a, (Irrefutable, b))
 let prod a b = ESig (a, (Irrefutable, b))
 
 let hcompval u = EApp (EApp (u, ezero), ERef eone)
+
+let ieq u v : bool = !Prefs.girard || u = v
+let freshDim () = let i = freshName "ι" in (i, EVar i, Var (i, VI))
+
+let vfst : value -> value = function
+  | VPair (_, u, _) -> u
+  | v               -> VFst v
+
+let vsnd : value -> value = function
+  | VPair (_, _, u) -> u
+  | v               -> VSnd v
+
+let eta v = (vfst v, vsnd v)
+
+let rec extByTag p : value -> value option = function
+  | VPair (t, fst, snd) ->
+  begin match !t with
+    | Some q -> if p = q then Some fst else extByTag p snd
+    | _      -> extByTag p snd
+  end
+  | _ -> None
+
+let rec getField p v = function
+  | VSig (t, (q, g)) ->
+    if matchIdent p q then (vfst v, t)
+    else getField p (vsnd v) (g (vfst v))
+  | t -> raise (ExpectedSig t)
 
 let rec salt (ns : name Env.t) : exp -> exp = function
   | ELam (a, (p, b))     -> saltTele eLam ns p a b

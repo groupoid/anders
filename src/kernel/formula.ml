@@ -132,6 +132,11 @@ let evalOr a b =
   | VOr (a, b) -> contrOr (uniq (extOr (VOr (a, b))))
   | v          -> v
 
+let reduceSystem ts x =
+  match System.find_opt eps ts with
+  | Some v -> v
+  | None   -> VApp (VSystem ts, x)
+
 let rec solve k x = match k, x with
   | VDir y, _ -> if x = y then [eps] else []
   | Var (p, _), _ -> [singleton p x]

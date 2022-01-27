@@ -33,14 +33,5 @@ jobs:
       - run: opam install . --deps-only
       - run: opam exec -- dune build
       - run: opam install .
-      - run: opam exec -- dune exec anders silent check library/mltt.anders
-      - run: opam exec -- dune exec anders silent check library/buddhism.anders
-      - run: opam exec -- dune exec anders silent check library/cat.anders
-      - run: opam exec -- dune exec anders silent check library/fun.anders
-      - run: opam exec -- dune exec anders silent check library/impredicative.anders
-      - run: opam exec -- dune exec anders silent check library/kraus.anders
-      - run: opam exec -- dune exec anders silent check library/list.anders
-      - run: opam exec -- dune exec anders silent check library/mltt.anders
-      - run: opam exec -- dune exec anders silent check library/path.anders
-      - run: opam exec -- dune exec anders silent check library/pi.anders
-      - run: opam exec -- dune exec anders silent check library/topos.anders
+      - run: opam exec -- dune exec anders silent check experiments/root.anders
+

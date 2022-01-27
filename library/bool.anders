@@ -8,16 +8,16 @@
 
 module bool where
 
-def id : Π (A : U), A → A := λ (A : U) (a : A), a
-def const (A : U) (B : U) (a : A) (b : B) : A := a
-def lam (A B : U) (b : B) : A → B := \ (_ : A), b
+def id′ : Π (A : U), A → A := λ (A : U) (a : A), a
+def const′ (A : U) (B : U) (a : A) (b : B) : A := a
+def lam′ (A B : U) (b : B) : A → B := \ (_ : A), b
 
 -- data bool : U := 0₂ | 1₂
 
 def not : bool → bool := ind₂ (λ (_ : bool), bool) 1₂ 0₂
-def and : bool → bool → bool := ind₂ (λ (_ : bool), bool → bool) (const bool bool false) (id bool)
-def or  : bool → bool → bool := ind₂ (λ (_ : bool), bool → bool) (id bool) (const bool bool true)
-def eq  : bool → bool → bool := lam bool (bool → bool) not
+def and : bool → bool → bool := ind₂ (λ (_ : bool), bool → bool) (const′ bool bool false) (id′ bool)
+def or  : bool → bool → bool := ind₂ (λ (_ : bool), bool → bool) (id′ bool) (const′ bool bool true)
+def eq  : bool → bool → bool := lam′ bool (bool → bool) not
 
 -- Church
 

@@ -1,9 +1,36 @@
 (env (dev (flags (:standard -warn-error -A))))
 
-(install (files library/mathematics/meta/buddhism.anders library/mathematics/categories/cat.anders
-                library/mathematics/categories/fun.anders library/foundations/mltt/list.anders
-                library/mathematics/meta/impredicative.anders library/mathematics/meta/kraus.anders
-                library/foundations/mltt/mltt.anders library/foundations/univalent/path.anders
-                library/foundations/univalent/equiv.anders library/mathematics/homotopy/constcubes.anders
-                library/mathematics/categories/ab.anders library/mathematics/algebra/algebra.anders
-                library/foundations/mltt/pi.anders library/mathematics/topoi/topos.anders) (section share) (package anders))
+(install (files library/foundations/mltt/bool.anders
+                library/foundations/mltt/induction.anders
+                library/foundations/mltt/list.anders
+                library/foundations/mltt/pi.anders
+                library/foundations/mltt/sigma.anders
+                library/foundations/univalent/path.anders
+                library/foundations/univalent/prop.anders
+                library/foundations/univalent/equiv.anders
+                library/foundations/univalent/iso.anders
+                library/foundations/modal/infinitesimal.anders
+                library/mathematics/algebra/algebra.anders
+                library/mathematics/analysis/real.anders
+                library/mathematics/categories/category.anders
+                library/mathematics/categories/functor.anders
+                library/mathematics/categories/abelian.anders
+                library/mathematics/categories/groupoid.anders
+                library/mathematics/topoi/topos.anders
+                library/mathematics/meta/favonia.anders
+                library/mathematics/meta/awodey.anders
+                library/mathematics/meta/kraus.anders
+                library/mathematics/geometry/bundle.anders
+                library/mathematics/geometry/etale.anders
+                library/mathematics/geometry/formalDisc.anders
+                library/mathematics/homotopy/coequalizer.anders
+                library/mathematics/homotopy/constcubes.anders
+                library/mathematics/homotopy/pullback.anders
+                library/mathematics/homotopy/pushout.anders
+                library/mathematics/homotopy/hubSpokes.anders
+                library/mathematics/homotopy/quotient.anders
+                library/mathematics/homotopy/truncation.anders
+                library/mathematics/homotopy/suspension.anders
+                library/mathematics/homotopy/S1.anders
+                library/mathematics/homotopy/Sn.anders
+                library/mathematics/homotopy/KGn.anders) (section share) (package anders))

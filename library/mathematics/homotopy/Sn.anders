@@ -1,6 +1,5 @@
 module Sn where
 import library/foundations/mltt/induction
 import library/mathematics/homotopy/suspension
-import library/mathematics/homotopy/hubSpokes
 
 def sphere : ℕ → U := ℕ-iter U 𝟐 𝚺

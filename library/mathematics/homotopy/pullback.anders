@@ -5,8 +5,8 @@
    Copyright (c) Groupoid Infinity, 2014-2022. -}
 
 module pullback where
-import library/path
-import library/equiv
+import library/foundations/univalent/path
+import library/foundations/univalent/equiv
 
 --       z₂
 --    Z ――――→ B

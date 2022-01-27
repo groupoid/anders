@@ -31,8 +31,8 @@
 -- https://www.cs.bham.ac.uk/~mhe/agda-new/UF-SIP-IntervalObject.html
 
 module real where
-import library/path
-import library/induction
+import library/foundations/univalent/path
+import library/foundations/mltt/induction
 
 def ≤₂ (a b : 𝟐) : U := Path 𝟐 a 0₂ → Path 𝟐 b 1₂
 def is-decreasing (α : ℕ → 𝟐) : U := Π (i : ℕ), ≤₂ (α (succ i)) (α i)

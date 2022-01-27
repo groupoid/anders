@@ -1,22 +1,13 @@
-{- Pi Type:
-   - Pi;
+{- FunExt Type:
    - FunExt.
 
-   HoTT 1.5 Product types
    HoTT 2.9 Pi-types and the function extensionality axiom.
 
    Copyright (c) Groupoid Infinity, 2014-2022. -}
 
-module pi where
-import library/path
-
-def Pi (A : U) (B : A → U) : U := Π (x : A), B x
-def lambda (A: U) (B: A → U) (b: Pi A B) : Pi A B := λ (x : A), b x
-def lam (A B: U) (f: A → B) : A → B ≔ λ (x : A), f x
-def apply (A: U) (B: A → U) (f: Pi A B) (a: A) : B a := f a
-def app (A B: U) (f: A → B) (x: A): B := f x
-def Π-β (A : U) (B : A → U) (a : A) (f : Pi A B) : Path (B a) (apply A B (lambda A B f) a) (f a) := idp (B a) (f a)
-def Π-η (A : U) (B : A → U) (a : A) (f : Pi A B) : Path (Pi A B) f (λ (x : A), f x) := idp (Pi A B) f
+module extensionality where
+import library/foundations/univalent/path
+import library/foundations/mltt/pi
 
 def funext-form (A B: U) (f g: A → B): U := Path (A → B) f g
 def funext (A B: U) (f g: A → B) (p: Π (x: A), Path B (f x) (g x)) : funext-form A B f g := <i> λ (a: A), p a @ i

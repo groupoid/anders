@@ -1,5 +1,5 @@
 module induction where
-import library/sigma
+import library/foundations/mltt/sigma
 
 option girard true
 

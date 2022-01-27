@@ -1,5 +1,5 @@
 module algebra where
-import library/path
+import library/foundations/univalent/path
 
 def isComm   (M : U) (op : M -> M -> M) : U := Π (x y : M), Path M (op x y) (op y x)
 def isAssoc  (M : U) (op : M -> M -> M) : U := Π (a b c : M), Path M (op a (op b c)) (op (op a b) c)

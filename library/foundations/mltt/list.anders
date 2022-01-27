@@ -1,0 +1,7 @@
+{- Run-Time List Type:
+   - List;
+   - Polymorphic funtions.
+   Copyright (c) Groupoid Infinity, 2014-2022. -}
+
+module list where
+import library/foundations/mltt/bool

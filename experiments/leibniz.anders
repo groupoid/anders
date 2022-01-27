@@ -1,5 +1,4 @@
 module leibniz where
-import experiments/3-mult
 option girard true
 
 def eq (A : U) (x y : A) : U := Π (P : A -> U), P x -> P y

@@ -9,8 +9,8 @@
    Copyright (c) Groupoid Infinity, 2014-2022. -}
 
 module infinitesimal where
-import library/path
-import library/iso
+import library/foundations/univalent/path
+import library/foundations/univalent/iso
 
 -- [Cherubini] 2018 de Rham Stack
 

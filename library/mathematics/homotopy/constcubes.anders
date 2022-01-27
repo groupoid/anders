@@ -1,5 +1,5 @@
 module constcubes where
-import library/path
+import library/foundations/univalent/path
 
 def Square (A : U)
     (a₀ a₁ b₀ b₁ : A)

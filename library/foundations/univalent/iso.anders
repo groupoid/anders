@@ -7,7 +7,7 @@
    Copyright (c) Groupoid Infinity, 2014-2022. -}
 
 module iso where
-import library/equiv
+import library/foundations/univalent/equiv
 
 -- Post-Voevodsky CCHM/hcomp lemIso implementation
 

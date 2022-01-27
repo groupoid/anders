@@ -9,13 +9,13 @@
    HoTT 6.10 Quotients
    HoTT 6.7 Hubs and Spokes
    HoTT 6.9 Truncations
-   
+
    Copyright (c) Groupoid Infinity, 2014-2022. -}
-   
+
 module coequalizer where
-import library/equiv
-import library/induction
-import library/algebra
+import library/foundations/univalent/equiv
+import library/foundations/mltt/induction
+import library/mathematics/algebra/algebra
 
 -- [1]. Nicolai Kraus, Jakob von Raumer.
 -- Path spaces of higher inductive types in homotopy type theory.
@@ -32,13 +32,13 @@ import library/algebra
 {- Coequalizer Primitive -}
 
 axiom coequ (A B : U) (f g : A → B) : U
-axiom ι (A B : U) (f g : A → B) : B → coequ A B f g
-axiom resp (A B : U) (f g : A → B) (x : A) : Path (coequ A B f g) (ι A B f g (f x)) (ι A B f g (g x))
-axiom coequ-ind (A B : U) (f g : A → B) (X : coequ A B f g → U) (i : Π (b : B), X (ι A B f g b))
+axiom ι₂ (A B : U) (f g : A → B) : B → coequ A B f g
+axiom resp (A B : U) (f g : A → B) (x : A) : Path (coequ A B f g) (ι₂ A B f g (f x)) (ι₂ A B f g (g x))
+axiom coequ-ind (A B : U) (f g : A → B) (X : coequ A B f g → U) (i : Π (b : B), X (ι₂ A B f g b))
     : (Π (x : A), PathP (<i> X (resp A B f g x @ i)) (i (f x)) (i (g x))) → (Π (z : coequ A B f g), X z)
-axiom coequ-ind-β₁ (A B : U) (f g : A → B) (X : coequ A B f g → U) (i : Π (b : B), X (ι A B f g b))
+axiom coequ-ind-β₁ (A B : U) (f g : A → B) (X : coequ A B f g → U) (i : Π (b : B), X (ι₂ A B f g b))
       (ρ : Π (x : A), PathP (<i> X (resp A B f g x @ i)) (i (f x)) (i (g x))) (b : B)
-    : Path (X (ι A B f g b)) (coequ-ind A B f g X i ρ (ι A B f g b)) (i b)
+    : Path (X (ι₂ A B f g b)) (coequ-ind A B f g X i ρ (ι₂ A B f g b)) (i b)
 
 -- coequ-ind-β₁ need to be definitional to write this properly (i.e. without transp)
 {-
@@ -51,15 +51,15 @@ axiom coequ-ind-β₂ (A B : U) (f g : A → B) (X : coequ A B f g → U) (i : �
 -- [Caglayan] 2014
 
 def pushout (A B C : U) (f : C → A) (g : C → B) : U := coequ C (+ A B) (∘ C A (+ A B) (inl A B) f) (∘ C B (+ A B) (inr A B) g)
-def po₁ (A B C: U) (f: C → A) (g: C → B) (a: A) : pushout A B C f g := ι C (+ A B) (∘ C A (+ A B) (inl A B) f) (∘ C B (+ A B) (inr A B) g) (inl A B a)
-def po₂ (A B C: U) (f: C → A) (g: C → B) (b: B) : pushout A B C f g := ι C (+ A B) (∘ C A (+ A B) (inl A B) f) (∘ C B (+ A B) (inr A B) g) (inr A B b)
+def po₁ (A B C: U) (f: C → A) (g: C → B) (a: A) : pushout A B C f g := ι₂ C (+ A B) (∘ C A (+ A B) (inl A B) f) (∘ C B (+ A B) (inr A B) g) (inl A B a)
+def po₂ (A B C: U) (f: C → A) (g: C → B) (b: B) : pushout A B C f g := ι₂ C (+ A B) (∘ C A (+ A B) (inl A B) f) (∘ C B (+ A B) (inr A B) g) (inr A B b)
 def po₃ (A B C: U) (f: C → A) (g: C → B) (c: C) : Path (pushout A B C f g) (po₁ A B C f g (f c)) (po₂ A B C f g (g c))
  := resp C (+ A B) (∘ C A (+ A B) (inl A B) f) (∘ C B (+ A B) (inr A B) g) c
 
 -- [Shulman] 2015
 
 def S¹ : U := coequ 𝟏 𝟏 (id 𝟏) (id 𝟏)
-def base : S¹ := ι 𝟏 𝟏 (id 𝟏) (id 𝟏) ★
+def base : S¹ := ι₂ 𝟏 𝟏 (id 𝟏) (id 𝟏) ★
 def loop : Path S¹ base base := resp 𝟏 𝟏 (id 𝟏) (id 𝟏) ★ 
 
 -- [Caglayan] 2018
@@ -106,7 +106,7 @@ def full (A : U) (R : A → A → U) := Σ (x y : A), R x y
 def quot (A : U) (R : A → A → U)
  := coequ (full A R) A (λ (w : full A R), w.1) (λ (w : full A R), w.2.1)
 def quot₁ (A : U) (R : A → A → U) : A → quot A R
- := ι (full A R) A (λ (w : full A R), w.1) (λ (w : full A R), w.2.1)
+ := ι₂ (full A R) A (λ (w : full A R), w.1) (λ (w : full A R), w.2.1)
 def quot₂ (A : U) (R : A → A → U) (x y : A) (ρ : R x y)
   : Path (quot A R) (quot₁ A R x) (quot₁ A R y)
  := resp (full A R) A (λ (w : full A R), w.1) (λ (w : full A R), w.2.1) (x, y, ρ)

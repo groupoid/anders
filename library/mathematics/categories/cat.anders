@@ -10,7 +10,7 @@
    Copyright (c) Groupoid Infinity, 2014-2022. -}
 
 module cat where
-import library/path
+import library/foundations/univalent/path
 option irrelevance true
 
 def cat : U₁ := Σ (ob: U) (hom: ob -> ob -> U), unit
@@ -37,13 +37,13 @@ def catᵒᵖ (P: precategory) : precategory :=
 
 def opPreserve (C: precategory) : PathP (<_>precategory) (catᵒᵖ (catᵒᵖ C)) C := <i> C
 
-def iso (P: precategory) (A B: P.C.ob) : U := Σ
+def isoCat (P: precategory) (A B: P.C.ob) : U := Σ
     (f: P.C.hom A B)
     (g: P.C.hom B A)
     (retract: Path (P.C.hom A A) (P.P.∘ A B A f g) (P.P.id A))
     (section: Path (P.C.hom B B) (P.P.∘ B A B g f) (P.P.id B)), unit
 
-def isCategory (P: precategory): U := Σ (A: P.C.ob), isContr (Π (B: P.C.ob), iso P A B)
+def isCategory (P: precategory): U := Σ (A: P.C.ob), isContr (Π (B: P.C.ob), isoCat P A B)
 def category: U₁ := Σ (P: precategory), isCategory P
 def isInitial (P: precategory) (bot: P.C.ob): U := Π (x: P.C.ob), isContr (P.C.hom bot x)
 def isTerminal (P: precategory) (top: P.C.ob): U := Π (x: P.C.ob), isContr (P.C.hom x top)

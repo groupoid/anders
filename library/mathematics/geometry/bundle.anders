@@ -8,34 +8,34 @@
    Copyright (c) Groupoid Infinity, 2014-2022. -}
 
 module bundle where
-import library/path
-import library/sigma
-import library/iso
-import library/pullback
-import library/coequalizer
+import library/foundations/univalent/path
+import library/foundations/mltt/sigma
+import library/foundations/univalent/iso
+import library/mathematics/homotopy/pullback
+import library/mathematics/homotopy/coequalizer
 option girard true
 
 def Family (B : U) : U₁ := B → U
 def Fibration (B : U) : U₁ := Σ (X : U), X → B
 
-def encode (B : U) (F : B → U) (y : B) : fiber (Sigma B F) B (pr₁ B F) y → F y
+def encode-Pi (B : U) (F : B → U) (y : B) : fiber (Sigma B F) B (pr₁ B F) y → F y
  := \(x : fiber (Sigma B F) B (pr₁ B F) y), subst B F x.1.1 y (<i> x.2 @ -i) x.1.2
 
-def decode (B : U) (F : B → U) (y : B) : F y → fiber (Sigma B F) B (pr₁ B F) y
+def decode-Pi (B : U) (F : B → U) (y : B) : F y → fiber (Sigma B F) B (pr₁ B F) y
  := \(x : F y), ((y, x), idp B y)
 
-def decode-encode (B : U) (F : B → U) (y : B) (x : F y)
+def decode-encode-Pi (B : U) (F : B → U) (y : B) (x : F y)
   : Path (F y) (transp (<i> F (idp B y @ i)) 0 x) x
  := <j> transp (<i> F y) j x
 
-def encode-decode (B : U) (F : B → U) (y : B) (x : fiber (Sigma B F) B (pr₁ B F) y)
-  : Path (fiber (Sigma B F) B (pr₁ B F) y) ((y, encode B F y x), idp B y) x
+def encode-decode-Pi (B : U) (F : B → U) (y : B) (x : fiber (Sigma B F) B (pr₁ B F) y)
+  : Path (fiber (Sigma B F) B (pr₁ B F) y) ((y, encode-Pi B F y x), idp B y) x
  := <i> ((x.2 @ i, transp (<j> F (x.2 @ i ∨ -j)) i x.1.2), <j> x.2 @ i ∧ j)
 
 -- [Sokhatsky, Mörtberg] 2018 CCHM right fiber version
 
 def Bundle=Pi (B : U) (F : B → U) (y : B) : PathP (<_> U) (fiber (Sigma B F) B (pr₁ B F) y) (F y)
- := isoPath (fiber (Sigma B F) B (pr₁ B F) y) (F y) (encode B F y) (decode B F y) (decode-encode B F y) (encode-decode B F y)
+ := isoPath (fiber (Sigma B F) B (pr₁ B F) y) (F y) (encode-Pi B F y) (decode-Pi B F y) (decode-encode-Pi B F y) (encode-decode-Pi B F y)
 
 -- [Cherubini] 2018 Four Fiber Bundles
 
@@ -48,7 +48,7 @@ def isFBundle2 (B: U) (p: B → U) (F: U): U
  := Σ (v: U) (w: surjective v B), (Π (x: v), PathP (<_>U) (p (w.1 x)) F)
 
 -- Definition (3) Non-Dependent
-def im₁ (A B: U) (f: A → B): U := Σ (b: B), ||₋₁ (Π (a : A), Path B (f a) b)
+def im₁ (A B: U) (f: A → B): U := Σ (b: B), ‖_‖₋₁ (Π (a : A), Path B (f a) b)
 def BAut (F: U): U := im₁ 𝟏 U (λ (x: 𝟏), F)
 def 𝟏-Im₁ (A B: U) (f: A → B): im₁ A B f → B := λ (x : im₁ A B f), x.1
 def 𝟏-BAut (F: U): BAut F → U := 𝟏-Im₁ 𝟏 U (λ (x: 𝟏), F)

@@ -6,9 +6,9 @@
    Copyright (c) Groupoid Infinity, 2014-2022. -}
 
 module etale where
-import library/path
-import library/pullback
-import library/infinitesimal
+import library/foundations/univalent/path
+import library/mathematics/homotopy/pullback
+import library/mathematics/geometry/infinitesimal
 
 --       ι A
 --    A ――――→ ℑ A

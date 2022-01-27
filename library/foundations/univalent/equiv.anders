@@ -10,7 +10,7 @@
    HoTT 4.6 Surjections and Embedding -}
 
 module equiv where
-import library/path
+import library/foundations/univalent/path
 
 -- [Pelayo, Warren, Voevodsky] 2012
 

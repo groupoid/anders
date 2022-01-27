@@ -16,7 +16,7 @@ let init : state = empty
 let st : state ref = ref init
 
 let checkAndEval ctx e : value * value =
-  (Check.infer ctx e, Check.eval e ctx)
+  (Check.infer ctx e, Check.eval ctx e)
 
 let main ctx : command -> unit = function
   | Eval e -> let (t, v) = checkAndEval ctx (freshExp e) in

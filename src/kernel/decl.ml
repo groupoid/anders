@@ -16,7 +16,7 @@ type plug = string -> exp -> string -> exp
 let plugin : (plug option) ref = ref None
 
 let getDeclName : decl -> string = function Def (p, _, _) | Ext (p, _, _) | Axiom (p, _) -> p
-let getTerm e ctx = if !Prefs.preeval then Value (eval e ctx) else Exp e
+let getTerm e ctx = if !Prefs.preeval then Value (eval ctx e) else Exp e
 
 let rec checkDecl ctx d : ctx =
   let x = getDeclName d in if Env.mem (name x) ctx then
@@ -24,7 +24,7 @@ let rec checkDecl ctx d : ctx =
   match d with
   | Def (p, Some a, e) ->
     ignore (extSet (infer ctx a));
-    let t = eval a ctx in check ctx e t;
+    let t = eval ctx a in check ctx e t;
     Env.add (name p) (Global, Value t, getTerm e ctx) ctx
   | Ext (p, t, v) -> begin match !plugin with
     | Some g -> checkDecl ctx (Def (p, Some t, g p t v))
@@ -34,7 +34,7 @@ let rec checkDecl ctx d : ctx =
     Env.add (name p) (Global, Value (infer ctx e), getTerm e ctx) ctx
   | Axiom (p, a) ->
     ignore (extSet (infer ctx a)); let x = name p in
-    let t = eval a ctx in Env.add x (Global, Value t, Value (Var (x, t))) ctx
+    let t = eval ctx a in Env.add x (Global, Value t, Value (Var (x, t))) ctx
 
 let getBoolVal opt = function
   | "tt" | "true"  -> true

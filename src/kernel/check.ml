@@ -40,59 +40,59 @@ let rec getField p v = function
   | t -> raise (ExpectedSig t)
 
 (* Evaluator *)
-let rec eval (e0 : exp) (ctx : ctx) = traceEval e0; match e0 with
+let rec eval ctx e0 = traceEval e0; match e0 with
   | EPre u               -> VPre u
   | EKan u               -> VKan u
   | EVar x               -> getRho ctx x
   | EHole                -> VHole
-  | EPi  (a, (p, b))     -> let t = eval a ctx in VPi (t, (fresh p, closByVal ctx p t b))
-  | ESig (a, (p, b))     -> let t = eval a ctx in VSig (t, (fresh p, closByVal ctx p t b))
-  | ELam (a, (p, b))     -> let t = eval a ctx in VLam (t, (fresh p, closByVal ctx p t b))
-  | EApp (f, x)          -> app (eval f ctx, eval x ctx)
-  | EPair (r, e1, e2)    -> VPair (r, eval e1 ctx, eval e2 ctx)
-  | EFst e               -> vfst (eval e ctx)
-  | ESnd e               -> vsnd (eval e ctx)
-  | EField (e, p)        -> evalField p (eval e ctx)
-  | EId e                -> VId (eval e ctx)
-  | ERef e               -> VRef (eval e ctx)
-  | EJ e                 -> VJ (eval e ctx)
-  | EPathP e             -> VPathP (eval e ctx)
-  | EPLam e              -> VPLam (eval e ctx)
-  | EAppFormula (e, x)   -> appFormula (eval e ctx) (eval x ctx)
+  | EPi  (a, (p, b))     -> let t = eval ctx a in VPi (t, (fresh p, closByVal ctx p t b))
+  | ESig (a, (p, b))     -> let t = eval ctx a in VSig (t, (fresh p, closByVal ctx p t b))
+  | ELam (a, (p, b))     -> let t = eval ctx a in VLam (t, (fresh p, closByVal ctx p t b))
+  | EApp (f, x)          -> app (eval ctx f, eval ctx x)
+  | EPair (r, e1, e2)    -> VPair (r, eval ctx e1, eval ctx e2)
+  | EFst e               -> vfst (eval ctx e)
+  | ESnd e               -> vsnd (eval ctx e)
+  | EField (e, p)        -> evalField p (eval ctx e)
+  | EId e                -> VId (eval ctx e)
+  | ERef e               -> VRef (eval ctx e)
+  | EJ e                 -> VJ (eval ctx e)
+  | EPathP e             -> VPathP (eval ctx e)
+  | EPLam e              -> VPLam (eval ctx e)
+  | EAppFormula (e, x)   -> appFormula (eval ctx e) (eval ctx x)
   | EI                   -> VI
   | EDir d               -> VDir d
-  | EAnd (e1, e2)        -> evalAnd (eval e1 ctx) (eval e2 ctx)
-  | EOr (e1, e2)         -> evalOr (eval e1 ctx) (eval e2 ctx)
-  | ENeg e               -> negFormula (eval e ctx)
-  | ETransp (p, i)       -> VTransp (eval p ctx, eval i ctx)
-  | EHComp (t, r, u, u0) -> hcomp (eval t ctx) (eval r ctx) (eval u ctx) (eval u0 ctx)
+  | EAnd (e1, e2)        -> evalAnd (eval ctx e1) (eval ctx e2)
+  | EOr (e1, e2)         -> evalOr (eval ctx e1) (eval ctx e2)
+  | ENeg e               -> negFormula (eval ctx e)
+  | ETransp (p, i)       -> VTransp (eval ctx p, eval ctx i)
+  | EHComp (t, r, u, u0) -> hcomp (eval ctx t) (eval ctx r) (eval ctx u) (eval ctx u0)
   | EPartial e           -> let (i, _, _) = freshDim () in
     VLam (VI, (i, fun r -> let ts = mkSystem (List.map (fun mu ->
-      (mu, eval e (faceEnv mu ctx))) (solve r One)) in VPartialP (VSystem ts, r)))
-  | EPartialP (t, r)     -> VPartialP (eval t ctx, eval r ctx)
+      (mu, eval (faceEnv mu ctx) e)) (solve r One)) in VPartialP (VSystem ts, r)))
+  | EPartialP (t, r)     -> VPartialP (eval ctx t, eval ctx r)
   | ESystem xs           -> VSystem (evalSystem ctx xs)
-  | ESub (a, i, u)       -> VSub (eval a ctx, eval i ctx, eval u ctx)
-  | EInc (t, r)          -> VInc (eval t ctx, eval r ctx)
-  | EOuc e               -> ouc (eval e ctx)
-  | EGlue e              -> VGlue (eval e ctx)
-  | EGlueElem (r, u, a)  -> glue (eval r ctx) (eval u ctx) (eval a ctx)
-  | EUnglue (r, u, e)    -> unglue (eval r ctx) (eval u ctx) (eval e ctx)
+  | ESub (a, i, u)       -> VSub (eval ctx a, eval ctx i, eval ctx u)
+  | EInc (t, r)          -> VInc (eval ctx t, eval ctx r)
+  | EOuc e               -> ouc (eval ctx e)
+  | EGlue e              -> VGlue (eval ctx e)
+  | EGlueElem (r, u, a)  -> glue (eval ctx r) (eval ctx u) (eval ctx a)
+  | EUnglue (r, u, e)    -> unglue (eval ctx r) (eval ctx u) (eval ctx e)
   | EEmpty               -> VEmpty
-  | EIndEmpty e          -> VIndEmpty (eval e ctx)
+  | EIndEmpty e          -> VIndEmpty (eval ctx e)
   | EUnit                -> VUnit
   | EStar                -> VStar
-  | EIndUnit e           -> VIndUnit (eval e ctx)
+  | EIndUnit e           -> VIndUnit (eval ctx e)
   | EBool                -> VBool
   | EFalse               -> VFalse
   | ETrue                -> VTrue
-  | EIndBool e           -> VIndBool (eval e ctx)
-  | EW (a, (p, b))       -> let t = eval a ctx in W (t, (fresh p, closByVal ctx p t b))
-  | ESup (a, b)          -> VSup (eval a ctx, eval b ctx)
-  | EIndW (a, b, c)      -> VIndW (eval a ctx, eval b ctx, eval c ctx)
-  | EIm e                -> VIm (eval e ctx)
-  | EInf e               -> inf (eval e ctx)
-  | EJoin e              -> join (eval e ctx)
-  | EIndIm (a, b)        -> VIndIm (eval a ctx, eval b ctx)
+  | EIndBool e           -> VIndBool (eval ctx e)
+  | EW (a, (p, b))       -> let t = eval ctx a in W (t, (fresh p, closByVal ctx p t b))
+  | ESup (a, b)          -> VSup (eval ctx a, eval ctx b)
+  | EIndW (a, b, c)      -> VIndW (eval ctx a, eval ctx b, eval ctx c)
+  | EIm e                -> VIm (eval ctx e)
+  | EInf e               -> inf (eval ctx e)
+  | EJoin e              -> join (eval ctx e)
+  | EIndIm (a, b)        -> VIndIm (eval ctx a, eval ctx b)
 
 and appFormula v x = match v with
   | VPLam f -> app (f, x)
@@ -304,7 +304,7 @@ and closByVal ctx p t e v = traceClos e p v;
   let ctx' = match v with
   | Var (x, t) -> if Env.mem x ctx then ctx else upLocal ctx x t v
   | _          -> ctx in
-  eval e (upLocal ctx' p t v)
+  eval (upLocal ctx' p t v) e
 
 and app : value * value -> value = function
   (* J A C a φ a (ref a) ~> φ *)
@@ -338,14 +338,14 @@ and app : value * value -> value = function
     if mem x u then VApp (VApp (VIndIm (a, b), VLam (t, (x, g))), v) else u
   | f, x -> VApp (f, x)
 
-and evalSystem ctx = bimap (getRho ctx) (fun mu t -> eval t (faceEnv mu ctx))
+and evalSystem ctx = bimap (getRho ctx) (fun mu t -> eval (faceEnv mu ctx) t)
 
 and getRho ctx x = match Env.find_opt x ctx with
   | Some (_, _, Value v) -> v
-  | Some (_, _, Exp e)   -> eval e ctx
+  | Some (_, _, Exp e)   -> eval ctx e
   | None                 -> raise (VariableNotFound x)
 
-and appFormulaE ctx e i = eval (EAppFormula (e, i)) ctx
+and appFormulaE ctx e i = eval ctx (EAppFormula (e, i))
 
 (* This is part of evaluator, not type checker *)
 and inferV v = traceInferV v; match v with
@@ -596,19 +596,19 @@ and eqNf v1 v2 : unit = traceEqNF v1 v2;
   if conv v1 v2 then () else raise (Ineq (v1, v2))
 
 (* Type checker itself *)
-and lookup (x : name) (ctx : ctx) = match Env.find_opt x ctx with
+and lookup ctx x = match Env.find_opt x ctx with
   | Some (_, Value v, _) -> v
-  | Some (_, Exp e, _)   -> eval e ctx
+  | Some (_, Exp e, _)   -> eval ctx e
   | None                 -> raise (VariableNotFound x)
 
 and check ctx (e0 : exp) (t0 : value) =
   traceCheck e0 t0; try match e0, t0 with
   | ELam (a, (p, b)), VPi (t, (_, g)) ->
-    ignore (extSet (infer ctx a)); eqNf (eval a ctx) t;
+    ignore (extSet (infer ctx a)); eqNf (eval ctx a) t;
     let x = Var (p, t) in let ctx' = upLocal ctx p t x in check ctx' b (g x)
   | EPair (r, e1, e2), VSig (t, (p, g)) ->
     ignore (extSet (inferV t)); check ctx e1 t;
-    check ctx e2 (g (eval e1 ctx));
+    check ctx e2 (g (eval ctx e1));
     begin match p with
       | Name (v, _) -> r := Some v
       | Irrefutable -> ()
@@ -616,8 +616,8 @@ and check ctx (e0 : exp) (t0 : value) =
   | EHole, v -> traceHole v ctx
   | EPLam (ELam (EI, (i, e))), VApp (VApp (VPathP p, u0), u1) ->
     let v = Var (i, VI) in let ctx' = upLocal ctx i VI v in
-    let v0 = eval e (upLocal ctx i VI vzero) in
-    let v1 = eval e (upLocal ctx i VI vone) in
+    let v0 = eval (upLocal ctx i VI vzero) e in
+    let v1 = eval (upLocal ctx i VI vone) e in
     check ctx' e (appFormula p v); eqNf v0 u0; eqNf v1 u1
   | e, VPre u -> begin
     match infer ctx e with
@@ -625,7 +625,7 @@ and check ctx (e0 : exp) (t0 : value) =
     | t -> raise (Ineq (VPre u, t))
   end
   | ESystem ts, VPartialP (u, i) ->
-    eqNf (eval (getFormula ts) ctx) i;
+    eqNf (eval ctx (getFormula ts)) i;
     System.iter (fun alpha e ->
       check (faceEnv alpha ctx) e
         (app (upd alpha u, VRef vone))) ts;
@@ -638,111 +638,111 @@ and checkOverlapping ctx ts =
     System.iter (fun beta e2 ->
       if comparable alpha beta then
         let ctx' = faceEnv (meet alpha beta) ctx in
-        eqNf (eval e1 ctx') (eval e2 ctx')
+        eqNf (eval ctx' e1) (eval ctx' e2)
       else ()) ts) ts
 
 and infer ctx e : value = traceInfer e; match e with
-  | EVar x -> lookup x ctx
+  | EVar x -> lookup ctx x
   | EKan u -> VKan (Z.succ u)
   | ESig (a, (p, b)) | EPi (a, (p, b)) | EW (a, (p, b)) -> inferTele ctx p a b
   | ELam (a, (p, b)) -> inferLam ctx p a b
   | EPLam (ELam (EI, (i, e))) ->
     let ctx' = upLocal ctx i VI (Var (i, VI)) in ignore (infer ctx' e);
-    let g = fun j -> eval e (upLocal ctx i VI j) in
+    let g = fun j -> eval (upLocal ctx i VI j) e in
     let t = VLam (VI, (freshName "ι", g >> inferV)) in
     VApp (VApp (VPathP (VPLam t), g vzero), g vone)
   | EApp (f, x) -> begin match infer ctx f with
-    | VPartialP (t, i) -> check ctx x (isOne i); app (t, eval x ctx)
-    | VPi (t, (_, g)) -> check ctx x t; g (eval x ctx)
+    | VPartialP (t, i) -> check ctx x (isOne i); app (t, eval ctx x)
+    | VPi (t, (_, g)) -> check ctx x t; g (eval ctx x)
     | v -> raise (ExpectedPi v)
   end
   | EFst e -> fst (extSigG (infer ctx e))
-  | ESnd e -> let (_, (_, g)) = extSigG (infer ctx e) in g (vfst (eval e ctx))
+  | ESnd e -> let (_, (_, g)) = extSigG (infer ctx e) in g (vfst (eval ctx e))
   | EField (e, p) -> inferField ctx p e
   | EPre u -> VPre (Z.succ u)
   | EPathP p -> inferPath ctx p
   | EPartial e -> let n = extSet (infer ctx e) in implv VI (VPre n)
   | EPartialP (u, r0) -> check ctx r0 VI; let t = infer ctx u in
   begin match t with
-    | VPartialP (ts, r) -> eqNf r (eval r0 ctx); inferV (inferV ts)
+    | VPartialP (ts, r) -> eqNf r (eval ctx r0); inferV (inferV ts)
     | _ -> failwith "Expected partial function into universe"
   end
   | EAppFormula (f, x) -> check ctx x VI;
     let (p, _, _) = extPathP (infer ctx f) in
-    appFormula p (eval x ctx)
+    appFormula p (eval ctx x)
   | ETransp (p, i) -> inferTransport ctx p i
-  | EHComp (e, i, u, u0) -> let t = eval e ctx in let r = eval i ctx in
+  | EHComp (e, i, u, u0) -> let t = eval ctx e in let r = eval ctx i in
     ignore (extKan (infer ctx e)); check ctx i VI;
     check ctx u (implv VI (partialv t r)); check ctx u0 t;
     List.iter (fun phi -> let ctx' = faceEnv phi ctx in
-      eqNf (eval (hcompval u) ctx') (eval u0 ctx')) (solve r One); t
+      eqNf (eval ctx' (hcompval u)) (eval ctx' u0)) (solve r One); t
   | ESub (a, i, u) -> let n = extSet (infer ctx a) in check ctx i VI;
-    check ctx u (partialv (eval a ctx) (eval i ctx)); VPre n
+    check ctx u (partialv (eval ctx a) (eval ctx i)); VPre n
   | EI -> VPre Z.zero | EDir _ -> VI
   | ENeg e -> check ctx e VI; VI
   | EOr (e1, e2) | EAnd (e1, e2) -> check ctx e1 VI; check ctx e2 VI; VI
-  | EId e -> let v = eval e ctx in let n = extSet (infer ctx e) in implv v (implv v (VPre n))
-  | ERef e -> let v = eval e ctx in let t = infer ctx e in VApp (VApp (VId t, v), v)
-  | EJ e -> inferJ (eval e ctx) (infer ctx e)
-  | EInc (e, r) -> ignore (extKan (infer ctx e)); check ctx r VI; inferInc (eval e ctx) (eval r ctx)
+  | EId e -> let v = eval ctx e in let n = extSet (infer ctx e) in implv v (implv v (VPre n))
+  | ERef e -> let v = eval ctx e in let t = infer ctx e in VApp (VApp (VId t, v), v)
+  | EJ e -> inferJ (eval ctx e) (infer ctx e)
+  | EInc (e, r) -> ignore (extKan (infer ctx e)); check ctx r VI; inferInc (eval ctx e) (eval ctx r)
   | EOuc e -> begin match infer ctx e with
     | VSub (t, _, _) -> t
     | _ -> raise (ExpectedSubtype e)
   end
   | ESystem ts -> checkOverlapping ctx ts;
     VPartialP (VSystem (System.mapi (fun mu -> infer (faceEnv mu ctx)) ts),
-               eval (getFormula ts) ctx)
-  | EGlue e -> ignore (extKan (infer ctx e)); inferGlue (eval e ctx)
-  | EGlueElem (e, u0, a) -> check ctx e VI; let r = eval e ctx in let t = infer ctx a in
-    check ctx u0 (partialv (equivPtSingl t) r); let u = eval u0 ctx in
+               eval ctx (getFormula ts))
+  | EGlue e -> ignore (extKan (infer ctx e)); inferGlue (eval ctx e)
+  | EGlueElem (e, u0, a) -> check ctx e VI; let r = eval ctx e in let t = infer ctx a in
+    check ctx u0 (partialv (equivPtSingl t) r); let u = eval ctx u0 in
     (* Γ, φ ⊢ a ≡ f t where u = [φ ↦ (T, (f, e), t)] *)
     List.iter (fun mu -> let v = app (upd mu u, VRef vone) in let f = vfst (vfst (vsnd v)) in
-      eqNf (eval a (faceEnv mu ctx)) (app (f, vsnd (vsnd v)))) (solve r One);
+      eqNf (eval (faceEnv mu ctx) a) (app (f, vsnd (vsnd v)))) (solve r One);
     inferGlueElem r u t
   | EUnglue (r, u, e) -> let (t, r', u') = extGlue (infer ctx e) in
-    eqNf (eval r ctx) r'; eqNf (eval u ctx) u'; t
+    eqNf (eval ctx r) r'; eqNf (eval ctx u) u'; t
   | EEmpty | EUnit | EBool -> VKan Z.zero
   | EStar -> VUnit | EFalse | ETrue -> VBool
-  | EIndEmpty e -> ignore (extSet (infer ctx e)); implv VEmpty (eval e ctx)
+  | EIndEmpty e -> ignore (extSet (infer ctx e)); implv VEmpty (eval ctx e)
   | EIndUnit e -> inferInd false ctx VUnit e recUnit
   | EIndBool e -> inferInd false ctx VBool e recBool
-  | ESup (a, b) -> let t = eval a ctx in ignore (extSet (infer ctx a));
+  | ESup (a, b) -> let t = eval ctx a in ignore (extSet (infer ctx a));
     let (t', (p, g)) = extPiG (infer ctx b) in eqNf t t';
     ignore (extSet (g (Var (p, t))));
-    inferSup t (eval b ctx)
-  | EIndW (a, b, c) -> let t = eval a ctx in ignore (extSet (infer ctx a));
+    inferSup t (eval ctx b)
+  | EIndW (a, b, c) -> let t = eval ctx a in ignore (extSet (infer ctx a));
     let (t', (p, g)) = extPiG (infer ctx b) in
     eqNf t t'; ignore (extSet (g (Var (p, t))));
 
     let (w', (q, h)) = extPiG (infer ctx c) in
-    eqNf (wtype t (eval b ctx)) w';
+    eqNf (wtype t (eval ctx b)) w';
     ignore (extSet (h (Var (q, w'))));
 
-    inferIndW t (eval b ctx) (eval c ctx)
+    inferIndW t (eval ctx b) (eval ctx c)
   | EIm e -> let t = infer ctx e in ignore (extSet t); t
   | EInf e -> VIm (infer ctx e)
   | EJoin e -> let t = extIm (infer ctx e) in ignore (extIm t); t
-  | EIndIm (a, b) -> ignore (extSet (infer ctx a)); let t = eval a ctx in
+  | EIndIm (a, b) -> ignore (extSet (infer ctx a)); let t = eval ctx a in
     let (c, (x, g)) = extPiG (infer ctx b) in eqNf (VIm t) c;
-    ignore (extSet (g (Var (x, c)))); inferIndIm t (eval b ctx)
+    ignore (extSet (g (Var (x, c)))); inferIndIm t (eval ctx b)
   | EPLam _ | EPair _ | EHole -> raise (InferError e)
 
 and inferInd fibrant ctx t e f =
   let (t', (p, g)) = extPiG (infer ctx e) in eqNf t t'; let k = g (Var (p, t)) in
-  ignore (if fibrant then extKan k else extSet k); f (eval e ctx)
+  ignore (if fibrant then extKan k else extSet k); f (eval ctx e)
 
-and inferField ctx p e = snd (getField p (eval e ctx) (infer ctx e))
+and inferField ctx p e = snd (getField p (eval ctx e) (infer ctx e))
 
 and inferTele ctx p a b =
   ignore (extSet (infer ctx a));
-  let t = eval a ctx in let x = Var (p, t) in
+  let t = eval ctx a in let x = Var (p, t) in
   let ctx' = upLocal ctx p t x in
   let v = infer ctx' b in imax (infer ctx a) v
 
 and inferLam ctx p a e =
-  ignore (extSet (infer ctx a)); let t = eval a ctx in
+  ignore (extSet (infer ctx a)); let t = eval ctx a in
   ignore (infer (upLocal ctx p t (Var (p, t))) e);
-  VPi (t, (p, fun x -> inferV (eval e (upLocal ctx p t x))))
+  VPi (t, (p, fun x -> inferV (eval (upLocal ctx p t x) e)))
 
 and inferPath ctx p =
   let (_, t0, t1) = extPathP (infer ctx p) in
@@ -763,5 +763,5 @@ and inferTransport ctx p i =
   (* Check that p is constant at i = 1 *)
   List.iter (fun phi -> let rho = faceEnv phi ctx' in
     eqNf (appFormulaE rho p ezero) (appFormulaE rho p e))
-    (solve (eval i ctx) One);
+    (solve (eval ctx i) One);
   implv u0 u1

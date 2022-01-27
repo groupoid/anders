@@ -14,6 +14,7 @@ import library/mathematics/analysis/real
 import library/mathematics/categories/category
 import library/mathematics/categories/functor
 import library/mathematics/categories/abelian
+import library/mathematics/categories/groupoid
 import library/mathematics/topoi/topos
 import library/mathematics/meta/buddhism
 import library/mathematics/meta/impredicative

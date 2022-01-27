@@ -1,5 +1,5 @@
-module ab where
-import library/mathematics/categories/cat
+module abelian where
+import library/mathematics/categories/category
 
 def zeroObject(C: precategory) (X: C.C.ob): U₁ := Σ
     (bot: isInitial C X)

@@ -9,8 +9,8 @@
    Copyright (c) Groupoid Infinity, 2014-2022. -}
 
 module topos where
-import library/mathematics/categories/cat
-import library/mathematics/categories/fun
+import library/mathematics/categories/category
+import library/mathematics/categories/functor
 import library/foundations/mltt/pi
 
 def epi (P: precategory) (X Y: P.C.ob) (f: P.C.hom X Y): U := Π (Z: P.C.ob) (g1 g2: P.C.hom Y Z),

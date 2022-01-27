@@ -9,7 +9,7 @@
 
    Copyright (c) Groupoid Infinity, 2014-2022. -}
 
-module cat where
+module category where
 import library/foundations/univalent/path
 option irrelevance true
 

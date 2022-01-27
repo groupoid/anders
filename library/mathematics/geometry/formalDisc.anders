@@ -1,0 +1,42 @@
+{- The modality of shape infinitesimal in cohesive infinity topos.
+   - \Im modality type.
+
+   Felix Cherubini PhD
+
+   https://arxiv.org/pdf/1806.05966.pdf
+
+   Copyright (c) Groupoid Infinity, 2014-2022. -}
+
+module formalDisc where
+import library/foundations/univalent/path
+import library/foundations/univalent/iso
+import library/foundations/modal/infinitesimal
+
+def ~ (X : U) (a x′ : X) : U := Path (ℑ X) (ι X a) (ι X x′)
+def 𝔻 (X : U) (a : X) : U := Σ (x′ : X), ~ X a x′
+def unitDisc (X : U) (x : ℑ X) : U := Σ (x′ : X), Path (ℑ X) x (ι X x′)
+def starDisc (X : U) (x : X) : 𝔻 X x := (x, idp (ℑ X) (ι X x))
+def T∞ (A : U) : U := Σ (a : A), 𝔻 A a
+def inf-prox-ap (X Y : U) (f : X → Y) (x x′ : X) (p : ~ X x x′) : ~ Y (f x) (f x′) := <i> ℑ-app X Y f (p @ i)
+def d (X Y : U) (f : X → Y) (x : X) (ε : 𝔻 X x) : 𝔻 Y (f x) := (f ε.1, inf-prox-ap X Y f x ε.1 ε.2)
+def T∞-map (X Y : U) (f : X → Y) (τ : T∞ X) : T∞ Y := (f τ.1, d X Y f τ.1 τ.2)
+def is-homogeneous (A : U) := Σ (e : A) (t : A → equiv A A), Π (x : A), Path A ((t x).1 e) x
+
+lemma inf-prox-comp (X Y Z : U) (f : Y → Z) (g : X → Y) (x x′ : X) (p : ~ X x x′)
+    : Path (~ Z (f (g x)) (f (g x′)))
+           (inf-prox-ap X Z (∘ X Y Z f g) x x′ p)
+           (inf-prox-ap Y Z f (g x) (g x′) (inf-prox-ap X Y g x x′ p))
+   := <i j> ℑ-app-comp X Y Z f g (p @ j) @ i
+
+theorem diff-comp (A B C : U) (f : A → B) (g : B → C) (x : A)
+      : Path ((𝔻 A x → 𝔻 C ((∘ A B C g f) x))) (d A C (∘ A B C g f) x)
+             (∘ (𝔻 A x) (𝔻 B (f x)) (𝔻 C (g (f x))) (d B C g (f x)) (d A B f x))
+     := <i> λ (ε : 𝔻 A x), (g (f ε.1), inf-prox-comp A B C g f x ε.1 ε.2 @ i)
+
+def ∞-unital-magma (X : U) := Σ (e : X) (μ : X → X → X), Π (x : X), Path X (μ e x) x × Path X (μ x e) x
+def is-left-invertible  (X : U) (M : ∞-unital-magma X) := Π (a : X), isEquiv X X (λ (x : X), M.μ x a)
+def is-right-invertible (X : U) (M : ∞-unital-magma X) := Π (a : X), isEquiv X X (M.μ a)
+
+def H-space   := Σ (X : U), ∞-unital-magma X
+def LIH-space := Σ (X : U) (M : ∞-unital-magma X), is-left-invertible X M
+def RIH-space := Σ (X : U) (M : ∞-unital-magma X), is-right-invertible X M

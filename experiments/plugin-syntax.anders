@@ -1,0 +1,22 @@
+module plugin-syntax where
+
+plugin _build/src/tactics/tactics
+
+def test (y : 𝟏) : 𝟐 → 𝟐 :=
+begin
+  tac1 some args,
+  tac2 alternative arguments
+       in multiple lines
+
+  a r b i t
+    r a r
+      y
+    t e x t
+
+    keywords:
+      indᵂ hcomp transp Glue glue unglue
+      option def begin theorem lemma
+
+  ) ( > < ) (
+  < > ( ) ] [
+end

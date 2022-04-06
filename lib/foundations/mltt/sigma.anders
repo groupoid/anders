@@ -1,0 +1,27 @@
+module sigma where
+import lib/foundations/univalent/path
+
+def Sigma (A : U) (B : A → U) : U := summa (x: A), B x
+def prod (A B : U) : U := summa (_ : A), B
+def pair (A: U) (B: A → U) (a: A) (b: B a) : Sigma A B ≔ (a, b)
+def pr₁ (A: U) (B: A → U) (x: Sigma A B) : A ≔ x.1
+def pr₂ (A: U) (B: A → U) (x: Sigma A B) : B (pr₁ A B x) ≔ x.2
+def Σ-β₁ (A : U) (B : A → U) (a : A) (b : B a) : Path A a (pr₁ A B (a ,b)) ≔ idp A a
+def Σ-β₂ (A : U) (B : A → U) (a : A) (b : B a) : Path (B a) b (pr₂ A B (a, b)) ≔ idp (B a) b
+def Σ-η (A : U) (B : A → U) (p : Sigma A B) : Path (Sigma A B) p (pr₁ A B p, pr₂ A B p) ≔ idp (Sigma A B) p
+
+def Sigma-rec (A: U) (B: A -> U) (C: U) (g: Π (x: A), B(x) -> C) (p: Σ (x: A), B x): C := g p.1 p.2
+def Sigma-ind (A : U) (B : A -> U) (C : Π (s: Σ (x: A), B x), U) 
+    (g: Π (x: A) (y: B x), C (x,y)) (p: Σ (x: A), B x) : C p := g p.1 p.2
+
+def ac (A B: U) (R: A -> B -> U) (g: Π (x: A), Σ (y: B), R x y) : Σ (f: A -> B), Π (x: A), R x (f x) := (\(i:A),(g i).1,\(j:A),(g j).2)
+def total (A:U) (B C : A -> U) (f : Π (x:A), B x -> C x) (w: Σ(x: A), B x) : Σ(x: A), C x := (w.1,f (w.1) (w.2))
+
+def funDepTr (A: U) (P: A -> U) (a0 a1: A) (p: PathP (<_>A) a0 a1) (u0: P a0) (u1: P a1)
+  : PathP (<_>U) (PathP (<i> P (p @ i)) u0 u1) (PathP (<_>P a1) (hcomp (P a1) 0 (λ (k : I), []) (transp (<i> P (p @ i)) 0 u0)) u1)
+ := <j> PathP (<i> P (p @ j \/ i)) (comp (\(i:I), P (p @ j /\ i)) -j (\(k: I), [(j = 0) -> u0 ]) (inc (P a0) -j u0)) u1
+
+def pathSig0 (A: U) (P: A -> U) (t u: Σ (x: A), P x) (p: PathP (<_>A) t.1 u.1)
+  : PathP (<_>U) (PathP (<i>P (p @ i)) t.2 u.2) (PathP (<_>P u.1) (hcomp (P u.1) 0 (λ(k:I),[]) (transp (<i> P (p @ i)) 0 t.2)) u.2)
+ := funDepTr A P t.1 u.1 p t.2 u.2
+

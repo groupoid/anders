@@ -1,0 +1,13 @@
+module vec where
+import experiments/church
+
+def vec (α : U) (n : N) : U₁
+ := Π (μ : N → U), μ N0 → (Π (n : N), α → μ n → μ (succ n)) → μ n
+
+def vnil (α : U) : vec α N0
+ := λ (μ : N -> U) (n : μ N0) (c : Π (n : N), α → μ n → μ (succ n)), n
+
+def vcons (α : U) (n : N) (x : α) (xs : vec α n) : vec α (succ n)
+ := λ (μ : N -> U) (s : μ N0) (c : Π (n : N), α → μ n → μ (succ n)), c n x (xs μ s c)
+
+axiom //~ : U

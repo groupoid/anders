@@ -1,0 +1,11 @@
+module axioms where
+import library/leibniz
+
+axiom T : U
+axiom t₁ : T
+axiom t₂ : T
+
+lemma refl-t₁ : eq T t₁ t₁ := refl T t₁
+
+-- fails
+--lemma t₁-eq-t₂ : eq T t₁ t₂ := refl T t₁

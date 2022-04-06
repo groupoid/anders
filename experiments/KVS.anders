@@ -1,0 +1,16 @@
+module KVS where
+import experiments/BASE
+
+axiom get : Π (f k v: U), f -> k -> IO (Maybe v)
+axiom put : Π (r: U), r -> IO StoreResult
+axiom delete : Π (f k: U), f -> k -> StoreResult
+axiom index : Π (f p v r: U), f -> Atom -> v -> List r
+
+axiom next : Reader -> IO Reader
+axiom prev : Reader -> IO Reader
+axiom take : Reader -> IO Reader
+axiom drop : Reader -> IO Reader
+axiom save : Reader -> IO Reader
+axiom append : Π (f r: U), f -> r -> IO StoreResult
+axiom remove : Π (f r: U), f -> r -> IO StoreResult
+

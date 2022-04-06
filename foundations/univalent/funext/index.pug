@@ -1,0 +1,64 @@
+include ../../../header
+
+html
+    head
+        meta(property='og:title'       content='FUNEXT')
+        meta(property='og:description' content='Functional Extensionality')
+        meta(property='og:url'         content='https://anders.groupoid.space/foundations/univalent/funext/')
+
+block title
+    title FUNEXT
+
+block content
+    nav
+        <a href='https://anders.groupoid.space/'>HTS</a>
+        <a href='https://anders.groupoid.space/lib/'>LIB</a>
+        <a href='#'>FUNEXT</a>
+    article.main
+        .exe
+            section
+                h1 FUNEXT
+
+        aside
+            time Published: 25 JUL 2018
+        .exe
+            section
+                p.
+                    From the categorical point of view functioncal extensionality
+                    validates full universal property in LCCC in contrast to weak one.
+
+                h2 Constructors
+                code.
+                    funext (A B: U) (f g: A -> B)
+                           (p: (x:A) -> Path B (f x) (g x))
+                         : Path (A -> B) f g
+                p.
+
+                h2 Elimination
+                code.
+                    happly (A B: U) (f g: A -> B) (p: Path (A -> B) f g) (x: A)
+                         : Path B (f x) (g x)
+                p.
+
+                h2 Computation
+                code.
+                    funext_Beta (A B: U) (f g: A -> B)
+                                (p: (x:A) -> Path B (f x) (g x))
+                              : (x:A) -> Path B (f x) (g x)
+                p.
+
+                h2 Uniqueness
+                code.
+                    funext_Eta (A B: U) (f g: A -> B)
+                               (p: Path (A -> B) f g)
+                             : Path (Path (A -> B) f g) (funext A B f g (happly A B f g p)) p
+                p.
+
+                h2 Dependent Version
+                code.
+                    piext (A: U) (B: A -> U) (f g: (x: A) -> B x)
+                          (p: (x: A) -> Path (B x) (f x) (g x))
+                        : Path ((y: A) -> B y) f g
+                p.
+
+include ../../../footer

@@ -1,0 +1,39 @@
+{- Category Theory.
+   - Categorical Groupoid.
+
+   HoTT 9.9 The Rezk completion
+
+   Copyright (c) Groupoid Infinity, 2014-2022. -}
+
+module groupoid where
+import lib/foundations/univalent/path
+import lib/mathematics/categories/category
+option irrelevance true
+
+def PathCat (X: U): cat := (X, \ (x y : X), PathP (<_>X) x y, star)
+
+def isCatGroupoid (C: cat): U := Σ
+    (id: Π (x: C.ob), C.hom x x)
+    (c: Π (x y z:C.ob), C.hom x y -> C.hom y z -> C.hom x z)
+    (HomSet: Π (x y: C.ob), isSet (C.hom x y))
+    (inv: Π (x y: C.ob), C.hom x y -> C.hom y x)
+    (inv-left: Π (x y: C.ob) (p: C.hom x y), Path (C.hom x x) (c x y x p (inv x y p)) (id x))
+    (inv-right: Π (x y: C.ob) (p: C.hom x y), Path (C.hom y y) (c y x y (inv x y p) p) (id y))
+    (left: Π (x y: C.ob) (f: C.hom x y), Path (C.hom x y) f (c x x y (id x) f))
+    (right: Π (x y: C.ob) (f: C.hom x y), Path (C.hom x y) f (c x y y f (id y)))
+    (assoc: Π (x y z w: C.ob) (f: C.hom x y) (g: C.hom y z) (h: C.hom z w),
+      Path (C.hom x w) (c x z w (c x y z f g) h) (c x y w f (c y z w g h))), unit
+
+def CatGroupoid (X : U) (G : isGroupoid X)
+  : isCatGroupoid (PathCat X)
+ := ( idp X,
+      comp-Path X,
+      G,
+      sym X,
+      comp-inv-Path⁻¹ X,
+      comp-inv-Path X,
+      comp-Path-left X,
+      comp-Path-right X,
+      comp-Path-assoc X,
+      star
+    )

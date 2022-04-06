@@ -1,0 +1,15 @@
+module illtyped where
+import library/foundations/univalent/equiv
+
+def G (A B : U) (p : PathP (<_> U) A B) (r : I)
+    (e : Π (i : I), equiv A (p @ i)) (φ : I) : U
+ := Glue (p @ φ) r [(r = 1) → (A, e φ)]
+
+def transp-G (A B : U) (p : PathP (<_> U) A B) (r : I)
+    (e : Π (i : I), equiv A (p @ i))
+ := transp (<i> G A B p r e i) r
+
+def f (A B : U) (p : PathP (<_> U) A B) (r : I)
+    (e : Π (i : I), equiv A (p @ i)) (g₀ : G A B p r e 0) : B
+ := unglue r [(r = 1) → (A, e 1)] (transp-G A B p r e g₀)
+

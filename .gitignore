@@ -1,0 +1,3 @@
+_build/*
+*.native
+node_modules/*

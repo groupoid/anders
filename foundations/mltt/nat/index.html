@@ -1,0 +1,48 @@
+<!DOCTYPE html><html><head><meta charset="utf-8"><meta http-equiv="x-ua-compatible" content="ie=edge"><meta property="fb:app_id" content="118554188236439"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="author" content="Maxim Sokhatsky"><meta name="twitter:site" content="@5HT"><meta name="twitter:creator" content="@5HT"><meta property="og:type" content="website"><meta property="og:image" content="https://avatars.githubusercontent.com/u/17128096?s=400&amp;u=66a63d4cdd9625b2b4b37d724cc00fe6401e5bd8&amp;v=4"><meta name="msapplication-TileColor" content="#ffffff"><meta name="msapplication-TileImage" content="https://anders.groupoid.space/images/ms-icon-144x144.png"><meta name="theme-color" content="#ffffff"><link rel="stylesheet" href="https://anders.groupoid.space/main.css?v=1"><link rel="apple-touch-icon" sizes="57x57" href="https://anders.groupoid.space/images/apple-icon-57x57.png"><link rel="apple-touch-icon" sizes="60x60" href="https://anders.groupoid.space/images/apple-icon-60x60.png"><link rel="apple-touch-icon" sizes="72x72" href="https://anders.groupoid.space/images/apple-icon-72x72.png"><link rel="apple-touch-icon" sizes="76x76" href="https://anders.groupoid.space/images/apple-icon-76x76.png"><link rel="apple-touch-icon" sizes="114x114" href="https://anders.groupoid.space/images/apple-icon-114x114.png"><link rel="apple-touch-icon" sizes="120x120" href="https://anders.groupoid.space/images/apple-icon-120x120.png"><link rel="apple-touch-icon" sizes="144x144" href="https://anders.groupoid.space/images/apple-icon-144x144.png"><link rel="apple-touch-icon" sizes="152x152" href="https://anders.groupoid.space/images/apple-icon-152x152.png"><link rel="apple-touch-icon" sizes="180x180" href="https://anders.groupoid.space/images//apple-icon-180x180.png"><link rel="icon" type="image/png" sizes="192x192" href="https://anders.groupoid.space/images/android-icon-192x192.png"><link rel="icon" type="image/png" sizes="32x32" href="https://anders.groupoid.space/images/favicon-32x32.png"><link rel="icon" type="image/png" sizes="96x96" href="https://anders.groupoid.space/images/favicon-96x96.png"><link rel="icon" type="image/png" sizes="16x16" href="https://anders.groupoid.space/images/favicon-16x16.png"><link rel="manifest" href="https://anders.groupoid.space/images/manifest.json"><style>svg a{fill:blue;stroke:blue}
+[data-mml-node="merror"]>g{fill:red;stroke:red}
+[data-mml-node="merror"]>rect[data-background]{fill:yellow;stroke:none}
+[data-frame],[data-line]{stroke-width:70px;fill:none}
+.mjx-dashed{stroke-dasharray:140}
+.mjx-dotted{stroke-linecap:round;stroke-dasharray:0,140}
+use[data-c]{stroke-width:3px}
+</style></head><body class="content"></body></html><html><head><meta property="og:title" content="NAT"><meta property="og:description" content="Natural Numbers"><meta property="og:url" content="https://anders.groupoid.space/foundations/mltt/nat/"></head></html><title>NAT</title><nav><a href='https://anders.groupoid.space/'>HTS</a>
+<a href='https://anders.groupoid.space/lib/'>LIB</a>
+<a href='#'>NAT</a></nav><article class="main list"><div class="exe"><section><h1>NATURAL NUMBERS</h1><aside><time>Published: 29 JAN 2022</time></aside><p>Pointed Unary System is a category $Nat$ with the terminal object and a
+carrier nat having morphism $[zero: 1 → Nat, succ: Nat → Nat]$.
+The initial object of $Nat$ is called Natural Number Object and models
+Peano axiom set.</p><p>In type theory $ℕ$ type could be expressed as
+$$
+  ℕ^W = W_{(x:2)},\ rec_2(U, 0, 1, x).
+$$</p><code>def ℕ := W (x : 𝟐), ind₂ (λ (_ : 𝟐), U) 𝟎 𝟏 x
+def ℕ-ctor := ind₂ (λ (_ : 𝟐), U) 𝟎 𝟏
+</code><h2>Constructors</h2><p>Type $ℕ$ provides two way of creating numbers: by $zero$ and $succ$ constructors.</p><code>def zero : ℕ := sup 𝟐 ℕ-ctor 0₂ (ind₀ ℕ)
+def succ (n : ℕ) : ℕ := sup 𝟐 ℕ-ctor 1₂ (λ (x : 𝟏), n)
+</code><h2>Eliminators</h2><p>The induction principle is derivable in CCHM with W-types:
+$$
+   ind^ℕ = ind^W(2,rec^2(U,0,1),C,ind^2(x,y,z)).
+$$</p><code>def ℕ-ind (C : ℕ → U) (z : C zero)
+    (s : Π (n : ℕ), C n → C (succ n)) : Π (n : ℕ), C n
+ := indᵂ 𝟐 ℕ-ctor C
+         (ind₂ (λ (x : 𝟐), Π (f : ℕ-ctor x → ℕ),
+                  (Π (b : ℕ-ctor x), C (f b)) → C (sup 𝟐 ℕ-ctor x f))
+               (λ (f : 𝟎 → ℕ) (g : Π (x : 𝟎), C (f x)), 𝟎⟶ℕ C f z)
+               (λ (f : 𝟏 → ℕ) (g : Π (x : 𝟏), C (f x)), 𝟏⟶ℕ C f (s (f ★) (g ★))))
+</code><p>Non-dependent versions:</p><code>def ℕ-rec (C : U) (z : C) (s : ℕ → C → C) : ℕ → C := ℕ-ind (λ (_ : ℕ), C) z s
+def ℕ-iter (C : U) (z : C) (s : C → C) : ℕ → C := ℕ-rec C z (λ (_ : ℕ), s)
+def ℕ-case (C : U) (z s : C) : ℕ → C := ℕ-iter C z (λ (_ : C), s)
+</code></section><section><h2>Transformations</h2><p></p><code>def plus : ℕ → ℕ → ℕ
+ := ℕ-iter (ℕ → ℕ) (idfun ℕ) (∘ ℕ ℕ ℕ succ)
+
+def mult : ℕ → ℕ → ℕ
+ := ℕ-rec (ℕ → ℕ) (λ (_: ℕ), zero)
+          (λ (_: ℕ) (x: ℕ → ℕ) (m: ℕ), plus m (x m))
+</code></section><section><h2>Theorems</h2><p></p><code>def add_zero (n : ℕ) : Path ℕ (add zero n) n
+def add_suc (a : ℕ) (n : ℕ) : Path ℕ (add (suc a) n) (suc (add a n))
+def add_comm (a : ℕ) (n : ℕ) : Path ℕ (add a n) (add n a)
+def assocAdd (a b : ℕ) (c : ℕ) : Path ℕ (add a (add b c)) (add (add a b) c)
+def sucInj (n m : ℕ) (p : Path ℕ (suc n) (suc m)) : Path ℕ n m
+def add_comm3 (a b c : nat) : Path ℕ (add a (add b c)) (add c (add b a))
+def caseNat (A : U) (z s : A) : ℕ -> A
+def natDec (n m : ℕ) : dec (Path ℕ n m)
+def natSet : isSet ℕ
+</code></section></div></article><footer class="footer"><a href="https://5ht.co/license/"><img class="footer__logo" src="https://longchenpa.guru/seal.png" width="50"></a><span class="footer__copy">2021&mdash;2022 &copy; <a href="//groupoid.space/" style="color:Lavender;">Groupoïd Infinity</a></span></footer>

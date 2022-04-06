@@ -1,0 +1,48 @@
+{- Topos Theory: https://anders.groupoid.space/mathematics/topoi/topos
+   - Category, Pullback, Mono, Epi, Set, subobjectClassifier, CCC;
+   - setSig, setPi, SET, Path;
+   - Topos, Set Topos.
+
+   http://www.ams.org/notices/200409/what-is-illusie.pdf
+
+   Copyright (c) Groupoid Infinity, 2014-2022. -}
+
+module topos where
+import lib/mathematics/categories/category
+import lib/mathematics/categories/functor
+import lib/foundations/mltt/pi
+
+def epi (P: precategory) (X Y: P.C.ob) (f: P.C.hom X Y): U := Π (Z: P.C.ob) (g1 g2: P.C.hom Y Z),
+    Path (P.C.hom X Z) (P.P.∘ X Y Z f g1) (P.P.∘ X Y Z f g2) -> Path (P.C.hom Y Z) g1 g2
+
+def mono (P: precategory) (Y Z: P.C.ob) (f: P.C.hom Y Z): U := Π (X: P.C.ob) (g1 g2: P.C.hom X Y),
+    Path (P.C.hom X Z) (P.P.∘ X Y Z g1 f) (P.P.∘ X Y Z g2 f) -> Path (P.C.hom X Y) g1 g2
+
+def subobjectClassifier (C: precategory): U := Σ
+    (omega: C.C.ob)
+    (end: terminal C)
+    (trueHom: C.C.hom end.top omega)
+    (xi: Π (Y X: C.C.ob) (j: C.C.hom Y X), C.C.hom X omega)
+    (square: Π (Y X: C.C.ob) (j: C.C.hom Y X), mono C Y X j -> hasPullback C (omega,(end.top,trueHom),(X,xi Y X j))),
+    Π (Y X: C.C.ob) (j: C.C.hom Y X) (k: C.C.hom X omega),
+    (mono C Y X j) -> (hasPullback C (omega,(end.top,trueHom),(X,k))) -> (Path (C.C.hom X omega) (xi Y X j) k)
+
+def isCCC (C: precategory): U := Σ
+    (Exp: Π (A B: C.C.ob), C.C.ob)
+    (Prod: Π (A B: C.C.ob), C.C.ob)
+    (Apply: Π (A B: C.C.ob), C.C.hom (Prod (Exp A B) A) B)
+    (P1: Π (A B: C.C.ob), C.C.hom (Prod A B) A)
+    (P2: Π (A B: C.C.ob), C.C.hom (Prod A B) B), terminal C
+
+axiom Set : precategory
+axiom cartesianClosed : isCCC Set
+axiom hasSubobject : subobjectClassifier Set
+
+def Topos (cat: precategory) : U := Σ (cartesianClosed: isCCC cat), subobjectClassifier cat
+def internal : Topos Set := (cartesianClosed,hasSubobject)
+def presheaf (C: precategory): U := catfunctor (catᵒᵖ C) Set
+def Co (C: precategory) (cod: C.C.ob) : U := Σ (dom: C.C.ob), C.C.hom dom cod
+def Delta (C: precategory) (d: C.C.ob) : U₁ := Σ (index: U), index -> Co C d
+def Coverage (C: precategory): U₁ := Σ (cod: C.C.ob) (fam: Delta C cod) (coverings: C.C.ob -> Delta C cod -> U), coverings cod fam
+def site  (C: precategory): U₁ := Σ (C: precategory), Coverage C
+def sheaf (C: precategory): U₁ := Σ (S: site C), presheaf S.C

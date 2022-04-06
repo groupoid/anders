@@ -1,0 +1,43 @@
+<!DOCTYPE html><html><head><meta charset="utf-8"><meta http-equiv="x-ua-compatible" content="ie=edge"><meta property="fb:app_id" content="118554188236439"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="author" content="Maxim Sokhatsky"><meta name="twitter:site" content="@5HT"><meta name="twitter:creator" content="@5HT"><meta property="og:type" content="website"><meta property="og:image" content="https://avatars.githubusercontent.com/u/17128096?s=400&amp;u=66a63d4cdd9625b2b4b37d724cc00fe6401e5bd8&amp;v=4"><meta name="msapplication-TileColor" content="#ffffff"><meta name="msapplication-TileImage" content="https://anders.groupoid.space/images/ms-icon-144x144.png"><meta name="theme-color" content="#ffffff"><link rel="stylesheet" href="https://anders.groupoid.space/main.css?v=1"><link rel="apple-touch-icon" sizes="57x57" href="https://anders.groupoid.space/images/apple-icon-57x57.png"><link rel="apple-touch-icon" sizes="60x60" href="https://anders.groupoid.space/images/apple-icon-60x60.png"><link rel="apple-touch-icon" sizes="72x72" href="https://anders.groupoid.space/images/apple-icon-72x72.png"><link rel="apple-touch-icon" sizes="76x76" href="https://anders.groupoid.space/images/apple-icon-76x76.png"><link rel="apple-touch-icon" sizes="114x114" href="https://anders.groupoid.space/images/apple-icon-114x114.png"><link rel="apple-touch-icon" sizes="120x120" href="https://anders.groupoid.space/images/apple-icon-120x120.png"><link rel="apple-touch-icon" sizes="144x144" href="https://anders.groupoid.space/images/apple-icon-144x144.png"><link rel="apple-touch-icon" sizes="152x152" href="https://anders.groupoid.space/images/apple-icon-152x152.png"><link rel="apple-touch-icon" sizes="180x180" href="https://anders.groupoid.space/images//apple-icon-180x180.png"><link rel="icon" type="image/png" sizes="192x192" href="https://anders.groupoid.space/images/android-icon-192x192.png"><link rel="icon" type="image/png" sizes="32x32" href="https://anders.groupoid.space/images/favicon-32x32.png"><link rel="icon" type="image/png" sizes="96x96" href="https://anders.groupoid.space/images/favicon-96x96.png"><link rel="icon" type="image/png" sizes="16x16" href="https://anders.groupoid.space/images/favicon-16x16.png"><link rel="manifest" href="https://anders.groupoid.space/images/manifest.json"><style>svg a{fill:blue;stroke:blue}
+[data-mml-node="merror"]>g{fill:red;stroke:red}
+[data-mml-node="merror"]>rect[data-background]{fill:yellow;stroke:none}
+[data-frame],[data-line]{stroke-width:70px;fill:none}
+.mjx-dashed{stroke-dasharray:140}
+.mjx-dotted{stroke-linecap:round;stroke-dasharray:0,140}
+use[data-c]{stroke-width:3px}
+</style></head><body class="content"></body></html><title>PUSHOUT</title><nav><a href='https://anders.groupoid.space/'>HTS</a>
+<a href='https://anders.groupoid.space/lib/'>LIB</a>
+<a href='#'>PUSHOUT</a></nav><article class="main"><div class="om"><section><h1>PUSHOUT</h1></section></div><aside><time>Published: 20 MAY 2018</time></aside><div class="enc"><section><figure>$$
+  \def\mapright#1{\xrightarrow{{#1}}}
+  \def\mapleft#1{\xleftarrow{{#1}}}
+  \def\mapdown#1{\Big\downarrow\rlap{\raise2pt{\scriptstyle{#1}}}}
+  \def\mapdiagl#1{\vcenter{\searrow}\rlap{\raise2pt{\scriptstyle{#1}}}}
+  \def\mapdiagr#1{\vcenter{\swarrow}\rlap{\raise2pt{\scriptstyle{#1}}}}
+$$</figure><p><b>Definition</b> (Span).
+The two maps $f,g$ with the same domain $C$ are called <i>span</i>:
+$$
+    A \mapleft{f} C \mapright{g} B.
+$$</p><p><b>Definition</b> (Homotopy Pushout).
+The homotopy pushout or homotopy colimit (denoted as $\mathrm{hocolim}$)
+of the span diagram:
+$$
+    \mathrm{hocolim}(A \mapleft{f} C \mapright{g} B)
+      = A \sqcup B \sqcup C \times I\ / \sim,
+$$
+where $\sim$ is an equivalence relation $f(c) \sim (w,0)$ and $g(w) \sim (w,1)$
+for $w \in C$. If $C$ is a based space with basepoint $w_0$, we
+add the relation $(w_0,t) ~ (w_1,s)$ for all $s,t \in I$.</p><code>data pushout (A B C: U) (f: C -> A) (g: C -> B)
+   = po1 (_: A)
+   | po2 (_: B)
+   | po3 (c: C) &lt;i&gt; [ (i = 0) -> po1 (f c) ,
+                      (i = 1) -> po2 (g c) ]</code><br><h1>EXAMPLES</h1><p><b>Definition</b> (Homotopy Fibers).</p><code>hofiber (A B: U) (f: A -> B) (y: B): U
+  = pullback A unit B f (\(x: unit) -> y)
+</code><p><b>Definition</b> (Fiber Pullback).</p><code>fiberPullback (A B: U) (f: A -> B) (y: B)
+  : pullbackSq (hofiber A B f y)
+</code><p><b>Definition</b> (Homotopy Cofiber).</p><code>cofiber (A B: U) (f: B -> A): U
+  = pushout A unit B f (\(x: B) -> tt)
+</code><p><b>Defintion</b> (Kernel).</p><code>kernel (A B: U) (f: A -> B): U
+  = pullback A A B f f
+</code><p><b>Definition</b> (Cokernel).</p><code>cokernel (A B: U) (f: B -> A): U
+  = pushout A A B f f</code><br><h1>LITERATURE</h1><p>[1]. Brian Munson and Ismar Volić. <a href="https://web.math.rochester.edu/people/faculty/doug/otherpapers/munson-volic.pdf">Cubical Homotopy Theory</a><br>
+</p></section></div></article><footer class="footer"><a href="https://5ht.co/license/"><img class="footer__logo" src="https://longchenpa.guru/seal.png" width="50"></a><span class="footer__copy">2021&mdash;2022 &copy; <a href="//groupoid.space/" style="color:Lavender;">Groupoïd Infinity</a></span></footer>

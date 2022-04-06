@@ -1,0 +1,50 @@
+{- Homotopy Type Theory:
+   - Coequalizer and Hubs/Spokes as primitives.
+   - S¹ sphere and 𝑛-sphere.
+   - Pushout.
+   - Suspension.
+   - 𝑛-Truncation.
+
+   HoTT 6.8 Pushouts
+   HoTT 6.10 Quotients
+   HoTT 6.7 Hubs and Spokes
+   HoTT 6.9 Truncations
+
+   Copyright (c) Groupoid Infinity, 2014-2022. -}
+
+module coequalizer where
+import lib/foundations/univalent/equiv
+import lib/foundations/mltt/inductive
+
+
+-- [1]. Nicolai Kraus, Jakob von Raumer.
+-- Path spaces of higher inductive types in homotopy type theory.
+-- http://pure-oai.bham.ac.uk/ws/files/84880431/Path_Spaces.pdf
+
+-- [2]. Bauer, Gross, Lumsdaine, Shulman, Sozeau, Spitters [HoTT/Coq]
+-- The HoTT Library: A formalization of homotopy type theory in Coq
+-- https://arxiv.org/pdf/1610.04591.pdf
+
+-- [3]. Andrej Bauer, Niels van der Weide 
+-- The Three-HITs Theorem
+-- https://github.com/nmvdw/Three-HITs
+
+{- Coequalizer Primitive -}
+
+axiom coequ (A B : U) (f g : A → B) : U
+axiom ι₂ (A B : U) (f g : A → B) : B → coequ A B f g
+axiom resp (A B : U) (f g : A → B) (x : A) : Path (coequ A B f g) (ι₂ A B f g (f x)) (ι₂ A B f g (g x))
+axiom coequ-ind (A B : U) (f g : A → B) (X : coequ A B f g → U) (i : Π (b : B), X (ι₂ A B f g b))
+    : (Π (x : A), PathP (<i> X (resp A B f g x @ i)) (i (f x)) (i (g x))) → (Π (z : coequ A B f g), X z)
+axiom coequ-ind-β₁ (A B : U) (f g : A → B) (X : coequ A B f g → U) (i : Π (b : B), X (ι₂ A B f g b))
+      (ρ : Π (x : A), PathP (<i> X (resp A B f g x @ i)) (i (f x)) (i (g x))) (b : B)
+    : Path (X (ι₂ A B f g b)) (coequ-ind A B f g X i ρ (ι₂ A B f g b)) (i b)
+
+-- coequ-ind-β₁ need to be definitional to write this properly (i.e. without transp)
+{-
+axiom coequ-ind-β₂ (A B : U) (f g : A → B) (X : coequ A B f g → U) (i : Π (b : B), X (ι A B f g b))
+  (ρ : Π (x : A), PathP (<i> X (resp A B f g x @ i)) (i (f x)) (i (g x))) (x : A) :
+  Path (PathP (<j> X (resp A B f g x @ j)) (i (f x)) (i (g x)))
+       (<j> coequ-ind A B f g X i ρ (resp A B f g x @ j)) (ρ x)
+-}
+

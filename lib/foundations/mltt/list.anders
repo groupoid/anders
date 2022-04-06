@@ -1,0 +1,61 @@
+{- Run-Time List Type: https://anders.groupoid.space/foundations/mltt/list/
+   - List;
+
+   HoTT 5.3 W-Types
+
+   Copyright (c) Groupoid Infinity, 2014-2022. -}
+
+module list where
+import lib/foundations/mltt/maybe
+import lib/foundations/mltt/nat
+
+option girard true
+
+def List-ctor (A: U) := maybe-rec A U 𝟎 (λ (a : A), 𝟏)
+def List (A: U) := W (x : Maybe A), List-ctor A x
+def nil (A: U) : List A := sup (Maybe A) (List-ctor A) (nothing A) (ind₀ (List A))
+def cons (A: U) (x : A) (xs: List A) : List A := sup (Maybe A) (List-ctor A) (just A x) (λ (x : 𝟏), xs)
+
+def nil-List (A: U) (C : List A → U) (f : 𝟎 → List A) : C (nil A) → C (sup (Maybe A) (List-ctor A) (0₂,★) f)
+ := transp (<i> C (sup (Maybe A) (List-ctor A) (0₂,★) (λ (x : 𝟎), ind₀ (PathP (<_> List A) (ind₀ (List A) x) (f x)) x @ i))) 0
+
+def cons-List (A: U) (C : List A → U) (f : 𝟏 → List A) (x: A) : C (cons A x (f ★)) → C (sup (Maybe A) (List-ctor A) (1₂,x) f)
+ := transp (<i> C (sup (Maybe A) (List-ctor A) (1₂,x) (λ (x : 𝟏), ind₁ (λ (y : 𝟏), PathP (<_> List A) (f ★) (f y)) (<_> f ★) x @ i))) 0
+
+def List-ind (A: U) (C: List A -> U) (z: C (nil A)) (s: Π (x: A) (xs: List A), C xs -> C (cons A x xs)) : Π (n: List A), C n
+ := indᵂ (Maybe A) (List-ctor A) C (maybe-ind A
+         (λ (x: Maybe A), Π (f : List-ctor A x → List A), (Π (b : List-ctor A x), C (f b)) → C (sup (Maybe A) (List-ctor A) x f))
+         (λ (f : 𝟎 → List A) (g : Π (x : 𝟎), C (f x)), nil-List A C f z)
+         (λ (x: A) (f : 𝟏 → List A) (g : Π (x : 𝟏), C (f x)), cons-List A C f x (s x (f ★) (g ★))))
+  
+def List-rec  (A: U) (C : U) (z : C) (s : A → List A → C → C) : List A → C := List-ind A (λ (_: List A), C) z s
+def List-iter (A: U) (C : U) (z : C) (s : A → C → C) : List A → C := List-rec A C z (λ (x: A) (_: List A), s x)
+def List-case (A: U) (C : U) (z : C) (s : A → C) : List A → C := List-iter A C z (λ (x : A) (_: C), s x)
+
+def head (A: U): List A → Maybe A
+ := List-case A (Maybe A) (nothing A) (λ(x: A), just A x)
+
+def tail (A: U): List A → Maybe (List A)
+ := List-ind A (λ (_: List A), Maybe (List A))
+               (nothing (List A))
+               (λ (a: A) (x: List A) (_: Maybe (List A)), just (List A) x)
+
+def z0 : List 𝟏 := nil 𝟏
+def z1 : List 𝟏 := cons 𝟏 ★ z0
+def z2 : List 𝟏 := cons 𝟏 ★ z1
+
+def append (A: U): List A -> List A -> List A
+ := λ (x: List A), List-rec A (List A) x (λ (z: A) (_: List A)(zs: List A), cons A z zs)
+
+def z1=z1+z0 : Path (List 𝟏) z1 (append 𝟏 z0 z1)
+ := List-ind 𝟏 (\(C: List 𝟏), Path (List 𝟏) z1 C)
+               ?
+               ? (append 𝟏 z0 z1)
+
+def append-assoc (A: U)
+  : Π (xs ys zs: List A), Path (List A) (append A (append A xs ys) zs) (append A xs (append A ys zs))
+ := λ (xs ys zs: List A),
+    List-ind A (\(C: List A), Path (List A) (append A (append A xs ys) zs) C)
+               ?
+               ?
+               (append A xs (append A ys zs))

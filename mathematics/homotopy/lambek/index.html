@@ -1,0 +1,38 @@
+<!DOCTYPE html><html><head><meta charset="utf-8"><meta http-equiv="x-ua-compatible" content="ie=edge"><meta property="fb:app_id" content="118554188236439"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="author" content="Maxim Sokhatsky"><meta name="twitter:site" content="@5HT"><meta name="twitter:creator" content="@5HT"><meta property="og:type" content="website"><meta property="og:image" content="https://avatars.githubusercontent.com/u/17128096?s=400&amp;u=66a63d4cdd9625b2b4b37d724cc00fe6401e5bd8&amp;v=4"><meta name="msapplication-TileColor" content="#ffffff"><meta name="msapplication-TileImage" content="https://anders.groupoid.space/images/ms-icon-144x144.png"><meta name="theme-color" content="#ffffff"><link rel="stylesheet" href="https://anders.groupoid.space/main.css?v=1"><link rel="apple-touch-icon" sizes="57x57" href="https://anders.groupoid.space/images/apple-icon-57x57.png"><link rel="apple-touch-icon" sizes="60x60" href="https://anders.groupoid.space/images/apple-icon-60x60.png"><link rel="apple-touch-icon" sizes="72x72" href="https://anders.groupoid.space/images/apple-icon-72x72.png"><link rel="apple-touch-icon" sizes="76x76" href="https://anders.groupoid.space/images/apple-icon-76x76.png"><link rel="apple-touch-icon" sizes="114x114" href="https://anders.groupoid.space/images/apple-icon-114x114.png"><link rel="apple-touch-icon" sizes="120x120" href="https://anders.groupoid.space/images/apple-icon-120x120.png"><link rel="apple-touch-icon" sizes="144x144" href="https://anders.groupoid.space/images/apple-icon-144x144.png"><link rel="apple-touch-icon" sizes="152x152" href="https://anders.groupoid.space/images/apple-icon-152x152.png"><link rel="apple-touch-icon" sizes="180x180" href="https://anders.groupoid.space/images//apple-icon-180x180.png"><link rel="icon" type="image/png" sizes="192x192" href="https://anders.groupoid.space/images/android-icon-192x192.png"><link rel="icon" type="image/png" sizes="32x32" href="https://anders.groupoid.space/images/favicon-32x32.png"><link rel="icon" type="image/png" sizes="96x96" href="https://anders.groupoid.space/images/favicon-96x96.png"><link rel="icon" type="image/png" sizes="16x16" href="https://anders.groupoid.space/images/favicon-16x16.png"><link rel="manifest" href="https://anders.groupoid.space/images/manifest.json"><style>svg a{fill:blue;stroke:blue}
+[data-mml-node="merror"]>g{fill:red;stroke:red}
+[data-mml-node="merror"]>rect[data-background]{fill:yellow;stroke:none}
+[data-frame],[data-line]{stroke-width:70px;fill:none}
+.mjx-dashed{stroke-dasharray:140}
+.mjx-dotted{stroke-linecap:round;stroke-dasharray:0,140}
+use[data-c]{stroke-width:3px}
+</style></head><body class="content"></body></html><title>LAMBEK</title><nav><a href='https://anders.groupoid.space/'>HTS</a>
+<a href='https://anders.groupoid.space/lib/'>LIB</a>
+<a href='#'>LAMBEK</a></nav><article class="main"><div class="om"><section><h1>Article</h1></section></div><aside><time>Published: 1 MAY 2016</time></aside><div class="enc"></div><section><h2>Initial Object</h2><code>data list (A: U) = nil
+                 | cons (a: A) (xs: list A)
+</code><h2>Representing Functor F</h2><code>F<sub>A</sub> = 1 + A * X
+</code><h2>Construct corresponding F-Algebra</h2><code>record listAlg (A: Type) : Type :=
+       (X: Type)
+       (nil: Unit -> X)
+       (cons: A -> X -> X)
+</code><h2>Introduce List Morphisms</h2><code>record listMor   (A: Type) (x1,x2: ListAlg A) : Type :=
+       (map:     x1.X -> x2.X)
+       (mapNil:  Path x2.X (map (x1.nil unit)) (x2.nil unit))
+       (mapCons: ∀ (a: A) -> ∀ (x: x1) ->
+                 Path x2.X (map (x1.cons a x)) (x2.cons a (map x)))
+</code><h2> Introduce connected points of List type</h2><code>record listPoint (A: Type) : Type :=
+       (point: ∀ (x: ListAlg A) -> x.X)
+       (map: ∀ (x1,x2: listAlg A) -> (m: ListMor A x1 x2) ->
+             Path x2.X (m.map (point x1)) (point x2))
+</code><figure>$$\def\mapright#1{\xrightarrow{{#1}}}
+  \def\mapdown#1{\Big\downarrow\rlap{\raise2pt{\scriptstyle{#1}}}}
+  \def\mapdiagl#1{\vcenter{\searrow}\rlap{\raise2pt{\scriptstyle{#1}}}}
+  \def\mapdiagr#1{\vcenter{\swarrow}\rlap{\raise2pt{\scriptstyle{#1}}}}
+$$
+</figure><figure>$$U = ListAlg\\$$
+
+$$U\ I = lim\ U\\$$
+
+$\begin{array}{c}lim\ U\\\mapdown{\pi_i}\\X_i\end{array}
+\Longrightarrow \begin{array}{c}F\ lim\ U\\\mapdown{F\ \pi_i}\\F\ X_i\end{array}
+\Longrightarrow lim\ \begin{array}{c}F\ lim\ U\\\mapdown{F \pi_i}\\F\ X_i\end{array}$
+</figure></section></article><footer class="footer"><a href="https://5ht.co/license/"><img class="footer__logo" src="https://longchenpa.guru/seal.png" width="50"></a><span class="footer__copy">2021&mdash;2022 &copy; <a href="//groupoid.space/" style="color:Lavender;">Groupoïd Infinity</a></span></footer>

@@ -1,0 +1,31 @@
+{
+    "name": "anders",
+    "displayName": "anders",
+    "version": "0.0.1",
+    "description": "anders syntax highlighting for Visual Studio Code",
+    "publisher": "siegmentationfault",
+    "categories": [
+        "Programming Languages"
+    ],
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/groupoid/anders/"
+    },
+    "engines": {
+        "vscode": "^0.10.10"
+    },
+    "contributes": {
+        "languages": [{
+            "id": "anders",
+            "extensions": [
+                ".anders"
+            ],
+            "configuration": "./anders-configuration.json"
+        }],
+        "grammars": [{
+                "language": "anders",
+                "scopeName": "source.anders",
+                "path": "./syntaxes/anders.tmLanguage.json"
+        }]
+    }
+}

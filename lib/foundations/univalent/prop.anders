@@ -1,0 +1,45 @@
+module prop where
+import lib/foundations/univalent/path
+import lib/foundations/mltt/sigma
+
+def lemPropF (A : U) (P : A -> U) (pP : Π (x : A), isProp (P x))
+    (a0 a1 : A) (p : PathP (<_> A) a0 a1) (b0 : P a0) (b1 : P a1) : PathP (<i>P (p @ i)) b0 b1
+ := <i> pP (p @ i) (comp (\(j : I), P (p @ (i /\ j))) -i (\(k : I), [ (i = 0) → b0 ]) (inc (P (p @ 0)) -i b0))
+                   (comp (\(j : I), P (p @ (i \/ -j))) i (\(k : I), [ (i = 1) → b1 ]) (inc (P (p @ 1)) i b1)) @ i
+
+def lemSig (A : U) (B : A -> U) (pB : Π (x : A), isProp (B x)) (u v : Σ(x:A), B x) (p : Path A u.1 v.1) : Path (Σ(x:A), B x) u v
+ := <i> (p @ i,(lemPropF A B pB u.1 v.1 p u.2 v.2) @ i)
+
+def propSig (A : U) (B : A -> U) (pA : isProp A) (pB : Π(x : A), isProp (B x)) (t u : Σ(x:A), B x)
+  : Path (Σ(x:A), B x) t u
+ := lemSig A B pB t u (pA t.1 u.1)
+
+def propPi (A : U) (B: A -> U) (h: Π(x : A), isProp (B x)) (f0 f1: Π(x: A), B x) : Path (Π(x: A), B x) f0 f1
+  := <i> \ (x : A), (h x (f0 x) (f1 x)) @ i
+
+def propPi2 (A: U) (B : A -> A -> U) (h: Π (x y: A), isProp (B x y)): isProp (Π(x y: A), B x y)
+  := propPi A (\(a: A), Π (b : A), B a b) (\(x : A), propPi A (B x) (h x))
+
+def isContrProp (A : U) (h : isContr A) : isProp A
+ := \(a b : A), <i> comp (\(j: I), A) (∂ i) (\(k: I), [ (i = 0) -> h.2 a @ k, (i = 1) -> h.2 b @ k ]) (inc A (∂ i) h.1)
+
+def propSet (A : U) (h : isProp A) : isSet A
+ := \(a b : A) (p q : Path A a b),
+    <j i> hcomp A (∂ i \/ ∂ j) (\(k: I), [ (i = 0) -> h a a @ k, (i = 1) -> h a b @ k,
+                                           (j = 0) -> h a (p @ i) @ k, (j = 1) -> h a (q @ i) @ k]) a
+
+def lemProp (A : U) (h : A -> isProp A) : isProp A := \(a : A), h a a
+
+def T (A : U) (x : A) : U := Π (y : A), Path A x y
+def lem1 (A : U) (t: isContr A) (x y : A) : Path A x y := comp-Path A x t.1 y (<i> t.2 x @ -i) (t.2 y)
+def lem2 (A : U) (t: isContr A) (x : A) : isProp (T A x) := propPi A (\ (y : A), Path A x y) (propSet A (lem1 A t) x)
+
+def propIsContr (A : U) : isProp (isContr A) := lemProp (isContr A) (\(t: isContr A), propSig A (T A) (lem1 A t) (lem2 A t))
+def propIsProp (A : U) : isProp (isProp A) := \(f g : isProp A), <i> \(a b : A), propSet A f a b (f a b) (g a b) @ i
+
+
+def corSigProp (A: U) (B: A -> U) (pB : Π (x:A), isProp (B x)) (t u : Σ(x:A), B x) (p:PathP (<_>A) t.1 u.1)
+  : isProp (PathP (<i>B (p @ i)) t.2 u.2)
+ := transp (<i> isProp (pathSig0 A B t u p @ -i)) 0
+      (propSet (B u.1) (pB u.1)
+        (hcomp (B u.1) 0 (λ (r: I), []) (transp (<i> B (p @ i)) 0 t.2)) u.2)

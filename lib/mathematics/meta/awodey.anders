@@ -1,0 +1,62 @@
+{- Impredicative Encoding of Inductive Types:
+   - Unit.
+   Copyright (c) Groupoid Infinity, 2014-2022. -}
+
+module awodey where
+option impredicativity true
+import lib/foundations/univalent/path
+
+def naturality (X Y: U) (f : X -> Y) (a : X -> X) (b : Y -> Y) : U := Path (X -> Y) (∘ X X Y f a) (∘ X Y Y b f)
+def 𝟙' : U := Π (X : U), isSet X -> X -> X
+def is-𝟙 (one: 𝟙') : U := Π (X Y: U) (x: isSet X) (y: isSet Y) (f: X -> Y), naturality X Y f (one X x) (one Y y)
+def 𝟙 : U := Σ (x: 𝟙'), is-𝟙 x
+def 𝟙-★ : 𝟙 := ((\ (X: U) (_: isSet X), \(x:X), x), (\ (X Y: U) (_: isSet X) (_: isSet Y), idp (X -> Y)))
+def 𝟙-rec (C: U) (s: isSet C) (c: C): 𝟙 -> C := \ (z: 𝟙), z.1 C s c
+axiom 𝟙-η (z: 𝟙): Path 𝟙 𝟙-★ z
+def 𝟙-ind (P: 𝟙 -> U) (a: 𝟙): P 𝟙-★ -> P a := subst 𝟙 P 𝟙-★ a (𝟙-η a)
+def 𝟙-β (C: U) (s: isSet C) (c: C): Path C (𝟙-rec C s c 𝟙-★) c := idp C c
+
+theorem 𝟙-condition (n: 𝟙'): isProp (is-𝟙 n) :=
+    \ (f g: is-𝟙 n), <k> \ (x y: U) (X: isSet x) (Y: isSet y) (F: x -> y), <i> \ (R: x),
+    Y (F (n x X R)) (n y Y (F R)) (<j> (f x y X Y F @ j) R) (<j> (g x y X Y F @ j) R) @ k @ i
+
+{-
+   Literature:
+
+   [1]. https://github.com/sspeight93/Papers/
+   [2]. https://homotopytypetheory.org/2017/10/11/impredicative-encodings-of-inductive-types-in-hott/
+   [3]. https://www.newton.ac.uk/files/seminar/20170711090010001-1009680.pdf
+-}
+
+{-
+   Abstract:
+
+   Church Encoding Nat:
+
+      Nat = (X: U) -> (X -> X) -> X -> X
+
+   Impredicative Encoding Unit:
+
+      Unit = (X: U) -> isSet X -> X -> X
+      Unit_Encoding = (one: Unit)
+                    * ((X Y: U) (x: isSet X) (y:isSet Y) (f:X->Y)
+                           -> naturality X Y f (one X x) (one Y y))
+
+   Impredicative Encoding Nat:
+
+      Nat  = (X: U) -> isSet X -> (X -> X) -> (X -> X)
+      Nat_Encoding = (one: Nat)
+                    * ((X Y: U) (x: isSet X) (y:isSet Y) (f:X->Y)
+                           -> naturality X Y f (one X x) (one Y y))
+
+   Motivation is to have algebra structure that could be used with any coherent carrier.
+   Impredicativity means that we can land inductive type in any universe.
+   E.g. one can change the predicate from isSet to isProp for truncations or to higher n-types.
+   You can also model HIT using impredicative encoding. Universes could be impredicative
+   and univalent at the same time.
+
+      Truncation ||A|| parametrized by (A:U) type = (X: U) -> isProp X -> (A -> X) -> X
+      S^1 = (X:U) -> isGroupoid X -> (x:X) -> Path X x x -> X
+      Arbitrary (A:U) type = (X: U) -> isSet X -> (A -> X) -> X
+-}
+

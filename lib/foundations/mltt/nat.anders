@@ -1,0 +1,42 @@
+{- Run-time Homotopy-inductive types: https://anders.groupoid.space/foundations/mltt/nat/
+   - Nat type.
+
+   HoTT 5.3 W-Types
+   HoTT 5.5 Homotopy-inductive types
+
+   Copyright (c) Groupoid Infinity, 2014-2022. -}
+
+module nat where
+import lib/foundations/mltt/inductive
+
+def ℕ-ctor := ind₂ (λ (_ : 𝟐), U) 𝟎 𝟏
+def ℕ := W (x : 𝟐), ℕ-ctor x
+def zero : ℕ := sup 𝟐 ℕ-ctor 0₂ (ind₀ ℕ)
+def succ (n : ℕ) : ℕ := sup 𝟐 ℕ-ctor 1₂ (λ (x : 𝟏), n)
+
+def 𝟎⟶ℕ (C : ℕ → U) (f : 𝟎 → ℕ) : C zero → C (sup 𝟐 ℕ-ctor 0₂ f)
+ := transp (<i> C (sup 𝟐 ℕ-ctor 0₂ (λ (x : 𝟎), ind₀ (PathP (<_> ℕ) (ind₀ ℕ x) (f x)) x @ i))) 0
+
+def 𝟏⟶ℕ (C : ℕ → U) (f : 𝟏 → ℕ) : C (succ (f ★)) → C (sup 𝟐 ℕ-ctor 1₂ f)
+ := transp (<i> C (sup 𝟐 ℕ-ctor 1₂ (λ (x : 𝟏), ind₁ (λ (y : 𝟏), PathP (<_> ℕ) (f ★) (f y)) (<_> f ★) x @ i))) 0
+
+def ℕ-ind (C : ℕ → U) (z : C zero) (s : Π (n : ℕ), C n → C (succ n)) : Π (n : ℕ), C n
+ := indᵂ 𝟐 ℕ-ctor C
+    (ind₂ (λ (x : 𝟐), Π (f : ℕ-ctor x → ℕ), (Π (b : ℕ-ctor x), C (f b)) → C (sup 𝟐 ℕ-ctor x f))
+          (λ (f : 𝟎 → ℕ) (g : Π (x : 𝟎), C (f x)), 𝟎⟶ℕ C f z)
+          (λ (f : 𝟏 → ℕ) (g : Π (x : 𝟏), C (f x)), 𝟏⟶ℕ C f (s (f ★) (g ★))))
+
+def ℕ-rec (C : U) (z : C) (s : ℕ → C → C) : ℕ → C := ℕ-ind (λ (_ : ℕ), C) z s
+def ℕ-iter (C : U) (z : C) (s : C → C) : ℕ → C := ℕ-rec C z (λ (_ : ℕ), s)
+def ℕ-case (C : U) (z s : C) : ℕ → C := ℕ-iter C z (λ (_ : C), s)
+def plus : ℕ → ℕ → ℕ := ℕ-iter (ℕ → ℕ) (idfun ℕ) (∘ ℕ ℕ ℕ succ)
+def mult : ℕ → ℕ → ℕ := ℕ-rec (ℕ → ℕ) (\(_: ℕ), zero) (\(_: ℕ) (x: ℕ → ℕ) (m: ℕ), plus m (x m))
+def one : ℕ := succ zero
+def two : ℕ := succ one
+def three : ℕ := succ two
+def four : ℕ := succ three
+def five : ℕ := succ four
+
+def 5′ : ℕ := plus two three
+def 10′ : ℕ := mult 5′ two
+def 55′ : ℕ := plus (mult 5′ 10′) 5′

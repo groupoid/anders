@@ -1,0 +1,45 @@
+module abelian where
+import lib/mathematics/categories/category
+
+def zeroObject(C: precategory) (X: C.C.ob): U₁ := Σ
+    (bot: isInitial C X)
+    (top: isTerminal C X), U
+
+def hasZeroObject (C: precategory) : U₁ := Σ
+    (ob: C.C.ob)
+    (zero: zeroObject C ob), U
+
+def hasAllProducts (C: precategory) : U₁ := Σ
+    (product: C.C.ob -> C.C.ob -> C.C.ob)
+    (π₁: Π (A B : C.C.ob), C.C.hom (product A B) A)
+    (π₂: Π (A B : C.C.ob), C.C.hom (product A B) B), U
+
+def hasAllCoproducts (C: precategory) : U₁ := Σ
+    (coproduct: C.C.ob -> C.C.ob -> C.C.ob)
+    (σ₁: Π (A B : C.C.ob), C.C.hom A (coproduct A B))
+    (σ₂: Π (A B : C.C.ob), C.C.hom B (coproduct A B)), U
+
+axiom hasAllKernels (C: precategory) : U
+axiom hasAllCokernels (C: precategory) : U
+
+def isMonic (P: precategory) (Y Z : P.C.ob) (f : P.C.hom Y Z) : U
+ := Π (X : P.C.ob) (g1 g2 : P.C.hom X Y),
+    Path (P.C.hom X Z) (P.P.∘ X Y Z g1 f) (P.P.∘ X Y Z g2 f)
+ -> Path (P.C.hom X Y) g1 g2
+
+def isEpic (P : precategory) (X Y : P.C.ob) (f : P.C.hom X Y) : U
+ := Π (Z : P.C.ob) (g1 g2 : P.C.hom Y Z),
+    Path (P.C.hom X Z) (P.P.∘ X Y Z f g1) (P.P.∘ X Y Z f g2)
+ -> Path (P.C.hom Y Z) g1 g2
+
+axiom isKernel (C: precategory) (zero: hasZeroObject C) (A B S: C.C.ob) (f: C.C.hom A B) (k: C.C.hom S A) : U
+axiom isCokernel (C: precategory) (zero: hasZeroObject C) (A B S: C.C.ob) (f: C.C.hom A B) (k: C.C.hom B S) : U
+
+def isAbelian (C: precategory): U₁ := Σ
+    (zero: hasZeroObject C)
+    (prod: hasAllProducts C)
+    (coprod: hasAllCoproducts C)
+    (ker: hasAllKernels C)
+    (coker: hasAllCokernels C)
+    (monicsAreKernels: Π (A S: C.C.ob) (k: C.C.hom S A) (_: isMonic C S A k), Σ (B: C.C.ob) (f: C.C.hom A B), isKernel C zero A B S f k)
+    (epicsAreCoKernels: Π (B S: C.C.ob) (k: C.C.hom B S) (_: isEpic C B S k), Σ (A: C.C.ob) (f: C.C.hom A B), isCokernel C zero A B S f k), U

@@ -1,0 +1,16 @@
+module N2O where
+import experiments/BASE
+
+axiom pickle : Binary -> Binary
+axiom depickle : Binary -> Binary
+axiom encode : Π (k: U), k -> Binary
+axiom decode : Π (k: U), Binary -> IO k
+axiom reg: Π (k: U), k -> IO k
+axiom unreg : Π (k: U), k -> IO k
+axiom send : Π (k v z: U), k -> v -> IO z
+axiom getSession : Π (k v: U), k -> IO v
+axiom putSession : Π (k v: U), k -> v -> IO v
+axiom getCache : Π (k v: U), Atom -> k -> IO v
+axiom putCache : Π (k v: U), Atom -> k -> v -> IO v
+
+axiom start : PI -> IO Sup

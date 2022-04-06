@@ -1,0 +1,27 @@
+module BASE where
+
+axiom Action : U
+axiom Element : U
+
+axiom Either (L R: U) : U
+axiom Binary : U
+axiom IO (A: U) : U
+axiom TableId : U
+axiom Atom : U
+axiom Tuple : U
+axiom Integer : U
+axiom TableOptions : U
+axiom List (A: U) : U
+axiom Maybe (A: U) : U
+axiom Boolean : U
+axiom String : U
+axiom Unit : U
+
+axiom StoreResult : U
+axiom Reader : U
+axiom PI : U
+axiom Sup : U
+axiom ProcId : U
+axiom ProcRes : U
+axiom Hist : U
+axiom Proc : U

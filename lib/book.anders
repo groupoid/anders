@@ -1,0 +1,42 @@
+module book where
+import lib/foundations/mltt/pi
+import lib/foundations/mltt/sigma
+import lib/foundations/mltt/inductive
+import lib/foundations/mltt/bool
+import lib/foundations/mltt/either
+import lib/foundations/mltt/maybe
+import lib/foundations/mltt/nat
+import lib/foundations/mltt/list
+import lib/foundations/mltt/fin
+import lib/foundations/mltt/vec
+import lib/foundations/univalent/path
+import lib/foundations/univalent/prop
+import lib/foundations/univalent/equiv
+import lib/foundations/univalent/iso
+import lib/foundations/modal/infinitesimal
+import lib/mathematics/algebra/algebra
+import lib/mathematics/analysis/real
+import lib/mathematics/categories/category
+import lib/mathematics/categories/functor
+import lib/mathematics/categories/abelian
+import lib/mathematics/categories/groupoid
+import lib/mathematics/topoi/topos
+import lib/mathematics/geometry/bundle
+import lib/mathematics/geometry/etale
+import lib/mathematics/geometry/formalDisc
+import lib/mathematics/homotopy/coequalizer
+import lib/mathematics/homotopy/constcubes
+import lib/mathematics/homotopy/pullback
+import lib/mathematics/homotopy/pushout
+import lib/mathematics/homotopy/hubSpokes
+import lib/mathematics/homotopy/quotient
+import lib/mathematics/homotopy/truncation
+import lib/mathematics/homotopy/suspension
+import lib/mathematics/homotopy/S1
+import lib/mathematics/homotopy/Sn
+import lib/mathematics/homotopy/KGn
+
+import lib/mathematics/meta/favonia
+import lib/mathematics/meta/kraus
+-- Impredicativity starts here
+import lib/mathematics/meta/awodey

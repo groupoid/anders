@@ -1,0 +1,24 @@
+{- FunExt Type:
+   - FunExt.
+
+   HoTT 2.9 Pi-types and the function extensionality axiom.
+
+   Copyright (c) Groupoid Infinity, 2014-2022. -}
+
+module extensionality where
+import lib/foundations/univalent/path
+import lib/foundations/mltt/pi
+
+def funext-form (A B: U) (f g: A → B): U := Path (A → B) f g
+def funext (A B: U) (f g: A → B) (p: Π (x: A), Path B (f x) (g x)) : funext-form A B f g := <i> λ (a: A), p a @ i
+def happly (A B: U) (f g : A → B) (p: funext-form A B f g) (x : A) : Path B (f x) (g x) := cong (A → B) B (λ (h: A → B), app A B h x) f g p
+def funext-β (A B: U) (f g: A → B) (p: Π (x: A), Path B (f x) (g x)) : Π (x: A), Path B (f x) (g x) := λ (x: A), happly A B f g (funext A B f g p) x
+def funext-η (A B: U) (f g: A → B) (p: Path (A → B) f g) : Path (Path (A → B) f g) (funext A B f g (happly A B f g p)) p := idp (Path (A → B) f g) p
+
+def piext (A: U) (B: A → U) (f g: Π (x: A), B x) (p: Π (x: A), Path (B x) (f x) (g x)) : Path (Π (y: A), B y) f g := <i> λ (a: A), (p a) @ i
+def setPi (A: U) (B: A → U) (h: Π (x: A), isSet (B x)) (f g: Pi A B) (p q: Path (Pi A B) f g) : Path (Path (Pi A B) f g) p q
+ := <i j> \(x: A), (h x (f x) (g x) (<i> (p @ i) x) (<i> (q @ i) x)) @ i @ j
+def setFun' (X Y: U) (p: X → isSet Y) : isSet (X → Y) := setPi X (λ (x: X), Y) p
+def setFun (A B : U) (sB: isSet B) : isSet (A → B) := setPi A (λ (x: A), B) (λ (x: A), sB)
+def piIsContr (A: U) (B: A → U) (u: isContr A) (q: Π (x: A), isContr (B x)) : isContr (Pi A B)
+ := ((\(x: A),(q x).1),(\(z: Π(x: A),B x),<i>\(a: A),(q a).2(z a)@ i))

@@ -1,0 +1,33 @@
+include ../../../header
+
+block title
+    title IO
+
+block content
+    nav
+        <a href='https://anders.groupoid.space/'>HTS</a>
+        <a href='https://anders.groupoid.space/lib/'>LIB</a>
+        <a href='#'>IO</a>
+    article.main
+        .exe
+            section
+                h1 I/O Monads
+        section
+            p Recursive and Corecursive Free Monads.
+
+            h2#io IO
+            p Finite I/O
+            code.
+                data IO (A: Type): Type :=
+                     (getLine: (String → IO) → IO)
+                     (putLine: String → IO → IO)
+                     (pure: A → IO)
+
+            p Example:
+            code.
+                record Main: Type :=
+                (main: IO.replicateM 100
+                       (IO.>>= IO.data () IO.getLine IO.putLine))
+
+
+include ../../../footer

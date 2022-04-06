@@ -1,0 +1,250 @@
+include ../../../header
+
+block title
+    title PRESHEAF
+
+block content
+    nav
+        <a href='https://anders.groupoid.space/'>HTS</a>
+        <a href='https://anders.groupoid.space/lib/'>LIB</a>
+        <a href='#'>PRESHEAF</a>
+    article.main
+        .om
+            section
+                h1 PRESHEAF TYPE THEORIES
+        aside
+            time Published: 13 JAN 2019
+        .om
+            section
+                +tex.
+                    This article requires as prerequisites an article about the formalization
+                    of the category theory and topos theory:
+                    <a href="../topos/index.html">Formal Set Topos</a>.
+                    Presheaf model of type theory could be seen as generalization
+                    of the notion of Kripke model.
+
+            section
+                h1 INTRO
+                +tex.
+                    $\mathbf{Definition}$ (Presheaf over $C$).
+                    A presheaf over a category $C$ is a functor
+                    from $C^{op}$ to the category of $\mathrm{Set}$.
+                    We denote $\mathrm{Ob}_C$ as $I,J,K$ and $\mathrm{Hom}_C$ as $f,g$,
+                    identity morphisms $1_I : I \rightarrow I$,
+                    composition $f\ g : K \rightarrow I$ for $g : K \rightarrow J$, $f : I \rightarrow J$.
+                    This means a presheaf $\mathrm{PSh}_C$ is given by a family of sets $C_I$
+                    and restriction maps $u \mapsto u\ f$, $C_I \rightarrow C_J$ for
+                    $f:J \rightarrow I$ satisfying the laws $u\ 1_I = u$ and $(u\ f)\ g=u\ (f\ g)$ for
+                    $g:K \rightarrow J$. The family of sets $C_I$ is called right action.
+                +tex.
+                    By the nature of the rescription maps we could classify presheaves:
+                    i) if the restriction map forms a boundary operator (degeneracy map)
+                    $\sigma : u_{n} \mapsto v_{n-1}$, such that $\sigma \sigma = 0$
+                    then this is cohomology presheaf; ii) if the restriction map is a process action
+                    $\pi : s_{n} \mapsto s_{n+1}$ then this is process presheaf;
+                    iii) if the restriction map actually restricts the domain the such presheaf is
+                    called topological (default meaning).
+                +tex.
+                    $\mathbf{Definition}$ (Yoneda presheaf $\mathrm{Yo}_X$).
+                    Any object $X$ of base category $C$ defines a
+                    presheaf $\mathrm{Yo}_X$ represented by $X$.
+                    This presheaf $\mathrm{Yo}_X$ assigns to each object $I$ in $C$
+                    the set of arrows $I \rightarrow X$. Given anarrow $f:J \rightarrow I$
+                    composition with f maps an arrow $I \rightarrow X$ to an arrow $J \rightarrow X$.
+                    In other words $\mathrm{Yo}_X(J)$
+                    then a set of maps $I \rightarrow J$ and the restriction maps defined by composition.
+                +tex.
+                    $\mathbf{Definition}$ (Seive).
+                    A sieve $S$ on $I$ is a set of maps with codomain $I$ such that $f g: K \rightarrow I$
+                    is in $S$ whenever $f : J \rightarrow I$ is in $S$ and $g : K \rightarrow J$.
+                +tex.
+                    $\mathbf{Definition}$ (Subpresheaf $\Omega(I)$).
+                    Subpresheaf of a presheaf A is a map $A \rightarrow \Omega_d(I)$, which
+                    for each $I$ selects a subset of $A(I)$ of shape $I$ defined by polyhedron A.
+                    $\Omega_d(I)$ is a presheaf where $\Omega_d(I)$ is a set of decidable seives,
+                    so that we can decide if $f: I \rightarrow J$ is a member of $S$.
+
+                h1 DEPENDENT TYPES
+
+                +tex.
+                    $\mathbf{Definition}$ (Type).
+                    A type is interpreted as a presheaf $A$, a family of sets $A_I$ with restriction maps
+                    $u \mapsto u\ f, A_I \rightarrow A_J$ for $f: J\rightarrow I$. A dependent type
+                    B on A is interpreted by a presheaf on category of elements of $A$: the objects
+                    are pairs $(I,u)$ with $u : A_I$ and morphisms $f: (J,v) \rightarrow (I,u)$ are
+                    maps $f : J \rightarrow$ such that $v = u\ f$. A dependent type B is thus given
+                    by a family of sets $B(I,u)$ and restriction maps $B(I,u) \rightarrow B(J,u\ f)$.
+
+                +tex.
+                    We think of $A$ as a type and $B$ as a family of presheves $B(x)$ varying $x:A$.
+                    The operation $\Pi(x:A)B(x)$ generalizes the semantics of
+                    implication in a Kripke model.
+
+                +tex.
+                    $\mathbf{Defintion}$ (Pi). An element $w:[\Pi(x:A)B(x)](I)$ is a family
+                    of functions $w_f : \Pi(u:A(J))B(J,u)$ for $f : J \rightarrow I$ such
+                    that $(w_f u)g=w_{f\ g}(u\ g)$ when $u:A(J)$ and $g:K\rightarrow J$.
+
+                +tex.
+                    $\mathbf{Defintion}$ (Sigma). The set $\Sigma(x:A)B(x)$ is the set
+                    of pairs $(u,v)$ when $u:A(I),v:B(I,u)$ and restriction map $(u,v)\ f=(u\ f,v\ f)$.
+
+                h1 SIMPLICIAL TYPES
+
+                +tex.
+                    $\mathbf{Definition}$ (Simplicial Types).
+                    The simplicial type is defined as a presheaf on category of
+                    finite linear posets $[n]$ and monotone maps. Let's write a presheaf
+                    as $\mathrm{X}: \Delta^{op} \rightarrow \mathrm{Set}$. In a sense that this
+                    is a category on a shapes, the notion of subpolyhedras is then
+                    represented by subpresheaves.
+
+                +tex.
+                    $\mathbf{Definition}$ ($\mathrm{sSet}$).
+                    The category of simplicial types denoted $\mathrm{sSet}$.
+
+                h1 CUBICAL TYPES
+
+                +tex.
+                    $\mathbf{Definition}$ (Cubical Presheaf $\mathbb{I}$).
+                    The identity types modeled with another presheaf, the presheaf on Lawvere
+                    category of distributive lattices (theory of de Morgan algebras) denoted
+                    with $\Box — \mathbb{I} : \Box^{op} \rightarrow \mathrm{Set}$.
+
+                +tex.
+                    $\mathbf{Properties\ of\ }\mathbb{I}$. The presheaf $\mathbb{I}$:
+                    i) has to distinct global elements $0$ and $1$ (B$_1$);
+                    ii) $\mathbb{I}$(I) has a decidable equality for each $I$ (B$_2$);
+                    iii) $\mathbb{I}$ is tiny so the path functor $X \mapsto X^\mathbb{I}$ has right adjoint (B$_3$).;
+                    iv) $\mathbb{I}$ has meet and join (connections, B$_4$).
+
+                +tex.
+                    NOTE: In the simplicial model B$_3$ condition is underivable.
+
+                +tex.
+                    $\mathbf{Definition}$ (Cofibrations Subpresheaf $\mathbb{F}$).
+                    The subpresheaf $\mathbb{F}$ corresponds to a map
+                    $\mathrm{Cofib} : \Omega \rightarrow \Omega$ so that $\mathbb{F}$ can
+                    be seen internally as the subpresheaf of propositions $\varphi$ in
+                    $\mathbb{F}$ satisfying the property $\mathrm{Cofib}\ (\varphi)$ (which
+                    reads ‘$\varphi$ is cofibrant’). In other words $\mathbb{F}$
+                    classified cofibrant maps.
+
+                +tex.
+                    $\mathbf{Properties\ of\ }\mathbb{F}$:
+                    i) cofibrant maps should contain isomorphisms and be closed under composition (A$_1$);
+                    ii) $\mathbb{F}$ is closed under disjunction: $\mathrm{Cofib}\ (\varphi_2)
+                          \rightarrow \mathrm{Cofib}\ (\varphi_1) \rightarrow \mathrm{Cofib}
+                          \ (\varphi_1 \wedge \varphi_2)$
+                    (A$_2$).
+
+                +tex.
+                    $\mathbf{Mixing\ Properties}$. This properties defined how we can mix the
+                    contexts of depedent types and cubical types:
+                    i) wedge $\forall\ (i: \mathbb{I})\ \mathrm{Cofib}\ (i=0) \wedge \mathrm{Cofib}\ (i=1)$ (C$_1$);
+                    ii) cofibrations $\forall\ (i: \mathbb{I})\ \mathrm{Cofib}\ (\phi) \rightarrow \mathrm{Cofib}\ (\forall(i: \mathbb{I})\ \phi))$ (C$_2$).
+
+                +tex.
+                    NOTE: B$_4$ could be replaced with strengthened
+                    C$_1 — \forall\ (i:\mathbb{I})\ \mathrm{Cofib}\ (i = j)$.
+
+                +tex.
+                    $\mathbf{Cubical\ Flavors}$:
+                    i) $\Box_m$ — free monoidal category on interval $1 \rightarrow I \leftarrow 1$;
+                    ii) $\Box_{mc}$ — free monoidal category on interval with connections $\vee$ and $\wedge$;
+                    iii) $\Box_s$ — free symmetric monoidal category on interval;
+                    iv) $\Box_c$ — free cartesian category on interval;
+                    v) $\Box_d$ — free cartesian category on distributive lattice.
+
+                +tex.
+                    NOTE: the cartesian cube category $\Box_c$ is the opposite of
+                    the category $\mathbb{B}$ of finite, strictly bipointed sets: $\Box_c =_{def} \mathbb{B}^{op}$.
+
+                +tex.
+                    <b>Theorem</b> (Awodey).
+                    The $\mathrm{cSet}$ category of cubical types (presheaves on $\Box$) is the
+                    classifying topos of strictly bipointed objects $(X,a,b,a \neq b)$. Geometric
+                    realisation $\mathrm{cSet} \rightarrow \mathrm{Top}$ preserves finite products.
+
+
+
+                h1 SIMPLIFICATION
+
+                p.
+                    What if we take not a category as the underlying objects for sheaves
+                    but monoidal structure just to simplify the model?
+
+                +code.
+                     isPSh (G: U) (M: monoid): U
+                       = (c: G -> M.1.1 -> G)
+                       * (left: (g: G) -> Path G (c g M.2.2.2.1) g)
+                       * ((g: G) (t r: M.1.1)
+                      -> Path G (c (c g t) r) (c g (M.2.1 t r)))
+
+                     PSh (M: monoid): U
+                       = (G: U)
+                       * (isPSh G M)
+
+                     NatPSh (M: monoid) (D G: PSh M): U
+                       = (sigma: D.1 -> G.1)
+                       * ((s: D.1)(t: M.1.1)
+                      -> Path G.1 (G.2.1 (sigma s) t)
+                                  (sigma (D.2.1 s t)))
+                br.
+                +code.
+                     isType (M: monoid) (G: PSh M) (A: G.1 -> U): U
+                       = (star: (g: G.1) -> A g -> (t: M.1.1) -> A (G.2.1 g t))
+                       * (coe1: (g: G.1) (t: M.1.1)
+                      -> Path U (A g) (A (G.2.1 g t)))
+                       * (coe2: (g: G.1) (t r: M.1.1)
+                      -> Path U (A(G.2.1(G.2.1 g t)r))(A(G.2.1 g(M.2.1 t r))))
+                       * (left: (g: G.1) (a: A g)
+                      -> PathP (coe1 g M.2.2.2.1) a (star g a M.2.2.2.1))
+                       * ((g:G.1)(a:A g) (t r: M.1.1)
+                      -> PathP (coe2 g t r) (star (G.2.1 g t) (star g a t) r)
+                                            (star g a (M.2.1 t r)))
+                br.
+                +code.
+                     Ctx: monoid -> U = PSh
+                     Type (M: monoid) (G: PSh M): U = (A: G.1 -> U) * isType M G A
+                     Substitution: (M: monoid) -> Ctx M -> Ctx M -> U = NatPSh
+                br.
+
+                h1 BIBLIOGRAPHY
+
+                p.
+
+                    [1]. Thierry Coquand.
+                    <a href="https://5ht.co/p54-coquand.pdf">A Survey of Constructive Presheaf Models of Univalence</a>.
+
+                    [2]. Mark Bickford.
+                    <a href="https://arxiv.org/pdf/1806.06114.pdf">Formalizing Category Theory and Presheaf Models of Type Theory in Nuprl</a>.
+
+                    [3]. Chuangjie Xu.
+                    <a href="http://cj-xu.github.io/ContinuityType/xu-thesis.pdf">A Continuous Computational Interpretation of Type Theories</a>.
+
+                    [4]. Thierry Coquand, Bassel Mannaa, Fabian Ruch.
+                    <a href="https://arxiv.org/pdf/1701.02571.pdf">Stack Semantics of Type Theory</a>.
+
+                    [5]. Ian Orton, Andrew M. Pitts.
+                    <a href="http://drops.dagstuhl.de/opus/volltexte/2016/6564/pdf/LIPIcs-CSL-2016-24.pdf">Axioms for Modelling Cubical Type Theory in a Topos</a>.
+
+                    [6]. Thierry Coquand, Simon Huber, Anders Mörtberg.
+                    <a href="https://arxiv.org/pdf/1802.01170.pdf">On Higher Inductive Types in Cubical Type Theory</a>
+
+                    [7]. Cyril Cohen, Thierry Coquand, Simon Huber, and Anders Mörtberg.
+                    <a href="https://arxiv.org/pdf/1611.02108.pdf">Cubical Type Theory: a constructive interpretation of the univalence axiom</a>
+
+                    [8]. Alexis LAOUAR.
+                    <a href="https://perso.crans.org/alaouar/rapportm1.pdf">A presheaf model of dependent type theory</a><br>
+
+                h1 VIDEO
+
+                p.
+                    The companion video for [1] source.
+                figure.
+                    <iframe width="560" height="315" src="https://www.youtube.com/embed/fv_dcmcQec4"
+                        frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen>
+                    </iframe>
+
+include ../../../footer

@@ -1,0 +1,76 @@
+{- Deductive Systems.
+   - Hilbert style deductive systems for propositional logic.
+
+   https://en.wikipedia.org/wiki/List_of_Hilbert_systems
+
+   Copyright (c) Groupoid Infinity, 2014-2022. -}
+
+module hilbert where
+import lib/foundations/univalent/path
+import lib/foundations/mltt/proto
+
+-- [Schönfinkel]
+
+def K := Π (p q: Ω) (x: p.1), q.1 → p.1
+def S := Π (p q r: Ω) (x: p.1 → q.1 → r.1) (y: p.1 → q.1), p.1 → r.1
+def E := Π (p : Ω), p.1 → p.1
+
+def k : K := \ (p q : Ω) (x: p.1) (y: q.1), x
+def s : S := \ (p q r: Ω) (f: p.1 → q.1 → r.1) (g: p.1 → q.1) (h: p.1), f h (g h)
+def e : E := \ (p : Ω) (x: p.1), x
+def e₁ : E := \ (p : Ω) (x: p.1), s p p p (k p p) (k p p x) x
+
+def X
+ := Π (p q r x y z h w: Ω)
+      (k: (p.1 → q.1 → p.1) → ((x.1 → y.1 → z.1) → (x.1 → y.1) → x.1 → z.1) → (r.1 → w.1 → r.1) → h.1), h.1
+
+def x : X
+ := \ (p q r a b c h w: Ω)
+      (v: (p.1 → q.1 → p.1) → ((a.1 → b.1 → c.1) → (a.1 → b.1) → a.1 → c.1) → (r.1 → w.1 → r.1) → h.1),
+      v (k p q) (s a b c) (k r w)
+
+def x₁ : X
+ := \ (p q r x y z h w: Ω)
+      (v: (p.1 → q.1 → p.1) → ((x.1 → y.1 → z.1) → (x.1 → y.1) → x.1 → z.1) → (r.1 → w.1 → r.1) → h.1),
+      v (\ (x: p.1) (y: q.1), x)
+        (\ (a: x.1 → y.1 → z.1) (b: x.1 → y.1) (c: x.1), a c (b c))
+        (\ (e: r.1) (f: w.1), e)
+
+def x=x₁ : PathP (<_>X) x x₁ := <_> x
+
+-- [Łukashewicz]
+
+def L3-1 := Π (p q: Ω) (x: p.1), q.1 → p.1
+def L3-2 := Π (p q r: Ω) (x: p.1 → q.1 → r.1) (y: p.1 → q.1), p.1 → r.1
+def L3-3 := Π (p q: Ω) (x: ¬ p.1 → ¬ q.1), q.1 → p.1
+
+-- [Frege]
+
+def THEN-1 := Π (p q: Ω) (x: p.1), q.1 → p.1
+def THEN-2 := Π (p q r: Ω) (x: p.1 → q.1 → r.1) (y: p.1 → q.1), p.1 → r.1
+def THEN-3 := Π (p q r: Ω) (x: p.1 → q.1 → r.1), q.1 → p.1 → r.1
+def FRG-1  := Π (p q: Ω) (x: p.1 → q.1), ¬ q.1 → ¬ p.1
+def FRG-2  := Π (p: Ω), ¬ (¬ p.1) → p.1
+def FRG-3  := Π (p: Ω), p.1 → ¬ (¬ p.1)
+
+-- [Hilbert]
+
+def H-1 := Π (p q: Ω) (x: p.1), q.1 → p.1
+def H-2 := Π (p q r: Ω) (x: p.1 → q.1 → r.1), q.1 → p.1 → r.1
+def H-3 := Π (p q r: Ω) (x: q.1 → r.1), ((p.1 → q.1) → (p.1 → r.1))
+def H-4 := Π (p q: Ω) (x: p.1), ¬ q.1 → p.1
+def H-5 := Π (p q: Ω) (x: p.1 → q.1), (¬ q.1 → p.1) → p.1
+
+-- [Church]
+
+def C-1 := Π (p q: Ω) (x: p.1), q.1 → p.1
+def C-2 := Π (p q r: Ω) (x: p.1 → q.1 → r.1) (y: p.1 → q.1), p.1 → r.1
+def C-3 := Π (p: Ω), ((p.1 → 𝟎) → 𝟎) → p.1
+
+-- [Tarski, Bernays]
+
+def TB-1 := Π (p q r: Ω) (x: q.1 → r.1), (q.1 → r.1) → (p.1 → r.1)
+def TB-2 := Π (p q: Ω) (x: p.1), q.1 → p.1
+def TB-3 := Π (p q: Ω) (x: (p.1 → q.1) → p.1), p.1
+def TB-4 := Π (p: Ω), 𝟎 → p.1
+

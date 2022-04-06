@@ -1,0 +1,65 @@
+<!DOCTYPE html><html><head><meta charset="utf-8"><meta http-equiv="x-ua-compatible" content="ie=edge"><meta property="fb:app_id" content="118554188236439"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="author" content="Maxim Sokhatsky"><meta name="twitter:site" content="@5HT"><meta name="twitter:creator" content="@5HT"><meta property="og:type" content="website"><meta property="og:image" content="https://avatars.githubusercontent.com/u/17128096?s=400&amp;u=66a63d4cdd9625b2b4b37d724cc00fe6401e5bd8&amp;v=4"><meta name="msapplication-TileColor" content="#ffffff"><meta name="msapplication-TileImage" content="https://anders.groupoid.space/images/ms-icon-144x144.png"><meta name="theme-color" content="#ffffff"><link rel="stylesheet" href="https://anders.groupoid.space/main.css?v=1"><link rel="apple-touch-icon" sizes="57x57" href="https://anders.groupoid.space/images/apple-icon-57x57.png"><link rel="apple-touch-icon" sizes="60x60" href="https://anders.groupoid.space/images/apple-icon-60x60.png"><link rel="apple-touch-icon" sizes="72x72" href="https://anders.groupoid.space/images/apple-icon-72x72.png"><link rel="apple-touch-icon" sizes="76x76" href="https://anders.groupoid.space/images/apple-icon-76x76.png"><link rel="apple-touch-icon" sizes="114x114" href="https://anders.groupoid.space/images/apple-icon-114x114.png"><link rel="apple-touch-icon" sizes="120x120" href="https://anders.groupoid.space/images/apple-icon-120x120.png"><link rel="apple-touch-icon" sizes="144x144" href="https://anders.groupoid.space/images/apple-icon-144x144.png"><link rel="apple-touch-icon" sizes="152x152" href="https://anders.groupoid.space/images/apple-icon-152x152.png"><link rel="apple-touch-icon" sizes="180x180" href="https://anders.groupoid.space/images//apple-icon-180x180.png"><link rel="icon" type="image/png" sizes="192x192" href="https://anders.groupoid.space/images/android-icon-192x192.png"><link rel="icon" type="image/png" sizes="32x32" href="https://anders.groupoid.space/images/favicon-32x32.png"><link rel="icon" type="image/png" sizes="96x96" href="https://anders.groupoid.space/images/favicon-96x96.png"><link rel="icon" type="image/png" sizes="16x16" href="https://anders.groupoid.space/images/favicon-16x16.png"><link rel="manifest" href="https://anders.groupoid.space/images/manifest.json"><style>svg a{fill:blue;stroke:blue}
+[data-mml-node="merror"]>g{fill:red;stroke:red}
+[data-mml-node="merror"]>rect[data-background]{fill:yellow;stroke:none}
+[data-frame],[data-line]{stroke-width:70px;fill:none}
+.mjx-dashed{stroke-dasharray:140}
+.mjx-dotted{stroke-linecap:round;stroke-dasharray:0,140}
+use[data-c]{stroke-width:3px}
+</style></head><body class="content"></body></html><title>ALGEBRAIC STRUCTURE</title><nav><a href='https://anders.groupoid.space/'>HTS</a>
+<a href='https://anders.groupoid.space/lib/'>LIB</a>
+<a href='#'>ALGEBRA</a></nav><article class="main"><div class="exe"><section><h1>ALGEBRAIC STRUCTURE</h1></section></div><aside><time>Published: 24 MAR 2021</time></aside><div class="exe"><section><p>Results presented here are formalized
+in <a href="https://github.com/groupoid/lean/blob/master/ground_zero/algebra/basic.lean">Ground Zero</a> library
+using <a href="http://leanprover.github.io/">Lean Theorem Prover</a>.
+</p></section><section><h1>ALGEBRA</h1><p><b>Definition.</b> Signature over given types $ι, υ : \mathcal{U}$
+(called <b>indices</b>) is an element of type $ι + υ \rightarrow \mathbb{N}$.
+<br>
+Where $A + B : \mathcal{U}$ denotes coproduct type.
+</p><p><b>Definition.</b> Vector of length $n$ over type $A : \mathcal{U}$
+(denoted $\mathrm{vect}(A, n)$) is a type:
+  $$ \underbrace{A \times A \times … \times A}_{\text{n times}} \times \textbf{1} $$
+<br>
+Where $\textbf{1} : \mathcal{U}$ denotes unit type that contains
+only $\star : \textbf{1}$.
+</p><p><b>Definition.</b> Assume we have types $A, B : \mathcal{U}$,
+function $f : A \rightarrow B$, and a natural number $n : \mathbb{N}$.
+Then we define function $f^{\mathrm{map}} :
+\mathrm{vect}(A, n) \rightarrow \mathrm{vect}(B, n)$:
+  $$ f^{\mathrm{map}}(a_1, a_2, …, a_n, \star) ≔ (f(a_1), f(a_2), …, f(a_n), \star) $$
+</p><p><b>Definition.</b> $n$-ary algebraic operation over given
+  type $A : \mathcal{U}$ is an element of type:
+  $$ \mathrm{vect}(A, n) \rightarrow A $$
+</p><p><b>Definition.</b> $n$-ary algebraic relation over given
+  type $A : \mathcal{U}$ is an element of type:
+  $$ \mathrm{vect}(A, n) \rightarrow Ω $$
+<br>
+Where $Ω$ denotes type of all propositions, i.e.
+  $$ Ω ≔ \sum_{A : \mathcal{U}} isProp(A) $$
+</p><p><b>Definition.</b> Algebraic structure over signature $\mathrm{deg}$ constists of:
+  (i) 0-Type called carrier,
+  (ii) $\mathrm{deg}(\mathrm{inl}(i))$-ary algebraic operation for each $i : ι$,
+  (iii) $\mathrm{deg}(\mathrm{inr}(i))$-ary algebraic relation for each $i : υ$.
+<br> Or, more explicitly:
+  $$ \mathrm{Alg}(\mathrm{deg}) ≔ \sum_{A : \text{0-Type}}
+    \left( \prod_{i : ι} \mathrm{vect}(A, \mathrm{deg}(\mathrm{inl}(i))) \rightarrow A \right) \times \\
+    \left( \prod_{i : υ} \mathrm{vect}(A, \mathrm{deg}(\mathrm{inr}(i))) \rightarrow Ω \right)
+  $$
+<br> We will write $Γ^{\mathrm{car}}$ for carrier of algebraic structure $Γ$,
+$Γ^{\mathrm{op}}$ for its algebraic operations,
+and $Γ^{\mathrm{rel}}$ for its relations.
+</p></section><section><h1>Mappings</h1><p><b>Definition</b> (Homomorphism). Given two algebraic structures $Γ, Λ$ over signature $\mathrm{deg}$
+and a function between them $φ : Γ^{\mathrm{car}} \rightarrow Λ^{\mathrm{car}}$,
+we say that $φ$ is homomorphism iff holds:
+<br> (i) $φ(Γ^{\mathrm{op}}(i, v)) = Λ^{\mathrm{op}}(i, φ^{\mathrm{map}}(v))$,
+<br> (ii) $Γ^{\mathrm{rel}}(i, v) = Λ^{\mathrm{rel}}(i, φ^{\mathrm{map}}(v))$,
+<br> for each $i : ι$ or $i : υ$ and $v : \mathrm{deg}(\mathrm{inr}(i))$.
+</p><p><b>Theorem.</b> Composition of two homomorphisms is also homomorphism.
+</p><p><b>Definition</b> (Isomorphism). We say that $φ : Γ^{\mathrm{car}} \rightarrow Λ^{\mathrm{car}}$
+is an ismorphism iff it is bijective and homomorphism.
+Then we can say that $Γ$ and $Λ$ are isomorphic and write $φ : Γ \cong Λ$.
+</p><p><b>Theorem.</b> Isomorphism is an equivalence relation, i.e.
+<br> (i) $Γ \cong Γ$,
+<br> (ii) $Γ \cong Λ \rightarrow Λ \cong Γ$,
+<br> (iii) $Γ \cong Λ \rightarrow Λ \cong Δ \rightarrow Γ \cong Δ$.
+</p><p><b>Theorem</b> (Univalence for Algebraic Structures).
+  $$ (Γ \cong Λ) \simeq (Γ = Λ) $$
+</p></section></div></article><footer class="footer"><a href="https://5ht.co/license/"><img class="footer__logo" src="https://longchenpa.guru/seal.png" width="50"></a><span class="footer__copy">2021&mdash;2022 &copy; <a href="//groupoid.space/" style="color:Lavender;">Groupoïd Infinity</a></span></footer>

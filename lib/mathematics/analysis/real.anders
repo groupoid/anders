@@ -1,0 +1,100 @@
+{- Real Numbers:
+   - Dedekind reals
+   - Cauchy reals
+   - Escardó-Simpson reals
+
+   HoTT 11.2 Dedekind reals
+   HoTT 11.3 Cauchy reals
+
+   Copyright (c) Groupoid Infinity, 2014-2022. -}
+
+-- Martín Hötzel Escardó, Thomas Streicher, 1999
+-- Induction and recursion on the partial real line with applications to Real PCF
+-- https://core.ac.uk/download/pdf/82595986.pdf
+
+-- Martín Hötzel Escardó, Alex Simpson, 2001
+-- A Universal Characterisation of the Closed Euclidean Interval
+-- https://www.cs.bham.ac.uk/~mhe/papers/interval.pdf
+
+-- Martín Hötzel Escardó, Alex Simpson, 2014
+-- Abstract Datatypes for Real Numbers in Type Theory
+-- https://www.cs.bham.ac.uk/~mhe/papers/realadt.pdf
+-- https://www.cs.bham.ac.uk/~mhe/agda-new/Escardo-Simpson-LICS2001.html
+
+-- Auke Bart Booij, PhD 2020
+-- Analysis in Univalent Type Theory
+-- http://etheses.bham.ac.uk//id/eprint/10411/7/Booij2020PhD.pdf
+
+-- Todd Waugh Ambridge, 2020
+-- Formalising the Escardó-Simpson Closed Interval Axiomatisation in Univalent Type Theory
+-- https://hott-uf.github.io/2020/HoTTUF_2020_paper_17.pdf
+-- https://www.cs.bham.ac.uk/~mhe/agda-new/UF-SIP-IntervalObject.html
+
+module real where
+import lib/foundations/univalent/path
+import lib/foundations/mltt/inductive
+
+def ≤₂ (a b : 𝟐) : U := Path 𝟐 a 0₂ → Path 𝟐 b 1₂
+def is-decreasing (α : ℕ → 𝟐) : U := Π (i : ℕ), ≤₂ (α (succ i)) (α i)
+def ℕ∞ : U := Σ (α : ℕ → 𝟐), is-decreasing α
+def incl (α : ℕ∞) : ℕ → 𝟐 := α.1
+def tail∞ (A : U) (a : ℕ → A) : ℕ → A := \ (n : ℕ), a (succ n)
+
+def midpoint-alg (A : U) (O : A → A → A) : U₁ :=
+  Σ (isSet : isSet A)
+    (idempodent : Π (a : A), Path A (O a a) a)
+    (commutative : Π (x y : A), Path A (O x y) (O y x))
+    (transpositional : Π (a b c d : A), Path A (O (O a b) (O c d)) (O (O a c) (O b d))), U
+
+def convex-body : U₁ :=
+  Σ (A : U)
+    (O : A → A → A)
+    (midpoint : midpoint-alg A O)
+    (cancelative : Π (a b c : A), Path A (O a c) (O b c) → Path A a b)
+    (iterative :
+    Σ (M : Π (_ : ℕ → A), A)
+      (x : Π (a : ℕ → A), Path A (M a) (O (a zero) (M (tail∞ A a)))),
+    Π (a x : ℕ → A) (y : Π (i : ℕ), Path A (a i) (O (x i) (a (succ i)))),
+      Path A (a zero) (M x)), U
+
+def ∃! (A : U) (B : A -> U) : U := isContr (Σ (x: A), B x)
+
+def Interval-Object : U₁ :=
+  Σ (J : convex-body) (u v : J.A),
+  Π (K : convex-body) (a b : K.A),
+ ∃! (J.A -> K.A)
+    ( λ (h : J.A -> K.A),
+      Σ (_ : Path (K.A) (h u) a) (_ : Path (K.A) (h v) b),
+      Π (x y : J.A), Path K.A (h (J.O x y)) (K.O (h x) (h y)))
+
+{- The key structure of the axiomatisation: an interval object.
+   An interval object is defined by a convex-body J and two points u,v : J.A, such that
+   For every two points a,b : K.A of a convex-body K there exists a unique h : J.A -> K.ob such that:
+   h u ≡ a /\ h v ≡ b /\ ∀ x,y : J.A, h (x J.O y) ≡ h x K.O h y -}
+
+-- Exact Real Arithmetics
+
+-- Peter John Potts, 1996
+-- Computable Real Arithmetic Using Linear Fractional Transformations
+-- https://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.24.7373&rep=rep1&type=pdf
+
+-- Peter John Potts, Abbas Edalat, 1997
+-- Exact Real Computer Arithmetic
+-- http://www.doc.ic.ac.uk/research/technicalreports/1997/DTR97-9.pdf
+
+-- Peter Potts, Abbas Edalat, Martín Hötzel Escardó, 1997
+-- Semantics of Exact Real Arithmetic
+-- https://www.researchgate.net/publication/221443275_Semantics_of_Exact_Real_Arithmetic
+
+-- Reinhold Heckmann, 1998
+-- The Appearance of Big Integers in Exact Real Arithmetic Based on Linear Fractional Transformations
+-- https://link.springer.com/content/pdf/10.1007%2FBFb0053549.pdf
+
+-- Peter John Potts, PhD, 1998
+-- Exact Real Arithmetics using Mobius Transformations
+-- https://www.doc.ic.ac.uk/~ae/papers/potts-phd.pdf
+
+-- Peter John Potts, Abbas Edalat, 1998
+-- A New Representation for Exact Real Numbers
+-- https://www.sciencedirect.com/science/article/pii/S1571066105801665
+

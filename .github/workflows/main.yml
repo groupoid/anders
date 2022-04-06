@@ -1,0 +1,35 @@
+name: opam
+
+on:
+  - pull_request
+  - push
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+#          - macos-latest
+          - ubuntu-latest
+#          - windows-latest
+        ocaml-version:
+          - 4.14.0
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Use OCaml ${{ matrix.ocaml-version }}
+        uses: avsm/setup-ocaml@v1
+        with:
+          ocaml-version: ${{ matrix.ocaml-version }}
+
+      - run: opam depext anders --yes
+      - run: opam install . --deps-only
+      - run: opam exec -- dune build
+      - run: opam install .
+      - run: opam exec -- dune exec anders silent check library/book.anders
+

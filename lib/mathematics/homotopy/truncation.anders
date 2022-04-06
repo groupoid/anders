@@ -1,0 +1,21 @@
+module truncation where
+import lib/mathematics/homotopy/Sn
+import lib/mathematics/homotopy/hubSpokes
+
+{- Generic ℕ-indexed Truncations -}
+
+def trunc (A : U) (n : ℕ) : U := hs (sphere n) A
+def trunc₁ (A : U) (n : ℕ) (x : A) : trunc A n := center (sphere n) A x
+def trunc₂ (A : U) (n : ℕ) (f : sphere n → trunc A n) : trunc A n := hub (sphere n) A f
+def trunc₃ (A : U) (n : ℕ) (f : sphere n → trunc A n) (s : sphere n)
+  : Path (trunc A n) (hub (sphere n) A f) (f s) := spoke (sphere n) A f s
+
+{- Trancation Instances for ₋₁,₀,₁ truncation levels -}
+
+def ‖_‖₋₁ (A : U) : U := trunc A zero -- Propositional Truncation ‖A‖₋₁
+def ‖_‖₀ (A : U) : U := trunc A one   -- Set Truncation ‖A‖₀
+def ‖_‖₁ (A : U) : U := trunc A two   -- Groupoid Truncation ‖A‖₁
+def ‖_‖ (A : U) : ℕ → U := trunc A
+
+def isSurjective (A B: U) (f: A -> B): U := summa (b: B), ‖_‖₋₁ (fiber A B f b)
+def surjective (A B: U): U := summa (f: A -> B), isSurjective A B f

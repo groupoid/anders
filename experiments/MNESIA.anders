@@ -1,0 +1,21 @@
+module MNESIA where
+import experiments/BASE
+
+axiom all : IO (List TableId)
+axiom browse : IO String
+axiom delete : Π (k: U), TableId -> k -> IO Unit
+axiom first : Π (t: TableId) (k: U), IO (Maybe k)
+axiom last : Π (k: U), TableId -> IO (Maybe k)
+axiom foldl : Π (v acc: U), (v -> acc -> acc) -> acc -> TableId -> IO acc
+axiom foldr : Π (v acc: U), (v -> acc -> acc) -> acc -> TableId -> IO acc
+axiom insert : Π (v: U), TableId -> v -> IO Boolean
+axiom lookup : Π (k v: U), TableId -> k -> IO (List v)
+axiom member : Π (k: U), TableId -> k -> IO Boolean
+axiom new : Atom -> TableOptions -> IO TableId
+axiom next : Π (k: U), TableId -> k -> IO (Maybe k)
+axiom prev : Π (k: U), TableId -> k -> IO (Maybe k)
+axiom rename : TableId -> Atom -> IO Atom
+axiom take : Π (k v: U), TableId -> k -> IO (List v)
+axiom match : Π (a v: U), TableId -> a -> IO (List v)
+axiom slot : Π (v: U), TableId -> Integer -> IO (Maybe (List v))
+

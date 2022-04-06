@@ -1,0 +1,40 @@
+{- Category Theory: https://anders.groupoid.space/mathematics/categories/functor/
+   - Functor;
+   - Coslice Category;
+   - Universal Arrow;
+   - Equivalence.
+
+   HoTT 9.2 Functors and transformations
+   HoTT 9.4 Equivalences
+
+   Copyright (c) Groupoid Infinity, 2014-2022. -}
+
+module functor where
+import lib/mathematics/categories/category
+
+def catfunctor (A B: precategory): U := Σ
+    (ob: A.C.ob -> B.C.ob)
+    (mor: Π (x y: A.C.ob), A.C.hom x y -> B.C.hom (ob x) (ob y))
+    (id: Π (x: A.C.ob), Path (B.C.hom (ob x) (ob x)) (mor x x (A.P.id x)) (B.P.id (ob x)))
+    (fcomp: Π (x y z: A.C.ob) (f: A.C.hom x y) (g: A.C.hom y z),
+    Path (B.C.hom (ob x) (ob z)) (mor x z (A.P.∘ x y z f g)) (B.P.∘ (ob x) (ob y) (ob z) (mor x y f) (mor y z g))), unit
+
+def idFunctor (A: precategory): catfunctor A A :=
+    (λ (x: A.C.ob), x,
+     λ (x y: A.C.ob) (h: A.C.hom x y), h,
+     λ (x: A.C.ob), <_> A.P.id x,
+     λ (x y z: A.C.ob) (f: A.C.hom x y) (g: A.C.hom y z), <_> A.P.∘ x y z f g, star)
+
+def compFunctor (A B C: precategory) (F: catfunctor A B) (G: catfunctor B C): catfunctor A C :=
+    (λ (x: A.C.ob), G.ob (F.ob x),
+     λ (x y: A.C.ob) (h: A.C.hom x y), G.mor (F.ob x) (F.ob y) (F.mor x y h),
+     λ (x: A.C.ob), pcomp (C.C.hom (G.ob (F.ob x)) (G.ob (F.ob x))) (G.mor (F.ob x) (F.ob x) (F.mor x x (A.P.id x)))
+       (G.mor (F.ob x) (F.ob x) (B.P.id (F.ob x))) (C.P.id (G.ob (F.ob x))) (<i> G.mor (F.ob x) (F.ob x) (F.id x @ i)) (G.id (F.ob x)),
+     λ (x y z: A.C.ob) (f: A.C.hom x y) (g: A.C.hom y z), pcomp (C.C.hom (G.ob (F.ob x)) (G.ob (F.ob z)))
+       (G.mor (F.ob x) (F.ob z) (F.mor x z (A.P.∘ x y z f g)))
+       (G.mor (F.ob x) (F.ob z) (B.P.∘ (F.ob x) (F.ob y) (F.ob z) (F.mor x y f) (F.mor y z g)))
+       (C.P.∘ (G.ob (F.ob x)) (G.ob (F.ob y)) (G.ob (F.ob z)) (G.mor (F.ob x) (F.ob y) (F.mor x y f))
+       (G.mor (F.ob y) (F.ob z) (F.mor y z g))) (<i> G.mor (F.ob x) (F.ob z) (F.fcomp x y z f g @ i))
+       (G.fcomp (F.ob x) (F.ob y) (F.ob z) (F.mor x y f) (F.mor y z g)), star)
+
+def compFunctor' (A B C: precategory) (F: catfunctor B C) (G: catfunctor A B): catfunctor A C := compFunctor A B C G F

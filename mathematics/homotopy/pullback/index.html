@@ -1,0 +1,65 @@
+<!DOCTYPE html><html><head><meta charset="utf-8"><meta http-equiv="x-ua-compatible" content="ie=edge"><meta property="fb:app_id" content="118554188236439"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="author" content="Maxim Sokhatsky"><meta name="twitter:site" content="@5HT"><meta name="twitter:creator" content="@5HT"><meta property="og:type" content="website"><meta property="og:image" content="https://avatars.githubusercontent.com/u/17128096?s=400&amp;u=66a63d4cdd9625b2b4b37d724cc00fe6401e5bd8&amp;v=4"><meta name="msapplication-TileColor" content="#ffffff"><meta name="msapplication-TileImage" content="https://anders.groupoid.space/images/ms-icon-144x144.png"><meta name="theme-color" content="#ffffff"><link rel="stylesheet" href="https://anders.groupoid.space/main.css?v=1"><link rel="apple-touch-icon" sizes="57x57" href="https://anders.groupoid.space/images/apple-icon-57x57.png"><link rel="apple-touch-icon" sizes="60x60" href="https://anders.groupoid.space/images/apple-icon-60x60.png"><link rel="apple-touch-icon" sizes="72x72" href="https://anders.groupoid.space/images/apple-icon-72x72.png"><link rel="apple-touch-icon" sizes="76x76" href="https://anders.groupoid.space/images/apple-icon-76x76.png"><link rel="apple-touch-icon" sizes="114x114" href="https://anders.groupoid.space/images/apple-icon-114x114.png"><link rel="apple-touch-icon" sizes="120x120" href="https://anders.groupoid.space/images/apple-icon-120x120.png"><link rel="apple-touch-icon" sizes="144x144" href="https://anders.groupoid.space/images/apple-icon-144x144.png"><link rel="apple-touch-icon" sizes="152x152" href="https://anders.groupoid.space/images/apple-icon-152x152.png"><link rel="apple-touch-icon" sizes="180x180" href="https://anders.groupoid.space/images//apple-icon-180x180.png"><link rel="icon" type="image/png" sizes="192x192" href="https://anders.groupoid.space/images/android-icon-192x192.png"><link rel="icon" type="image/png" sizes="32x32" href="https://anders.groupoid.space/images/favicon-32x32.png"><link rel="icon" type="image/png" sizes="96x96" href="https://anders.groupoid.space/images/favicon-96x96.png"><link rel="icon" type="image/png" sizes="16x16" href="https://anders.groupoid.space/images/favicon-16x16.png"><link rel="manifest" href="https://anders.groupoid.space/images/manifest.json"><style>svg a{fill:blue;stroke:blue}
+[data-mml-node="merror"]>g{fill:red;stroke:red}
+[data-mml-node="merror"]>rect[data-background]{fill:yellow;stroke:none}
+[data-frame],[data-line]{stroke-width:70px;fill:none}
+.mjx-dashed{stroke-dasharray:140}
+.mjx-dotted{stroke-linecap:round;stroke-dasharray:0,140}
+use[data-c]{stroke-width:3px}
+</style></head><body class="content"></body></html><title>PULLBACK</title><nav><a href='https://anders.groupoid.space/'>HTS</a>
+<a href='https://anders.groupoid.space/lib/'>LIB</a>
+<a href='#'>PULLBACK</a></nav><article class="main"><div class="om"><section><h1>PULLBACK</h1></section></div><aside><time>Published: 20 MAY 2018</time></aside><div class="enc"></div><section><figure>$$\def\mapright#1{\xrightarrow{{#1}}}
+  \def\mapdown#1{\Big\downarrow\rlap{\raise2pt{\scriptstyle{#1}}}}
+  \def\mapdiagl#1{\vcenter{\searrow}\rlap{\raise2pt{\scriptstyle{#1}}}}
+  \def\mapdiagr#1{\vcenter{\swarrow}\rlap{\raise2pt{\scriptstyle{#1}}}}
+$$</figure><p><a href="https://raw.githubusercontent.com/groupoid/cubical/master/src/pullback.ctt">
+Pullback package</a> contains basic information about Homotopy Limits known as Pullbacks.
+</p><h2>Definitions</h2><p><b>Definition</b> (Homotopy Pullback). The pullback of the first diagram (which is called cospan)</p><div class="semantics"><figure>$$
+\begin{array}{ccc}
+    & & B \\
+    & & \mapdown{\mathbf{g}} \\
+    A & \mapright{\mathbf{f}} & C \\
+\end{array}
+$$</figure><figure>$$
+\begin{array}{ccc}
+    A \times^{h}_{C} B & \mapright{\mathbf{pb_2}} & B \\
+    \mapdown{\mathbf{pb_1}} & \mapdiagl{\mathbf{pb_3}} & \mapdown{\mathbf{g}} \\
+    A & \mapright{\mathbf{f}} & C \\
+\end{array}
+$$</figure></div><figure>$$
+    A \times^{h}_{C} B = \Sigma_A\Sigma_B C^I \\
+    = \left\{ (x,y,h) : \Sigma_X\Sigma_Y C^I | h(0)=f(x), h(1)=g(y) \right\}
+$$</figure><p>is a $X \times^h_C Y$
+together with the projection maps $pb_{1,2,3}$ making the second
+diagram commute up to homotopy $H(x,y,h,t) = h(t)$.</p><code>pullback (A B C:U) (f: A -> C) (g: B -> C): U = (a: A) * (b: B) * Path C (f a) (g b)
+
+pb1 (A B C: U) (f: A -> C) (g: B -> C): pullback A B C f g -> A = \(x: pullback A B C f g) -> x.1
+pb2 (A B C: U) (f: A -> C) (g: B -> C): pullback A B C f g -> B = \(x: pullback A B C f g) -> x.2.1
+pb3 (A B C: U) (f: A -> C) (g: B -> C): (x: pullback A B C f g) -> Path C (f x.1) (g x.2.1)
+  = \(x: pullback A B C f g) -> x.2.2
+</code><p><b>Definition</b> (Homotopy Pullback Square). A homotopy pullback or cospan
+is called a homotopy pullback square if there exists a homotopy
+equivalence $\phi : Z \rightarrow A \times_C^h B$ satisfying
+$z_1 : Z \rightarrow A = pb_1 \circ \phi$
+and $z_2: Z \rightarrow B = pb_2 \circ \phi$. Map $\phi$ is called induced map.</p><figure>$$
+    \begin{array}{ccc}
+        X \times^{h}_{C} Y & \mapright{\mathbf{pb_2}} & B \\
+        \mapdown{\mathbf{pb_1}} & \square_{(Z,z_1,z_2)} & \mapdown{\mathbf{g}} \\
+        A & \mapright{\mathbf{f}} & C \\
+    \end{array}
+$$</figure><code>induced (Z A B C: U) (f: A -> C) (g: B -> C)
+        (z1: Z -> A) (z2: Z -> B)
+        (h: (z:Z) -> Path C ((o Z A C f z1) z) (((o Z B C g z2)) z))
+      : Z -> pullback A B C f g
+      = \(z: Z) -> ((z1 z),(z2 z),h z)
+
+pullbackSq (Z A B C: U) (f: A -> C) (g: B -> C) (z1: Z -> A) (z2: Z -> B): U
+         = (h: (z:Z) -> Path C ((o Z A C f z1) z) (((o Z B C g z2)) z))
+         * isEquiv Z (pullback A B C f g) (induced Z A B C f g z1 z2 h)
+
+isPullbackSq (Z A B C: U) (f: A -> C) (g: B -> C) (z1: Z -> A) (z2: Z -> B)
+             (h: (z:Z) -> Path C ((o Z A C f z1) z) (((o Z B C g z2)) z)): U
+           = isEquiv Z (pullback A B C f g) (induced Z A B C f g z1 z2 h)</code><p><b>Proposition</b> (Existence of Pullback Square).
+Pullback Square exists and equals Pullback, where induced map is identity.
+Given as 2.11 Exercise in HoTT Chapter 2.</p><code>completePullback (A B C: U) (f: A -> C) (g: B -> C) :
+    pullbackSq (pullback A B C f g) A B C f g (pb1 A B C f g) (pb2 A B C f g)
+</code></section></article><footer class="footer"><a href="https://5ht.co/license/"><img class="footer__logo" src="https://longchenpa.guru/seal.png" width="50"></a><span class="footer__copy">2021&mdash;2022 &copy; <a href="//groupoid.space/" style="color:Lavender;">Groupoïd Infinity</a></span></footer>

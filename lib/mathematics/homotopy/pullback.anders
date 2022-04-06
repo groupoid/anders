@@ -1,0 +1,42 @@
+{- Homotopy Pullback: https://anders.groupoid.space/mathematics/homotopy/pullback/
+
+   HoTT 2.15
+
+   Copyright (c) Groupoid Infinity, 2014-2022. -}
+
+module pullback where
+import lib/foundations/univalent/path
+import lib/foundations/univalent/equiv
+
+--       z₂
+--    Z ――――→ B
+--    |       |
+-- z₁ |  pb   | g
+--    ↓       ↓
+--    A ――――→ C
+--        f
+
+def pullback (A B C : U) (f : A → C) (g : B → C) : U := Σ (a : A) (b : B), Path C (f a) (g b)
+def kernel  (A B : U) (f : A → B) : U := pullback A A B f f
+def hofiber (A B : U) (f : A → B) (y : B): U := pullback A 𝟏 B f (λ (x : 𝟏), y)
+
+def pb₁ (A B C : U) (f : A → C) (g : B → C) : pullback A B C f g → A := λ (x : pullback A B C f g), x.1
+def pb₂ (A B C : U) (f : A → C) (g : B → C) : pullback A B C f g → B := λ (x : pullback A B C f g), x.2.1
+def pb₃ (A B C : U) (f : A → C) (g : B → C) : Π (x : pullback A B C f g), Path C (f x.1) (g x.2.1) := λ (x : pullback A B C f g), x.2.2
+
+def induced (Z A B C : U) (f : A → C) (g : B → C) (z₁ : Z → A) (z₂ : Z → B)
+  (h : Π (z : Z), Path C ((∘ Z A C f z₁) z) (((∘ Z B C g z₂)) z)) : Z → pullback A B C f g
+ := λ (z : Z), (z₁ z, z₂ z, h z)
+
+def pullbackSq (Z A B C : U) (f : A → C) (g : B → C) (z₁ : Z → A) (z₂ : Z → B): U
+ := Σ (h : Π (z : Z), Path C ((∘ Z A C f z₁) z) (((∘ Z B C g z₂)) z)), isEquiv Z (pullback A B C f g) (induced Z A B C f g z₁ z₂ h)
+
+def isPullbackSq (Z A B C : U) (f : A → C) (g : B → C) (z₁ : Z → A) (z₂ : Z → B) (h : Π (z : Z), Path C ((∘ Z A C f z₁) z) (((∘ Z B C g z₂)) z)) : U
+ := isEquiv Z (pullback A B C f g) (induced Z A B C f g z₁ z₂ h)
+
+-- Exercise 2.11. Prove that the pullback P :≡ A x_C B defined in (2.15.11) is the corner of a pullback square.
+axiom completePullback (A B C : U) (f : A → C) (g : B → C) : pullbackSq (pullback A B C f g) A B C f g (pb₁ A B C f g) (pb₂ A B C f g)
+
+def fiberPullback (A B : U) (f : A → B) (y : B)
+  : pullbackSq (hofiber A B f y) A 𝟏 B f (λ (x : 𝟏), y) (pb₁ A 𝟏 B f (λ (x : 𝟏), y)) (pb₂ A 𝟏 B f (λ (x : 𝟏), y))
+ := completePullback A 𝟏 B f (λ (x : 𝟏), y)

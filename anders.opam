@@ -1,0 +1,19 @@
+opam-version: "2.0"
+name: "anders"
+version: "1.4.0"
+maintainer: "Namdak Tonpa <maxim@synrc.com>"
+authors: [ "Groupoid Infinity @infinitystack" ]
+homepage: "https://anders.groupoid.space/"
+bug-reports: "https://github.com/groupoid/anders/issues"
+dev-repo: "https://github.com/groupoid/anders"
+synopsis: "Modal Homotopy Type System"
+license: "ISC"
+depends: [
+  "dune" {>= "2.9"}
+  "zarith" {>= "1.12"}
+  "ocaml" {>= "4.14"}
+  "menhir" {>= "20220210"}
+]
+build: [
+  ["dune" "build" "-p" name "-j" jobs]
+]

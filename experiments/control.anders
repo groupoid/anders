@@ -1,0 +1,25 @@
+module control where
+
+-- compilation scheme
+
+-- record pure (P: U → U) (A: U) := (return: P A)
+-- record functor (F: U → U) (A B: U) := (fmap: (A → B) → F A → F B)
+-- record applicative (F: U → U) (A B: U) extends pure F A, functor F A B := (ap: F (A → B) → F A → F B)
+-- record monad (F: U → U) (A B: U) extends pure F A, functor F A B := (join: F (F A) → F B)
+
+def return_sig (F: U → U): U₁ := Π (A: U), A → F A
+def ap_sig     (F: U → U): U₁ := Π (A B: U), F (A → B) → F A → F B
+def fmap_sig   (F: U → U): U₁ := Π (A B: U), (A → B) → F A → F B
+def join_sig   (F: U → U): U₁ := Π (A: U), F (F A) → F A
+
+def pure:        U₁ := Σ (F: U → U) (return: return_sig F), 𝟏
+def functor:     U₁ := Σ (F: U → U) (fmap: fmap_sig F), 𝟏
+def applicative: U₁ := Σ (F: U → U) (return: return_sig F)
+                                    (fmap: fmap_sig F)
+                                    (ap: ap_sig F), 𝟏
+def monad:       U₁ := Σ (F: U → U) (return: return_sig F)
+                                    (fmap: fmap_sig F)
+                                    (join: join_sig F), 𝟏
+
+def join (m: monad) := m.join
+

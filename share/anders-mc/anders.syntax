@@ -1,0 +1,140 @@
+# Cubical Syntax for Midnight Commander to place in Syntax Files
+
+# Syntax Files: /usr/share/mc/syntax
+# Top Configuration File for mcedit: ~/.config/mc/mcedit/Syntax
+
+context default
+    keyword whole Pi brightmagenta
+    keyword whole Equ brightmagenta
+    keyword whole zero brightmagenta
+    keyword whole succ brightmagenta
+    keyword whole ℕ-ind brightmagenta
+    keyword whole ℕ-rec brightmagenta
+    keyword whole ℕ-case brightmagenta
+    keyword whole ℕ brightmagenta
+    keyword whole Fin-ind brightmagenta
+    keyword whole Fin-rec brightmagenta
+    keyword whole Fin-iter brightmagenta
+    keyword whole Fin brightmagenta
+    keyword whole vzero brightmagenta
+    keyword whole vsucc brightmagenta
+    keyword whole Vec-ind brightmagenta
+    keyword whole Vec-rec brightmagenta
+    keyword whole Vec-case brightmagenta
+    keyword whole vzero brightmagenta
+    keyword whole vsucc brightmagenta
+    keyword whole Vec brightmagenta
+    keyword whole lam brightmagenta
+    keyword whole apply brightmagenta
+    keyword whole app brightmagenta
+    keyword whole pair brightmagenta
+    keyword whole lambda brightmagenta
+    keyword whole ap brightmagenta
+    keyword whole fiber brightmagenta
+    keyword whole subst brightmagenta
+    keyword whole contr brightmagenta
+    keyword whole inv brightmagenta
+    keyword whole isContr brightmagenta
+    keyword whole transport brightmagenta
+    keyword whole cong brightmagenta
+    keyword whole Sigma brightmagenta
+    keyword whole pi brightmagenta
+    keyword whole pr brightmagenta
+    keyword whole fst brightmagenta
+    keyword whole snd brightmagenta
+    keyword whole funext brightmagenta
+    keyword whole happly brightmagenta
+    keyword whole Path brightmagenta
+    keyword whole idp brightmagenta
+    keyword whole sym brightmagenta
+    keyword whole trans brightmagenta
+    keyword whole isSet brightmagenta
+    keyword whole isProp brightmagenta
+    keyword whole isGroupoid brightmagenta
+    keyword whole propQuot brightmagenta
+    keyword whole setQuot brightmagenta
+    keyword whole grpdQuot brightmagenta
+    keyword whole propTrunc brightmagenta
+    keyword whole setTrunc brightmagenta
+    keyword whole grpdTrunc brightmagenta
+    keyword whole diff brightmagenta
+    keyword whole conjugate brightmagenta
+    keyword whole empty brightmagenta
+    keyword whole unit brightmagenta
+    keyword whole fill brightmagenta
+    keyword whole LineP brightmagenta
+    keyword whole Σ-ind cyan
+    keyword whole Σ cyan
+    keyword whole Π cyan
+    keyword whole W cyan
+    keyword whole module cyan
+    keyword whole def cyan
+    keyword whole definition cyan
+    keyword whole axiom cyan
+    keyword whole theorem cyan
+    keyword whole summa cyan
+    keyword whole import cyan
+    keyword whole option cyan
+    keyword whole true cyan
+    keyword whole false cyan
+    keyword whole module cyan
+    keyword whole plugin cyan
+    keyword whole begin cyan
+    keyword whole end cyan
+    keyword whole where cyan
+    keyword whole ind₀  cyan
+    keyword whole ind₁  cyan
+    keyword whole ind₂  cyan
+    keyword whole pr₁  cyan
+    keyword whole pr₂  cyan
+    keyword whole 0₂  cyan
+    keyword whole 1₂  cyan
+    keyword whole indᵂ cyan
+    keyword whole sup cyan
+    keyword whole Glue cyan
+    keyword whole glue cyan
+    keyword whole unglue cyan
+    keyword whole one? cyan
+    keyword whole Id cyan
+    keyword whole idJ cyan
+    keyword whole ref cyan
+    keyword whole PathP cyan
+    keyword whole Partial cyan
+    keyword whole PartialP cyan
+    keyword whole ↦ cyan
+    keyword whole Sub cyan
+    keyword whole inc cyan
+    keyword whole ouc cyan
+    keyword whole hcomp cyan
+    keyword whole transp cyan
+    keyword whole λ cyan
+    keyword = cyan
+    keyword .1 cyan
+    keyword .2 cyan
+    keyword > cyan
+    keyword < cyan
+    keyword * cyan
+    keyword | cyan
+    keyword V cyan
+    keyword U cyan
+    keyword whole /\\ cyan
+    keyword whole \\/ cyan
+    keyword whole → cyan
+    keyword whole -> cyan
+    keyword whole := cyan
+    keyword whole ≔ cyan
+    keyword @ cyan
+    keyword = cyan
+    keyword [ cyan
+    keyword ] cyan
+    keyword ( cyan
+    keyword ) cyan
+    keyword { cyan
+    keyword } cyan
+    keyword , cyan
+    keyword : cyan
+    keyword ; cyan
+
+context exclusive \-\- \n brown
+    spellcheck
+

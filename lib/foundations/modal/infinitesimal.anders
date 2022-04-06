@@ -1,0 +1,110 @@
+{- The modality of shape infinitesimal: https://anders.groupoid.space/foundations/modal/infinitesimal/
+   - \Im modality type.
+
+   HoTT 7.7 Modalities
+
+   Copyright (c) Groupoid Infinity, 2014-2022. -}
+
+module infinitesimal where
+import lib/foundations/univalent/path
+import lib/foundations/univalent/iso
+
+-- [Cherubini] 2018 de Rham Stack
+
+def ι (A : U) (a : A) : ℑ A := ℑ-unit a
+def μ (A : U) (a : ℑ (ℑ A)) := ℑ-join a
+
+def is-coreduced (A : U) : U := isEquiv A (ℑ A) (ι A)
+def ℑ-coreduced (A : U) : is-coreduced (ℑ A) := isoToEquiv (ℑ A) (ℑ (ℑ A)) (ι (ℑ A)) (μ A) (λ (x : ℑ (ℑ A)), <_> x) (λ (y : ℑ A), <_> y)
+def ind-ℑβ (A : U) (B : ℑ A → U) (f : Π (a : A), ℑ (B (ι A a))) (a : A) : Path (ℑ (B (ι A a))) (ind-ℑ A B f (ι A a)) (f a) := <_> f a
+
+-- this seems as natural way to obtain coreduceness of paths in “ℑ A”
+def ind-ℑ-const (A B : U) (b : ℑ B) (x : ℑ A) : Path (ℑ B) (ind-ℑ A (λ (_ : ℑ A), B) (λ (_ : A), b) x) b := <_> b
+
+-- Simon Huber Equations
+
+def trans-ℑ (A : I → U) (a : A 0) : ℑ (A 1) := ℑ-unit (transp (<i> A i) 0 a)
+def trans-ℑ′ (A : I → U) (a : A 0) : ℑ (A 1) := transp (<i> ℑ (A i)) 0 (ℑ-unit a)
+def trans-ℑ-is-correct (A : I → U) (a : A 0) : Path (ℑ (A 1)) (trans-ℑ A a) (trans-ℑ′ A a) := <_> trans-ℑ A a
+
+def hcomp-ℑ (A : U) (r : I) (u : I → Partial A r) (u₀ : A[r ↦ u 0]) : ℑ A
+ := ℑ-unit (hcomp A r u (ouc u₀))
+def hcomp-ℑ′ (A : U) (r : I) (u : I → Partial A r) (u₀ : A[r ↦ u 0]) : ℑ A
+ := hcomp (ℑ A) r (λ (i : I), [(r = 1) → ℑ-unit (u i 1=1)]) (ℑ-unit (ouc u₀))
+def hcomp-ℑ-is-correct (A : U) (r : I) (u : I → Partial A r) (u₀ : A[r ↦ u 0])
+  : Path (ℑ A) (hcomp-ℑ A r u u₀) (hcomp-ℑ′ A r u u₀)
+ := <_> hcomp-ℑ A r u u₀
+
+def ind-hcomp-ℑ (A : U) (B : ℑ A → U) (φ : Π (a : A), ℑ (B (ℑ-unit a))) (r : I)
+  (u : I → Partial (ℑ A) r) (u₀ : (ℑ A)[r ↦ u 0]) : ℑ (B (hcomp (ℑ A) r u (ouc u₀))) :=
+comp (λ (i : I), ℑ (B (hfill (ℑ A) r u u₀ i))) r
+  (λ (i : I), [(r = 1) → ind-ℑ A B φ (u i 1=1)])
+  (inc (ℑ (B (ouc u₀))) r (ind-ℑ A B φ (ouc u₀)))
+
+def ind-hcomp-ℑ′ (A : U) (B : ℑ A → U) (φ : Π (a : A), ℑ (B (ℑ-unit a))) (r : I)
+  (u : I → Partial (ℑ A) r) (u₀ : (ℑ A)[r ↦ u 0]) : ℑ (B (hcomp (ℑ A) r u (ouc u₀))) :=
+ind-ℑ A B φ (hcomp (ℑ A) r u (ouc u₀))
+
+def ind-hcomp-ℑ-is-correct (A : U) (B : ℑ A → U) (φ : Π (a : A), ℑ (B (ℑ-unit a))) (r : I)
+  (u : I → Partial (ℑ A) r) (u₀ : (ℑ A)[r ↦ u 0]) :
+  Path (ℑ (B (hcomp (ℑ A) r u (ouc u₀)))) (ind-hcomp-ℑ A B φ r u u₀) (ind-hcomp-ℑ′ A B φ r u u₀) :=
+<_> ind-hcomp-ℑ A B φ r u u₀
+
+-- Induction Principle #1
+
+def ℑ-ind (A : U) (B : ℑ A → U) (c : Π (a : ℑ A), is-coreduced (B a)) (f : Π (a : A), B (ι A a)) (a : ℑ A) : B a
+ := (c a (ind-ℑ A B (λ (x : A), ι (B (ι A x)) (f x)) a)).1.1
+def ℑ-indβ (A : U) (B : ℑ A → U) (c : Π (a : ℑ A), is-coreduced (B a)) (f : Π (a : A), B (ι A a)) (a : A)
+  : Path (B (ι A a)) (f a) ((ℑ-ind A B c f) (ι A a))
+ := <i> sec-equiv (B (ι A a)) (ℑ (B (ι A a))) (ι (B (ι A a)), c (ι A a)) (f a) @ -i
+
+def ℑ-rec (A B : U) (c : is-coreduced B) (f : A → B) : ℑ A → B
+ := ℑ-ind A (λ (_ : ℑ A), B) (λ (_ : ℑ A), c) f
+def ℑ-recβ (A B : U) (c : is-coreduced B) (f : A → B) (a : A) : PathP (<_> B) (f a) ((ℑ-rec A B c f) (ι A a))
+ := ℑ-indβ A (λ (_ : ℑ A), B) (λ (_ : ℑ A), c) f a
+
+def ℑ-rec′ (A B : U) (f : A → ℑ B) : ℑ A → ℑ B := ind-ℑ A (λ (x : ℑ A), B) f
+def ℑ-rec′-β (A B : U) (f : A → ℑ B) (x : A) : Path (ℑ B) (ℑ-rec′ A B f (ℑ-unit x)) (f x) := <_> f x
+def ℑ-Π-comm (A : U) (B : A → U) (φ : ℑ (Π (x : A), B x)) (y : A) : ℑ (B y)
+ := ℑ-rec′ (Π (x : A), B x) (B y) (λ (f : Π (x : A), B x), ℑ-unit (f y)) φ
+def ℑ-→-comm (A B : U) : ℑ (A → B) → (A → ℑ B) := ℑ-Π-comm A (λ (_ : A), B)
+def ℑ-app (A B : U) (f : A → B) : ℑ A → ℑ B := ℑ-rec A (ℑ B) (ℑ-coreduced B) (∘ A B (ℑ B) (ι B) f)
+def ℑ-naturality (A B : U) (f : A → B) (a : A) : Path (ℑ B) ((ι B) (f a)) ((ℑ-app A B f) (ι A a))
+ := <_> ℑ-unit (f a) -- slightly surprisingly, but it computes
+
+-- Induction Principle #2
+
+def ind-ℑ₂ (A : U) (B : ℑ A → ℑ A → U) (f : Π (a b : A), ℑ (B (ℑ-unit a) (ℑ-unit b))) (x y : ℑ A) : ℑ (B x y)
+ := ℑ-join (ℑ-Π-comm (ℑ A) (λ (y : ℑ A), ℑ (B x y))
+                     (ind-ℑ A (λ (x : ℑ A), Π (y : ℑ A), ℑ (B x y))
+                     (λ (a : A), ℑ-unit (ind-ℑ A (B (ℑ-unit a)) (f a))) x) y)
+
+-- more direct derivation of ℑ-app
+def ℑ-lift (A B : U) (f : A → B) : ℑ A → ℑ B := ℑ-rec′ A B (λ (a : A), ℑ-unit (f a))
+
+def ℑ-Ω-elim (A : U) (a b : ℑ A) (ρ : ℑ (Path (ℑ A) a b)) : Path (ℑ A) a b
+ := <i> ℑ-rec′ (Path (ℑ A) a b) A (λ (p : Path (ℑ A) a b), p @ i) ρ
+
+def ℑ-path-coreduced (A : U) (a b : ℑ A)
+  : is-coreduced (Path (ℑ A) a b)
+ := isoToEquiv (Path (ℑ A) a b) (ℑ (Path (ℑ A) a b)) (ι (Path (ℑ A) a b)) (ℑ-Ω-elim A a b)
+    (λ (ρ : ℑ (Path (ℑ A) a b)),
+     ℑ-Ω-elim (Path (ℑ A) a b) (ℑ-unit (ℑ-Ω-elim A a b ρ)) ρ
+              (ind-ℑ (Path (ℑ A) a b)
+                     (λ (μ : ℑ (Path (ℑ A) a b)), Path (ℑ (Path (ℑ A) a b)) (ℑ-unit (ℑ-Ω-elim A a b μ)) μ)
+                     (λ (p : Path (ℑ A) a b), ℑ-unit (<_> ℑ-unit p)) ρ))
+    (λ (p : Path (ℑ A) a b), <_> p)
+
+def ℑ-idfun (A : U) : ℑ A → ℑ A := ℑ-rec′ A A (ι A)
+
+def ℑ-idfun=idfun (A : U) : Π (x : ℑ A), Path (ℑ A) (ℑ-idfun A x) x :=
+ℑ-ind A (λ (x : ℑ A), Path (ℑ A) (ℑ-idfun A x) x)
+        (λ (x : ℑ A), ℑ-path-coreduced A (ℑ-idfun A x) x)
+        (λ (a : A), <_> ℑ-unit a)
+
+def ℑ-app-comp (A B C : U) (f : B → C) (g : A → B)
+  : Π (x : ℑ A), Path (ℑ C) (ℑ-app A C (∘ A B C f g) x) (ℑ-app B C f (ℑ-app A B g x))
+ := ℑ-ind A (λ (x : ℑ A), Path (ℑ C) (ℑ-app A C (∘ A B C f g) x) (ℑ-app B C f (ℑ-app A B g x)))
+            (λ (x : ℑ A), ℑ-path-coreduced C (ℑ-app A C (∘ A B C f g) x) (ℑ-app B C f (ℑ-app A B g x)))
+            (λ (a : A), <_> ℑ-unit (f (g a)))
+

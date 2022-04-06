@@ -1,0 +1,115 @@
+<!DOCTYPE html><html><head><meta charset="utf-8"><meta http-equiv="x-ua-compatible" content="ie=edge"><meta property="fb:app_id" content="118554188236439"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="author" content="Maxim Sokhatsky"><meta name="twitter:site" content="@5HT"><meta name="twitter:creator" content="@5HT"><meta property="og:type" content="website"><meta property="og:image" content="https://avatars.githubusercontent.com/u/17128096?s=400&amp;u=66a63d4cdd9625b2b4b37d724cc00fe6401e5bd8&amp;v=4"><meta name="msapplication-TileColor" content="#ffffff"><meta name="msapplication-TileImage" content="https://anders.groupoid.space/images/ms-icon-144x144.png"><meta name="theme-color" content="#ffffff"><link rel="stylesheet" href="https://anders.groupoid.space/main.css?v=1"><link rel="apple-touch-icon" sizes="57x57" href="https://anders.groupoid.space/images/apple-icon-57x57.png"><link rel="apple-touch-icon" sizes="60x60" href="https://anders.groupoid.space/images/apple-icon-60x60.png"><link rel="apple-touch-icon" sizes="72x72" href="https://anders.groupoid.space/images/apple-icon-72x72.png"><link rel="apple-touch-icon" sizes="76x76" href="https://anders.groupoid.space/images/apple-icon-76x76.png"><link rel="apple-touch-icon" sizes="114x114" href="https://anders.groupoid.space/images/apple-icon-114x114.png"><link rel="apple-touch-icon" sizes="120x120" href="https://anders.groupoid.space/images/apple-icon-120x120.png"><link rel="apple-touch-icon" sizes="144x144" href="https://anders.groupoid.space/images/apple-icon-144x144.png"><link rel="apple-touch-icon" sizes="152x152" href="https://anders.groupoid.space/images/apple-icon-152x152.png"><link rel="apple-touch-icon" sizes="180x180" href="https://anders.groupoid.space/images//apple-icon-180x180.png"><link rel="icon" type="image/png" sizes="192x192" href="https://anders.groupoid.space/images/android-icon-192x192.png"><link rel="icon" type="image/png" sizes="32x32" href="https://anders.groupoid.space/images/favicon-32x32.png"><link rel="icon" type="image/png" sizes="96x96" href="https://anders.groupoid.space/images/favicon-96x96.png"><link rel="icon" type="image/png" sizes="16x16" href="https://anders.groupoid.space/images/favicon-16x16.png"><link rel="manifest" href="https://anders.groupoid.space/images/manifest.json"><style>svg a{fill:blue;stroke:blue}
+[data-mml-node="merror"]>g{fill:red;stroke:red}
+[data-mml-node="merror"]>rect[data-background]{fill:yellow;stroke:none}
+[data-frame],[data-line]{stroke-width:70px;fill:none}
+.mjx-dashed{stroke-dasharray:140}
+.mjx-dotted{stroke-linecap:round;stroke-dasharray:0,140}
+use[data-c]{stroke-width:3px}
+</style></head><body class="content"></body></html><html><head><meta property="og:title" content="PATH"><meta property="og:description" content="Path Equality"><meta property="og:url" content="https://anders.groupoid.space/foundations/univalent/path/"></head></html><title>PATH</title><nav><a href='https://anders.groupoid.space/'>HTS</a>
+<a href='https://anders.groupoid.space/lib/'>LIB</a>
+<a href='#'>PATH</a></nav><article class="main"><div class="exe"><section><h1>PATH</h1></section></div><aside><time>Published: 25 JUL 2018</time></aside><div class="exe"><section><p>The Path identity type defines a Path space with elements and values.
+Elements of that space are functions
+from interval $[0,1]$ to values of that path space.
+This ctt file reflects <a href="https://arxiv.org/pdf/1611.02108.pdf">CCHM</a><sup>2</sup> cubicaltt model with connections.
+There is a <a href="https://arxiv.org/pdf/1712.04864.pdf">PO</a><sup>3</sup>
+paper about CCHM axiomatic in a topos.</p><h><div><sup>1</sup> &mdash; Bezem, Coquand, Huber (2014)<br>
+<sup>2</sup> &mdash; Cohen, Coquand, Huber, Mörtberg (2015)<br>
+<sup>3</sup> &mdash; Pitts, Orton (2016)<br>
+</div>
+</h></section><section><h2>Constructors</h2><code>refl (A: U) (a: A) : Path A a a</code><p>Returns a reflexivity path space for a given value of the type.
+The inhabitant of that path space is the lambda on the homotopy
+interval $[0,1]$ that returns a constant value a. Written in
+syntax as $&lt;i&gt;a$.
+</p><h2>Eliminators</h2><code>app1 (A: U) (a b: A) (p: Path A a b): A = p @ 0
+app2 (A: U) (a b: A) (p: Path A a b): A = p @ 1
+</code><p>Connections allow you to build a square
+with only one element of path: i) $\\(i,j:I) \rightarrow p\ @\ min(i,j)$;
+ii) $\\(i,j:I)\rightarrow p\ @\ max(i,j)$.</p><figure>$$
+\begin{array}{ccc}
+    b & \mapright{\\(i:I) \rightarrow b} & b \\
+    \mapupl{p} &  & \mapup{\\(i:I)\rightarrow b} \\
+    a & \mapright{p} & b \\
+\end{array}
+$$
+$$
+\begin{array}{ccc}
+    a & \mapright{p} & b \\
+    \mapupl{\\(i:I)\rightarrow a} &  & \mapup{p} \\
+    a & \mapright{\\(i:I)\rightarrow a} & a \\
+\end{array}
+$$</figure><code>connection1 (A: U) (a b: A) (p: Path A a b)
+  : PathP (&lt;x&gt; Path A (p@x) b) p (&lt;i&gt; b)
+  = &lt;y x&gt; p @ (x \/ y)
+
+connection2 (A: U) (a b: A) (p: Path A a b)
+  : PathP (&lt;x&gt; Path A a (p@x)) (&lt;i&gt; a) p
+  = &lt;x y&gt; p @ (x /\ y)</code><br><h2>Congruence</h2><code>ap  (A B: U) (f: A -> B)
+    (a b: A) (p: Path A a b)
+  : Path B (f a) (f b)
+
+apd (A: U) (a x:A) (B:A->U) (f: A->B a)
+    (b: B a) (p: Path A a x)
+  : Path (B a) (f a) (f x)
+</code><p>Maps a given path space between values of one type
+to path space of another type using an encode function between types.
+Implemented as a lambda defined on $[0,1]$ that returns
+application of encode function to path application of
+the given path to lamda argument <mark>&lt;i&gt f (p @ i)</mark>
+in both cases.
+</p><h2>Transport</h2><code>trans (A B: U) (p: Path U A B) (a: A) : B</code><p>Transports a value of the left type to the value of the right type
+by a given path element of the path space between left and right types.
+Defined as path composition with $[]$ of a over a path p
+<mark>comp p a []</mark>.
+</p><h2>Substitution</h2><code>subst (A: U) (P: A -> U)
+      (a b: A) (p: Path A a b)
+      (u: P a) : P b</code><p>Acts like transport of mapOnPath value, representing the
+dependent function transport or substitution.
+</p><h2>Composition</h2><figure>$$
+\begin{array}{ccc}
+    a & \mapright{comp} & c \\
+    \mapupl{\\(i:I) \rightarrow a} & & \mapup{q} \\
+    a & \mapright{p\ @\ i} & b \\
+\end{array}
+$$
+</figure><code>composition (A: U) (a b c: A)
+            (p: Path A a b) (q: Path A b c): Path A a c</code><p>Composition operation allows building a new path from two given paths
+in a connected point. The proofterm is
+<mark>comp (&lt;i&gt;Path A a (q @ i)) p []</mark>.
+</p><h2>Contractability of Singleton</h2><code>singl (A: U) (a: A) : U = (x: A) * Path A a x
+
+contrSingl (A: U) (a b: A) (p: Path A a b)
+         : Path (singl A a) (a,refl A a) (b,p)</code><p>Proof that singleton is contractible space. Implemented as
+<mark>&lt;i&gt; (p @ i,<j> p @ i/\j)</mark>.
+</p><h1>Eliminators</h1><h2>J by Paulin-Mohring</h2><code>J (A: U)
+  (a b: A)
+  (P: singl A a -> U)
+  (u: P (a,refl A a))
+  (p: Path A a b) : P (b,p)</code><p>J is formulated in a form of Paulin-Mohring and implemented using
+two facts that singletons are contractible and dependent function
+transport.
+</p><h2>Dependent Eliminator (HoTT)</h2><code>J (A: U)
+  (a: A)
+  (C: (x: A) -> Path A a x -> U)
+  (d: C a (refl A a))
+  (x: A)
+  (p: Path A a x) : C x p</code><p>J from HoTT book.
+</p><h2>Diagonal Version</h2><code>D (A: U) : U = (x y: A) -> Path A x y -> U
+
+J (A: U)
+  (x: A)
+  (C: D A)
+  (d: C x x (refl A x))
+  (y: A)
+  (p: Path A x y) : C x y p</code><p></p><h2>Computation</h2><code>trans_comp (A: U) (a: A)
+         : Path A a (trans A A (<_> A) a)
+
+subst_comp (A: U) (P: A -> U) (a: A) (e: P a)
+         : Path (P a) e (subst A P a a (refl A a) e)
+
+J_comp     (A: U) (a: A) (C: (x: A) -> Path A a x -> U)
+           (d: C a (refl A a))
+         : Path (C a (refl A a)) d (J A a C d a (refl A a))</code><p>Note that in HoTT there is no Eta rule, otherwise
+Path between element would requested to be unique applying
+UIP at any Path level which is prohibited. UIP in HoTT
+is defined only as instance of n-groupoid, the PROP type.
+</p></section></div></article><footer class="footer"><a href="https://5ht.co/license/"><img class="footer__logo" src="https://longchenpa.guru/seal.png" width="50"></a><span class="footer__copy">2021&mdash;2022 &copy; <a href="//groupoid.space/" style="color:Lavender;">Groupoïd Infinity</a></span></footer>

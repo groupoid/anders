@@ -1,0 +1,8 @@
+Makefile linguist-detectable=false
+*.mll linguist-language=OCaml
+*.mly linguist-language=OCaml
+*.ml linguist-language=OCaml
+*.js linguist-detectable=false
+*.css linguist-detectable=false
+*.scss linguist-detectable=false
+*.html linguist-detectable=false

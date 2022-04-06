@@ -1,0 +1,16 @@
+module 3-mult where
+import experiments/church
+
+definition N1 : N := succ N0
+definition N2 : N := succ N1
+definition N3 : N := succ N2
+definition N4 : N := succ N3
+definition N5 : N := succ N4
+definition N6 : N := succ N5
+definition N7 : N := succ N6
+definition N8 : N := succ N7
+definition N9 : N := succ N8
+definition N10 : N := succ N9
+
+definition N3000 : N :=
+mult N10 (mult N10 (mult N10 N3))

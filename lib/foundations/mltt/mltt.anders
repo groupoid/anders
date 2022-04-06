@@ -1,0 +1,34 @@
+{- MLTT Reality Check: https://groupoid.space/articles/mltt/mltt.pdf
+   - Pi, Sigma, Path.
+
+   Copyright (c) Groupoid Infinity, 2014-2022. -}
+
+module mltt where
+import lib/foundations/mltt/pi
+import lib/foundations/mltt/sigma
+import lib/foundations/univalent/path
+
+def MLTT (A : U) : U₁ ≔ Σ
+  (Π-form  : Π (B : A → U), U)
+  (Π-ctor₁ : Π (B : A → U), Pi A B → Pi A B)
+  (Π-elim₁ : Π (B : A → U), Pi A B → Pi A B)
+  (Π-comp₁ : Π (B : A → U) (a : A) (f : Pi A B), Path (B a) (Π-elim₁ B (Π-ctor₁ B f) a) (f a))
+  (Π-comp₂ : Π (B : A → U) (a : A) (f : Pi A B), Path (Pi A B) f (λ (x : A), f x))
+  (Σ-form  : Π (B : A → U), U)
+  (Σ-ctor₁ : Π (B : A → U) (a : A) (b : B a) , Sigma A B)
+  (Σ-elim₁ : Π (B : A → U) (p : Sigma A B), A)
+  (Σ-elim₂ : Π (B : A → U) (p : Sigma A B), B (pr₁ A B p))
+  (Σ-comp₁ : Π (B : A → U) (a : A) (b: B a), Path A a (Σ-elim₁ B (Σ-ctor₁ B a b)))
+  (Σ-comp₂ : Π (B : A → U) (a : A) (b: B a), Path (B a) b (Σ-elim₂ B (a, b)))
+  (Σ-comp₃ : Π (B : A → U) (p : Sigma A B), Path (Sigma A B) p (pr₁ A B p, pr₂ A B p))
+  (=-form  : Π (a : A), A → U)
+  (=-ctor₁ : Π (a : A), Path A a a)
+  (=-elim₁ : Π (a : A) (C: D A) (d: C a a (=-ctor₁ a)) (y: A) (p: Path A a y), C a y p)
+  (=-comp₁ : Π (a : A) (C: D A) (d: C a a (=-ctor₁ a)), Path (C a a (=-ctor₁ a)) d (=-elim₁ a C d a (=-ctor₁ a))), 𝟏
+
+-- Theorem. β-rule for pretypes is derivable with generalized transport
+
+theorem internalizing (A : U) : MLTT A ≔
+  (Pi A, lambda A, apply A, Π-β A, Π-η A,
+   Sigma A, pair A, pr₁ A, pr₂ A, Σ-β₁ A, Σ-β₂ A, Σ-η A,
+   Path A, idp A, J A, J-β A, ★)

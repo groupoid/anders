@@ -11,7 +11,7 @@ block title
 
 block content
     nav
-        <a href='https://anders.groupoid.space/'>HTS</a>
+        <a href='https://anders.groupoid.space/'>ANDERS</a>
         <a href='https://anders.groupoid.space/lib/'>LIB</a>
         <a href='#'>NAT</a>
     article.main.list
@@ -20,12 +20,12 @@ block content
                 h1 NATURAL NUMBERS
                 aside
                     time Published: 29 JAN 2022
-                p.
+                +tex.
                     Pointed Unary System is a category $Nat$ with the terminal object and a
                     carrier nat having morphism $[zero: 1 → Nat, succ: Nat → Nat]$.
                     The initial object of $Nat$ is called Natural Number Object and models
                     Peano axiom set.
-                p.
+                +tex(true).
                     In type theory $ℕ$ type could be expressed as
                     $$
                       ℕ^W = W_{(x:2)},\ rec_2(U, 0, 1, x).
@@ -35,14 +35,14 @@ block content
                     def ℕ-ctor := ind₂ (λ (_ : 𝟐), U) 𝟎 𝟏
 
                 h2 Constructors
-                p.
+                +tex.
                     Type $ℕ$ provides two way of creating numbers: by $zero$ and $succ$ constructors.
                 code.
                     def zero : ℕ := sup 𝟐 ℕ-ctor 0₂ (ind₀ ℕ)
                     def succ (n : ℕ) : ℕ := sup 𝟐 ℕ-ctor 1₂ (λ (x : 𝟏), n)
 
                 h2 Eliminators
-                p.
+                +tex(true).
                     The induction principle is derivable in CCHM with W-types:
                     $$
                        ind^ℕ = ind^W(2,rec^2(U,0,1),C,ind^2(x,y,z)).

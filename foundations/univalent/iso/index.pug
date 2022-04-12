@@ -104,7 +104,7 @@ block content
                     Let's try to build a proof-term:
                 code.
                     PathElem nat2 nat zero2 zero nat2nat
-                p.
+                +tex.
                     You may think of it as building proof of $0_A = 0_B$.
                 h2#nat Path Isomorphism
                 p.
@@ -115,9 +115,8 @@ block content
                     There is already an <mark>isoPath</mark> inside cubical. The proof-term
                     of isoPath is implemented using glueing of types and composition
                     primitives of type checker inside <mark>isoToEquiv</mark> lemma.
-                .semantics
-                    figure.
-                        $$Iso(A,B) = \sum_{f:A\rightarrow B}\sum_{g:B\rightarrow A}\Biggl(\prod_{x:A} Id_A(gfx,x)) \times \prod_{y:B} Id_B(fgy,y)\Biggr)$$
+                +tex(true).
+                    $$Iso(A,B) = \sum_{f:A\rightarrow B}\sum_{g:B\rightarrow A}\Biggl(\prod_{x:A} Id_A(gfx,x)) \times \prod_{y:B} Id_B(fgy,y)\Biggr)$$
                 code.
                     isoPath (A B : U) (f : A -> B) (g : B -> A)
                             (s : (y : B) -> Path B (f (g y)) y)
@@ -126,18 +125,16 @@ block content
                                          (i = 1) -> (B,idfun B,idIsEquiv B) ]
 
                 h2 Contractability and Fibers
-                p.
+                +tex.
                     A type $A$ is contractible, or a singleton, if there is $a : A$,
                     called the center of contraction, such that $a = x$ for all $x : A$:
-                .semantics
-                    figure.
-                        $$isContr(A) = \sum_{a:A}\prod_{x:A} a = x$$.
-                p.
+                +tex(true).
+                    $$isContr(A) = \sum_{a:A}\prod_{x:A} a = x$$.
+                +tex.
                     The fiber of a map $f : A \rightarrow B$ over a point
                     $y : B$ is:
-                .semantics
-                    figure.
-                        $$fib_f(y) = \sum f x = y$$.
+                +tex(true).
+                    $$fib_f(y) = \sum f x = y$$.
                 code.
                     isContr (A : U) : U = (x : A) * ((y : A) -> Path A x y)
                     fiber (A B : U) (f : A -> B) (y : B) : U = (x : A) * Path B y (f x)
@@ -146,14 +143,12 @@ block content
                         Path (singl A a) (a,refl A a) (b,p) = &lt;i&gt; (p @ i,&lt;j&gt; p @ i/\j)
 
                 h2 Equivalence
-                p.
+                +tex.
                     <mark>isEquiv</mark> is a contractible map $f: A \rightarrow B$, so that
                     for all $y:B$ the fiber $fib_f(y)$ is contractible.
                 code.
                     isEquiv (A B : U) (f : A -> B) : U = (y : B) -> isContr (fiber A B f y)
-                p.
-                .semantics
-                    figure.
+                +tex(true).
                         $$Iso(A,B) \rightarrow Equiv(A,B)$$.
                 code.
                     isoToEquiv (A B : U) (f : A -> B) (g : B -> A)
@@ -171,19 +166,18 @@ block content
                 p.
                     For proving <mark>lemIso</mark> we need a simple
                     commutative square term which is higher 2-path.
-                .semantics
-                    figure.
-                        $\require{AMScd}$
-                        \begin{CD}
-                             a_0 @>u>> a_1\\
-                             @V r_0 V V= @VV r_1 V\\
-                             b_0 @>>v> b_1
-                        \end{CD}
+                +tex(true).
+                     \begin{CD}
+                         a_0 @>u>> a_1\\
+                         @V r_0 V V= @VV r_1 V\\
+                         b_0 @>>v> b_1
+                     \end{CD}
                 code.
                     Square (A : U) (a0 a1 b0 b1 : A)
                            (u : Path A a0 a1) (v : Path A b0 b1)
                            (r0 : Path A a0 b0) (r1 : Path A a1 b1) : U
                          = PathP (&lt;i&gt; (PathP (&lt;j&gt; A) (u @ i) (v @ i))) r0 r1
+
                 h2 Iso Lemma
                 code.
                     lemIso (A B : U) (f : A -> B) (g : B -> A)

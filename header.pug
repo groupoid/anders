@@ -9,6 +9,14 @@ mixin tex(center=false, paragraph=true)
             'padding-bottom': '8px',
         } : null)!= tex(`${block}`)
 
+mixin tex2(center=false, paragraph=true)
+    p(style=center ? {
+        'text-align': 'center',
+        'display': 'block',
+        'padding-top': '8px',
+        'padding-bottom': '8px',
+    } : null)!= tex(`${block}`)
+
 mixin code
     code!= highlight(`${block}`)
 

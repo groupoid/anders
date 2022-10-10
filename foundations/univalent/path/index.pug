@@ -23,7 +23,7 @@ block content
             time Published: 25 JUL 2018
         .exe
             section
-                p.
+                +tex.
                     The Path identity type defines a Path space with elements and values.
                     Elements of that space are functions
                     from interval $[0,1]$ to values of that path space.
@@ -40,7 +40,7 @@ block content
                 h2 Constructors
                 code.
                     refl (A: U) (a: A) : Path A a a
-                p.
+                +tex.
                     Returns a reflexivity path space for a given value of the type.
                     The inhabitant of that path space is the lambda on the homotopy
                     interval $[0,1]$ that returns a constant value a. Written in
@@ -51,18 +51,21 @@ block content
                     app1 (A: U) (a b: A) (p: Path A a b): A = p @ 0
                     app2 (A: U) (a b: A) (p: Path A a b): A = p @ 1
 
-                p.
+                +tex.
                     Connections allow you to build a square
                     with only one element of path: i) $\\(i,j:I) \rightarrow p\ @\ min(i,j)$;
                     ii) $\\(i,j:I)\rightarrow p\ @\ max(i,j)$.
-                figure.
+
+                +tex(true).
                     $$
                     \begin{array}{ccc}
                         b & \mapright{\\(i:I) \rightarrow b} & b \\
-                        \mapupl{p} &  & \mapup{\\(i:I)\rightarrow b} \\
+                        \mapup{p} &  & \mapup{\\(i:I)\rightarrow b} \\
                         a & \mapright{p} & b \\
                     \end{array}
                     $$
+
+                +tex(true).
                     $$
                     \begin{array}{ccc}
                         a & \mapright{p} & b \\
@@ -70,6 +73,7 @@ block content
                         a & \mapright{\\(i:I)\rightarrow a} & a \\
                     \end{array}
                     $$
+
                 code.
                     connection1 (A: U) (a b: A) (p: Path A a b)
                       : PathP (&lt;x&gt; Path A (p@x) b) p (&lt;i&gt; b)
@@ -90,22 +94,22 @@ block content
                         (b: B a) (p: Path A a x)
                       : Path (B a) (f a) (f x)
 
-                p.
+                +tex.
                     Maps a given path space between values of one type
                     to path space of another type using an encode function between types.
                     Implemented as a lambda defined on $[0,1]$ that returns
                     application of encode function to path application of
-                    the given path to lamda argument <mark>&lt;i&gt f (p @ i)</mark>
+                    the given path to lamda argument $&lt;i&gt; f (p @ i)$
                     in both cases.
 
                 h2 Transport
                 code.
                     trans (A B: U) (p: Path U A B) (a: A) : B
-                p.
+                +tex.
                     Transports a value of the left type to the value of the right type
                     by a given path element of the path space between left and right types.
                     Defined as path composition with $[]$ of a over a path p
-                    <mark>comp p a []</mark>.
+                    $comp p a []$.
 
                 h2 Substitution
                 code.
@@ -117,11 +121,11 @@ block content
                     dependent function transport or substitution.
 
                 h2 Composition
-                figure.
+                +tex(true).
                     $$
                     \begin{array}{ccc}
                         a & \mapright{comp} & c \\
-                        \mapupl{\\(i:I) \rightarrow a} & & \mapup{q} \\
+                        \mapup{\\(i:I) \rightarrow a} & & \mapup{q} \\
                         a & \mapright{p\ @\ i} & b \\
                     \end{array}
                     $$
@@ -129,10 +133,10 @@ block content
                 code.
                     composition (A: U) (a b c: A)
                                 (p: Path A a b) (q: Path A b c): Path A a c
-                p.
+                +tex.
                     Composition operation allows building a new path from two given paths
                     in a connected point. The proofterm is
-                    <mark>comp (&lt;i&gt;Path A a (q @ i)) p []</mark>.
+                    $comp (&lt;i&gt;Path A a (q @ i)) p []$.
 
                 h2 Contractability of Singleton
                 code.
@@ -140,9 +144,9 @@ block content
 
                     contrSingl (A: U) (a b: A) (p: Path A a b)
                              : Path (singl A a) (a,refl A a) (b,p)
-                p.
+                +tex.
                     Proof that singleton is contractible space. Implemented as
-                    <mark>&lt;i&gt; (p @ i,<j> p @ i/\j)</mark>.
+                    $&lt;i&gt; (p @ i,&lt;j&gt; p @ i/\backslash j)$.
 
                 h1 Eliminators
 

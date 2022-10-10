@@ -39,7 +39,10 @@ const tex = new TeX({
         join:          '\\mathopen{\u2228}',
         trans:         '\\, \\mathbin{\\vcenter{\\rule{.3ex}{.3ex}}} \\,',
         mapright:      ['\\xrightarrow{{#1}}', 1],
+        mapleft:       ['\\xlefttarrow{{#1}}', 1],
         mapdown:       ['\\Big\\downarrow\\rlap{\\raise2pt{\\scriptstyle{#1}}}', 1],
+        mapup:         ['\\Big\\uparrow\\rlap{\\raise2pt{\\scriptstyle{#1}}}', 1],
+        mapupl:        ['\\Big\\uparrow\\llap{\\raise2pt{\\scriptstyle{#1}}}', 1],
         mapdiagl:      ['\\vcenter{\\searrow}\\rlap{\\raise2pt{\\scriptstyle{#1}}}', 1],
         mapdiagr:      ['\\vcenter{\\swarrow}\\rlap{\\raise2pt{\\scriptstyle{#1}}}', 1],
     }

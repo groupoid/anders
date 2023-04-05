@@ -33,11 +33,11 @@ def isEpic (P : precategory) (X Y : P.C.ob) (f : P.C.hom X Y) : U
 
 def kernel (C: precategory) (zero: hasZeroObject C)
     (A B S: C.C.ob) (f: C.C.hom A B) : U₁
- := Σ (k: C.C.hom S A) (monic: isMonic C S A k), U
+ := Σ (k: C.C.hom S A) (monic: isMonic C S A k), unit
 
 def cokernel (C: precategory) (zero: hasZeroObject C)
     (A B S: C.C.ob) (f: C.C.hom A B)  : U₁
- := Σ (k: C.C.hom B S) (epic: isEpic C B S k), U
+ := Σ (k: C.C.hom B S) (epic: isEpic C B S k), unit
 
 def isKernel (C: precategory) (zero: hasZeroObject C)
     (A B S: C.C.ob) (f: C.C.hom A B) (k: C.C.hom S A) : U₁
@@ -49,11 +49,11 @@ def isCokernel (C: precategory) (zero: hasZeroObject C)
 
 def hasKernel (C: precategory) (zero: hasZeroObject C)
     (A B: C.C.ob) (f: C.C.hom A B) : U₁
- := ‖_‖₋₁ (Σ (monic: isMonic C A B f), U)
+ := ‖_‖₋₁ (Σ (monic: isMonic C A B f), unit)
 
 def hasCokernel (C: precategory) (zero: hasZeroObject C)
     (A B: C.C.ob) (f: C.C.hom A B) : U₁
- := ‖_‖₋₁ (Σ (epic: isEpic C A B f), U)
+ := ‖_‖₋₁ (Σ (epic: isEpic C A B f), unit)
 
 def hasAllKernels (C : precategory) (zero: hasZeroObject C) : U₁
  := Σ (A B : C.C.ob) (f : C.C.hom A B), hasKernel C zero A B f

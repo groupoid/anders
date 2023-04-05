@@ -2,6 +2,9 @@ module abelian where
 import lib/mathematics/categories/category
 import lib/mathematics/homotopy/truncation
 
+-- David Elinder
+-- Investigating abelian categories in univalent type theory
+
 def zeroObject(C: precategory) (X: C.C.ob): U₁
  := Σ (bot: isInitial C X) (top: isTerminal C X), U
 
@@ -28,9 +31,21 @@ def isEpic (P : precategory) (X Y : P.C.ob) (f : P.C.hom X Y) : U
     Path (P.C.hom X Z) (P.P.∘ X Y Z f g1) (P.P.∘ X Y Z f g2)
  -> Path (P.C.hom Y Z) g1 g2
 
+def kernel (C: precategory) (zero: hasZeroObject C)
+    (A B S: C.C.ob) (f: C.C.hom A B) : U₁
+ := Σ (k: C.C.hom S A) (monic: isMonic C S A k), U
+
+def cokernel (C: precategory) (zero: hasZeroObject C)
+    (A B S: C.C.ob) (f: C.C.hom A B)  : U₁
+ := Σ (k: C.C.hom B S) (epic: isEpic C B S k), U
+
 def isKernel (C: precategory) (zero: hasZeroObject C)
     (A B S: C.C.ob) (f: C.C.hom A B) (k: C.C.hom S A) : U₁
- := Σ (monic: isMonic C S A k), U
+ := Σ (ker: kernel C zero A B S f), Path (C.C.hom S A) ker.k k
+
+def isCokernel (C: precategory) (zero: hasZeroObject C)
+    (A B S: C.C.ob) (f: C.C.hom A B) (k: C.C.hom B S) : U₁
+ := Σ (coker: cokernel C zero A B S f), Path (C.C.hom B S) coker.k k
 
 def hasKernel (C: precategory) (zero: hasZeroObject C)
     (A B: C.C.ob) (f: C.C.hom A B) : U₁
@@ -39,10 +54,6 @@ def hasKernel (C: precategory) (zero: hasZeroObject C)
 def hasCokernel (C: precategory) (zero: hasZeroObject C)
     (A B: C.C.ob) (f: C.C.hom A B) : U₁
  := ‖_‖₋₁ (Σ (epic: isEpic C A B f), U)
-
-def isCokernel (C: precategory) (zero: hasZeroObject C)
-    (A B S: C.C.ob) (f: C.C.hom A B) (k: C.C.hom B S) : U₁
- := Σ (epic: isEpic C B S k), U
 
 def hasAllKernels (C : precategory) (zero: hasZeroObject C) : U₁
  := Σ (A B : C.C.ob) (f : C.C.hom A B), hasKernel C zero A B f

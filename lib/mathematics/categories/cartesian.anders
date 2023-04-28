@@ -1,0 +1,11 @@
+module cartesian where
+import lib/mathematics/categories/category
+
+def isCCC (C: precategory): U
+ := Σ (exp:   Π (A B: C.C.ob), C.C.ob)
+      (prod:  Π (A B: C.C.ob), C.C.ob)
+      (apply: Π (A B: C.C.ob), C.C.hom (prod (exp A B) A) B)
+      (p1:    Π (A B: C.C.ob), C.C.hom (prod A B) A)
+      (p2:    Π (A B: C.C.ob), C.C.hom (prod A B) B)
+      (term:  terminal C),
+      unit

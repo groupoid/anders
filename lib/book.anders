@@ -22,6 +22,7 @@ import lib/mathematics/categories/natural
 import lib/mathematics/categories/abelian
 import lib/mathematics/categories/groupoid
 import lib/mathematics/categories/symmetric
+import lib/mathematics/categories/cartesian
 import lib/mathematics/categories/instances/functor-instances
 import lib/mathematics/topoi/topos
 import lib/mathematics/geometry/bundle

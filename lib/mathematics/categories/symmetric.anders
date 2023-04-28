@@ -9,19 +9,19 @@ axiom flipBifunctor (X Y Z: precategory) (F: catfunctor (catproduct X Y) Z)
 def isMonoidal (C: precategory): U
  := Σ (tensor: catfunctor (catproduct C C) C)
       (tensor₁: C.C.ob)
-      (left-unitor: Π (x: C.C.ob),  Path (C.C.ob) x (tensor.ob (tensor₁,x)))
-      (right-unitor: Π (x: C.C.ob), Path (C.C.ob) x (tensor.ob (x,tensor₁)))
-      (associator: Π (x y z: C.C.ob), Path (C.C.ob) (tensor.ob ((tensor.ob (x,y)),z))
-                                                    (tensor.ob (x,(tensor.ob (y,z)))))
+      (left₁: Π (x: C.C.ob),  Path (C.C.ob) x (tensor.ob (tensor₁,x)))
+      (right₁: Π (x: C.C.ob), Path (C.C.ob) x (tensor.ob (x,tensor₁)))
+      (associator: Π (x y z: C.C.ob),
+         Path (C.C.ob) (tensor.ob ((tensor.ob (x,y)),z)) (tensor.ob (x,(tensor.ob (y,z)))))
       (triangle: Π (x y: C.C.ob), 𝟏)
       (pentagon: Π (x y z w: C.C.ob), 𝟏), 𝟏
 
 def isBraided (C: precategory) (m: isMonoidal C) : U
  := Σ (braiding: NatIso C C m.tensor (flipBifunctor C C C m.tensor))
       (hexagon₁: unit)
-      (hexagon₂: unit), unit
+      (hexagon₂: unit), 𝟏
 
 def isSymmetric (C: precategory) (m: isMonoidal C) (b: isBraided C m) : U
  := Σ (commutative: unit)
-      (braidingCondition: unit), unit
+      (braidingCondition: unit), 𝟏
 

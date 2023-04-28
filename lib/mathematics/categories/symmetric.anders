@@ -18,10 +18,10 @@ def isMonoidal (C: precategory): U
 
 def isBraided (C: precategory) (m: isMonoidal C) : U
  := Σ (braiding: NatIso C C m.tensor (flipBifunctor C C C m.tensor))
-      (hexagon₁: unit),
+      (hexagon₁: unit)
       (hexagon₂: unit), unit
 
-def isSymmetric (C: precategory) (m: isBraided) : U
+def isSymmetric (C: precategory) (m: isMonoidal C) (b: isBraided C m) : U
  := Σ (commutative: unit)
       (braidingCondition: unit), unit
 

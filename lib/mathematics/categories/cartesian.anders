@@ -1,11 +1,19 @@
 module cartesian where
 import lib/mathematics/categories/category
+import lib/mathematics/categories/functor
+
+axiom sliceCat (C D: precategory)
+      (a: (catᵒᵖ C).C.ob)
+      (F: catfunctor D (catᵒᵖ C))
+    : precategory
 
 def isCCC (C: precategory): U
  := Σ (exp:   Π (A B: C.C.ob), C.C.ob)
       (prod:  Π (A B: C.C.ob), C.C.ob)
       (apply: Π (A B: C.C.ob), C.C.hom (prod (exp A B) A) B)
       (p1:    Π (A B: C.C.ob), C.C.hom (prod A B) A)
-      (p2:    Π (A B: C.C.ob), C.C.hom (prod A B) B)
-      (term:  terminal C),
-      unit
+      (p2:    Π (A B: C.C.ob), C.C.hom (prod A B) B),
+      terminal C
+
+def isLCCC (C: precategory) : U
+ := Σ (slices: Π (x: C.C.ob), isCCC (sliceCat C C x (?,?,?,?,?))), unit

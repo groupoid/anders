@@ -10,6 +10,7 @@
 module topos where
 import lib/mathematics/categories/category
 import lib/mathematics/categories/functor
+import lib/mathematics/categories/cartesian
 import lib/foundations/mltt/pi
 
 def epi (P: precategory) (X Y: P.C.ob) (f: P.C.hom X Y): U := Π (Z: P.C.ob) (g1 g2: P.C.hom Y Z),
@@ -26,13 +27,6 @@ def subobjectClassifier (C: precategory): U := Σ
     (square: Π (Y X: C.C.ob) (j: C.C.hom Y X), mono C Y X j -> hasPullback C (omega,(end.top,trueHom),(X,xi Y X j))),
     Π (Y X: C.C.ob) (j: C.C.hom Y X) (k: C.C.hom X omega),
     (mono C Y X j) -> (hasPullback C (omega,(end.top,trueHom),(X,k))) -> (Path (C.C.hom X omega) (xi Y X j) k)
-
-def isCCC (C: precategory): U := Σ
-    (Exp: Π (A B: C.C.ob), C.C.ob)
-    (Prod: Π (A B: C.C.ob), C.C.ob)
-    (Apply: Π (A B: C.C.ob), C.C.hom (Prod (Exp A B) A) B)
-    (P1: Π (A B: C.C.ob), C.C.hom (Prod A B) A)
-    (P2: Π (A B: C.C.ob), C.C.hom (Prod A B) B), terminal C
 
 axiom Set : precategory
 axiom cartesianClosed : isCCC Set

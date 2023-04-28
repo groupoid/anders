@@ -8,6 +8,7 @@
    Copyright (c) Groupoid Infinity, 2014-2022. -}
 
 module category where
+import lib/foundations/mltt/sigma
 import lib/foundations/univalent/path
 option irrelevance true
 
@@ -23,6 +24,11 @@ def isPrecategory (C: cat) : U := Σ
        Path (C.hom x w) (∘ x z w (∘ x y z f g) h) (∘ x y w f (∘ y z w g h))), unit
 
 def precategory: U₁ := Σ (C: cat) (P: isPrecategory C), unit
+
+def catproduct (A B: precategory): precategory
+ := ((prod A.C.ob B.C.ob,(\(x y: prod A.C.ob B.C.ob), prod (A.C.hom x.1 y.1) (B.C.hom x.2 y.2)), star),
+    (?,?,?,?,?,?,star),
+    star)
 
 def catᵒᵖ (P: precategory) : precategory :=
     ((P.C.ob, (λ (A B: P.C.ob), P.C.hom B A), P.C.2.2),

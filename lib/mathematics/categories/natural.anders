@@ -1,0 +1,33 @@
+{- Category Theory: https://anders.groupoid.space/mathematics/categories/natural/
+   - Natural Transformations.
+
+   HoTT 9.2 Functors and transformations
+   HoTT 9.4 Equivalences
+
+   Copyright (c) Groupoid Infinity, 2014-2022. -}
+
+module natural where
+import lib/mathematics/categories/category
+import lib/mathematics/categories/functor
+
+-- Definitive Property
+def isNaturalTransformation
+    (C D: precategory)
+    (F G: catfunctor C D)
+    (eta: Π (x: C.C.ob), D.C.hom (F.ob x) (G.ob x)) : U
+ := Π (x y: C.C.ob)
+      (h: C.C.hom x y),
+      Path (D.C.hom (F.ob x) (G.ob y))
+           (D.P.∘ (F.ob x) (F.ob y) (G.ob y) (F.mor x y h) (eta y))
+           (D.P.∘ (F.ob x) (G.ob x) (G.ob y) (eta x) (G.mor x y h))
+
+-- Natural transformation
+def nattrans (C D: precategory) (F G: catfunctor C D): U
+ := Σ (η: Π (x: C.C.ob), D.C.hom (F.ob x) (G.ob x))
+      (commute: isNaturalTransformation C D F G η), unit
+
+-- Natural Transformation Isomorphism
+def natiso (C D: precategory) (F G: catfunctor C D) : U
+ := Σ (left: nattrans C D F G)
+      (right: nattrans C D G F),
+      unit

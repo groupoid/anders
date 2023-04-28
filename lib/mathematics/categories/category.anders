@@ -16,7 +16,7 @@ def cat : U₁ := Σ (ob: U) (hom: ob -> ob -> U), unit
 
 def isPrecategory (C: cat) : U := Σ
     (id: Π (x: C.ob), C.hom x x)
-    (∘: Π (x y z:C.ob), C.hom x y -> C.hom y z -> C.hom x z)
+    (∘: Π (x y z: C.ob), C.hom x y -> C.hom y z -> C.hom x z)
     (homSet: Π (x y: C.ob), isSet (C.hom x y))
     (∘-left: Π (x y: C.ob) (f: C.hom x y), Path (C.hom x y) (∘ x x y (id x) f) f)
     (∘-right: Π (x y: C.ob) (f: C.hom x y), Path (C.hom x y) (∘ x y y f (id y)) f)

@@ -3,7 +3,6 @@ import lib/mathematics/categories/category
 import lib/mathematics/categories/functor
 import lib/mathematics/categories/natural
 
-axiom NatIso (C : precategory) (D : precategory) (F G: catfunctor (catproduct C C) D) : U
 axiom flipBifunctor (X Y Z: precategory) (F: catfunctor (catproduct X Y) Z)
     : catfunctor (catproduct Y X) Z
 
@@ -18,11 +17,10 @@ def isMonoidal (C: precategory): U
       (pentagon: Π (x y z w: C.C.ob), 𝟏), 𝟏
 
 def isBraided (C: precategory) (m: isMonoidal C) : U
- := Σ (braiding: NatIso C C m.tensor (flipBifunctor C C C m.tensor))
+ := Σ (braiding: natiso (catproduct C C) C m.tensor (flipBifunctor C C C m.tensor))
       (hexagon₁: unit)
       (hexagon₂: unit), 𝟏
 
 def isSymmetric (C: precategory) (m: isMonoidal C) (b: isBraided C m) : U
  := Σ (commutative: unit)
       (braidingCondition: unit), 𝟏
-

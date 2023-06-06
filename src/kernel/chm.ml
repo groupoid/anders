@@ -44,7 +44,14 @@ let proto : req -> resp = function
           ctx := Env.add y (Global, Value t', Value (Var (y, t'))) !ctx; OK))
   | Erase x            -> ctx := Env.remove (ident x) !ctx; OK
   | Wipe               -> ctx := Env.empty; OK
-  | Set (p, x)         -> Error (InvalidOpt p)
+  | Set (p, x)         -> 
+  begin match p with
+    | "trace"           -> promote (fun () -> Prefs.trace           := getBoolVal p x; OK)
+    | "girard"          -> promote (fun () -> Prefs.girard          := getUnitVal p x; OK)
+    | "irrelevance"     -> promote (fun () -> Prefs.irrelevance     := getUnitVal p x; OK)
+    | "impredicativity" -> promote (fun () -> Prefs.impredicativity := getUnitVal p x; OK)
+    | _                 -> Error (InvalidOpt p)
+  end
   | Version            -> Version (1L, 3L, 0L)
   | Ping               -> Pong
 

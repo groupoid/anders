@@ -28,3 +28,14 @@ def abgroup : U₁ := Σ (X : SET), isAbGroup X
 def ring    : U₁ := Σ (X : SET), isRing X
 def abring  : U₁ := Σ (X : SET), isAbRing X
 def dgroup  : U₁ := Σ (X : SET), isDiffGroup X
+
+def unital   (C R : U) : U := R -> C -> R
+def counital (C R : U) : U := Π (_ : C -> R), R
+def BiAlg    (C R : U) : U := Σ (_ : unital C R) (_ : counital C R), unit
+def HopfAlg (F : U) (C R : U) : U₁ :=
+  Σ (t: Π (x y: BiAlg C R), U)
+    (u: F → BiAlg C R)
+    (w: BiAlg C R → F)
+    (p: Π (x y: BiAlg C R) (_: t x y), BiAlg C R)
+    (c: Π (x y: BiAlg C R) (_: BiAlg C R), t x y)
+    (s: BiAlg C R → BiAlg C R), unit

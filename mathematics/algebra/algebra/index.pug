@@ -16,20 +16,20 @@ block content
       time Published: 24 MAR 2021
     .exe
       section
-        p.
+        +tex.
           Results presented here are formalized
           in <a href="https://github.com/groupoid/lean/blob/master/ground_zero/algebra/basic.lean">Ground Zero</a> library
           using <a href="http://leanprover.github.io/">Lean Theorem Prover</a>.
 
       section
         h1 ALGEBRA
-        p.
+        +tex.
           <b>Definition.</b> Signature over given types $ι, υ : \mathcal{U}$
           (called <b>indices</b>) is an element of type $ι + υ \rightarrow \mathbb{N}$.
           <br>
           Where $A + B : \mathcal{U}$ denotes coproduct type.
 
-        p.
+        +tex.
           <b>Definition.</b> Vector of length $n$ over type $A : \mathcal{U}$
           (denoted $\mathrm{vect}(A, n)$) is a type:
             $$ \underbrace{A \times A \times … \times A}_{\text{n times}} \times \textbf{1} $$
@@ -37,19 +37,19 @@ block content
           Where $\textbf{1} : \mathcal{U}$ denotes unit type that contains
           only $\star : \textbf{1}$.
 
-        p.
+        +tex.
           <b>Definition.</b> Assume we have types $A, B : \mathcal{U}$,
           function $f : A \rightarrow B$, and a natural number $n : \mathbb{N}$.
           Then we define function $f^{\mathrm{map}} :
           \mathrm{vect}(A, n) \rightarrow \mathrm{vect}(B, n)$:
             $$ f^{\mathrm{map}}(a_1, a_2, …, a_n, \star) ≔ (f(a_1), f(a_2), …, f(a_n), \star) $$
 
-        p.
+        +tex.
           <b>Definition.</b> $n$-ary algebraic operation over given
             type $A : \mathcal{U}$ is an element of type:
             $$ \mathrm{vect}(A, n) \rightarrow A $$
 
-        p.
+        +tex.
           <b>Definition.</b> $n$-ary algebraic relation over given
             type $A : \mathcal{U}$ is an element of type:
             $$ \mathrm{vect}(A, n) \rightarrow Ω $$
@@ -57,15 +57,17 @@ block content
           Where $Ω$ denotes type of all propositions, i.e.
             $$ Ω ≔ \sum_{A : \mathcal{U}} isProp(A) $$
 
-        p.
+        +tex.
           <b>Definition.</b> Algebraic structure over signature $\mathrm{deg}$ constists of:
             (i) 0-Type called carrier,
             (ii) $\mathrm{deg}(\mathrm{inl}(i))$-ary algebraic operation for each $i : ι$,
             (iii) $\mathrm{deg}(\mathrm{inr}(i))$-ary algebraic relation for each $i : υ$.
           <br> Or, more explicitly:
             $$ \mathrm{Alg}(\mathrm{deg}) ≔ \sum_{A : \text{0-Type}}
-              \left( \prod_{i : ι} \mathrm{vect}(A, \mathrm{deg}(\mathrm{inl}(i))) \rightarrow A \right) \times \\
-              \left( \prod_{i : υ} \mathrm{vect}(A, \mathrm{deg}(\mathrm{inr}(i))) \rightarrow Ω \right)
+              \left( \prod_{i : ι} \mathrm{vect}(A, \mathrm{deg}(\mathrm{inl}(i))) \rightarrow A \right) 
+            $$
+            $$
+              \hspace{4cm} \times \left( \prod_{i : υ} \mathrm{vect}(A, \mathrm{deg}(\mathrm{inr}(i))) \rightarrow Ω \right)
             $$
           <br> We will write $Γ^{\mathrm{car}}$ for carrier of algebraic structure $Γ$,
           $Γ^{\mathrm{op}}$ for its algebraic operations,
@@ -73,30 +75,30 @@ block content
 
       section
         h1 Mappings
-        p.
-          <b>Definition</b> (Homomorphism). Given two algebraic structures $Γ, Λ$ over signature $\mathrm{deg}$
+        +tex.
+          $\mathbf{Definition}$ (Homomorphism). Given two algebraic structures $Γ, Λ$ over signature $\mathrm{deg}$
           and a function between them $φ : Γ^{\mathrm{car}} \rightarrow Λ^{\mathrm{car}}$,
           we say that $φ$ is homomorphism iff holds:
           <br> (i) $φ(Γ^{\mathrm{op}}(i, v)) = Λ^{\mathrm{op}}(i, φ^{\mathrm{map}}(v))$,
           <br> (ii) $Γ^{\mathrm{rel}}(i, v) = Λ^{\mathrm{rel}}(i, φ^{\mathrm{map}}(v))$,
           <br> for each $i : ι$ or $i : υ$ and $v : \mathrm{deg}(\mathrm{inr}(i))$.
 
-        p.
-          <b>Theorem.</b> Composition of two homomorphisms is also homomorphism.
+        +tex.
+          $\mathbf{Theorem}$ Composition of two homomorphisms is also homomorphism.
 
-        p.
-          <b>Definition</b> (Isomorphism). We say that $φ : Γ^{\mathrm{car}} \rightarrow Λ^{\mathrm{car}}$
+        +tex.
+          $\mathbf{Definition}$ (Isomorphism). We say that $φ : Γ^{\mathrm{car}} \rightarrow Λ^{\mathrm{car}}$
           is an ismorphism iff it is bijective and homomorphism.
           Then we can say that $Γ$ and $Λ$ are isomorphic and write $φ : Γ \cong Λ$.
 
-        p.
-          <b>Theorem.</b> Isomorphism is an equivalence relation, i.e.
+        +tex.
+          $\mathbf{Theorem}$ Isomorphism is an equivalence relation, i.e.
           <br> (i) $Γ \cong Γ$,
           <br> (ii) $Γ \cong Λ \rightarrow Λ \cong Γ$,
           <br> (iii) $Γ \cong Λ \rightarrow Λ \cong Δ \rightarrow Γ \cong Δ$.
 
-        p.
-          <b>Theorem</b> (Univalence for Algebraic Structures).
+        +tex.
+          $\mathbf{Theorem}$ (Univalence for Algebraic Structures).
             $$ (Γ \cong Λ) \simeq (Γ = Λ) $$
 
 include ../../../footer

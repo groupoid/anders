@@ -1,5 +1,11 @@
 include ../../../header
 
+html
+    head
+        meta(property='og:title'       content='PUSHOUT')
+        meta(property='og:description' content='Homotopy Pushout')
+        meta(property='og:url'         content='https://anders.groupoid.space/mathematics/homotopy/pushout/')
+
 block title
     title PUSHOUT
 
@@ -7,16 +13,15 @@ block content
     nav
         <a href='https://anders.groupoid.space/'>ANDERS</a>
         <a href='https://anders.groupoid.space/lib/'>LIB</a>
-        <a href='#'>PUSHOUT</a>
-    article.main
-        .om
+        <a href='#'>LIST</a>
+    article.main.list
+        .ext
             section
                 h1 PUSHOUT
-        aside
-            time Published: 20 MAY 2018
-        .enc
+                aside
+                    time Published: 20 MAY 2018
             section
-                figure.
+                +tex(true).
                     $$
                       \def\mapright#1{\xrightarrow{{#1}}}
                       \def\mapleft#1{\xleftarrow{{#1}}}
@@ -24,20 +29,23 @@ block content
                       \def\mapdiagl#1{\vcenter{\searrow}\rlap{\raise2pt{\scriptstyle{#1}}}}
                       \def\mapdiagr#1{\vcenter{\swarrow}\rlap{\raise2pt{\scriptstyle{#1}}}}
                     $$
-                p.
-                    <b>Definition</b> (Span).
+                +tex.
+                    $\mathbf{Definition}$ (Span).
                     The two maps $f,g$ with the same domain $C$ are called <i>span</i>:
+                +tex(true).
                     $$
                         A \mapleft{f} C \mapright{g} B.
                     $$
-                p.
-                    <b>Definition</b> (Homotopy Pushout).
+                +tex.
+                    $\mathbf{Definition}$ (Homotopy Pushout).
                     The homotopy pushout or homotopy colimit (denoted as $\mathrm{hocolim}$)
                     of the span diagram:
+                +tex(true).
                     $$
                         \mathrm{hocolim}(A \mapleft{f} C \mapright{g} B)
                           = A \sqcup B \sqcup C \times I\ / \sim,
                     $$
+                +tex.
                     where $\sim$ is an equivalence relation $f(c) \sim (w,0)$ and $g(w) \sim (w,1)$
                     for $w \in C$. If $C$ is a based space with basepoint $w_0$, we
                     add the relation $(w_0,t) ~ (w_1,s)$ for all $s,t \in I$.
@@ -51,32 +59,32 @@ block content
 
                 h1 EXAMPLES
 
-                p.
-                    <b>Definition</b> (Homotopy Fibers).
+                +tex.
+                    $\mathbf{Definition}$ (Homotopy Fibers).
                 code.
                   hofiber (A B: U) (f: A -> B) (y: B): U
                     = pullback A unit B f (\(x: unit) -> y)
 
-                p.
-                    <b>Definition</b> (Fiber Pullback).
+                +tex.
+                    $\mathbf{Definition}$ (Fiber Pullback).
                 code.
                   fiberPullback (A B: U) (f: A -> B) (y: B)
                     : pullbackSq (hofiber A B f y)
 
-                p.
-                    <b>Definition</b> (Homotopy Cofiber).
+                +tex.
+                    $\mathbf{Definition}$ (Homotopy Cofiber).
                 code.
                   cofiber (A B: U) (f: B -> A): U
                     = pushout A unit B f (\(x: B) -> tt)
 
-                p.
-                    <b>Defintion</b> (Kernel).
+                +tex.
+                    $\mathbf{Definition}$> (Kernel).
                 code.
                   kernel (A B: U) (f: A -> B): U
                     = pullback A A B f f
 
-                p.
-                    <b>Definition</b> (Cokernel).
+                +tex.
+                    $\mathbf{Definition}$> (Cokernel).
                 code.
                   cokernel (A B: U) (f: B -> A): U
                     = pushout A A B f f

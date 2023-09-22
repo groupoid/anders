@@ -37,6 +37,8 @@ const tex = new TeX({
         meet:          '\\mathopen{\u2227}',
         map:           '\\mathopen{\u21A6}',
         esh:           '\\mathopen{\u0283}',
+        Edia:          '\\mathopen{\uC389}',
+        edia:          '\\mathopen{\uC3A9}',
         join:          '\\mathopen{\u2228}',
         trans:         '\\, \\mathbin{\\vcenter{\\rule{.3ex}{.3ex}}} \\,',
         mapright:      ['\\xrightarrow{{#1}}', 1],

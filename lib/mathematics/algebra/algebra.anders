@@ -1,4 +1,5 @@
 module algebra where
+import lib/foundations/mltt/sigma
 import lib/foundations/univalent/path
 
 def isComm   (M : U) (op : M -> M -> M) : U := Π (x y : M), Path M (op x y) (op y x)
@@ -34,10 +35,24 @@ def dgroup  : U₁ := Σ (X : SET), isDiffGroup X
 def unital   (C R: U): U := R → (C → R)
 def counital (C R: U): U := (C → R) → R
 def BiAlg    (C R: U): U := Σ (u: unital C R) (ϵ: counital C R), 𝟏
-def HopfAlg  (C R: U) (F: U): U₁ :=
-  Σ (⊗: BiAlg C R → BiAlg C R → U)
+def Tensor   (C R: U): U := prod (BiAlg C R) (BiAlg C R)
+def HopfAlg  (C R F: U): U :=
+  Σ (⊗: Π (x y: BiAlg C R), Tensor C R)
     (unit-u: F → BiAlg C R)
     (counit-ϵ: BiAlg C R → F)
-    (product-m:   Π (x y: BiAlg C R), ⊗ x y → BiAlg C R)
-    (coproduct-Δ: Π (x y: BiAlg C R), BiAlg C R → ⊗ x y)
+    (product-m:   Π (x y: BiAlg C R), Tensor C R → BiAlg C R)
+    (coproduct-Δ: Π (x y: BiAlg C R), BiAlg C R  → Tensor C R)
     (antipode-S: BiAlg C R → BiAlg C R), 𝟏
+
+def aid (C R F: U) (H: HopfAlg C R F) (x: BiAlg C R): BiAlg C R
+ := H.antipode-S (H.antipode-S x)
+
+def gconv (C R F: U) (H: HopfAlg C R F) (f g: BiAlg C R): Tensor C R
+ := H.coproduct-Δ f g (H.product-m f g (H.⊗ f g))
+
+def Dirac-δ (C R F: U) (H: HopfAlg C R F) (x: BiAlg C R): Tensor C R
+ := gconv C R F H x (H.unit-u (H.counit-ϵ x))
+
+def Hopf-coherence (C R F: U) (H: HopfAlg C R F) (x: BiAlg C R)
+ := Path (Tensor C R) (gconv C R F H (aid C R F H x) (H.antipode-S x))
+                      (Dirac-δ C R F H x)

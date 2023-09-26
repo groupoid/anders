@@ -23,8 +23,8 @@ block content
                 from algebraic topology.
 
             h2 Fiber
-            p.
-                <b>Definition</b> (Fiber). The fiber of the map $p: E \rightarrow B$ in a point $y: B$
+            +tex.
+                $\mathbf{Definition}$ (Fiber). The fiber of the map $p: E \rightarrow B$ in a point $y: B$
                 is all points $x: E$ such that $p(x)=y$.
             p.
             code.
@@ -32,8 +32,8 @@ block content
                     = (x: E) * Path B y (p x)
 
             h2 Fiber Bundle
-            p.
-                <b>Definition</b> (Fiber Bundle). The fiber bundle $ F \rightarrow E \mapright{p} B$ on a
+            +tex.
+                $\mathbf{Definition}$ (Fiber Bundle). The fiber bundle $ F \rightarrow E \mapright{p} B$ on a
                 total space $E$ with fiber layer $F$ and base $B$ is a
                 structure $(F,E,p,B)$ where $p: E \rightarrow B$ is a surjective
                 map with following property:
@@ -41,7 +41,7 @@ block content
                 homeomorphism $f: p^{-1}(U_b) \rightarrow U_b \times F$
                 making the following diagram commute.
             p.
-            figure.
+            +tex(true).
                 $$
                 \begin{array}{ccc}
                     p^{-1}(U_b) & \mapright{f} & U_b \times F \\
@@ -51,8 +51,8 @@ block content
                 $$
 
             h2 Trivial Fiber Bundle
-            p.
-                <b>Definition</b> (Trivial Fiber Bundle).
+            +tex.
+                $\mathbf{Definition}$ (Trivial Fiber Bundle).
                 When total space $E$ is cartesian product $\Sigma(B,F)$
                 and $p = pr_1$ then such bundle is called trivial $(F,\Sigma(B,F),pr_1,B)$.
             code.
@@ -64,8 +64,8 @@ block content
                            fiber E B p y -> total B F
 
             h2 Fiber is a Dependent Family
-            p.
-                <b>Theorem</b> (Fiber in a trivial total space is a family over base).
+            +tex.
+                $\mathbf{Theorem}$ (Fiber in a trivial total space is a family over base).
                 Inverse image (fiber) of fiber bundle $(F,B*F,pr_1,B)$ in point $y:B$ equals $F(y)$.
                 Thre proof sketch is following:
             code.
@@ -76,7 +76,7 @@ block content
                       = (z: E) * Path B z.1 y
                       = fiber (total B F) B (trivial B F) y
             br.
-            p.
+            +tex.
                 The equality is proven by $isoPath$ lemma and $encode/decode$ functions.
             code.
                 encode (B: U) (F: B -> U) (y: B)
@@ -107,9 +107,9 @@ block content
                     t (x: T): Path T (g (f x)) x = lem3 B F y x
 
             h2 G-structure
-            p.
-                The structure group of an $F$-fiber bundle is just Aut(F),
-                the loop space of BAut(F).
+            +tex.
+                The structure group of an $F$-fiber bundle is just $Aut(F)$,
+                the loop space of $BAut(F)$.
 
 include ../../../footer
 

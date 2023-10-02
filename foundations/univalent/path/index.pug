@@ -3,7 +3,7 @@ include ../../../header
 html
     head
         meta(property='og:title'       content='PATH')
-        meta(property='og:description' content='Path Equality')
+        meta(property='og:description' content='Path Spaces')
         meta(property='og:url'         content='https://anders.groupoid.space/foundations/univalent/path/')
 
 block title
@@ -17,16 +17,12 @@ block content
     article.main.list
         .exe
             section
-                h1 PATH
+                h1 PATH SPACES
                 aside
                     time Published: 25 JUL 2018
                 +tex.
-                    The Path identity type defines a Path space with elements and values.
-                    Elements of that space are functions
-                    from interval $[0,1]$ to values of that path space.
-                    This ctt file reflects <a href="https://arxiv.org/pdf/1611.02108.pdf">CCHM</a><sup>2</sup> cubicaltt model with connections.
-                    There is a <a href="https://arxiv.org/pdf/1712.04864.pdf">PO</a><sup>3</sup>
-                    paper about CCHM axiomatic in a topos.
+                    The homotopy identity system defines a Path space indexed over type $A$
+                    with elements as functions from interval $[0,1]$ to values of that path space $[0,1] \rightarrow A$.
                 h.
                     <div><sup>1</sup> &mdash; Bezem, Coquand, Huber (2014)<br>
                     <sup>2</sup> &mdash; Cohen, Coquand, Huber, Mörtberg (2015)<br>

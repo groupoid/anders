@@ -44,15 +44,25 @@ def HopfAlg  (C R F: U): U :=
     (coproduct-Δ: Π (x y: BiAlg C R), BiAlg C R  → Tensor C R)
     (antipode-S: BiAlg C R → BiAlg C R), 𝟏
 
-def aid (C R F: U) (H: HopfAlg C R F) (x: BiAlg C R): BiAlg C R
- := H.antipode-S (H.antipode-S x)
-
 def gconv (C R F: U) (H: HopfAlg C R F) (f g: BiAlg C R): Tensor C R
  := H.coproduct-Δ f g (H.product-m f g (H.⊗ f g))
 
 def Dirac-δ (C R F: U) (H: HopfAlg C R F) (x: BiAlg C R): Tensor C R
  := gconv C R F H x (H.unit-u (H.counit-ϵ x))
 
-def Hopf-coherence (C R F: U) (H: HopfAlg C R F) (x: BiAlg C R)
- := Path (Tensor C R) (gconv C R F H (aid C R F H x) (H.antipode-S x))
+def aid (C R F: U) (H: HopfAlg C R F) (x: BiAlg C R): BiAlg C R
+ := H.antipode-S (H.antipode-S x)
+
+def Hopf-coherence (C R F: U) (H: HopfAlg C R F) : U
+ := Π (x: BiAlg C R),
+    Path (Tensor C R) (gconv C R F H (aid C R F H x) (H.antipode-S x))
                       (Dirac-δ C R F H x)
+
+axiom Coherence-proof (C R F: U) (H: HopfAlg C R F): Hopf-coherence C R F H
+
+def ConvFull (C R F: U) (H: HopfAlg C R F): U
+ := Σ (convDef: Tensor C R),
+    Hopf-coherence C R F H
+
+def instance (C R F: U) (H: HopfAlg C R F) (f g: BiAlg C R) : ConvFull C R F H
+ := (gconv C R F H f g, Coherence-proof C R F H)

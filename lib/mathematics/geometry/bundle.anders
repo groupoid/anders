@@ -34,8 +34,11 @@ def encode-decode-Pi (B : U) (F : B → U) (y : B) (x : fiber (Sigma B F) B (pr�
 
 -- [Sokhatsky, Mörtberg] 2018 CCHM right fiber version
 
-def Bundle=Pi (B : U) (F : B → U) (y : B) : PathP (<_> U) (fiber (Sigma B F) B (pr₁ B F) y) (F y)
- := isoPath (fiber (Sigma B F) B (pr₁ B F) y) (F y) (encode-Pi B F y) (decode-Pi B F y) (decode-encode-Pi B F y) (encode-decode-Pi B F y)
+def Bundle=Pi (B : U) (F : B → U) (y : B)
+  : PathP (<_> U) (fiber (Sigma B F) B (pr₁ B F) y) (F y)
+ := isoPath (fiber (Sigma B F) B (pr₁ B F) y) (F y)
+    (encode-Pi B F y) (decode-Pi B F y)
+    (decode-encode-Pi B F y) (encode-decode-Pi B F y)
 
 -- [Cherubini] 2018 Four Fiber Bundles
 

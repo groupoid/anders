@@ -24,9 +24,11 @@ def subobjectClassifier (C: precategory): U := Σ
     (end: terminal C)
     (trueHom: C.C.hom end.top omega)
     (xi: Π (Y X: C.C.ob) (j: C.C.hom Y X), C.C.hom X omega)
-    (square: Π (Y X: C.C.ob) (j: C.C.hom Y X), mono C Y X j -> hasPullback C (omega,(end.top,trueHom),(X,xi Y X j))),
-    Π (Y X: C.C.ob) (j: C.C.hom Y X) (k: C.C.hom X omega),
-    (mono C Y X j) -> (hasPullback C (omega,(end.top,trueHom),(X,k))) -> (Path (C.C.hom X omega) (xi Y X j) k)
+    (square: Π (Y X: C.C.ob) (j: C.C.hom Y X), mono C Y X j ->
+       hasPullback C (omega,(end.top,trueHom),(X,xi Y X j))),
+       Π (Y X: C.C.ob) (j: C.C.hom Y X) (k: C.C.hom X omega),
+    (mono C Y X j) -> (hasPullback C (omega,(end.top,trueHom),(X,k))) ->
+       (Path (C.C.hom X omega) (xi Y X j) k)
 
 axiom Set : precategory
 axiom cartesianClosed : isCCC Set

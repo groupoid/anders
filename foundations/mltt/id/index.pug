@@ -21,8 +21,43 @@ block content
                 time Published: 16 OCT 2017
 
             h2 Formation
+            +tex.
+                $\mathbf{Definition}$ ($=$-Formation, Family). The inductive family
+                $Id_V: A \rightarrow A \rightarrow V$ with domains and codomain in pretypes $V$
+                represents inhabitants carrying proofs that given indexed
+                elements $x,y:A$ are equal.
+            code.
+                def IdV (A: V) (x y: A): V := Id A x y
+            +tex(true).
+                $$
+                    Id_V(A,x,y) =_{def} \prod_{A:V}\prod_{x,y:A} x =_A y
+                $$
+
             h2 Introduction
+
+            +tex.
+                $\mathbf{Definition}$ ($=$-Intro, Reflection). The inductive family elements
+                are instantiated by single constructor that carries proof that $x:A$ element are equals to itself.
+            code.
+                def Id-ref (A : V) (a: A) : Id A a a := ref a
+            +tex(true).
+                $$
+                    ref_V(A,x) =_{def} \prod_{A:V}\prod_{x:A} ref_x : x =_A x
+                $$
+
             h2 Elimination
+
+            +tex.
+                $\mathbf{Definition}$ ($=$-Elimination, J). Given a family $C : \Pi_{x,y:A}(x =_A y) \rightarrow V$
+                and a function $c: \Pi_{x:A}C(x,x,ref_V(A,x))$, there is a function
+                $f: \Pi_{x,y:A}\Pi_{p: x =_A y}C(x,y,p)$ such that $f(x,x,ref_V(A,x)) = c(x)$.
+            code.
+                def Jˢ (A : V) (C : Π (a x : A), Id A a x -> V)
+                       (a x : A) (c : C a a (ref a))
+                       (p : Id A a x)
+                     : C a x p
+                    := idJ A C a c x p
+
             h2 Computation
             h2 Uniqueness
 

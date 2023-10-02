@@ -16,7 +16,6 @@ module coequalizer where
 import lib/foundations/univalent/equiv
 import lib/foundations/mltt/inductive
 
-
 -- [1]. Nicolai Kraus, Jakob von Raumer.
 -- Path spaces of higher inductive types in homotopy type theory.
 -- http://pure-oai.bham.ac.uk/ws/files/84880431/Path_Spaces.pdf
@@ -34,6 +33,7 @@ import lib/foundations/mltt/inductive
 axiom coequ (A B : U) (f g : A → B) : U
 axiom ι₂ (A B : U) (f g : A → B) : B → coequ A B f g
 axiom resp (A B : U) (f g : A → B) (x : A) : Path (coequ A B f g) (ι₂ A B f g (f x)) (ι₂ A B f g (g x))
+
 axiom coequ-ind (A B : U) (f g : A → B) (X : coequ A B f g → U) (i : Π (b : B), X (ι₂ A B f g b))
     : (Π (x : A), PathP (<i> X (resp A B f g x @ i)) (i (f x)) (i (g x))) → (Π (z : coequ A B f g), X z)
 axiom coequ-ind-β₁ (A B : U) (f g : A → B) (X : coequ A B f g → U) (i : Π (b : B), X (ι₂ A B f g b))
@@ -41,10 +41,10 @@ axiom coequ-ind-β₁ (A B : U) (f g : A → B) (X : coequ A B f g → U) (i : �
     : Path (X (ι₂ A B f g b)) (coequ-ind A B f g X i ρ (ι₂ A B f g b)) (i b)
 
 -- coequ-ind-β₁ need to be definitional to write this properly (i.e. without transp)
+-- coequ-ind A B f g X i ρ (ι₂ A B f g (f x)) === i (f x)
 {-
-axiom coequ-ind-β₂ (A B : U) (f g : A → B) (X : coequ A B f g → U) (i : Π (b : B), X (ι A B f g b))
-  (ρ : Π (x : A), PathP (<i> X (resp A B f g x @ i)) (i (f x)) (i (g x))) (x : A) :
+axiom coequ-ind-β₂ (A B : U) (f g : A → B) (X : coequ A B f g → U) (i : Π (b : B), X (ι₂ A B f g b))
+  (ρ : Π (x : A), PathP (<k> X (resp A B f g x @ k)) (i (f x)) (i (g x))) (x : A) :
   Path (PathP (<j> X (resp A B f g x @ j)) (i (f x)) (i (g x)))
-       (<j> coequ-ind A B f g X i ρ (resp A B f g x @ j)) (ρ x)
+              (<j> coequ-ind A B f g X i ρ (resp A B f g x @ j)) (ρ x)
 -}
-

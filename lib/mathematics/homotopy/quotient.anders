@@ -2,12 +2,10 @@ module quotient where
 import lib/mathematics/homotopy/coequalizer
 
 def full (A : U) (R : A → A → U) := Σ (x y : A), R x y
-def quot (A : U) (R : A → A → U)
- := coequ (full A R) A (λ (w : full A R), w.1) (λ (w : full A R), w.2.1)
-def quot₁ (A : U) (R : A → A → U) : A → quot A R
- := ι₂ (full A R) A (λ (w : full A R), w.1) (λ (w : full A R), w.2.1)
-def quot₂ (A : U) (R : A → A → U) (x y : A) (ρ : R x y)
-  : Path (quot A R) (quot₁ A R x) (quot₁ A R y)
+
+def quot (A : U) (R : A → A → U) := coequ (full A R) A (λ (w : full A R), w.1) (λ (w : full A R), w.2.1)
+def quot₁ (A : U) (R : A → A → U) : A → quot A R := ι₂ (full A R) A (λ (w : full A R), w.1) (λ (w : full A R), w.2.1)
+def quot₂ (A : U) (R : A → A → U) (x y : A) (ρ : R x y) : Path (quot A R) (quot₁ A R x) (quot₁ A R y)
  := resp (full A R) A (λ (w : full A R), w.1) (λ (w : full A R), w.2.1) (x, y, ρ)
 
 -- [van Doorn] 2016 2-quotient

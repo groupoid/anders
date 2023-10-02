@@ -56,6 +56,11 @@ block content
                     Lambda constructor defines a new lambda function in the space of dependent functions.
                     it is called lambda abstraction and displayed as $\lambda x. b(x)$ or $x \mapsto b(x)$.
 
+                +tex(true).
+                    $$
+                      \backslash (x: A) \rightarrow b =_{def} \prod_{A:U}\prod_{B:A \rightarrow U}\prod_{a: A}\prod_{b:B(a)}\lambda x.b : \prod_{y:A}B(a).
+                    $$
+
                 +code.
                     def lambda (A: U) (B: A → U) (b: Pi A B) : Pi A B := λ (x : A), b x
                     def lam (A B: U) (f: A → B) : A → B := λ (x : A), f x
@@ -65,6 +70,11 @@ block content
                 +tex.
                     $\mathbf{Definition}$ (Application).
                     Application reduces the term by using recursive substitution.
+
+                +tex(true).
+                    $$
+                       f\ a =_{def} \prod_{A:U}\prod_{B: A \rightarrow U}\prod_{a:A}\prod_{f: \prod_{x:A}B(a)}f(a) : B(a).
+                    $$
 
                 +code.
                     def apply (A: U) (B: A → U) (f: Pi A B) (a: A) : B a := f a
@@ -84,6 +94,11 @@ block content
                     $\mathbf{Theorem}$ (Computation $\Pi_\beta$).
                     $β$-rule shows that composition $\mathrm{lam} \circ \mathrm{app}$ could be fused.
 
+                +tex(true).
+                    $$
+                       f(a) =_{B(a)} (\lambda (x:A) \rightarrow f(a))(a).
+                    $$
+
                 +code.
                     def Π-β (A : U) (B : A → U) (a : A) (f : Pi A B)
                       : Path (B a) (apply A B (lambda A B f) a) (f a)
@@ -94,6 +109,11 @@ block content
                 +tex.
                     $\mathbf{Theorem}$ (Uniqueness $\Pi_\eta$).
                     $η$-rule shows that composition $\mathrm{app} \circ \mathrm{lam}$ could be fused.
+
+                +tex(true).
+                    $$
+                       f =_{(x:A)\rightarrow B(a)} (\lambda (y:A) \rightarrow f(y)).
+                    $$
 
                 +code.
                     def Π-η (A : U) (B : A → U) (a : A) (f : Pi A B)
@@ -148,6 +168,7 @@ block content
                 br
 
                 h1 Interpretations
+                p.
 
                 h2 Homotopy Theory
 

@@ -8,8 +8,9 @@
 
 module nat where
 import lib/foundations/mltt/inductive
+import lib/foundations/univalent/path
 
-def ℕ-ctor := ind₂ (λ (_ : 𝟐), U) 𝟎 𝟏
+def ℕ-ctor := ind₂ (λ (f : 𝟐), U) 𝟎 𝟏
 def ℕ := W (x : 𝟐), ℕ-ctor x
 def zero : ℕ := sup 𝟐 ℕ-ctor 0₂ (ind₀ ℕ)
 def succ (n : ℕ) : ℕ := sup 𝟐 ℕ-ctor 1₂ (λ (x : 𝟏), n)
@@ -40,3 +41,4 @@ def five : ℕ := succ four
 def 5′ : ℕ := plus two three
 def 10′ : ℕ := mult 5′ two
 def 55′ : ℕ := plus (mult 5′ 10′) 5′
+

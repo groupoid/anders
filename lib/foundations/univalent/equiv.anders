@@ -16,7 +16,7 @@ import lib/foundations/univalent/path
 
 def fiber (A B : U) (f: A → B) (y : B): U := Σ (x : A), Path B y (f x)
 def isEquiv (A B : U) (f : A → B) : U := Π (y : B), isContr (fiber A B f y)
-def equiv (A B : U) : U := Σ (f : A → B), isEquiv A B f
+def equiv (A B : U) : U := Σ (f : A → B), isEquiv A B f -- 2.4.11
 def contrSingl (A : U) (a b : A) (p : Path A a b) : Path (Σ (x : A), Path A a x) (a,<_>a) (b,p) := <i> (p @ i, <j> p @ i /\ j)
 def idIsEquiv (A : U) : isEquiv A A (id A) := λ (a : A), ((a, <_> a), λ (z : fiber A A (id A) a), contrSingl A a z.1 z.2)
 def idEquiv (A : U) : equiv A A := (id A, isContrSingl A)

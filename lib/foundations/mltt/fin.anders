@@ -10,7 +10,8 @@ def Fin-ind (T : Π (n : ℕ), Fin n → U) (z : Π (n : ℕ), T (succ n) (fzero
  := ℕ-ind (λ (k : ℕ), Π (x : Fin k), T k x)
           (λ (x : 𝟎), ind₀ (T zero x) x)
           (λ (k : ℕ) (f : Π (x : Fin k), T k x),
-              +-ind 𝟏 (Fin k) (T (succ k)) (ind₁ (λ (w : 𝟏), T (succ k) (0₂, w)) (z k)) (λ (w : Fin k), s k w (f w))) m x
+              +-ind 𝟏 (Fin k) (T (succ k)) (ind₁ (λ (w : 𝟏), T (succ k) (0₂, w)) (z k))
+                      (λ (w : Fin k), s k w (f w))) m x
 
 def 𝟑 : U := + 𝟏 𝟐
 def 0₃ : 𝟑 := inl 𝟏 𝟐 ★

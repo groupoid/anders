@@ -63,7 +63,6 @@ block content
             h2 Elimination
 
             +tex.
-<<<<<<< HEAD
                 $\mathbf{Definition}$ ($=$-Elimination, J). Given a family
             +tex(true).
                 $$
@@ -100,17 +99,6 @@ block content
                    \prod_{x:A}C(x,x,ref_V(a,x)) \rightarrow \prod_{x,y:A}\prod_{p: x=_A y}C(x,y,p).
 
                $$
-=======
-                $\mathbf{Definition}$ ($=$-Elimination, J). Given a family $C : \Pi_{x,y:A}(x =_A y) \rightarrow V$
-                and a function $c: \Pi_{x:A}C(x,x,ref_V(A,x))$, there is a function
-                $f: \Pi_{x,y:A}\Pi_{p: x =_A y}C(x,y,p)$ such that $f(x,x,ref_V(A,x)) = c(x)$.
-            +code.
-                def Jˢ (A : V) (C : Π (a x : A), Id A a x -> V)
-                       (a x : A) (c : C a a (ref a))
-                       (p : Id A a x)
-                     : C a x p
-                    := idJ A C a c x p
->>>>>>> a15fcf56569ef2c16e21314cf8634c37ef1d5ca1
 
             h2 Computation
 

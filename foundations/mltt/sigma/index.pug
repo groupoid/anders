@@ -59,7 +59,7 @@ block content
 
                 +tex(true).
                     $$
-                        (a,b) =_{def} \prod_{A:U}\prod_{B:A \rightarrow U} (a,b) : \sum_{x: A} B(x).
+                        (a,b) =_{def} \prod_{A:U}\prod_{B:A \rightarrow U}\prod_{a:A}\prod_{b:B(a)} (a,b) : \sum_{x: A} B(x).
                     $$
 
                 h2 Elimination
@@ -67,32 +67,30 @@ block content
                 +tex.
                     $\mathbf{Definition}$ (Dependent Projections). The dependent projections
                     $pr_{1}: \Sigma(A,B) \rightarrow A$ and
-                    $pr_{2}: \Sigma(x:A),B(x) \rightarrow B(x) ]$ are pair deconstructors.
+                    $pr_{2}: \Pi_{x: \Sigma(A,B)} B(pr_{1}(x))$ are pair deconstructors.
 
                 +code.
-                    pr1 (A: U) (B: A -> U)
-                        (x: Sigma A B): A = x.1
+                    def pr₁ (A: U) (B: A → U) (x: Sigma A B) : A ≔ x.1
 
                 +tex(true).
                     $$
-                        pr_1 : \prod_{A:U} \prod_{B:A \rightarrow U} \sum_{x:A} B(x) \rightarrow A
+                        pr_1 : \prod_{A:U} \prod_{B:A \rightarrow U} \prod_{x: \Sigma(A,B)} A
                     $$
                 +tex(true).
                     $$
-                             =_{def} (a,b) \mapsto a.
+                             =_{def} .1 =_{def} (a,b) \mapsto a.
                     $$
 
                 +code.
-                    pr2 (A: U) (B: A -> U)
-                        (x: Sigma A B): B (pr1 A B x) = x.2
+                    def pr₂ (A: U) (B: A → U) (x: Sigma A B) : B (pr₁ A B x) ≔ x.2
 
                 +tex(true).
                     $$
-                        pr_2 : \prod_{A:U} \prod_{B:A \rightarrow U} \sum_{x:A} B(x) \rightarrow B(x)
+                        pr_2 : \prod_{A:U} \prod_{B:A \rightarrow U} \prod_{x: \Sigma(A,B)} B(x.1)
                     $$
                 +tex(true).
                     $$
-                             =_{def} (a,b) \mapsto b.
+                             =_{def} .2 =_{def} (a,b) \mapsto b.
                     $$
 
                 +tex.
@@ -143,7 +141,7 @@ block content
                     that for all $x : A$ there is a witness of $R(x,f(x))$.
 
                 +code.
-                    ac   (A B: U) (R: A -> B -> U):
+                      ac (A B: U) (R: A -> B -> U):
                          (p: (x:A)->(y:B)*(R x y)) -> (f:A->B)*((x:A)->R(x)(f x))
                       = \(g: (x:A)->(y:B)*(R x y)) -> (\(i:A)->(g i).1,\(j:A)->(g j).2)
 

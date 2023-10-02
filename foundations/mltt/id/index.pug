@@ -3,7 +3,7 @@ include ../../../header
 html
     head
         meta(property='og:title'       content='ID')
-        meta(property='og:description' content='Equality types')
+        meta(property='og:description' content='Identity Spaces')
         meta(property='og:url'         content='https://anders.groupoid.space/foundations/mltt/id/')
 
 block title
@@ -19,6 +19,21 @@ block content
             h1 IDENTITY SPACES
             aside
                 time Published: 16 OCT 2017
+            +tex.
+                $\mathbf{Definition}$ (Identity System). An identity system
+                over type $A$ in universe $X_i$ is a family $R : A \rightarrow A \rightarrow X_i$
+                with a function $r_0: \Pi_{a:A}R(a,a)$ such that any type family
+                $D : \Pi_{a,b:A}R(a,b) \rightarrow X_i$ and $d: \Pi_{a:A}D(a,a,r_0(a))$,
+                there exists a function $f: \Pi_{a,b:A}\Pi_{r:R(a,b)}D(a,b,r)$ such that
+                $f(a,a,r_0(a))=d(a)$ for all $a:A$.
+            +tex.
+                $\mathbf{Definition}$ (Strict Identity System). An identity system
+                over type $A$ and universe of pretypes $V_i$ is called strict identity
+                system, which respects UIP.
+            +tex.
+                $\mathbf{Definition}$ (Homotopy Identity System). An identity system
+                over type $A$ and universe of homotopy types $U_i$ is called homotopy identity
+                system, which models discrete infinity groupoid.
 
             h2 Formation
             +tex.
@@ -26,7 +41,7 @@ block content
                 $Id_V: A \rightarrow A \rightarrow V$ with domains and codomain in pretypes $V$
                 represents inhabitants carrying proofs that given indexed
                 elements $x,y:A$ are equal.
-            code.
+            +code.
                 def IdV (A: V) (x y: A): V := Id A x y
             +tex(true).
                 $$
@@ -38,7 +53,7 @@ block content
             +tex.
                 $\mathbf{Definition}$ ($=$-Intro, Reflection). The inductive family elements
                 are instantiated by single constructor that carries proof that $x:A$ element are equals to itself.
-            code.
+            +code.
                 def Id-ref (A : V) (a: A) : Id A a a := ref a
             +tex(true).
                 $$
@@ -48,18 +63,56 @@ block content
             h2 Elimination
 
             +tex.
-                $\mathbf{Definition}$ ($=$-Elimination, J). Given a family $C : \Pi_{x,y:A}(x =_A y) \rightarrow V$
-                and a function $c: \Pi_{x:A}C(x,x,ref_V(A,x))$, there is a function
-                $f: \Pi_{x,y:A}\Pi_{p: x =_A y}C(x,y,p)$ such that $f(x,x,ref_V(A,x)) = c(x)$.
-            code.
-                def Jˢ (A : V) (C : Π (a x : A), Id A a x -> V)
-                       (a x : A) (c : C a a (ref a))
-                       (p : Id A a x)
-                     : C a x p
-                    := idJ A C a c x p
+                $\mathbf{Definition}$ ($=$-Elimination, J). Given a family
+            +tex(true).
+                $$
+                   C : \prod_{x,y:A}(x =_A y) \rightarrow V
+                $$
+            +tex.
+                and a function
+            +tex(true).
+                $$
+                   c: \prod_{x:A}C(x,x,ref_V(A,x))
+                $$
+            +tex.
+                there is a function
+            +tex(true).
+                $$
+                   f: \prod_{x,y:A}\Pi_{p: x =_A y}C(x,y,p)
+                $$
+            +tex.
+                such that $f(x,x,ref_V(A,x)) = c(x)$.
+
+            +code.
+                def =-ind (A : V) (C : Π (x y : A), Id A x y -> V)
+                       (x y : A) (c : C x x (ref x))
+                       (p : Id A x y)
+                     : C x y p
+                    := idJ A C x c y p
+
+            +tex(true).
+               $$
+                   ind_{=_A}  =_{def} J_V : \prod_{A:V}\prod_{C:\Pi_{(x,y:A)}(x=_A y)\rightarrow V}
+               $$
+            +tex(true).
+               $$
+                   \prod_{x:A}C(x,x,ref_V(a,x)) \rightarrow \prod_{x,y:A}\prod_{p: x=_A y}C(x,y,p).
+
+               $$
 
             h2 Computation
+
+            +code.
+                def Jˢ-β (A : V) (C : Π (a b : A), Id A a b -> V)
+                         (a : A) (c : C a a (ref a))
+                       : Id (C a a (ref a)) (Jˢ A C a a c (ref a)) c
+                      := ref c
+
             h2 Uniqueness
+
+            +code.
+                def UIP (A : V) (a b : A) (p q : Id A a b)
+                      : Id (Id A a b) p q := ref p
 
 include ../../../footer
 

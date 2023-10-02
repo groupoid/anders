@@ -17,30 +17,30 @@ block content
     article.main
         .exe
             section
-                h1 DEPENDENT PRODUCT
+                h1 SPACE OF FUNCTIONS
                 span.
         aside
             time Published: 28 JAN 2017
         .exe
             section
                 +tex.
-                    $\Pi$ is a dependent function type, the generalization of functions.
-                    As a function it can serve the wide range of mathematical constructions,
-                    objects, types, or spaces. The known domain and codomain spaces could be:
-                    depndent functions itself, sets, polynomial functors, $\infty$-groupoids,
-                    cw-complexes, categories, languages, processes, protocols, etc.
+                    $\Pi$-type is a space that contains dependent functions, which
+                    codomain type depends on value from domain type. As fiber domain
+                    present in every defined function, $\Pi$-type is also a dependent product.
 
-                +tex.
-                    In Category Theory $\Pi$ is called dependent product as right adjoint of base change.
+                    Spaces of dependent functions could serve as models for various mathematical constructions,
+                    objects, types, or spaces: dependent functions, sets, polynomial functors, $\infty$-groupoids,
+                    CW-complexes, categories, languages, processes, protocols, etc.
 
                 h2 Formation
 
                 p
-                    +tex(false, false).
-                        $\mathbf{Definition}$ ($\Pi$-Formation). $\Pi$-types represents the way we create
-                        the spaces of dependent functions from type family B of functions over type A.
+                    +tex.
+                        $\mathbf{Definition}$ ($\Pi$-Formation, Dependent Product).
+                        $\Pi$-types represents the way we create the spaces of dependent functions
+                        with domain in $A$ and codomain in type family $B : A \rightarrow U$ over A.
 
-                    +tex(true, false).
+                    +tex(true).
                         $$
                            \Pi (A,B) =_{def} \prod_{x:A}B(x) : \mathcal{U}.
                         $$
@@ -58,7 +58,8 @@ block content
 
                 +tex(true).
                     $$
-                      \backslash (x: A) \rightarrow b =_{def} \prod_{A:U}\prod_{B:A \rightarrow U}\prod_{a: A}\prod_{b:B(a)}\lambda x.b : \prod_{y:A}B(a).
+                      \backslash (x: A) \rightarrow b =_{def} \\
+                         \prod_{A:U}\prod_{B:A \rightarrow U}\prod_{a: A}\prod_{b:B(a)}\lambda x.b : \prod_{y:A}B(a).
                     $$
 
                 +code.

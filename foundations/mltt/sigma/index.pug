@@ -17,39 +17,77 @@ block content
     article.main
         .exe
             section
-                h1 DEPENDENT SUM
+                h1 SPACE OF PAIRS
         aside
             time Published: 16 OCT 2017
         .exe
             section
                 +tex.
-                    $\Sigma$-type is a total space of fibration. Element of total
-                    space is formed as a pair of basepoint and fibration. <br>
-                    Categorically, $\Sigma$ is a dependent product type,
-                    the generalization of products or disjoint union of family of sets.
+                    $\Sigma$-type is a space that contains dependent pairs
+                    where type of the second element depends on the value
+                    of the first element. As only one point of fiber domain
+                    present in every defined pair, $\Sigma$-type is also a dependent sum,
+                    where fiber base is a disjoint union.
 
             section
-                h2 Definition
+                h2 Formation
 
                 +tex.
-                    $\mathbf{Definition}$ (Dependent Sum). The dependent sum
-                    along the morphism $f: A \rightarrow B$ in category $C$ is the left
-                    adjoint $\Sigma_f : C_{/A} \rightarrow C_{/B}$ of the base change functor.
+                    $\mathbf{Definition}$ ($\Sigma$-Formation, Dependent Sum). The dependent sum
+                    type is indexed over type $A$ in the sense of coproduct or disjoint union,
+                    where only one fiber codomain $B(x)$ is present in pair.
 
-                h2 Constructors
+                +code.
+                    def Sigma (A: U) (B: A → U) : U := Σ (x: A), B(x)
+                br
+
+                +tex(true).
+                    $$
+                        \Sigma (A,B) =_{def} \sum_{x:A} B(x) : \mathcal{U}.
+                    $$
+
+                h2 Introduction
+
+                +tex.
+                    $\mathbf{Definition}$ (Dependent Pair). The dependent pair
+                    constructor is a way to create indexed pair over type A
+                    in the sense of coproduct or disjoint union.
 
                 +code.
                     def pair (A: U) (B: A → U) (a: A) (b: B a) : Sigma A B := (a, b)
                 br
 
-                h2 Eliminators
+                +tex(true).
+                    $$
+                        (a,b) =_{def} \prod_{A:U}\prod_{B:A \rightarrow U} (a,b) : \sum_{x: A} B(x).
+                    $$
+
+                h2 Elimination
+
+                +tex.
+                    $\mathbf{Definition}$ (Dependent Projections). The dependent projections
+                    $pr_{1}: \Sigma(A,B) \rightarrow A$ and
+                    $pr_{2}: \Sigma(x:A),B(x) \rightarrow B(x) ]$ are pair deconstructors.
 
                 +code.
                     pr1 (A: U) (B: A -> U)
                         (x: Sigma A B): A = x.1
 
+                +tex(true).
+                    $$
+                        pr_1 : \prod_{A:U} \prod_{B:A \rightarrow U} \sum_{x:A} B(x) \rightarrow A
+                             =_{def} (a,b) \mapsto a.
+                    $$
+
+                +code.
                     pr2 (A: U) (B: A -> U)
                         (x: Sigma A B): B (pr1 A B x) = x.2
+
+                +tex(true).
+                    $$
+                        pr_2 : \prod_{A:U} \prod_{B:A \rightarrow U} \sum_{x:A} B(x) \rightarrow B(x)
+                             =_{def} (a,b) \mapsto b.
+                    $$
 
                 +tex.
                     If you want to access deep sigma a series of $.2$
@@ -70,7 +108,7 @@ block content
                          = g p.1 p.2
                 br
 
-                h2 Computation and Uniquness
+                h2 Computation
 
                 +code.
                     Beta1 (A: U) (B: A -> U)
@@ -84,13 +122,15 @@ block content
                         = reflect (B a)
                 br
 
+                h2 Uniqueness
+
                 +code.
                     Eta12 (A: U) (B: A -> U) (p: Sigma A B)
                         : Equ (Sigma A B) p (pr1 A B p,pr2 A B p)
                         = refl (Sigma A B) p
                 br
 
-                h1 Theorems
+                h2 Theorems
                 +tex.
                     $\mathbf{Theorem}$ (Axiom of Choice). If for all $x : A$ there is $y : B$
                     such that $R(x,y)$, then there is a function $f : A \rightarrow B$ such

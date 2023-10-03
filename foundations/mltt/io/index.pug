@@ -8,26 +8,35 @@ block content
         <a href='https://anders.groupoid.space/'>ANDERS</a>
         <a href='https://anders.groupoid.space/lib/'>LIB</a>
         <a href='#'>IO</a>
-    article.main
-        .exe
-            section
-                h1 I/O Monads
+    article.main.list
         section
-            p Recursive and Corecursive Free Monads.
+            h1 IO
 
-            h2#io IO
-            p Finite I/O
-            code.
-                data IO (A: Type): Type :=
-                     (getLine: (String → IO) → IO)
-                     (putLine: String → IO → IO)
-                     (pure: A → IO)
+        section
+            h2 FINITE
+            p Finite I/O is recursive free monad represented as inductive type IO.
+            +code.
+                foldNat : Nat -> (a -> a) -> a -> a
+                foldNat  Zero    f x = x
+                foldNat (Succ m) f x = f (foldNat m f x)
 
-            p Example:
-            code.
-                record Main: Type :=
-                (main: IO.replicateM 100
-                       (IO.>>= IO.data () IO.getLine IO.putLine))
+                data IO r = PutStrLn String (IO r) | GetLine (String -> IO r) | Return r
 
+                putStrLn : String -> IO U
+                putStrLn str = PutStrLn str (Return Unit)
+                getLine : IO String
+                getLine = GetLine Return
+                return : a -> IO a
+                return = Return
+
+                (>>=) : IO a -> (a -> IO b) -> IO b
+                PutStrLn str io >>= f = PutStrLn str (io >>= f)
+                GetLine k       >>= f = GetLine (\str -> k str >>= f)
+                Return r        >>= f = f r
+
+                replicateM : Nat -> IO U -> IO U
+                replicateM n io = foldNat n (io >>) (return Unit)
+                io : IO U
+                   = replicateM 5 (getLine >>= putStrLn)
 
 include ../../../footer

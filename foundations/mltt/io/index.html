@@ -7,12 +7,26 @@
 use[data-c]{stroke-width:3px}
 </style></head><body class="content"></body></html><title>IO</title><nav><a href='https://anders.groupoid.space/'>ANDERS</a>
 <a href='https://anders.groupoid.space/lib/'>LIB</a>
-<a href='#'>IO</a></nav><article class="main"><div class="exe"><section><h1>I/O Monads</h1></section></div><section><p>Recursive and Corecursive Free Monads.</p><h2 id="io">IO</h2><p>Finite I/O</p><code>data IO (A: Type): Type :=
-     (getLine: (String → IO) → IO)
-     (putLine: String → IO → IO)
-     (pure: A → IO)
-</code><p>Example:</p><code>record Main: Type :=
-(main: IO.replicateM 100
-       (IO.>>= IO.data () IO.getLine IO.putLine))
+<a href='#'>IO</a></nav><article class="main list"><section><h1>IO</h1></section><section><h2>FINITE</h2><p>Finite I/O is recursive free monad represented as inductive type IO.</p><code>foldNat <span class="h__symbol">:</span> Nat -> <span class="h__symbol">(</span>a -> a<span class="h__symbol">)</span> -> a -> a
+foldNat  Zero    f x <span class="h__symbol">=</span> x
+foldNat <span class="h__symbol">(</span>Succ m<span class="h__symbol">)</span> f x <span class="h__symbol">=</span> f <span class="h__symbol">(</span>foldNat m f x<span class="h__symbol">)</span>
 
+data IO r <span class="h__symbol">=</span> PutStrLn String <span class="h__symbol">(</span>IO r<span class="h__symbol">)</span> | GetLine <span class="h__symbol">(</span>String -> IO r<span class="h__symbol">)</span> | Return r
+
+putStrLn <span class="h__symbol">:</span> String -> IO <span class="h__keyword">U</span>
+putStrLn str <span class="h__symbol">=</span> PutStrLn str <span class="h__symbol">(</span>Return Unit<span class="h__symbol">)</span>
+getLine <span class="h__symbol">:</span> IO String
+getLine <span class="h__symbol">=</span> GetLine Return
+return <span class="h__symbol">:</span> a -> IO a
+return <span class="h__symbol">=</span> Return
+
+<span class="h__symbol">(</span>>><span class="h__symbol">=)</span> <span class="h__symbol">:</span> IO a -> <span class="h__symbol">(</span>a -> IO b<span class="h__symbol">)</span> -> IO b
+PutStrLn str io >><span class="h__symbol">=</span> f <span class="h__symbol">=</span> PutStrLn str <span class="h__symbol">(</span>io >><span class="h__symbol">=</span> f<span class="h__symbol">)</span>
+GetLine k       >><span class="h__symbol">=</span> f <span class="h__symbol">=</span> GetLine <span class="h__symbol">(</span>\str -> k str >><span class="h__symbol">=</span> f<span class="h__symbol">)</span>
+Return r        >><span class="h__symbol">=</span> f <span class="h__symbol">=</span> f r
+
+replicateM <span class="h__symbol">:</span> Nat -> IO <span class="h__keyword">U</span> -> IO <span class="h__keyword">U</span>
+replicateM n io <span class="h__symbol">=</span> foldNat n <span class="h__symbol">(</span>io >><span class="h__symbol">)</span> <span class="h__symbol">(</span>return Unit<span class="h__symbol">)</span>
+io <span class="h__symbol">:</span> IO <span class="h__keyword">U</span>
+   <span class="h__symbol">=</span> replicateM 5 <span class="h__symbol">(</span>getLine >><span class="h__symbol">=</span> putStrLn<span class="h__symbol">)</span>
 </code></section></article><footer class="footer"><a href="https://5ht.co/license/"><img class="footer__logo" src="https://longchenpa.guru/seal.png" width="50"></a><span class="footer__copy">2021&mdash;2023 &copy; <a href="//groupoid.space/" style="color:Lavender;">Groupoïd Infinity</a></span></footer>

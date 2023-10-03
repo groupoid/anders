@@ -7,23 +7,15 @@
 use[data-c]{stroke-width:3px}
 </style></head><body class="content"></body></html><title>IOI</title><nav><a href='https://anders.groupoid.space/'>ANDERS</a>
 <a href='https://anders.groupoid.space/lib/'>LIB</a>
-<a href='#'>IOI</a></nav><article class="main"><div class="exe"><section><h1>Infinity I/O Monads</h1></section></div><section><h2 id="ioi">IOI</h2><p>Infinity I/O</p><code>data IOI.F (A,State: Type): Type :=
-     (getLine: (String → State) → IO)
-     (putLine: String → State → IO)
-     (pure: A → IO)
+<a href='#'>IOI</a></nav><article class="main list"><section><h1>IOI</h1></section><section><h2>INFINITE</h2><p>Infinite I/O is corecursive cofree comonad represented as coinductive type IOI.</p><code>data IOF r s
+   <span class="h__symbol">=</span> PutStrLn String s
+   | GetLine <span class="h__symbol">(</span>String -> s<span class="h__symbol">)</span>
+   | Return r
 
-data IOI (A,State: Type) :=
-     (intro: State -> (State -> IOI.F A State) -> IOI)
-</code><p>Example:</p><code>record Main: Type :=
-(main: λ (r: Type) ->
-    IOI.MkIO r (Maybe IOI.data) (Maybe.Nothing IOI.data)
-                ( λ (m: Maybe IOI.data) ->
-                    Maybe.maybe IOI.data m
-                    (IOI.F r (Maybe IOI.data))
-                    ( λ (str: IOI.data) ->
-                        IOI.putLine r (Maybe IOI.data)
-                        str (Maybe.Nothing IOI.data))
-                    (IOI.getLine r (Maybe IOI.data)
-                                (Maybe.Just IOI.data))))
+data IOI r
+   <span class="h__symbol">=</span> forall s . MkIO s <span class="h__symbol">(</span>s -> IOF r s<span class="h__symbol">)</span>
 
-</code></section><div class="om"></div></article><footer class="footer"><a href="https://5ht.co/license/"><img class="footer__logo" src="https://longchenpa.guru/seal.png" width="50"></a><span class="footer__copy">2021&mdash;2023 &copy; <a href="//groupoid.space/" style="color:Lavender;">Groupoïd Infinity</a></span></footer>
+io <span class="h__symbol">:</span> IOI
+   <span class="h__symbol">=</span> MkIO Nothing <span class="h__symbol">(</span>maybe <span class="h__symbol">(</span>\str -> PutStrLn str Nothing<span class="h__symbol">)</span>
+                         <span class="h__symbol">(</span>GetLine Just<span class="h__symbol">))</span>
+</code></section></article><footer class="footer"><a href="https://5ht.co/license/"><img class="footer__logo" src="https://longchenpa.guru/seal.png" width="50"></a><span class="footer__copy">2021&mdash;2023 &copy; <a href="//groupoid.space/" style="color:Lavender;">Groupoïd Infinity</a></span></footer>

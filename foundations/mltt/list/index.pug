@@ -31,16 +31,16 @@ block content
                 $nil = in \cdot inl$ and
                 $cons = in \cdot inr$, so
                 $in = [nil,cons]$.
+            +code.
+                def List-ctor (A: U) := maybe-rec A U 𝟎 (λ (a : A), 𝟏)
+                def List (A: U) := W (x : Maybe A), List-ctor A x
             +tex.
                 In type theory $List$ type could be expressed as
                 $$
                    List(A) := W_{(x:1+A)},\ rec_{1+A}(A,U,0,λa.𝟏,x).
                 $$
-            code.
-                def List-ctor (A: U) := maybe-rec A U 𝟎 (λ (a : A), 𝟏)
-                def List (A: U) := W (x : Maybe A), List-ctor A x
 
-            h2 Constructors
+            h2 Introduction
             +tex.
                 You can create zero list with $nil$ and append an element
                 to the head of the list with $cons$.
@@ -48,17 +48,16 @@ block content
                 def nil (A: U) : List A
                 def cons (A: U) (x : A) (xs: List A) : List A
 
-            h2 Induction Principle
+            h2 Elimination
             +tex.
                Induction principle allows you to prove general predicate on $List (C\ n)$
                from predicates on constructors $(C\ nil)$ and $(C\ cons)$.
-            code.
+            +code.
                 def List-ind (A: U) (C: List A -> U)
                     (z: C (nil A)) (s: Π (x: A) (xs: List A), C xs -> C (cons A x xs))
                   : Π (n: List A), C n
 
-            h2 Eliminators
-            code.
+            +code.
                 def List-rec  (A: U) (C : U) (z : C) (s : A → List A → C → C) : List A → C
                 def List-iter (A: U) (C : U) (z : C) (s : A → C → C) : List A → C
                 def List-case (A: U) (C : U) (z : C) (s : A → C) : List A → C

@@ -8,37 +8,23 @@ block content
         <a href='https://anders.groupoid.space/'>ANDERS</a>
         <a href='https://anders.groupoid.space/lib/'>LIB</a>
         <a href='#'>IOI</a>
-    article.main
-        .exe
-            section
-                h1 Infinity I/O Monads
+    article.main.list
         section
-            h2#ioi IOI
-            p Infinity I/O
-            code.
-                data IOI.F (A,State: Type): Type :=
-                     (getLine: (String → State) → IO)
-                     (putLine: String → State → IO)
-                     (pure: A → IO)
+            h1 IOI
+        section
+            h2 INFINITE
+            p Infinite I/O is corecursive cofree comonad represented as coinductive type IOI.
+            +code.
+                data IOF r s
+                   = PutStrLn String s
+                   | GetLine (String -> s)
+                   | Return r
 
-                data IOI (A,State: Type) :=
-                     (intro: State -> (State -> IOI.F A State) -> IOI)
+                data IOI r
+                   = forall s . MkIO s (s -> IOF r s)
 
-            p Example:
-            code.
-                record Main: Type :=
-                (main: λ (r: Type) ->
-                    IOI.MkIO r (Maybe IOI.data) (Maybe.Nothing IOI.data)
-                                ( λ (m: Maybe IOI.data) ->
-                                    Maybe.maybe IOI.data m
-                                    (IOI.F r (Maybe IOI.data))
-                                    ( λ (str: IOI.data) ->
-                                        IOI.putLine r (Maybe IOI.data)
-                                        str (Maybe.Nothing IOI.data))
-                                    (IOI.getLine r (Maybe IOI.data)
-                                                (Maybe.Just IOI.data))))
-
-
-        .om
+                io : IOI
+                   = MkIO Nothing (maybe (\str -> PutStrLn str Nothing)
+                                         (GetLine Just))
 
 include ../../../footer

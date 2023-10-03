@@ -20,17 +20,18 @@ block content
                 h1 FUNCTION SPACES
                 span.
         aside
-            time Published: 16 OCT 2017
+            time Published: 14 OCT 2017
         .exe
             section
                 +tex.
                     $\Pi$-type is a space that contains dependent functions, which
                     codomain type depends on value from domain type. As fiber domain
                     present in every defined function, $\Pi$-type is also a dependent product.
-
-                    Spaces of dependent functions could serve as models for various mathematical constructions,
-                    objects, types, or spaces: dependent functions, $\infty$-groupoids,
-                    $\mathrm{CW}$-complexes, sets, polynomial functors, categories, languages, processes, protocols, etc.
+                +tex.
+                    Spaces of dependent functions are serving as models for various mathematical constructions,
+                    objects, types, or spaces and their maps: dependent functions,
+                    continuous maps, Étale maps, fibre bundles, universal
+                    quantifier $\mathbf{\forall}$-type, etc.
 
                 h2 Formation
 
@@ -54,7 +55,7 @@ block content
                     Lambda constructor defines a new lambda function in the space of dependent functions.
                     it is called lambda abstraction and displayed as $\lambda x. b(x)$ or $x \mapsto b(x)$.
 
-                code.
+                +code.
                     def lambda (A: U) (B: A → U) (b: Pi A B) : Pi A B := λ (x : A), b x
                     def lam (A B: U) (f: A → B) : A → B := λ (x : A), f x
 
@@ -96,7 +97,7 @@ block content
                     $\mathbf{Theorem}$ (Computation $\Pi_\beta$).
                     $β$-rule shows that composition $\mathrm{lam} \circ \mathrm{app}$ could be fused.
 
-                code.
+                +code.
                     def Π-β (A : U) (B : A → U) (a : A) (f : Pi A B)
                       : Path (B a) (apply A B (lambda A B f) a) (f a)
                      := idp (B a) (f a)
@@ -112,7 +113,7 @@ block content
                     $\mathbf{Theorem}$ (Uniqueness $\Pi_\eta$).
                     $η$-rule shows that composition $\mathrm{app} \circ \mathrm{lam}$ could be fused.
 
-                code.
+                +code.
                     def Π-η (A : U) (B : A → U) (a : A) (f : Pi A B)
                       : Path (Pi A B) f (λ (x : A), f x)
                      := idp (Pi A B) f
@@ -130,7 +131,7 @@ block content
                     application of $f$ to path or congruence property ($\mathrm{cong}$, for non-dependent case).
                     This property behaves functoriality as if paths are groupoid morphisms and types are objects.
 
-                code.
+                +code.
                     FiberPi (B: U) (F: B -> U) (y: B)
                           : Path U (fiber (Sigma B F) B (pi1 B F) y) (F y)
 

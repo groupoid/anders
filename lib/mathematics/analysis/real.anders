@@ -44,7 +44,8 @@ def midpoint-alg (A : U) (O : A → A → A) : U₁ :=
   Σ (isSet : isSet A)
     (idempodent : Π (a : A), Path A (O a a) a)
     (commutative : Π (x y : A), Path A (O x y) (O y x))
-    (transpositional : Π (a b c d : A), Path A (O (O a b) (O c d)) (O (O a c) (O b d))), U
+    (transpositional : Π (a b c d : A),
+        Path A (O (O a b) (O c d)) (O (O a c) (O b d))), U
 
 def convex-body : U₁ :=
   Σ (A : U)

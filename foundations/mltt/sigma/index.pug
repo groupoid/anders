@@ -14,83 +14,82 @@ block content
         <a href='https://anders.groupoid.space/'>ANDERS</a>
         <a href='https://anders.groupoid.space/lib/'>LIB</a>
         <a href='#'>SIGMA</a>
-    article.main
-        .exe
-            section
-                h1 CONTEXT SPACES
-        aside
-            time Published: 14 OCT 2017
-        .exe
-            section
-                +tex.
-                    $\Sigma$-type is a space that contains dependent pairs
-                    where type of the second element depends on the value
-                    of the first element. As only one point of fiber domain
-                    present in every defined pair, $\Sigma$-type is also a dependent sum,
-                    where fiber base is a disjoint union.
-                +tex.
-                    Spaces of dependent pairs are using in type theory to model
-                    cartesian products, disjoint sums, fiber bundles, vector spaces,
-                    telescopes, lenses, contexts, objects, algebras, ∃-type, etc.
+    article.main.list
+        section
+            h1 CONTEXT SPACES
+            aside time Published: 14 OCT 2017
+        section
+            +tex.
+                $\Sigma$-type is a space that contains dependent pairs
+                where type of the second element depends on the value
+                of the first element. As only one point of fiber domain
+                present in every defined pair, $\Sigma$-type is also a dependent sum,
+                where fiber base is a disjoint union.
+            +tex.
+                Spaces of dependent pairs are using in type theory to model
+                cartesian products, disjoint sums, fiber bundles, vector spaces,
+                telescopes, lenses, contexts, objects, algebras, ∃-type, etc.
 
-            section
-                h2 Formation
+        section
+            h2 Formation
 
-                +tex.
-                    $\mathbf{Definition}$ ($\Sigma$-Formation, Dependent Sum). The dependent sum
-                    type is indexed over type $A$ in the sense of coproduct or disjoint union,
-                    where only one fiber codomain $B(x)$ is present in pair.
+            +tex.
+                $\mathbf{Definition}$ ($\Sigma$-Formation, Dependent Sum). The dependent sum
+                type is indexed over type $A$ in the sense of coproduct or disjoint union,
+                where only one fiber codomain $B(x)$ is present in pair.
 
-                +code.
-                    def Sigma (A: U) (B: A → U) : U := Σ (x: A), B(x)
-                br
+            +code.
+                def Sigma (A: U) (B: A → U) : U := Σ (x: A), B(x)
+            br
 
-                +tex(true).
-                    $$
-                        \Sigma (A,B) =_{def} \sum_{x:A} B(x) : \mathcal{U}.
-                    $$
+            +tex(true).
+                $$
+                    \Sigma (A,B) =_{def} \sum_{x:A} B(x) : \mathcal{U}.
+                $$
 
-                h2 Introduction
+            h2 Introduction
 
-                +tex.
-                    $\mathbf{Definition}$ (Dependent Pair). The dependent pair
-                    constructor is a way to create indexed pair over type $A$
-                    in the sense of coproduct or disjoint union.
+            +tex.
+                $\mathbf{Definition}$ (Dependent Pair). The dependent pair
+                constructor is a way to create indexed pair over type $A$
+                in the sense of coproduct or disjoint union.
 
-                +code.
-                    def pair (A: U) (B: A → U) (a: A) (b: B a) : Sigma A B := (a, b)
-                br
+            +code.
+                def pair (A: U) (B: A → U) (a: A) (b: B a) : Sigma A B := (a, b)
+            br
 
-                +tex(true).
-                    $$
-                        (a,b) =_{def}
-                    $$
-                +tex(true).
-                    $$
-                        \prod_{A:U}\prod_{B:A \rightarrow U}\prod_{a:A}\prod_{b:B(a)} (a,b) : \sum_{x: A} B(x).
-                    $$
+            +tex(true).
+                $$
+                    (a,b) =_{def}
+                $$
 
-                h2 Elimination
+            +tex(true).
+                $$
+                    \prod_{A:U}\prod_{B:A \rightarrow U}\prod_{a:A}\prod_{b:B(a)} (a,b) : \sum_{x: A} B(x).
+                $$
 
-                +tex.
-                    $\mathbf{Definition}$ (Dependent Projections). The dependent projections
-                    $pr_{1}: \Sigma(A,B) \rightarrow A$ and
-                    $pr_{2}: \Pi_{x: \Sigma(A,B)} B(pr_{1}(x))$ are pair deconstructors.
+            h2 Elimination
 
-                +code.
-                    def pr₁ (A: U) (B: A → U) (x: Sigma A B) : A ≔ x.1
+            +tex.
+                $\mathbf{Definition}$ (Dependent Projections). The dependent projections
+                $pr_{1}: \Sigma(A,B) \rightarrow A$ and
+                $pr_{2}: \Pi_{x: \Sigma(A,B)} B(pr_{1}(x))$ are pair deconstructors.
 
-                +tex(true).
-                    $$
-                        pr_1 : \prod_{A:U} \prod_{B:A \rightarrow U} \prod_{x: \Sigma(A,B)} A
-                    $$
-                +tex(true).
-                    $$
-                             =_{def} .1 =_{def} (a,b) \mapsto a.
-                    $$
+            +code.
+                def pr₁ (A: U) (B: A → U) (x: Sigma A B) : A ≔ x.1
 
-                +code.
-                    def pr₂ (A: U) (B: A → U) (x: Sigma A B) : B (pr₁ A B x) ≔ x.2
+            +tex(true).
+                $$
+                    pr_1 : \prod_{A:U} \prod_{B:A \rightarrow U} \prod_{x: \Sigma(A,B)} A
+                $$
+
+            +tex(true).
+                $$
+                    =_{def} .1 =_{def} (a,b) \mapsto a.
+                $$
+
+            +code.
+                def pr₂ (A: U) (B: A → U) (x: Sigma A B) : B (pr₁ A B x) ≔ x.2
 
                 +tex(true).
                     $$

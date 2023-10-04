@@ -30,14 +30,14 @@ block content
                 +tex.
                     Spaces of dependent functions are using in type theory to model
                     various mathematical constructions, objects, types, or spaces and their maps:
-                    dependent functions, continuous maps, Étale maps, fibre bundles, universal
+                    dependent functions, continuous maps, étale maps, fibre bundles, universal
                     quantifier $\mathbf{\forall}$-type, implications, etc.
 
                 h2 Formation
 
                 +tex.
                     $\mathbf{Definition}$ ($\Pi$-Formation, Dependent Product).
-                    $\Pi$-types represents the way we create the spaces of dependent functions
+                    $\Pi$-types represents the way we create the spaces of dependent functions $f: \Pi(x:A), B(x)$
                     with domain in $A$ and codomain in type family $B : A \rightarrow U$ over $A$.
 
                 +code.
@@ -67,6 +67,11 @@ block content
                     $$
                        \prod_{A:U}\prod_{B:A \rightarrow U}\prod_{a: A}\prod_{b:B(a)}\lambda x.b : \prod_{y:A}B(a).
                     $$
+
+                +tex.
+                    When codomain is not dependent on valude from domain the function $f: A \rightarrow B$
+                    is studied in System F$_\omega$, dependent case in studied
+                    in Systen P$_\omega$ or Calculus of Construction (CoC).
 
                 h2 Elimination
 

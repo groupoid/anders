@@ -57,23 +57,31 @@ block content
                     не тільки типи-аксіоми, але і мета-теоретичні спряження в яких
                     вони приймають участь.
 
-                h2 Основна ідея
+                h2  Мотивація
+                +tex.
+                    Головна мотивація гомотопічної теорії — надати обчислювальну семантику
+                    гомотопічним типам та CW-комплексам.
+                    Головна ідея гомотопічної теорії [1] полягає в поєднанні
+                    просторів функцій $\Pi$, просторів контекстів $\Sigma$ і
+                    просторів шляхів $\mathrm{Path}$ таким чином, що вони
+                    утворюють фібраційну рівність яка
+                    збігається (доводиться в самій теорії) з простором шляхів.
+
                 +code.
-                   isContr (A: U): U
-                      := Σ (x: A), Π (y: A), Path A x y
+                   isContr (A: U): U := Σ (x: A), Π (y: A), Path A x y
+                   fiber (A B: U) (f: A → B) (y: B): U := Σ (x: A), Path B y (f x)
+                   isEquiv (A B: U) (f: A → B): U := Π (y: B), isContr (fiber A B f y)
 
-                   fiber (A B : U) (f: A → B) (y : B) : U 
-                      := Σ (x : A), Path B y (f x)
-
-                   isEquiv (A B : U) (f : A → B) : U 
-                      := Π (y : B), isContr (fiber A B f y)
                 br.
-                +code.
-                   isProp (A : U) : U
-                      := Π (a b : A), Path A a b
+                p.
+                   Завдяки відсутності ета-правила у рівності,
+                   не кожне доведення дорівнює одне одному, отже
+                   простір шляхів утворю багатовимірну структуру
+                   інфініті-групоїда.
 
-                   isSet (A : U) : U
-                      := Π (a b : A) (a0 b0 : Path A a b),
+                +code.
+                   isProp (A : U) : U := Π (a b : A), Path A a b
+                   isSet (A : U) : U := Π (a b : A) (a0 b0 : Path A a b),
                          Path (Path A a b) a0 b0
 
                    isGroupoid (A : U) : U
@@ -81,13 +89,10 @@ block content
                          (i j : Path (Path A a b) x y),
                          Path (Path (Path A a b) x y) i j
                 br.
+                +tex.
+                    Групоїдна інтерпретація теорії типів ставить питання про існування мови,
+                    в якій можна довести механічно всі всластивості категорного визначення групоїда.
                 +code.
-                   cat : U₁
-                      := Σ (ob: U) (hom: ob -> ob -> U), unit
-
-                   PathCat (X: U): cat
-                      := (X, \ (x y : X), PathP (<_>X) x y, star)
-
                    CatGroupoid (X : U) (G : isGroupoid X)
                        : isCatGroupoid (PathCat X)
                       := ( idp X,
@@ -101,6 +106,16 @@ block content
                            comp-Path-assoc X,
                            star
                          )
+                +tex.
+                    За цей час були перепробувані глобулярні та сімліціальні моделі, але
+                    аксіома унівалентності конструктивно валідується тільки в кубічних множинах,
+                    на рівні теорії типів це відбувається в Кан-операціях $\mathrm{transp}$ та $\mathrm{hcomp}$.
+
+                br.
+                center.
+                    &dot;
+                p.
+                    [1]. Pelayo, Warren. Homotopy type theory and Voevodsky's univalent foundations. 2012.
 
                 h2 Фібраційні доведення
                 +tex(true).

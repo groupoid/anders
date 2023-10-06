@@ -11,17 +11,6 @@ import lib/foundations/mltt/nat
 
 option girard true
 
--- data pts (lang: U)
---    = star (n: nat)
---    | var (l: nat)
---    | pi (l: nat) (d c: lang)
---    | lambda (l: nat) (d c: lang)
---    | app (f a: lang)
-
---      + N (+ N (+ N (+ N    𝟏)))
---        0    0    1    1    1
-
-
 -- def L-ctor (A : U)  : U := W (x : Maybe A), maybe-rec A U 𝟎 (λ (a : A), 𝟏) x
 -- def N-ctor              := W (x : 𝟐),       ind₂ (λ (f : 𝟐), U) 𝟎 𝟏 x
 -- def B-ctor          : U := W (x : + ℕ ℕ), +-rec ℕ ℕ (λ (f : + ℕ ℕ), U) 𝟎 (𝟏 × 𝟏) x

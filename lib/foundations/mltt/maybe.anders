@@ -10,3 +10,4 @@ def maybe-ind (A : U) (P: Maybe A -> U) (n: P (nothing A)) (j: Π (x: A), P (jus
 
 def maybe-rec (A P: U) (n: P) (j: A -> P) : Maybe A -> P
  := maybe-ind A (\(x: Maybe A), P) n j
+

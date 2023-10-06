@@ -17,7 +17,14 @@ option girard true
 -- def M-ctor (A: U)   : U := Σ (x : 𝟐),       ind₂ (λ (f : 𝟐), U) 𝟏 A x
 -- def +-ctor (A B: U) : U := Σ (x : 𝟐),       ind₂ (λ (f : 𝟐), U) A B x
 
-def List-ctor (A: U) := maybe-rec A U 𝟎 (λ (a : A), 𝟏)
+--def List-ctor (A: U)  := maybe-rec A U 𝟎 (λ (a : A), 𝟏)
+def List-ctor (A: U)
+  : Π (w : Maybe A), U
+ := λ (w : Maybe A), ind₂ (λ (x: 𝟐),
+               Π (u: ind₂ (λ (x: 𝟐), U) 𝟏 A x), U)
+                    (ind₁ (λ (x: 𝟏), U) 𝟎)
+                          (λ (a: A), 𝟏) w.1 w.2
+
 def List (A: U) := W (x : Maybe A), List-ctor A x
 def nil (A: U) : List A := sup (Maybe A) (List-ctor A) (nothing A) (ind₀ (List A))
 def cons (A: U) (x : A) (xs: List A) : List A := sup (Maybe A) (List-ctor A) (just A x) (λ (x : 𝟏), xs)
@@ -68,13 +75,3 @@ def append-assoc (A: U)
                ?
                (append A xs (append A ys zs))
 
-def 𝟓-ctor (A B C D E: U): U := + A (+ B (+ C (+ D E)))
-def 𝟓-ind (A B C D E: U)
-          (C  : 𝟓-ctor A B C D E → U)
-          (c₀ : C (inl ))
-          (c₁ : C 1₅)
-          (c₂ : C 2₅)
-          (c₃ : C 3₅)
-          (c₄ : C 4₅): Π (x : 𝟓-ctor A B C D E), C x
- := +-ind 𝟐 𝟑 C (ind₂ (λ (x : 𝟐), C (0₂, x)) c₀ c₁) (ind₃ (λ (x : 𝟑), C (1₂, x)) c₂ c₃ c₄)
-def PTS-ctor : U := W (x : 𝟓-ctor ℕ ℕ ℕ ℕ 𝟏), ?

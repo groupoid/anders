@@ -71,6 +71,10 @@ block content
                    isContr (A: U): U := Σ (x: A), Π (y: A), Path A x y
                    fiber (A B: U) (f: A → B) (y: B): U := Σ (x: A), Path B y (f x)
                    isEquiv (A B: U) (f: A → B): U := Π (y: B), isContr (fiber A B f y)
+                   equiv(X Y: U): U := Σ (f: X → Y), isEqiv X Y f
+                   ua (A B : U) (p : Path U A B) : equiv A B
+                      := transp (<i> equiv A (p @ i)) 0 (idEquiv A)
+                   ua-β (A B: U) := isEquiv (Path U A B) (equiv A B) (ua A B)
 
                 br.
                 p.

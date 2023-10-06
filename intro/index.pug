@@ -17,7 +17,7 @@ block content
     article.main
         .exe
             section
-                h1 Теорія типів
+                h1 Модальна<br>гомотопічна<br>теорія типів
                 span.
         aside
             time Код курсу: КМ-111-10<br>Кількість кредитів: 12
@@ -56,6 +56,51 @@ block content
                     Курс (10) умовно можна розділити на 4 частини, кожна з яких показує
                     не тільки типи-аксіоми, але і мета-теоретичні спряження в яких
                     вони приймають участь.
+
+                h2 Основна ідея
+                +code.
+                   isContr (A: U): U
+                      := Σ (x: A), Π (y: A), Path A x y
+
+                   fiber (A B : U) (f: A → B) (y : B) : U 
+                      := Σ (x : A), Path B y (f x)
+
+                   isEquiv (A B : U) (f : A → B) : U 
+                      := Π (y : B), isContr (fiber A B f y)
+                br.
+                +code.
+                   isProp (A : U) : U
+                      := Π (a b : A), Path A a b
+
+                   isSet (A : U) : U
+                      := Π (a b : A) (a0 b0 : Path A a b),
+                         Path (Path A a b) a0 b0
+
+                   isGroupoid (A : U) : U
+                      := Π (a b : A) (x y : Path A a b)
+                         (i j : Path (Path A a b) x y),
+                         Path (Path (Path A a b) x y) i j
+                br.
+                +code.
+                   cat : U₁
+                      := Σ (ob: U) (hom: ob -> ob -> U), unit
+
+                   PathCat (X: U): cat
+                      := (X, \ (x y : X), PathP (<_>X) x y, star)
+
+                   CatGroupoid (X : U) (G : isGroupoid X)
+                       : isCatGroupoid (PathCat X)
+                      := ( idp X,
+                           comp-Path X,
+                           G,
+                           sym X,
+                           comp-inv-Path⁻¹ X,
+                           comp-inv-Path X,
+                           comp-Path-left X,
+                           comp-Path-right X,
+                           comp-Path-assoc X,
+                           star
+                         )
 
                 h2 Фібраційні доведення
                 +tex(true).

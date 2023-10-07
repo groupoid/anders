@@ -22,7 +22,10 @@ block content
                     time Published: 25 JUL 2018
                 +tex.
                     The homotopy identity system defines a Path space indexed over type $A$
-                    with elements as functions from interval $[0,1]$ to values of that path space $[0,1] \rightarrow A$.
+                    with elements as functions from interval $[0,1]$ to values
+                    of that path space $[0,1] \rightarrow A$. HoTT book
+                    defines two induction principles for identity types:
+                    path induction and based path induction.
                 h.
                     <div><sup>1</sup> &mdash; Bezem, Coquand, Huber (2014)<br>
                     <sup>2</sup> &mdash; Cohen, Coquand, Huber, Mörtberg (2015)<br>
@@ -30,7 +33,7 @@ block content
                     </div>
 
             section
-                h2 Constructors
+                h2 Introduction
                 code.
                     refl (A: U) (a: A) : Path A a a
                 +tex.
@@ -39,7 +42,7 @@ block content
                     interval $[0,1]$ that returns a constant value a. Written in
                     syntax as $[i]a$.
 
-                h2 Eliminators
+                h2 Elimination
                 code.
                     app1 (A: U) (a b: A) (p: Path A a b): A = p @ 0
                     app2 (A: U) (a b: A) (p: Path A a b): A = p @ 1
@@ -68,11 +71,11 @@ block content
                     $$
 
                 code.
-                    connection1 (A: U) (a b: A) (p: Path A a b)
+                    join (A: U) (a b: A) (p: Path A a b)
                       : PathP (&lt;x&gt; Path A (p@x) b) p (&lt;i&gt; b)
                       = &lt;y x&gt; p @ (x \/ y)
 
-                    connection2 (A: U) (a b: A) (p: Path A a b)
+                    meet (A: U) (a b: A) (p: Path A a b)
                       : PathP (&lt;x&gt; Path A a (p@x)) (&lt;i&gt; a) p
                       = &lt;x y&gt; p @ (x /\ y)
                 br.

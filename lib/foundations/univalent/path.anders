@@ -12,6 +12,7 @@
    HoTT 2.1 Types are higher groupoids
    HoTT 2.11 Identity type
    HoTT 3.11 Contractibility
+   HoTT 5.8 Identity types and identity systems
    HoTT 6.2 Induction principles and dependent paths.
 
    Copyright (c) Groupoid Infinity, 2014-2022. -}

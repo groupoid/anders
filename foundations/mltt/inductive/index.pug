@@ -24,11 +24,15 @@ block content
                 and are built-in into the type checker that allows to express
                 well-founded trees and coinductive streams with $\mathrm{M}$-types.
             +code.
-                def L (A : U)  : U := W (x : Maybe A), maybe-rec A U 𝟎 (λ (a : A), 𝟏) x
-                def N              := W (x : 𝟐),       ind₂ (λ (f : 𝟐), U) 𝟎 𝟏 x
-                def B          : U := W (x : + ℕ ℕ), +-rec ℕ ℕ (λ (f : + ℕ ℕ), U) 𝟎 (𝟏 × 𝟏) x
-                def M (A: U)   : U := Σ (x : 𝟐),       ind₂ (λ (f : 𝟐), U) 𝟏 A x
-                def + (A B: U) : U := Σ (x : 𝟐),       ind₂ (λ (f : 𝟐), U) A B x
+                L (A : U)  : U := W (x : Maybe A), maybe-rec A U 𝟎 (λ (a : A), 𝟏) x
+                B : U := W (x : + ℕ ℕ), +-rec ℕ ℕ (λ (f : + ℕ ℕ), U) 𝟎 (𝟏 × 𝟏) x
+                N : U := W (x : 𝟐), ind₂ (λ (f : 𝟐), U) 𝟎 𝟏 x
+                M (A: U)   : U := Σ (x : 𝟐), ind₂ (λ (f : 𝟐), U) 𝟏 A x
+                + (A B: U) : U := Σ (x : 𝟐), ind₂ (λ (f : 𝟐), U) A B x
+                V (A: U₁)  : ℕ → U := ℕ-iter U 𝟏 (λ (X : U), A × X)
+                F          : ℕ → U := ℕ-iter U 𝟎 (+ 𝟏)
+
+
             br.
 
             h1 EMPTY

@@ -68,36 +68,39 @@ block content
                     збігається (доводиться в самій теорії) з простором шляхів.
 
                 +code.
-                   isContr (A: U): U := Σ (x: A), Π (y: A), Path A x y
-                   fiber (A B: U) (f: A → B) (y: B): U := Σ (x: A), Path B y (f x)
-                   isEquiv (A B: U) (f: A → B): U := Π (y: B), isContr (fiber A B f y)
-                   equiv(X Y: U): U := Σ (f: X → Y), isEqiv X Y f
-                   ua (A B : U) (p : Path U A B) : equiv A B
-                      := transp (&lt;i> equiv A (p @ i)) 0 (idEquiv A)
+                    isContr (A: U): U := Σ (x: A), Π (y: A), Path A x y
+                    fiber (A B: U) (f: A → B) (y: B): U := Σ (x: A), Path B y (f x)
+                    isEquiv (A B: U) (f: A → B): U := Π (y: B), isContr (fiber A B f y)
+                    equiv(X Y: U): U := Σ (f: X → Y), isEqiv X Y f
+                    ua (A B : U) (p : Path U A B) : equiv A B
+                       := transp (&lt;i> equiv A (p @ i)) 0 (idEquiv A)
 
                 br.
                 p.
-                   Завдяки відсутності ета-правила у рівності,
-                   не кожні два доведення одного простору шляхів
-                   дорівнюють між собою, отже
-                   простір шляхів утворює багатовимірну структуру
-                   інфініті-групоїда.
+                    Завдяки відсутності ета-правила у рівності,
+                    не кожні два доведення одного простору шляхів
+                    дорівнюють між собою, отже
+                    простір шляхів утворює багатовимірну структуру
+                    інфініті-групоїда.
 
                 +code.
-                   isProp (A : U) : U := Π (a b : A), Path A a b
-                   isSet (A : U) : U := Π (a b : A) (a0 b0 : Path A a b),
-                         Path (Path A a b) a0 b0
+                    isProp (A : U) : U := Π (a b : A),
+                        Path A a b
 
-                   isGroupoid (A : U) : U
-                      := Π (a b : A) (x y : Path A a b)
-                         (i j : Path (Path A a b) x y),
-                         Path (Path (Path A a b) x y) i j
+                    isSet (A : U) : U := Π (a b : A)
+                        (a0 b0 : Path A a b),
+                        Path (Path A a b) a0 b0
+
+                    isGroupoid (A : U) : U
+                     := Π (a b : A) (x y : Path A a b)
+                        (i j : Path (Path A a b) x y),
+                        Path (Path (Path A a b) x y) i j
                 br.
                 +tex.
                     Групоїдна інтерпретація теорії типів ставить питання про існування мови,
                     в якій можна довести механічно всі всластивості категорного визначення групоїда.
                 +code.
-                   CatGroupoid (X : U) (G : isGroupoid X)
+                    CatGroupoid (X : U) (G : isGroupoid X)
                        : isCatGroupoid (PathCat X)
                       := ( idp X,
                            comp-Path X,

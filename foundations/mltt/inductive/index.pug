@@ -26,13 +26,13 @@ block content
                 spaces with reversed intro-elim rules.
 
             +code.
-                L (A : U)  : U := W (x : Maybe A), maybe-rec A U 𝟎 (λ (a : A), 𝟏) x
-                B : U := W (x : + ℕ ℕ), +-rec ℕ ℕ (λ (f : + ℕ ℕ), U) 𝟎 (𝟏 × 𝟏) x
-                N          : U := W (x : 𝟐), ind₂ (λ (f : 𝟐), U) 𝟎 𝟏 x
-                M (A: U)   : U := Σ (x : 𝟐), ind₂ (λ (f : 𝟐), U) 𝟏 A x
-                + (A B: U) : U := Σ (x : 𝟐), ind₂ (λ (f : 𝟐), U) A B x
-                V (A: U₁)  : ℕ → U := ℕ-iter U 𝟏 (λ (X : U), A × X)
-                F          : ℕ → U := ℕ-iter U 𝟎 (+ 𝟏)
+                def B: U := W (x: + ℕ ℕ), +-rec ℕ ℕ (λ (f: + ℕ ℕ), U) 𝟎 𝟏×𝟏 x
+                def L (A: U): U :=    W (x: M A), M-rec A U 𝟎 (λ (a: A), 𝟏) x
+                def N: U :=           W (x: 𝟐), ind₂ (λ (f: 𝟐), U) 𝟎 𝟏 x
+                def M (A: U): U :=    Σ (x: 𝟐), ind₂ (λ (f: 𝟐), U) 𝟏 A x
+                def + (A B: U): U :=  Σ (x: 𝟐), ind₂ (λ (f: 𝟐), U) A B x
+                def V (A: U₁):    ℕ → U := ℕ-iter U 𝟏 (λ (X: U), A × X)
+                def F:            ℕ → U := ℕ-iter U 𝟎 (+ 𝟏)
             br.
             +tex.
                 Library includes definitions for other
@@ -40,7 +40,16 @@ block content
                 ballanced packing, like $𝟕=𝟑+𝟒$, $𝟓=𝟐+𝟑$, $𝟔=𝟑+𝟑$. For multiple
                 occurance of fixpoint variable in W-fiber encoded
                 argument use $×$ cartesian product, like for binary trees 𝟏 × 𝟏.
-
+                Here is example for List MLTT encoding:
+            +code.
+                def List (A: U)
+                  : Π (w : M A), U
+                 := λ (w : M A),
+                            ind₂ (λ (x: 𝟐),
+                      Π (u: ind₂ (λ (x: 𝟐), U) 𝟏 A x), U)
+                           (ind₁ (λ (x: 𝟏), U) 𝟎)
+                                 (λ (a: A), 𝟏) w.1 w.2
+            br.
 
             h1 EMPTY
             p.

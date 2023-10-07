@@ -18,20 +18,29 @@ block content
         section
             h1 INDUCTIVE SPACES
             aside
-                time Published: 17 OCT 2017
+                time Published: 7 OCT 2017
             +tex.
-                $𝟎,𝟏,𝟐,\mathrm{W}$-types form the inductive basis of MLTT-80 foundations
-                and are built-in into the type checker that allows to express
-                well-founded trees and coinductive streams with $\mathrm{M}$-types.
+                $𝟎,$ $𝟏,$ $𝟐$ form the inductive base for well-founded
+                spaces $\mathrm{W}$ of MLTT-80 that allow to manipulate F-algebras.
+                For coinductive streams (G-coalgebras) one may need $\mathrm{M}$
+                spaces with reversed intro-elim rules.
+
             +code.
                 L (A : U)  : U := W (x : Maybe A), maybe-rec A U 𝟎 (λ (a : A), 𝟏) x
                 B : U := W (x : + ℕ ℕ), +-rec ℕ ℕ (λ (f : + ℕ ℕ), U) 𝟎 (𝟏 × 𝟏) x
-                N : U := W (x : 𝟐), ind₂ (λ (f : 𝟐), U) 𝟎 𝟏 x
+                N          : U := W (x : 𝟐), ind₂ (λ (f : 𝟐), U) 𝟎 𝟏 x
                 M (A: U)   : U := Σ (x : 𝟐), ind₂ (λ (f : 𝟐), U) 𝟏 A x
                 + (A B: U) : U := Σ (x : 𝟐), ind₂ (λ (f : 𝟐), U) A B x
                 V (A: U₁)  : ℕ → U := ℕ-iter U 𝟏 (λ (X : U), A × X)
                 F          : ℕ → U := ℕ-iter U 𝟎 (+ 𝟏)
             br.
+            +tex.
+                Library includes definitions for other
+                disjunction ranks $𝟑,$ $𝟒,$ $𝟓,$ $𝟔,$ $𝟕$ with
+                ballanced packing, like $𝟕=𝟑+𝟒$, $𝟓=𝟐+𝟑$, $𝟔=𝟑+𝟑$. For multiple
+                occurance of fixpoint variable in W-fiber encoded
+                argument use $×$ cartesian product, like for binary trees 𝟏 × 𝟏.
+
 
             h1 EMPTY
             p.

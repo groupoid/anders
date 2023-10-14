@@ -11,19 +11,20 @@ block content
     article.main
         .om
             section
-                h1 CW-Complex
+                h1 CW
         aside
             time Published: 25 JUL 2018
         .om
             section
                 p.
-                    CW module contains basic theorems about general theory of CW-complexes.
+                    CW module contains basic definitions and
+                    theorems about general theory of CW-complexes.
 
             section
                 h1 FOUNDATIONS
                 p.
                     CW-complexes are fundamental objects in homotopy type theory.
-                    They're even presented in cubical type checker in the form of
+                    They're presented in cubical type checker in the form of
                     higher (co)-inductive types (HITs).
                     Just like regular (co)-inductive types could be described as recursive
                     terminating (well-founded) or non-terminating trees,
@@ -31,6 +32,13 @@ block content
                     Defining HIT means to define some CW-complex
                     directly using cubical homogeneous composition structure as an
                     element of initial algebra inside cubical model.
+                +tex.
+                    $\mathbf{Definition}$ (HIT). With a given context variables
+                    Δ,K ⊢ (Γ,Ξ,Ψ,𝜑,𝑒) and telescope (𝛿 : Δ) (𝑖 : 𝕀) (𝜑 : 𝔽) (𝑢₀: H 𝛿 [𝜑 ↦ 𝑢[0/𝑖]])
+                    every HIT is defines as:
+                    1) ctorⁱ (𝛾: Γⁱ [𝛿]) (𝑥: Ξⁱ [𝛿,𝛾] → H 𝛿) (s: Ψₓ) : H 𝛿 [𝜑ₛ ↦ 𝑒[𝛾,𝑥]];
+                    2) hcompⁱ [𝜑 ↦ 𝑢] 𝑢₀ : H 𝛿 [𝜑 ↦ 𝑢[1/𝑖]];
+                    3) transpⁱ 𝜑 𝑢₀ : H 𝛿 [1] [𝜑 ↦ 𝑢₀].
                 +tex.
                     $\mathbf{Examples}$. One of the notables is pushout as it's used
                     to define the cell attachment formally, as others cofibrant objects.

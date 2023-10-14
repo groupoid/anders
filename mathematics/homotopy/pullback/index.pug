@@ -11,9 +11,9 @@ block title
 
 block content
     nav
-        <a href='https://anders.groupoid.space/'>ANDERS</a>
-        <a href='https://anders.groupoid.space/lib/'>LIB</a>
-        <a href='#'>PULLBACK</a>
+        <a href='../../../index.html'>ANDERS</a>
+        <a href='../../../lib/index.html'>LIB</a>
+        <a href='#'>LIMIT</a>
     article.main.list
         .exe
             section
@@ -53,19 +53,26 @@ block content
                     $$
                 +tex(true).
                     $$
-                        A \times^{h}_{C} B = \Sigma_A\Sigma_B C^I \\
-                        = \left\{ (x,y,h) : \Sigma_X\Sigma_Y C^I | h(0)=f(x), h(1)=g(y) \right\}
+                        A \times^{h}_{C} B = \Sigma_A\Sigma_B C^I = \\
+                    $$
+                +tex(true).
+                    $$
+                        \left\{ (x,y,h) : \Sigma_X\Sigma_Y C^I | h(0)=f(x), h(1)=g(y) \right\}
                      $$
                 +tex.
                     is a $X \times^h_C Y$
                     together with the projection maps $pb_{1,2,3}$ making the second
                     diagram commute up to homotopy $H(x,y,h,t) = h(t)$.
                 code.
-                    pullback (A B C:U) (f: A -> C) (g: B -> C): U = (a: A) * (b: B) * Path C (f a) (g b)
+                    pullback (A B C:U) (f: A -> C) (g: B -> C): U
+                      = (a: A) * (b: B) * Path C (f a) (g b)
 
-                    pb1 (A B C: U) (f: A -> C) (g: B -> C): pullback A B C f g -> A = \(x: pullback A B C f g) -> x.1
-                    pb2 (A B C: U) (f: A -> C) (g: B -> C): pullback A B C f g -> B = \(x: pullback A B C f g) -> x.2.1
-                    pb3 (A B C: U) (f: A -> C) (g: B -> C): (x: pullback A B C f g) -> Path C (f x.1) (g x.2.1)
+                    pb1 (A B C: U) (f: A -> C) (g: B -> C)
+                      : pullback A B C f g -> A = \(x: pullback A B C f g) -> x.1
+                    pb2 (A B C: U) (f: A -> C) (g: B -> C)
+                      : pullback A B C f g -> B = \(x: pullback A B C f g) -> x.2.1
+                    pb3 (A B C: U) (f: A -> C) (g: B -> C)
+                      : (x: pullback A B C f g) -> Path C (f x.1) (g x.2.1)
                       = \(x: pullback A B C f g) -> x.2.2
 
                 +tex.

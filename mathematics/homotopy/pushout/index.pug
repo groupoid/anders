@@ -11,9 +11,9 @@ block title
 
 block content
     nav
-        <a href='https://anders.groupoid.space/'>ANDERS</a>
-        <a href='https://anders.groupoid.space/lib/'>LIB</a>
-        <a href='#'>LIST</a>
+        <a href='../../../index.html'>ANDERS</a>
+        <a href='../../../lib/index.html'>LIB</a>
+        <a href='#'>COLIMIT</a>
     article.main.list
         .ext
             section
@@ -78,13 +78,13 @@ block content
                     = pushout A unit B f (\(x: B) -> tt)
 
                 +tex.
-                    $\mathbf{Definition}$> (Kernel).
+                    $\mathbf{Definition}$ (Kernel).
                 code.
                   kernel (A B: U) (f: A -> B): U
                     = pullback A A B f f
 
                 +tex.
-                    $\mathbf{Definition}$> (Cokernel).
+                    $\mathbf{Definition}$ (Cokernel).
                 code.
                   cokernel (A B: U) (f: B -> A): U
                     = pushout A A B f f

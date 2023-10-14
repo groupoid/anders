@@ -1,4 +1,5 @@
 {- Isomorphisms: https://anders.groupoid.space/foundations/univalent/iso
+   - Isomorphism;
    - Unimorphism;
    - Minivalence.
 
@@ -12,46 +13,73 @@ import lib/foundations/univalent/equiv
 -- Post-Voevodsky CCHM/hcomp lemIso implementation
 
 def fill0 (A B : U) (f : A -> B) (g : B -> A) (x0 x1 : A) (y : B)
-    (p0 : Path B (f x0) y) (p1 : Path B (f x1) y) (t : Π (x : A), Path A (g (f x)) x) (i : I) : I -> A
- := hfill A (∂ i) (λ (k : I), [(i = 1) → t x0 @ k, (i = 0) → g y ]) (inc A (∂ i) (g (p0 @ -i)))
+    (p0 : Path B (f x0) y) (p1 : Path B (f x1) y)
+    (t : Π (x : A), Path A (g (f x)) x) (i : I) : I -> A
+ := hfill A (∂ i) (λ (k : I),
+      [ (i = 1) → t x0 @ k,
+        (i = 0) → g y ]) (inc A (∂ i) (g (p0 @ -i)))
 
 def fill1 (A B : U) (f : A -> B) (g : B -> A) (x0 x1 : A) (y : B)
-    (p0 : Path B (f x0) y) (p1 : Path B (f x1) y) (t : Π (x : A), Path A (g (f x)) x) (i : I) : I -> A
- := hfill A (∂ i) (λ (k : I), [(i = 1) → t x1 @ k, (i = 0) → g y ]) (inc A (∂ i) (g (p1 @ -i)))
+    (p0 : Path B (f x0) y) (p1 : Path B (f x1) y)
+    (t : Π (x : A), Path A (g (f x)) x) (i : I) : I -> A
+ := hfill A (∂ i) (λ (k : I),
+      [ (i = 1) → t x1 @ k,
+        (i = 0) → g y ]) (inc A (∂ i) (g (p1 @ -i)))
 
 def fill2 (A B : U) (f : A -> B) (g : B -> A) (x0 x1 : A) (y : B)
-    (p0 : Path B (f x0) y) (p1 : Path B (f x1) y) (t : Π (x : A), Path A (g (f x)) x) (i : I) : I -> A
- := hfill A (∂ i) (λ (k : I), [(i = 1) → fill1 A B f g x0 x1 y p0 p1 t k 1, (i = 0) → fill0 A B f g x0 x1 y p0 p1 t k 1]) (inc A (∂ i) (g y))
+    (p0 : Path B (f x0) y) (p1 : Path B (f x1) y)
+    (t : Π (x : A), Path A (g (f x)) x) (i : I) : I -> A
+ := hfill A (∂ i) (λ (k : I),
+      [ (i = 1) → fill1 A B f g x0 x1 y p0 p1 t k 1,
+        (i = 0) → fill0 A B f g x0 x1 y p0 p1 t k 1 ]) (inc A (∂ i) (g y))
 
-def sqA (A B : U) (f : A -> B) (g : B -> A) (x0 x1 : A) (y : B) (p0 : Path B (f x0) y) (p1 : Path B (f x1) y)
+def sqA (A B : U) (f : A -> B) (g : B -> A) (x0 x1 : A) (y : B)
+    (p0 : Path B (f x0) y) (p1 : Path B (f x1) y)
     (t : Π (x : A), Path A (g (f x)) x) (i j : I) : A
- := hcomp A (∂ i ∨ ∂ j) (λ (k : I), [(i = 1) → fill1 A B f g x0 x1 y p0 p1 t j -k,
-                                     (i = 0) → fill0 A B f g x0 x1 y p0 p1 t j -k,
-                                     (j = 1) → t (fill2 A B f g x0 x1 y p0 p1 t i 1) @ -k,
-                                     (j = 0) → g y ]) (fill2 A B f g x0 x1 y p0 p1 t i j)
+ := hcomp A (∂ i ∨ ∂ j) (λ (k : I),
+      [ (i = 1) → fill1 A B f g x0 x1 y p0 p1 t j -k,
+        (i = 0) → fill0 A B f g x0 x1 y p0 p1 t j -k,
+        (j = 1) → t (fill2 A B f g x0 x1 y p0 p1 t i 1) @ -k,
+        (j = 0) → g y ]) (fill2 A B f g x0 x1 y p0 p1 t i j)
 
-def sqB (A B : U) (f : A -> B) (g : B -> A) (x0 x1 : A) (y : B) (p0 : Path B (f x0) y) (p1 : Path B (f x1) y)
-    (s : Π (y : B), Path B (f (g y)) y) (t : Π (x : A), Path A (g (f x)) x) (i j : I) : B
- := hcomp B (∂ i ∨ ∂ j) (λ (k : I), [(i = 1) → s (p1 @ -j) @ k,
-                                     (i = 0) → s (p0 @ -j) @ k,
-                                     (j = 1) → s (f ((<r> fill2 A B f g x0 x1 y p0 p1 t r 1) @ i)) @ k,
-                                     (j = 0) → s y @ k ]) (f (sqA A B f g x0 x1 y p0 p1 t i j))
+def sqB (A B : U) (f : A -> B) (g : B -> A) (x0 x1 : A) (y : B)
+    (p0 : Path B (f x0) y) (p1 : Path B (f x1) y)
+    (s : Π (y : B), Path B (f (g y)) y)
+    (t : Π (x : A), Path A (g (f x)) x) (i j : I) : B
+ := hcomp B (∂ i ∨ ∂ j) (λ (k : I),
+      [ (i = 1) → s (p1 @ -j) @ k,
+        (i = 0) → s (p0 @ -j) @ k,
+        (j = 1) → s (f ((<r> fill2 A B f g x0 x1 y p0 p1 t r 1) @ i)) @ k,
+        (j = 0) → s y @ k ]) (f (sqA A B f g x0 x1 y p0 p1 t i j))
 
-def lemIso (A B : U) (f : A -> B) (g : B -> A) (s : Π (y : B), Path B (f (g y)) y) (t : Π (x : A), Path A (g (f x)) x)
-    (x0 x1 : A) (y : B) (p0 : Path B y (f x0)) (p1 : Path B y (f x1)) : Path (fiber A B f y) (x0, p0) (x1, p1)
- := <i> ((<r> fill2 A B f g x0 x1 y (<k> p0 @ -k) (<k> p1 @ -k) t r 1) @ i, <j> sqB A B f g x0 x1 y (<k> p0 @ -k) (<k> p1 @ -k) s t i j)
+def lemIso (A B : U) (f : A -> B) (g : B -> A)
+    (s : Π (y : B), Path B (f (g y)) y)
+    (t : Π (x : A), Path A (g (f x)) x)
+    (x0 x1 : A) (y : B) (p0 : Path B y (f x0))
+    (p1 : Path B y (f x1))
+  : Path (fiber A B f y) (x0, p0) (x1, p1)
+ := <i> ((<r> fill2 A B f g x0 x1 y (<k> p0 @ -k) (<k> p1 @ -k) t r 1) @ i,
+          <j> sqB   A B f g x0 x1 y (<k> p0 @ -k) (<k> p1 @ -k) s t i j)
 
 -- [Shulman, Lumsdaine, Warren, Licata] 2010
 
-def isoToEquiv (A B : U) (f : A -> B) (g : B -> A) (s : Π (y : B), Path B (f (g y)) y) (t : Π (x : A), Path A (g (f x)) x)
-  : isEquiv A B f := \ (y : B), ((g y,<i> s y @ -i), \ (z : fiber A B f y), lemIso A B f g s t (g y) z.1 y (<i> s y @ -i) z.2)
+def isoToEquiv (A B : U) (f : A -> B) (g : B -> A)
+    (s : Π (y : B), Path B (f (g y)) y)
+    (t : Π (x : A), Path A (g (f x)) x)
+  : isEquiv A B f
+ := \ (y : B),
+      ((g y,<i> s y @ -i),
+      \ (z : fiber A B f y),
+        lemIso A B f g s t (g y) z.1 y (<i> s y @ -i) z.2)
 
 -- [Cohen, Coquand, Huber, Mörtberg] 2016
 
-def iso (A B: U) : U := Σ (f : A -> B) (g : B -> A) (s : section A B f g) (t : retract A B f g), unit
+def iso (A B: U) : U :=
+  Σ (f : A -> B) (g : B -> A)
+    (s : section A B f g)
+    (t : retract A B f g), unit
 
-def isoPath (A B : U)
-    (f : A -> B) (g : B -> A)
+def isoPath (A B : U) (f : A -> B) (g : B -> A)
     (s : Π (y : B), Path B (f (g y)) y)
     (t : Π (x : A), Path A (g (f x)) x)
   : PathP (<_> U) A B

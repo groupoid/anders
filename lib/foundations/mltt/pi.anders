@@ -13,6 +13,7 @@ def lambda (A: U) (B: A → U) (b: Pi A B) : Pi A B := λ (x : A), b x
 def lam (A B: U) (f: A → B) : A → B ≔ λ (x : A), f x
 def apply (A: U) (B: A → U) (f: Pi A B) (a: A) : B a := f a
 def app (A B: U) (f: A → B) (x: A): B := f x
-def Π-β (A : U) (B : A → U) (a : A) (f : Pi A B) : Path (B a) (apply A B (lambda A B f) a) (f a) := idp (B a) (f a)
-def Π-η (A : U) (B : A → U) (a : A) (f : Pi A B) : Path (Pi A B) f (λ (x : A), f x) := idp (Pi A B) f
-
+def Π-β (A : U) (B : A → U) (a : A) (f : Pi A B)
+  : Path (B a) (apply A B (lambda A B f) a) (f a) := idp (B a) (f a)
+def Π-η (A : U) (B : A → U) (a : A) (f : Pi A B)
+  : Path (Pi A B) f (λ (x : A), f x) := idp (Pi A B) f

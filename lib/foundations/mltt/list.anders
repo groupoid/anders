@@ -8,7 +8,6 @@
 module list where
 import lib/foundations/mltt/maybe
 import lib/foundations/mltt/nat
-
 option girard true
 
 -- def L-ctor (A : U)  : U := W (x : Maybe A), maybe-rec A U 𝟎 (λ (a : A), 𝟏) x
@@ -17,7 +16,6 @@ option girard true
 -- def M-ctor (A: U)   : U := Σ (x : 𝟐),       ind₂ (λ (f : 𝟐), U) 𝟏 A x
 -- def +-ctor (A B: U) : U := Σ (x : 𝟐),       ind₂ (λ (f : 𝟐), U) A B x
 
---def List-ctor (A: U)  := maybe-rec A U 𝟎 (λ (a : A), 𝟏)
 def List-ctor (A: U)
   : Π (w : Maybe A), U
  := λ (w : Maybe A), ind₂ (λ (x: 𝟐),
@@ -25,6 +23,7 @@ def List-ctor (A: U)
                     (ind₁ (λ (x: 𝟏), U) 𝟎)
                           (λ (a: A), 𝟏) w.1 w.2
 
+def List' (A: U) := maybe-rec A U 𝟎 (λ (a : A), 𝟏)
 def List (A: U) := W (x : Maybe A), List-ctor A x
 def nil (A: U) : List A := sup (Maybe A) (List-ctor A) (nothing A) (ind₀ (List A))
 def cons (A: U) (x : A) (xs: List A) : List A := sup (Maybe A) (List-ctor A) (just A x) (λ (x : 𝟏), xs)

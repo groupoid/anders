@@ -11,7 +11,7 @@ def Σ-β₂ (A : U) (B : A → U) (a : A) (b : B a) : Path (B a) b (pr₂ A B (
 def Σ-η (A : U) (B : A → U) (p : Sigma A B) : Path (Sigma A B) p (pr₁ A B p, pr₂ A B p) ≔ idp (Sigma A B) p
 
 def Sigma-rec (A: U) (B: A -> U) (C: U) (g: Π (x: A), B(x) -> C) (p: Σ (x: A), B x): C := g p.1 p.2
-def Sigma-ind (A : U) (B : A -> U) (C : Π (s: Σ (x: A), B x), U) 
+def Sigma-ind (A : U) (B : A -> U) (C : Π (s: Σ (x: A), B x), U)
     (g: Π (x: A) (y: B x), C (x,y)) (p: Σ (x: A), B x) : C p := g p.1 p.2
 
 def ac (A B: U) (R: A -> B -> U) (g: Π (x: A), Σ (y: B), R x y) : Σ (f: A -> B), Π (x: A), R x (f x) := (\(i:A),(g i).1,\(j:A),(g j).2)

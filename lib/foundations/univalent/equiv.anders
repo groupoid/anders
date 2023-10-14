@@ -1,10 +1,10 @@
 {- Equivalence: https://anders.groupoid.space/foundations/univalent/equiv
-   - Fibers;
-   - Contractability of Fibers and Singletons;
-   - Equivalence.
-   - Surjective, Injective, Embedding, Hae;
-   - Theorems, Gluing;
-   - Theorem of univalence.
+   — Fibers;
+   — Contractability of Fibers and Singletons;
+   — Equivalence.
+   — Surjective, Injective, Embedding, Hae;
+   — Univalence.
+   — Theorems, Gluing;
    Copyright (c) Groupoid Infinity, 2014-2022.
 
    HoTT 4.6 Surjections and Embedding -}
@@ -28,8 +28,8 @@ def embedding (A B : U) : U := Σ (f : A → B), isEmbedding A B f
 def inv-equiv (A B : U) (w : equiv A B) : B → A := λ (y : B), (w.2 y).1.1
 def ret-equiv (A B : U) (w : equiv A B) (y : B) : Path B (w.1 (inv-equiv A B w y)) y := <i> (w.2 y).1.2 @ -i
 def sec-equiv (A B : U) (w : equiv A B) (x : A) : Path A (inv-equiv A B w (w.1 x)) x := <i> ((w.2 (w.1 x)).2 (x, <j> w.1 x) @ i).1
-def Glue′ (A : U) (φ : I) (e : Partial (Σ (T : U), equiv T A) φ) : U := Glue A φ e
-def glue′ (A : U) (φ : I) (u : Partial (Σ (T : U), equiv T A × T) φ) (a : A[φ ↦ [(φ = 1) → (u 1=1).2.1.1 (u 1=1).2.2]]) := glue φ u (ouc a)
+def Glue′   (A : U) (φ : I) (e : Partial (Σ (T : U), equiv T A) φ) : U := Glue A φ e
+def glue′   (A : U) (φ : I) (u : Partial (Σ (T : U), equiv T A × T) φ) (a : A[φ ↦ [(φ = 1) → (u 1=1).2.1.1 (u 1=1).2.2]]) := glue φ u (ouc a)
 def unglue′ (A : U) (φ : I) (e : Partial (Σ (T : U), equiv T A) φ) (b : Glue A φ e) : A := unglue φ e b
 
 def hcomp-Glue (A : U) (φ : I) (e : Partial (Σ (T : U), equiv T A) φ)

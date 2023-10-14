@@ -16,15 +16,6 @@ import lib/foundations/univalent/iso
 import lib/foundations/modal/infinitesimal
 import lib/mathematics/algebra/algebra
 import lib/mathematics/analysis/real
-import lib/mathematics/categories/category
-import lib/mathematics/categories/functor
-import lib/mathematics/categories/natural
-import lib/mathematics/categories/abelian
-import lib/mathematics/categories/groupoid
-import lib/mathematics/categories/symmetric
-import lib/mathematics/categories/cartesian
-import lib/mathematics/categories/instances/functor-instances
-import lib/mathematics/topoi/topos
 import lib/mathematics/geometry/bundle
 import lib/mathematics/geometry/etale
 import lib/mathematics/geometry/formalDisc
@@ -39,8 +30,15 @@ import lib/mathematics/homotopy/suspension
 import lib/mathematics/homotopy/S1
 import lib/mathematics/homotopy/Sn
 import lib/mathematics/homotopy/KGn
-
-import lib/mathematics/meta/favonia
-import lib/mathematics/meta/kraus
--- Impredicativity starts here
-import lib/mathematics/meta/awodey
+import lib/mathematics/categories/category
+import lib/mathematics/categories/functor
+import lib/mathematics/categories/natural
+import lib/mathematics/categories/abelian
+import lib/mathematics/categories/groupoid
+import lib/mathematics/categories/symmetric
+import lib/mathematics/categories/cartesian
+import lib/mathematics/categories/instances/functor-instances
+import lib/mathematics/categories/topos
+import lib/mathematics/categories/meta/favonia
+import lib/mathematics/categories/meta/kraus
+import lib/mathematics/categories/meta/awodey

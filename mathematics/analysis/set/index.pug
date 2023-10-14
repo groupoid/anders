@@ -1,0 +1,94 @@
+include ../../../header
+
+html
+    head
+        meta(property='og:title'       content='SET')
+        meta(property='og:description' content='Set Theory')
+        meta(property='og:url'         content='https://anders.groupoid.space/mathematics/analysis/set/')
+
+block title
+    title TOPOS
+
+block content
+    nav
+        <a href='../../../index.html'>ANDERS</a>
+        <a href='../../../lib/index.html'>LIB</a>
+        <a href='#'>SET</a>
+
+    article.main.list
+        .exe
+            section
+                h1 Set Theory
+                aside
+                    time Published: 9 AUG 2018
+            section
+                p.
+                    Other disputed foundations for set theory could be taken as:
+                    ZFC, NBG, ETCS. We will disctinct syntetically: i) category theory;
+                    ii) set theory in univalent foundations; iii) topos theory, grothendieck topos,
+                    elementary topos.
+                +tex.
+                    Here is the $\infty$-groupoid model of sets.
+                +tex.
+                    $\mathbf{Definition}$ (Mere proposition, $\mathrm{PROP}$). A type P is a mere proposition
+                    if for all $x,y: P$ we have $x=y$:
+                +tex(true).
+                    $$
+                        \mathrm{isProp}(P) = \prod_{x,y:P}(x=y).
+                    $$
+                +tex.
+                    $\mathbf{Definition}$ (0-type). A type A is a 0-type is for all
+                    $x,y: A$ and $p,q: x =_A y$ we have $p = q$.
+                +tex.
+                    $\mathbf{Definition}$ (1-type). A type A is a 1-type if for all
+                    $x,y: A$ and $p,q: x =_A y$ and $r,s:p =_{=_A} q$, we have $r = s$.
+                +tex.
+                    $\mathbf{Definition}$ (A set of elements, $\mathrm{SET}$).
+                    A type A is a $\mathrm{SET}$ if for all $x,y: A$ and $p,q: x = y$, we have $p = q$:
+                +tex(true).
+                    $$
+                        \mathrm{isSet}(A) = \prod_{x,y:A}\prod_{p,q:x=y}(p=q).
+                    $$
+                +tex.
+                    $\mathbf{Theorem}$. If A is a set then A is a 1-type.
+                code.
+                    data N = Z  | S (n: N)
+
+                    n_grpd (A: U) (n: N): U = (a b: A) -> rec A a b n where
+                       rec (A: U) (a b: A) : (k: N) -> U
+                         = split { Z -> Path A a b ; S n -> n_grpd (Path A a b) n }
+
+                    isContr (A: U): U = (x: A) * ((y: A) -> Path A x y)
+                    isProp  (A: U): U = n_grpd A Z
+                    isSet   (A: U): U = n_grpd A (S Z)
+
+                    PROP  : U = (X:U) * isProp X
+                    SET   : U = (X:U) * isSet X
+                +tex.
+                    $\mathbf{Theorem}$ ($\Pi$-Contractability). if fiber is set then
+                    path space between any sections is contractible.
+                code.
+                    setPi  (A: U) (B: A -> U) (h: (x: A) -> isSet (B x)) (f g: Pi A B)
+                           (p q: Path (Pi A B) f g)
+                         : Path (Path (Pi A B) f g) p q
+                +tex.
+                    $\mathbf{Theorem}$ ($\Sigma$-Contractability). if fiber is set then $\Sigma$ is set.
+                code.
+                    setSig (A:U) (B: A -> U) (sA: isSet A)
+                           (sB : (x:A) -> isSet (B x)) : isSet (Sigma A B)
+                +tex.
+                    $\mathbf{Definition}$ (Unit type, $1$). The unit $1$ is a type with one element.
+                code.
+                    data unit = tt
+                    unitRec (C: U) (x: C): unit -> C = split tt -> x
+                    unitInd (C: unit -> U) (x: C tt): (z:unit) -> C z = split tt -> x
+                +tex.
+                    $\mathbf{Theorem}$ ($1$ is a proposition).
+                code.
+                    propUnit : isProp unit
+                +tex.
+                    $\mathbf{Theorem}$ ($1$ is a set).
+                code.
+                    setUnit : isSet unit
+
+include ../../../footer

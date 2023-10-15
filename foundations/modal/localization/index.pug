@@ -41,20 +41,20 @@ block content
                     $$
                           \begin{cases}
                             \mathrm{center} : X \\
-                            \mathrm{ext} : \Pi_(a:A) \rightarrow (S(a) \rightarrow L_{F_A}(X)) \rightarrow T(a) \\
-                            \mathrm{isExt} : \Pi_(a:A) \rightarrow (f: S(a) \rightarrow L_{F_A}(X))
+                            \mathrm{ext} : \Pi_{a:A} (S(a) \rightarrow L_{F_A}(X)) \rightarrow T(a) \\
+                            \mathrm{isExt} : \Pi_{a:A} (f: S(a) \rightarrow L_{F_A}(X))
                                  (s:S(a)) \\ \hspace{1em} [i]
                                \begin{cases}
                                  i=0 \mapsto \mathrm{ext}(a,f,F_a(s)) \\
                                  i=1 \mapsto f(s)
                                \end{cases} \\
-                            \mathrm{extEq} : \Pi_{a:A} \rightarrow (g,h: T(a) \rightarrow L_{F_A}(X)) \\
+                            \mathrm{extEq} : \Pi_{a:A} (g,h: T(a) \rightarrow L_{F_A}(X)) \\
                                \hspace{1em} (p: \Pi_{s:S(a)}g(F_a(s))=h(F_a(s))\ (t:T(a)) \\ \hspace{1em} [i]
                                \begin{cases}
                                  i=0 \mapsto g(t) \\
                                  i=1 \mapsto h(t)
                                \end{cases} \\
-                            \mathrm{isExtEq} : \Pi_{a:A} \rightarrow (g,h: T(a) \rightarrow L_{F_A}(X)) \\
+                            \mathrm{isExtEq} : \Pi_{a:A} (g,h: T(a) \rightarrow L_{F_A}(X)) \\
                                \hspace{1em} (p: \Pi_{s:S(a)}g(F_a(s))=h(F_a(s))\ (s:S(a)) \\ \hspace{1em} [i]
                                \begin{cases}
                                  i=0 \mapsto \mathrm{extEq}(a,g,h,p,F_a(s))\ @\ 0 \\

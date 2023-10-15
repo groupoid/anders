@@ -1,0 +1,53 @@
+include ../../../header
+
+html
+    head
+        meta(property='og:title'       content='Modality')
+        meta(property='og:description' content='Modality')
+        meta(property='og:url'         content='https://anders.groupoid.space/foundations/modal/modality/')
+
+block title
+    title INFINITESIMAL
+
+block content
+    nav
+        <a href='../../../index.html'>ANDERS</a>
+        <a href='../../../lib/index.html'>LIB</a>
+        <a href='#'>MODALITY</a>
+    article.main
+        .exe
+            section
+                h1 MODALITY
+
+        aside
+            time Published: 15 JAN 2019
+        .exe
+            section
+
+                +tex.
+                    $\mathbf{Definition}$ (Modality).
+
+                +code.
+                    Modality : U
+                     = (isModal : U -> U)
+                     * (isPropIsModal : (A : U) -> isProp (isModal A))
+                     * (modality: U -> U)
+                     * (modalityIsModal : (A : U) -> isModal (modality A))
+                     * (eta: (A : U) -> A -> modality A)
+                     * (elim: (A : U) (B : modality A -> U)
+                         (BModal : (x : modality A) -> isModal (B x))
+                         (f: (x : A) -> (B (eta A x))) -> ((x : modality A) -> B x))
+                     * (elimBeta : (A : U) (B : modality A -> U)
+                         (BModal : (x : modality A) -> isModal (B x))
+                         (f : (x : A) -> (B (eta A x)))
+                         (a : A) -> Path (B (eta A a)) (elim A B BModal f (eta A a)) (f a))
+                     * (isModal: (A : U) (x y : modality A) -> isModal (Path (modality A) x y))
+                     * unit
+                br.
+
+                h1 LITERATURE
+                p.
+                    [1]. Felix Cherubini <a href="https://www.math.kit.edu/iag3/~wellen/media/diss.pdf">
+                    Formalizing Cartan Geometry in Modal Homotopy Type Theory</a>.<br>
+
+include ../../../footer.pug

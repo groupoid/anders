@@ -1,0 +1,71 @@
+include ../../../header
+
+html
+    head
+        meta(property='og:title'       content='Localization')
+        meta(property='og:description' content='Localization Modality')
+        meta(property='og:url'         content='https://anders.groupoid.space/foundations/modal/localization/')
+
+block title
+    title INFINITESIMAL
+
+block content
+    nav
+        <a href='../../../index.html'>ANDERS</a>
+        <a href='../../../lib/index.html'>LIB</a>
+        <a href='#'>LOCALIZATION</a>
+    article.main
+        .exe
+            section
+                h1 LOCALIZATION MODALITY
+        aside
+            time Published: 15 JAN 2019
+        .exe
+            section
+                +tex.
+                    $\mathbf{Definition}$ (Localization Modality).
+
+                h2 Formation
+                +code.
+                    data Localize (A X: U) (S T: A -> U) (F : (x:A) -> S x -> T x)
+                       = center (x: X)
+                       | ext (a: A) (f: S a -> Localize A X S T F) (t: T a)
+                       | isExt (a: A) (f: S a -> Localize A X S T F) (s: S a) &lt;i>
+                         [ (i=0) -> ext a f (F a s) , (i=1) -> f s ]
+                       | extEq (a: A) (g h: T a -> Localize A X S T F)
+                         (p: (s : S a) -> Path (Localize A X S T F) (g (F a s)) (h (F a s)))
+                         (t : T a) &lt;i> [ (i=0) -> g t , (i=1) -> h t ]
+                       | isExtEq (a: A) (g h : T a -> Localize A X S T F)
+                         (p: (s : S a) -> Path (Localize A X S T F) (g (F a s)) (h (F a s)))
+                         (s : S a) &lt;i> [ (i=0) -> extEq {Localize A X S T F} a g h p (F a s) @ i, (i=1) -> p s @ i]
+                br.
+                h2 Recursor
+                +code.
+                    isLocal (A X: U) (S T: A -> U) (F : (x:A) -> S x -> T x) : U = undefined
+                    LocalizationRec (A X: U) (S T: A -> U) (F : (x:A) -> S x -> T x)
+                         (Y : U)
+                         (locality : isLocal A Y S T F)
+                         (f: X -> Y)
+                       : Localize A X S T F -> Y
+                br.
+                h2 Elimination
+                +code.
+                    LocalizationInd (A X : U) (S T : A -> U) (F : (x:A) -> S x -> T x)
+                         (P : Localize A X S T F -> U)
+                         (n : (x : X) -> P (center x))
+                         (r : (a : A) (f: S a -> Localize A X S T F)
+                              (g: (b: S a) -> P (f b))
+                              (t: T a) -> P (ext a f t))
+                         (s : (a : A) (f: S a -> Localize A X S T F)
+                              (g: (b: S a) -> P (f b))
+                              (b: S a) -> PathP (&lt;i> P (isExt {Localize A X S T F} a f b @ i))
+                                                (r a f g (F a b)) (g b))
+                       : (x : Localize A X S T F) -> P x
+                br.
+
+                h1 LITERATURE
+                p.
+                    [1]. Felix Cherubini <a href="https://www.math.kit.edu/iag3/~wellen/media/diss.pdf">
+                    Formalizing Cartan Geometry in Modal Homotopy Type Theory</a>.<br>
+
+include ../../../footer.pug

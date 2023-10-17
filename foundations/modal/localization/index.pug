@@ -88,6 +88,22 @@ block content
                     $n$-truncations, nullification, open, closed.
 
                 h2 Elimination
+                +tex.
+                    $\mathbf{Definition}$ (Localization Induction Principle).
+                    For any $P: \Pi_{X:U}L_{F_A}(X)\rightarrow U$ with ${n,r,s}$:
+                +tex(true).
+                    $$
+                       \begin{cases}
+                         n : \Pi_{x:X}P(\alpha_X(x)) \\
+                         r : \Pi_{a:A}\Pi_{f:B(a)\rightarrow L_{F_A}(X)}, \\
+                         \hspace{1em} \Pi_{b:B(a)}P(f(b))\rightarrow \Pi_{c:C(a)}P(\mathrm{ext}(f,c)) \\
+                         s : \Pi_{a:A}\Pi_{f:B(a)\rightarrow L_{F_A}(X)}, \\
+                         \hspace{1em} \Pi_{b:B(a)}P(f(b))\Pi_{b:B(a)} \\
+                         \hspace{1em} R(g,F_a(b))=_{P(\mathrm{isExt(a,f,g,b)})}g(b), \\
+                       \end{cases}
+                    $$
+                +tex.
+                    there is a section $i: \Pi_{x:L_{F_A}(X)}P(x)$ such that $i\cdot\alpha_X=n$.
                 +code.
                     LocalizationInd (A X : U) (S T : A -> U) (F : (x:A) -> S x -> T x)
                          (P : Localize A X S T F -> U)

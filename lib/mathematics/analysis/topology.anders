@@ -1,6 +1,7 @@
 module topology where
 
 --- Kang Rongji, 2022-2023
+--- Classical Topology
 
 def Path₁ (A : U₁) (x y : A) := PathP (<_> A) x y
 def isProp₁ (A : U₁) := Π (a b : A), Path₁ A a b

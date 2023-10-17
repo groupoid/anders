@@ -8,6 +8,7 @@
    Copyright (c) Groupoid Infinity, 2014-2022. -}
 
 module iso where
+import lib/foundations/univalent/path
 import lib/foundations/univalent/equiv
 
 -- Post-Voevodsky CCHM/hcomp lemIso implementation
@@ -114,3 +115,4 @@ def isHae (A B : U) (f : A -> B): U :=
   Π (x : A), Path B (f ((eta_ @ 0) x)) ((eps_ @ 0) (f x))
 
 def hae (A B : U) : U := Σ (f : A -> B), isHae A B f
+

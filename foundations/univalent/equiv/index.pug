@@ -7,22 +7,184 @@ html
         meta(property='og:url'         content='https://anders.groupoid.space/foundations/mltt/equiv/')
 
 block title
-    title UNIVALENCE
+    title EQUIV
 
 block content
     nav
         <a href='https://anders.groupoid.space/'>ANDERS</a>
         <a href='https://anders.groupoid.space/lib/'>LIB</a>
         <a href='#'>EQUIV</a>
-    article.main
-        .exe
-            section
-                h1 EQUIV
+    article.main.list
+        section
+            h1 EQUIVALENCE
+            aside
+                time Published: 30 DEC 2018
+            h2 Formation
+            +tex.
+                $\mathbf{Definition}$ (Fiberwise Equivalence).
+                Fiberwise equivalence $~$ of function $f: A \rightarrow B$
+                represents internal equality of types $A$ and $B$
+                in the universe $U$ as contractible fibers of $f$
+                over base $B$.
+            +tex(true).
+                $$
+                    \mathrm{Equiv}(A,B) : U =_{def}
+                $$
+            +tex(true).
+                $$
+                        \sum_{f: A \rightarrow B}
+                        \prod_{y:B} 
+                        \sum_{x: \Sigma_{x:A} y =_B f(x)}
+                        \sum_{w: \Sigma_{x:A} y =_B f(x)}
+                $$
+            +tex(true).
+                $$
+                        x =_{\Sigma_{x:A} y =_B f(x)} w.
+                $$
+            +code.
+                def isContr (A: U) : U
+                 := Σ (x: A), Π (y: A), Path A x y
 
-        aside
-            time Published: 30 DEC 2018
-        .exe
-            section
-                h1 UNIVALENCE
+                def fiber (A B : U) (f: A → B) (y : B): U
+                 := Σ (x : A), Path B y (f x)
+
+                def isEquiv (A B : U) (f : A → B) : U
+                 := Π (y : B), isContr (fiber A B f y)
+
+                def equiv (A B : U) : U
+                 := Σ (f : A → B), isEquiv A B f
+            br.
+            h2 Introduction
+            +tex.
+                $\mathbf{Definition}$ (Fiberwise Reflection).
+                There is a fiberwise instance $\mathrm{idEquiv}$
+                of $\mathrm{Equiv}(A,A)$ that is derived
+                as $(\mathrm{id},\mathrm{isContrSingl}(A))$:
+            +tex(true).
+                $$
+                    \mathrm{idEquiv}_A : \mathrm{Equiv}(A,A).
+                $$
+            +code.
+                def singl (A: U) (a: A): U
+                 := Σ (x: A), Path A a x
+
+                def contr (A : U) (a b : A) (p : Path A a b)
+                  : Path (singl A a) (eta A a) (b, p)
+                 := &lt;i> (p @ i, &lt;j> p @ i /\ j)
+
+                def isContrSingl (A : U) (a : A)
+                  : isContr (singl A a)
+                 := ((a,idp A a),
+                     (\(z:singl A a),contr A a z.1 z.2))
+
+                def idEquiv (A : U)
+                  : equiv A A
+                 := (\(a:A) -> a, isContrSingl A)
+            br.
+            h2 Elimination
+            +tex.
+                $\mathbf{Definition}$ (Fiberwise Induction Principle).
+                For any $C : A \rightarrow B \rightarrow \mathrm{Equiv}(A,B)\rightarrow U$
+                and it's evidence $d$ at $(a,a,\mathrm{idEquiv}_A)$
+                there is a function:
+            +tex(true).
+                $$
+                  ind_{\mathrm{Equiv}}(C,d) : \mathrm{Equiv}(A,B)\rightarrow C(A,B,p).
+                $$
+            +code.
+                def D-equiv
+                 := Π (A B: U), equiv A B → U
+
+                def ind-Equiv (A B: U) (C: D-equiv)
+                    (d: C A A (idEquiv A)) 
+                  : (p: equiv A B) -> C A B p
+            br.
+            h2 Computation
+            +tex.
+                $\mathbf{Definition}$ (Fiberwise Computation of Induction Principle).
+            +code.
+                def compute-Equiv (A : U) 
+                    (C : D-equiv) (d: C A A (idEquiv A))
+                  : Path (C A A (idEquiv A)) d
+                         (ind-Equiv A A C d a (idEquiv A))
+            br.
+
+        section
+            h1 UNIVALENCE
+            p.
+                The notion of Univalence was discovered by Vladimir Voevodsky
+                as forth and back transport between fibrational equivalence
+                as contractability of fibers and homotopical multi-dimentional
+                heterogeneous path equality. The Equiv → Path type is called Univalence type,
+                where univalence intro is obtained by Glue type and elim (Path → Equiv) is
+                obtained by sigma transport from constant map.
+            h2 Formation
+            +code.
+                def univ-formation (A B : U)
+                 := equiv A B → PathP (&lt;_> U) A B
+            br.
+            h2 Introduction
+            +code.
+                def univ-intro (A B : U)
+                  : univ-formation A B
+                 := λ (e : equiv A B),
+                    &lt;i> Glue B (∂ i)
+                     [ (i = 0) → (A, e),
+                       (i = 1) → (B, idEquiv B) ]
+            br.
+            h2 Elimination
+            +code.
+                def univ-elim (A B : U)
+                    (p : PathP (&lt;_> U) A B)
+                  : equiv A B
+                 := transp (&lt;i> equiv A (p @ i))
+                           0 (idEquiv A)
+            br.
+            h2 Computation
+            +code.
+                def univ-computation (A B : U)
+                    (p : PathP (&lt;_> U) A B)
+                  : PathP (&lt;_> PathP (&lt;_> U) A B)
+                          (univ-intro A B (univ-elim A B p)) p
+                 := &lt;j i> Glue B (j ∨ ∂ i)
+                       [ (i = 0) → (A, univ-elim A B p),
+                         (i = 1) → (B, idEquiv B),
+                         (j = 1) → (p @ i, univ-elim (p @ i)
+                                           B (&lt;k> p @ (i ∨ k))) ]
+            br.
+
+        section
+            h1 MINIVALENCE
+            p.
+                The notion of Minivalence as forth-back map between
+                fibrational equivalence and section/retract-based
+                isomorphism is mentioned in Cubical Agda sources.
+
+            h2 Formation
+            +code.
+                def mini-Form (A B : U) : U
+                 := iso A B -> equiv A B
+            br.
+            h2 Introduction
+            +code.
+                def mini-Intro (A B : U)
+                  : mini-Form A B
+                 := \ (x : iso A B),
+                      univ-elim A B
+                        (isoPath A B x.f x.g x.s x.t)
+            br.
+
+            h2 Elimination
+            +code.
+                def mini-Elim (A B : U)
+                  : equiv A B -> iso A B
+                 := \ (x : equiv A B),
+                      ( x.f,
+                        inv-equiv A B x,
+                        ret-equiv A B x,
+                        sec-equiv A B x,
+                        star
+                      )
+            br.
 
 include ../../../footer

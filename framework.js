@@ -82,6 +82,6 @@ exports.highlight = function (block) {
     return renderPug(block)
         .replace(/([(){}→=]+|:|:=)/g,
             '<span class="h__symbol">$1</span>')
-        .replace(/\b(∀|Π|Σ|W|λ|glue|unglue|Glue|transp|Path|Id|ref|hcomp|where|def|begin|end|module|import|option|false|true|indᵂ|sup|.1|.2|𝟎|𝟏|𝟐|ind₂|ind₁|ind₀|★|0₂|1₂|PathP|PartialP|inc|ouc|axiom|theorem|lemdata|ma|U|V)\b(?!:)/g,
+        .replace(/\b(∀|Π|Σ|W|λ|glue|unglue|Glue|transp|Path|Id|refl|ref|idp|hcomp|where|def|definition|begin|end|module|import|option|false|true|indᵂ|sup|.1|.2|𝟎|𝟏|𝟐|ind₂|ind₁|ind₀|★|0₂|1₂|PathP|PartialP|inc|ouc|axiom|theorem|U|V)\b(?!:)/g,
             '<span class="h__keyword">$1</span>');
 }

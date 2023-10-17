@@ -61,7 +61,7 @@ isGroupoid <span class="h__symbol">(</span>A <span class="h__symbol">:</span> <s
     <span class="h__keyword">Path</span> <span class="h__symbol">(</span><span class="h__keyword">Path</span> <span class="h__symbol">(</span><span class="h__keyword">Path</span> A a b<span class="h__symbol">)</span> x y<span class="h__symbol">)</span> i j</code><br><p>Групоїдна інтерпретація теорії типів ставить питання про існування мови,
 в якій можна довести механічно всі всластивості категорного визначення групоїда.</p><code>CatGroupoid <span class="h__symbol">(</span>X <span class="h__symbol">:</span> <span class="h__keyword">U</span><span class="h__symbol">)</span> <span class="h__symbol">(</span>G <span class="h__symbol">:</span> isGroupoid X<span class="h__symbol">)</span>
    <span class="h__symbol">:</span> isCatGroupoid <span class="h__symbol">(</span>PathCat X<span class="h__symbol">)</span>
-  <span class="h__symbol">:</span><span class="h__symbol">=</span> <span class="h__symbol">(</span> idp X,
+  <span class="h__symbol">:</span><span class="h__symbol">=</span> <span class="h__symbol">(</span> <span class="h__keyword">idp</span> X,
        comp-<span class="h__keyword">Path</span> X,
        G,
        sym X,

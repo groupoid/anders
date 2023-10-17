@@ -42,6 +42,7 @@ block content
                          \simeq & \mathrm{Equivalence} \\
                           \cong & \mathrm{Isomorphism} \\
                            \sim & \mathrm{Homotopy} \\
+                        \approx & \mathrm{Bisimulation} \\
                       \end{array}
                     $$
             +tex.
@@ -61,7 +62,7 @@ block content
                 elements $x,y:A$ are equal.
             +tex(true).
                 $$
-                    =\hspace{0.4em} : U =_{def} \mathbf{Id}_V(A,x,y) =_{def} \prod_{A:V}\prod_{x,y:A} x =_A y.
+                    =\hspace{0.4em} : U =_{def} \prod_{A:V}\prod_{x,y:A} \mathbf{Id}_V(A,x,y).
                 $$
             +code.
                 definition IdV (A: V) (x y: A)
@@ -74,7 +75,7 @@ block content
                 are instantiated by single constructor that carries proof that $x:A$ element are equals to itself.
             +tex(true).
                 $$
-                    \mathbf{ref}_V(A,x) : x =_A x =_{def} \prod_{A:V}\prod_{x:A} \mathbf{ref}_x
+                    \mathbf{ref}_V : x =_A x =_{def} \prod_{A:V}\prod_{x:A} \mathbf{ref}_A(x)
                 $$
             +code.
                 def Id-ref (A : V) (a: A) : Id A a a := ref a

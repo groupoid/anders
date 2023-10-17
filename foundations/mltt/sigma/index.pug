@@ -43,7 +43,8 @@ block content
                 $$
 
             +code.
-                def Sigma (A: U) (B: A → U) : U := Σ (x: A), B(x)
+                def Sigma (A: U) (B: A → U) : U
+                 := Σ (x: A), B(x)
             br
 
 
@@ -55,7 +56,7 @@ block content
                 in the sense of coproduct or disjoint union.
             +tex(true).
                 $$
-                    (a,b) : \Sigma(A,B) =_{def}
+                    \mathbf{pair} : \Sigma(A,B) =_{def}
                 $$
             +tex(true).
                 $$
@@ -74,11 +75,19 @@ block content
                 $pr_{2}: \Pi_{x: \Sigma(A,B)} B(pr_{1}(x))$ are pair deconstructors.
             +tex(true).
                 $$
-                    pr_1 : \prod_{A:U} \prod_{B:A \rightarrow U} \prod_{x: \Sigma(A,B)} A
+                    \mathbf{pr}_1 : \prod_{A:U} \prod_{B:A \rightarrow U} \prod_{x: \Sigma(A,B)} A
                 $$
             +tex(true).
                 $$
                     =_{def} .1 =_{def} (a,b) \mapsto a.
+                $$
+            +tex(true).
+                $$
+                    \mathbf{pr}_2 : \prod_{A:U} \prod_{B:A \rightarrow U} \prod_{x: \Sigma(A,B)} B(x.1)
+                $$
+            +tex(true).
+                $$
+                    =_{def} .2 =_{def} (a,b) \mapsto b.
                 $$
             +code.
                 def pr₁ (A: U) (B: A → U) (x: Sigma A B)
@@ -86,14 +95,6 @@ block content
                 def pr₂ (A: U) (B: A → U) (x: Sigma A B)
                   : B (pr₁ A B x) := x.2
             br.
-            +tex(true).
-                $$
-                    pr_2 : \prod_{A:U} \prod_{B:A \rightarrow U} \prod_{x: \Sigma(A,B)} B(x.1)
-                $$
-            +tex(true).
-                $$
-                    =_{def} .2 =_{def} (a,b) \mapsto b.
-                $$
 
             +tex.
                 If you want to access deep sigma a series of $.2$

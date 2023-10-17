@@ -29,7 +29,7 @@ block content
                 over base $B$.
             +tex(true).
                 $$
-                    \simeq_{A,B}\hspace{.4em}=_U\mathrm{Equiv}(A,B) : U =_{def}
+                    \simeq_{A,B}\hspace{.4em}=_U\mathbf{Equiv}(A,B) : U =_{def}
                 $$
             +tex(true).
                 $$
@@ -63,7 +63,7 @@ block content
                 as $(\mathrm{id},\mathrm{isContrSingl}(A))$:
             +tex(true).
                 $$
-                    \mathrm{idEquiv}_A : \mathrm{Equiv}(A,A).
+                    \mathrm{idEquiv}_A : \mathbf{Equiv}(A,A).
                 $$
             +code.
                 def singl (A: U) (a: A): U
@@ -119,7 +119,11 @@ block content
                 heterogeneous path equality (HoTT 2.10):
             +tex(true).
                 $$
-                  \mathrm{Univ} =_{def} \mathrm{isEquiv}(f: \mathrm{Equiv} \rightarrow \mathrm{Path})
+                   \mathrm{Univalence} =_{def}
+                $$
+            +tex(true).
+                $$
+                   \mathbf{isEquiv}(A\simeq B,A = B, \mathbf{ua}).
                 $$
             +tex.
                 The $\mathrm{isEquiv(f: Equiv \rightarrow Path)}$ type

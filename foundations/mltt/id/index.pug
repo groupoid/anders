@@ -11,8 +11,8 @@ block title
 
 block content
     nav
-        <a href='https://anders.groupoid.space/'>ANDERS</a>
-        <a href='https://anders.groupoid.space/lib/'>LIB</a>
+        <a href='../../../index.html'>ANDERS</a>
+        <a href='../../../lib/index.html'>LIB</a>
         <a href='#'>ID</a>
     article.main.list
         section
@@ -30,13 +30,28 @@ block content
                 there exists a function $f: \Pi_{a,b:A}\Pi_{r:R(a,b)}D(a,b,r)$ such that
                 $f(a,a,r_0(a))=d(a)$ for all $a:A$.
             +tex.
+                There are number of equality sign used in this tutorial,
+                all of them listed in the following table of identity systems:
+            +tex(true).
+                $$
+                   \begin{array}{ll} \mathrm{Sign} & \mathrm{Meaning} \\
+                         \hline
+                        =_{def} & \mathrm{Definition} \\
+                              = & \mathrm{Id} \\
+                         \equiv & \mathrm{Path} \\
+                         \simeq & \mathrm{Equivalence} \\
+                          \cong & \mathrm{Isomorphism} \\
+                           \sim & \mathrm{Homotopy} \\
+                      \end{array}
+                    $$
+            +tex.
                 $\mathbf{Definition}$ (Strict Identity System). An identity system
                 over type $A$ and universe of pretypes $V_i$ is called strict identity
-                system, which respects UIP.
+                system ($=$), which respects UIP.
             +tex.
                 $\mathbf{Definition}$ (Homotopy Identity System). An identity system
                 over type $A$ and universe of homotopy types $U_i$ is called homotopy identity
-                system, which models discrete infinity groupoid.
+                system ($\equiv$), which models discrete infinity groupoid.
 
             h2 Formation
             +tex.
@@ -44,24 +59,25 @@ block content
                 $Id_V: A \rightarrow A \rightarrow V$ with domains and codomain in universe $V$
                 represents inhabitants carrying proofs that given indexed
                 elements $x,y:A$ are equal.
-            +code.
-                def IdV (A: V) (x y: A): V := Id A x y
             +tex(true).
                 $$
-                    Id_V(A,x,y) =_{def} \prod_{A:V}\prod_{x,y:A} x =_A y
+                    =\hspace{0.4em} : U =_{def} \mathbf{Id}_V(A,x,y) =_{def} \prod_{A:V}\prod_{x,y:A} x =_A y.
                 $$
+            +code.
+                definition IdV (A: V) (x y: A)
+                         : V := Id A x y
 
             h2 Introduction
 
             +tex.
                 $\mathbf{Definition}$ ($=$-Intro, Reflection). The inductive family elements
                 are instantiated by single constructor that carries proof that $x:A$ element are equals to itself.
-            +code.
-                def Id-ref (A : V) (a: A) : Id A a a := ref a
             +tex(true).
                 $$
-                    ref_V(A,x) =_{def} \prod_{A:V}\prod_{x:A} ref_x : x =_A x
+                    \mathbf{ref}_V(A,x) : x =_A x =_{def} \prod_{A:V}\prod_{x:A} \mathbf{ref}_x
                 $$
+            +code.
+                def Id-ref (A : V) (a: A) : Id A a a := ref a
 
             h2 Elimination
 
@@ -75,7 +91,7 @@ block content
                 and a function
             +tex(true).
                 $$
-                   c: \prod_{x:A}C(x,x,ref_V(A,x))
+                   c: \prod_{x:A}C(x,x,\mathbf{ref}_V(A,x))
                 $$
             +tex.
                 there is a function
@@ -84,7 +100,7 @@ block content
                    f: \prod_{x,y:A}\Pi_{p: x =_A y}C(x,y,p)
                 $$
             +tex.
-                such that $f(x,x,ref_V(A,x)) = c(x)$.
+                such that $f(x,x,\mathbf{ref}_V(A,x)) = c(x)$.
 
             +code.
                 def =-ind (A : V) (C : Π (x y : A), Id A x y -> V)
@@ -95,11 +111,11 @@ block content
 
             +tex(true).
                $$
-                   ind_{=_A}  =_{def} J_V : \prod_{A:V}\prod_{C:\Pi_{(x,y:A)}(x=_A y)\rightarrow V}
+                   \mathbf{ind}_{=_A}  =_{def} \mathbf{J}_V : \prod_{A:V}\prod_{C:\Pi_{(x,y:A)}(x=_A y)\rightarrow V}
                $$
             +tex(true).
                $$
-                   \prod_{x:A}C(x,x,ref_V(a,x)) \rightarrow \prod_{x,y:A}\prod_{p: x=_A y}C(x,y,p).
+                   \prod_{x:A}C(x,x,\mathbf{ref}_V(a,x)) \rightarrow \prod_{x,y:A}\prod_{p: x=_A y}C(x,y,p).
 
                $$
 

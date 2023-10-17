@@ -22,13 +22,14 @@ block content
             h2 Formation
             +tex.
                 $\mathbf{Definition}$ (Fiberwise Equivalence).
-                Fiberwise equivalence $~$ of function $f: A \rightarrow B$
+                Fiberwise equivalence $\simeq$ or $\mathrm{Equiv}$
+                of function $f: A \rightarrow B$
                 represents internal equality of types $A$ and $B$
                 in the universe $U$ as contractible fibers of $f$
                 over base $B$.
             +tex(true).
                 $$
-                    \mathrm{Equiv}(A,B) : U =_{def}
+                    \simeq_{A,B}\hspace{.4em}=_U\mathrm{Equiv}(A,B) : U =_{def}
                 $$
             +tex(true).
                 $$
@@ -92,10 +93,8 @@ block content
                   \mathbf{ind}_{\mathrm{Equiv}}(C,d) : \mathrm{Equiv}(A,B)\rightarrow C(A,B,p).
                 $$
             +code.
-                def D-equiv
-                 := Π (A B: U), equiv A B → U
-
-                def ind-Equiv (A B: U) (C: D-equiv)
+                def ind-Equiv (A B: U)
+                    (C: Π (A B: U), equiv A B → U)
                     (d: C A A (idEquiv A)) 
                   : (p: equiv A B) -> C A B p
             br.
@@ -104,20 +103,30 @@ block content
                 $\mathbf{Definition}$ (Fiberwise Computation of Induction Principle).
             +code.
                 def compute-Equiv (A : U) 
-                    (C : D-equiv) (d: C A A (idEquiv A))
+                    (C : Π (A B: U), equiv A B → U)
+                    (d: C A A (idEquiv A))
                   : Path (C A A (idEquiv A)) d
                          (ind-Equiv A A C d (idEquiv A))
             br.
 
         section
             h1 UNIVALENCE
-            p.
-                The notion of Univalence was discovered by Vladimir Voevodsky
-                as forth and back transport between fibrational equivalence
-                as contractability of fibers and homotopical multi-dimentional
-                heterogeneous path equality. The Equiv → Path type is called Univalence type,
-                where univalence intro is obtained by Glue type and elim (Path → Equiv) is
-                obtained by sigma transport from constant map.
+            +tex.
+                The notion of univalence represents
+                transport between fibrational equivalence 
+                as contractability of fibers and homotopical
+                multi-dimentional
+                heterogeneous path equality:
+            +tex(true).
+                $$
+                  \mathrm{Univ} =_{def} \mathrm{isEquiv}(f: \mathrm{Equiv} \rightarrow \mathrm{Path})
+                $$
+            +tex.
+                The $\mathrm{isEquiv(f: Equiv \rightarrow Path)}$ type
+                is called $\mathrm{Univ}$ type. Univalence is packed
+                as isomorphism where intro is obtained by $\mathrm{Glue}$ type
+                and elim $g: \mathrm{Path} \rightarrow \mathrm{Equiv}$
+                is obtained by $\Sigma$ transport from constant map.
             h2 Formation
             +code.
                 def univ-formation (A B : U)

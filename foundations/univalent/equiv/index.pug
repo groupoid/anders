@@ -116,7 +116,7 @@ block content
                 transport between fibrational equivalence 
                 as contractability of fibers and homotopical
                 multi-dimentional
-                heterogeneous path equality:
+                heterogeneous path equality (HoTT 2.10):
             +tex(true).
                 $$
                   \mathrm{Univ} =_{def} \mathrm{isEquiv}(f: \mathrm{Equiv} \rightarrow \mathrm{Path})
@@ -128,11 +128,23 @@ block content
                 and elim $g: \mathrm{Path} \rightarrow \mathrm{Equiv}$
                 is obtained by $\Sigma$ transport from constant map.
             h2 Formation
+            +tex.
+                $\mathbf{Definition}$ (Univalence Formation).
+            +tex(true).
+                $$
+                    (A \simeq B) \rightarrow (A =_U B) : U.
+                $$
             +code.
                 def univ-formation (A B : U)
                  := equiv A B → PathP (&lt;_> U) A B
             br.
             h2 Introduction
+            +tex.
+                $\mathbf{Definition}$ (Univalence Intro).
+            +tex(true).
+                $$
+                    \mathbf{ua} : (A\simeq B) \rightarrow (A =_U B).
+                $$
             +code.
                 def univ-intro (A B : U)
                   : univ-formation A B
@@ -142,6 +154,12 @@ block content
                        (i = 1) → (B, idEquiv B) ]
             br.
             h2 Elimination
+            +tex.
+                $\mathbf{Definition}$ (Univalence Elimination).
+            +tex(true).
+                $$
+                    \mathbf{idToEquiv} \equiv \mathbf{transp}\ ([i] \mathbf{equiv}_A(p@i))\ 0\ \mathbf{idEquiv}_A.
+                $$
             +code.
                 def univ-elim (A B : U)
                     (p : PathP (&lt;_> U) A B)
@@ -150,6 +168,19 @@ block content
                            0 (idEquiv A)
             br.
             h2 Computation
+            +tex.
+                $\mathbf{Definition}$ (Univalence Computation).
+            +tex(true).
+                $$
+                    \mathbf{transp}(\mathbf{ua}(f),x) \equiv f(x).
+                $$
+            h2 Uniqueness
+            +tex.
+                $\mathbf{Definition}$ (Univalence Uniqueness).
+            +tex(true).
+                $$
+                    p \equiv \mathbf{ua}(\mathbf{transp}(p)).
+                $$
             +code.
                 def univ-computation (A B : U)
                     (p : PathP (&lt;_> U) A B)

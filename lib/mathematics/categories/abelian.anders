@@ -4,6 +4,8 @@ import lib/mathematics/homotopy/truncation
 
 -- David Elinder
 -- Investigating abelian categories in univalent type theory
+-- https://odr.chalmers.se/server/api/core/bitstreams/1e433d84-c3b8-4010-b71f-4fe204ff6cf1/content
+
 
 def zeroObject(C: precategory) (X: C.C.ob): U₁
  := Σ (bot: isInitial C X) (top: isTerminal C X), U
@@ -62,16 +64,16 @@ def hasAllCokernels (C : precategory) (zero: hasZeroObject C) : U₁
  := Σ (A B : C.C.ob) (f : C.C.hom A B), hasCokernel C zero A B f
 
 def isAbelian (C: precategory): U₁
- := Σ (zero:   hasZeroObject C)
-      (prod:   hasAllProducts C)
+ := Σ (zero:      hasZeroObject C)
+      (prod:     hasAllProducts C)
       (coprod: hasAllCoproducts C)
-      (ker:    hasAllKernels C zero)
-      (coker:  hasAllCokernels C zero)
+      (ker:       hasAllKernels C zero)
+      (coker:   hasAllCokernels C zero)
       (monicsAreKernels:
-         Π (A S: C.C.ob) (k: C.C.hom S A),
-         Σ (B: C.C.ob) (f: C.C.hom A B),
-         isKernel C zero A B S f k)
+         Π (A S: C.C.ob) (k: C.C.hom S A) (_: isMonic C S A k),
+         ‖_‖₋₁ (Σ (B: C.C.ob) (f: C.C.hom A B),
+                  isKernel C zero A B S f k))
       (epicsAreCoKernels:
-         Π (B S: C.C.ob) (k: C.C.hom B S),
-         Σ (A: C.C.ob) (f: C.C.hom A B),
-         isCokernel C zero A B S f k), U
+         Π (B S: C.C.ob) (k: C.C.hom B S) (_: isEpic C B S k),
+         ‖_‖₋₁ (Σ (A: C.C.ob) (f: C.C.hom A B),
+                  isCokernel C zero A B S f k)), U

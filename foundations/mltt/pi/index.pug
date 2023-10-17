@@ -11,8 +11,8 @@ block title
 
 block content
     nav
-        <a href='https://anders.groupoid.space/'>ANDERS</a>
-        <a href='https://anders.groupoid.space/lib/'>LIB</a>
+        <a href='../../../index.html'>ANDERS</a>
+        <a href='../../../lib/index.html'>LIB</a>
         <a href='#'>PI</a>
     article.main
         .exe
@@ -39,14 +39,14 @@ block content
                     $\mathbf{Definition}$ ($\Pi$-Formation, Dependent Product).
                     $\Pi$-types represents the way we create the spaces of dependent functions $f: \Pi(x:A), B(x)$
                     with domain in $A$ and codomain in type family $B : A \rightarrow U$ over $A$.
-
-                +code.
-                    def Pi (A : U) (B : A → U) : U := Π (x : A), B x
-
                 +tex(true).
                     $$
-                       \Pi (A,B) =_{def} \prod_{x:A}B(x) : \mathcal{U}.
+                       \Pi : U =_{def} \prod_{x:A}B(x).
                     $$
+                +code.
+                    def Pi (A : U) (B : A → U) : U
+                     := Π (x : A), B x
+                br.
 
                 h2 Introduction
 
@@ -55,18 +55,19 @@ block content
                     Lambda constructor defines a new lambda function in the space of dependent functions.
                     it is called lambda abstraction and displayed as $\lambda x. b(x)$ or $x \mapsto b(x)$.
 
+                +tex(true).
+                    $$
+                       \backslash (x: A) \rightarrow b : \Pi(A,B) =_{def}
+                    $$
+                +tex(true).
+                    $$
+                       \prod_{A:U}\prod_{B:A \rightarrow U}\prod_{a: A}\prod_{b:B(a)}\lambda x.b.
+                    $$
+
                 +code.
                     def lambda (A: U) (B: A → U) (b: Pi A B) : Pi A B := λ (x : A), b x
                     def lam (A B: U) (f: A → B) : A → B := λ (x : A), f x
-
-                +tex(true).
-                    $$
-                       \backslash (x: A) \rightarrow b =_{def}
-                    $$
-                +tex(true).
-                    $$
-                       \prod_{A:U}\prod_{B:A \rightarrow U}\prod_{a: A}\prod_{b:B(a)}\lambda x.b : \prod_{y:A}B(a).
-                    $$
+                br.
 
                 +tex.
                     When codomain is not dependent on valude from domain the function $f: A \rightarrow B$
@@ -79,14 +80,14 @@ block content
                     $\mathbf{Definition}$ ($\lambda$-application).
                     Application reduces the term by using recursive substitution.
 
+                +tex(true).
+                    $$
+                       f\ a : B(a) =_{def} \prod_{A:U}\prod_{B: A \rightarrow U}\prod_{a:A}\prod_{f: \prod_{x:A}B(a)}f(a).
+                    $$
+
                 +code.
                     def apply (A: U) (B: A → U) (f: Pi A B) (a: A) : B a := f a
                     def app (A B: U) (f: A → B) (x: A): B := f x
-
-                +tex(true).
-                    $$
-                       f\ a =_{def} \prod_{A:U}\prod_{B: A \rightarrow U}\prod_{a:A}\prod_{f: \prod_{x:A}B(a)}f(a) : B(a).
-                    $$
 
                 +tex.
                     $\mathbf{Definition}$ (Composition).
@@ -95,22 +96,25 @@ block content
                 +code.
                     def ∘ᵀ (α β γ: U) : U := (β → γ) → (α → β) → (α → γ)
                     def ∘ (α β γ : U) : ∘ᵀ α β γ := λ (g: β → γ) (f: α → β) (x: α), g (f x)
+                br.
 
                 h2 Computation
 
                 +tex.
                     $\mathbf{Theorem}$ (Computation $\Pi_\beta$).
-                    $β$-rule shows that composition $\mathrm{lam} \circ \mathrm{app}$ could be fused.
-
-                +code.
-                    def Π-β (A : U) (B : A → U) (a : A) (f : Pi A B)
-                      : Path (B a) (apply A B (lambda A B f) a) (f a)
-                     := idp (B a) (f a)
+                    $β$-rule shows that composition $\mathrm{lam} \circ \mathrm{app}$
+                    could be fused.
 
                 +tex(true).
                     $$
                        f(a) =_{B(a)} (\lambda (x:A) \rightarrow f(a))(a).
                     $$
+
+                +code.
+                    def Π-β (A : U) (B : A → U) (a : A) (f : Pi A B)
+                      : Path (B a) (apply A B (lambda A B f) a) (f a)
+                     := idp (B a) (f a)
+                br.
 
                 h2 Uniqueness
 
@@ -118,15 +122,15 @@ block content
                     $\mathbf{Theorem}$ (Uniqueness $\Pi_\eta$).
                     $η$-rule shows that composition $\mathrm{app} \circ \mathrm{lam}$ could be fused.
 
-                +code.
-                    def Π-η (A : U) (B : A → U) (a : A) (f : Pi A B)
-                      : Path (Pi A B) f (λ (x : A), f x)
-                     := idp (Pi A B) f
-
                 +tex(true).
                     $$
                        f =_{(x:A)\rightarrow B(a)} (\lambda (y:A) \rightarrow f(y)).
                     $$
+                +code.
+                    def Π-η (A : U) (B : A → U) (a : A) (f : Pi A B)
+                      : Path (Pi A B) f (λ (x : A), f x)
+                     := idp (Pi A B) f
+                br.
 
                 h2 Theorems
 

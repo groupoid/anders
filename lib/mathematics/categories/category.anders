@@ -5,7 +5,7 @@
 
    HoTT 9.1 Categories and precategories
 
-   Copyright (c) Groupoid Infinity, 2014-2022. -}
+   Copyright (c) Groupoid Infinity, 2014-2023. -}
 
 module category where
 import lib/foundations/mltt/sigma

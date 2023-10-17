@@ -1,0 +1,20 @@
+module topology where
+
+--- Kang Rongji, 2022-2023
+
+def Path₁ (A : U₁) (x y : A) := PathP (<_> A) x y
+def isProp₁ (A : U₁) := Π (a b : A), Path₁ A a b
+def isSet₁ (A : U₁) := Π (a b : A) (a0 b0 : Path₁ A a b), Path₁ (Path₁ A a b) a0 b0
+def Ω := U → 𝟐
+def ℙ (X: U₁) := X → Ω
+axiom isSet-ℙ (X: U₁) : isSet₁ (ℙ X)
+axiom specify (X: U₁) : (X → Ω) → ℙ X
+def ∅ (X: U₁) : ℙ X := \ (_: X) (_: U), false
+def total (X: U₁) : ℙ X := \ (_: X) (_: U), true
+def ∈ (X: U₁) (el: X) (set: ℙ X) : U₁ := Path₁ (U → 𝟐) (set el) (\(_: U), true)
+def ∉ (X: U₁) (el: X) (set: ℙ X) : U₁ := Path₁ (U → 𝟐) (set el) (\(_: U), false)
+def ⊆ (X: U₁) (A B: ℙ X) := Π (x: X), (∈ X x A) × (∈ X x B)
+axiom ∁ (X: U₁) : ℙ X → ℙ X       -- not (complement)
+axiom ∪ (X: U₁) : ℙ X → ℙ X → ℙ X -- or (union)
+axiom ∩ (X: U₁) : ℙ X → ℙ X → ℙ X -- and (intersection)
+

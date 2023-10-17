@@ -4,7 +4,7 @@
    HoTT 9.2 Functors and transformations
    HoTT 9.4 Equivalences
 
-   Copyright (c) Groupoid Infinity, 2014-2022. -}
+   Copyright (c) Groupoid Infinity, 2014-2023. -}
 
 module natural where
 import lib/mathematics/categories/category

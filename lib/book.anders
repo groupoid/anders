@@ -37,7 +37,6 @@ import lib/mathematics/categories/abelian
 import lib/mathematics/categories/groupoid
 import lib/mathematics/categories/symmetric
 import lib/mathematics/categories/cartesian
-import lib/mathematics/categories/instances/functor-instances
 import lib/mathematics/categories/topos
 import lib/mathematics/categories/meta/favonia
 import lib/mathematics/categories/meta/kraus

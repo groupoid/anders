@@ -5,7 +5,7 @@
 
    http://www.ams.org/notices/200409/what-is-illusie.pdf
 
-   Copyright (c) Groupoid Infinity, 2014-2022. -}
+   Copyright (c) Groupoid Infinity, 2014-2023. -}
 
 module topos where
 import lib/mathematics/categories/category
@@ -39,6 +39,7 @@ def internal : Topos Set := (cartesianClosed,hasSubobject)
 def presheaf (C: precategory): U := catfunctor (catᵒᵖ C) Set
 def Co (C: precategory) (cod: C.C.ob) : U := Σ (dom: C.C.ob), C.C.hom dom cod
 def Delta (C: precategory) (d: C.C.ob) : U₁ := Σ (index: U), index -> Co C d
-def Coverage (C: precategory): U₁ := Σ (cod: C.C.ob) (fam: Delta C cod) (coverings: C.C.ob -> Delta C cod -> U), coverings cod fam
+def Coverage (C: precategory): U₁ := Σ (cod: C.C.ob) (fam: Delta C cod)
+    (coverings: C.C.ob -> Delta C cod -> U), coverings cod fam
 def site  (C: precategory): U₁ := Σ (C: precategory), Coverage C
 def sheaf (C: precategory): U₁ := Σ (S: site C), presheaf S.C

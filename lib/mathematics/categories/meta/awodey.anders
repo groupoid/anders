@@ -1,6 +1,6 @@
 {- Impredicative Encoding of Inductive Types:
    - Unit.
-   Copyright (c) Groupoid Infinity, 2014-2022. -}
+   Copyright (c) Groupoid Infinity, 2014-2023. -}
 
 module awodey where
 option impredicativity true

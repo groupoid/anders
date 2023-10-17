@@ -2,10 +2,10 @@ module abelian where
 import lib/mathematics/categories/category
 import lib/mathematics/homotopy/truncation
 
--- David Elinder
--- Investigating abelian categories in univalent type theory
+-- David Elinder Master Thesis
+-- Investigating Abelian categories in univalent type theory
+-- Supervisor: Thierry Coquand
 -- https://odr.chalmers.se/server/api/core/bitstreams/1e433d84-c3b8-4010-b71f-4fe204ff6cf1/content
-
 
 def zeroObject(C: precategory) (X: C.C.ob): U₁
  := Σ (bot: isInitial C X) (top: isTerminal C X), U
@@ -70,10 +70,10 @@ def isAbelian (C: precategory): U₁
       (ker:       hasAllKernels C zero)
       (coker:   hasAllCokernels C zero)
       (monicsAreKernels:
-         Π (A S: C.C.ob) (k: C.C.hom S A) (_: isMonic C S A k),
+         Π (A S: C.C.ob) (k: C.C.hom S A),
          ‖_‖₋₁ (Σ (B: C.C.ob) (f: C.C.hom A B),
                   isKernel C zero A B S f k))
       (epicsAreCoKernels:
-         Π (B S: C.C.ob) (k: C.C.hom B S) (_: isEpic C B S k),
+         Π (B S: C.C.ob) (k: C.C.hom B S),
          ‖_‖₋₁ (Σ (A: C.C.ob) (f: C.C.hom A B),
                   isCokernel C zero A B S f k)), U

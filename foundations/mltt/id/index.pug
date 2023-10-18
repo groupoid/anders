@@ -65,8 +65,8 @@ block content
                     =\hspace{0.4em} : U =_{def} \prod_{A:V}\prod_{x,y:A} \mathbf{Id}_V(A,x,y).
                 $$
             +code.
-                definition IdV (A: V) (x y: A)
-                         : V := Id A x y
+                def IdV (A: V) (x y: A)
+                  : V := Id A x y
 
             h2 Introduction
 
@@ -110,7 +110,7 @@ block content
                     (x y : A) (c : C x x (ref x))
                     (p : Id A x y)
                   : C x y p
-                 := idJ A C x c y p
+                 := indJ A C x c y p
 
             +tex(true).
                $$
@@ -119,7 +119,6 @@ block content
             +tex(true).
                $$
                    \prod_{x,y:A}C(x,x,\mathbf{ref}_V(a,x)) \rightarrow \prod_{p: x=_A y}C(x,y,p).
-
                $$
 
             h2 Computation

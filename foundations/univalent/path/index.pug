@@ -59,7 +59,8 @@ block content
                        \mathbf{idp} : x \equiv_A x =_{def} \prod_{A:U}\prod_{x:A} [i] x
                     $$
                 +code.
-                    def idp (A: U) (x: A) : Path A x x := <_> x
+                    def idp (A: U) (x: A)
+                      : Path A x x := <_> x
                 +tex.
                     Returns a reflexivity path space for a given value of the type.
                     The inhabitant of that path space is the lambda on the homotopy
@@ -69,9 +70,12 @@ block content
                 +tex.
                     $\mathbf{Definition}$ (Path Application).
                 +code.
-                    def at0 (A: U) (a b: A) (p: Path A a b): A := p @ 0
-                    def at1 (A: U) (a b: A) (p: Path A a b): A := p @ 1
+                    def at0 (A: U) (a b: A)
+                        (p: Path A a b) : A := p @ 0
 
+                    def at1 (A: U) (a b: A)
+                        (p: Path A a b): A := p @ 1
+                br.
                 +tex.
                     Connections allow you to build a square
                     with only one element of path: i) $[i,j] p\ @\ min(i,j)$;
@@ -109,11 +113,11 @@ block content
                     $\mathbf{Theorem}$ (Congruence).
                 +tex(true).
                     $$
-                        \mathbf{ap} : f(a)\equiv f(b) =_{def} 
+                        \mathbf{apd} : f(a)\equiv f(b) =_{def} 
                     $$
                 +tex(true).
                     $$
-                        \prod_{A:U}\prod_{a,x:A}\prod_{B:A\rightarrow}\prod_{f: \Pi(A,B)}\prod_{p:a\equiv_A x}[i] f(p@i).
+                        \prod_{A:U}\prod_{a,x:A}\prod_{B:A\rightarrow U}\prod_{f: \Pi(A,B)}\prod_{p:a\equiv_A x}[i] f(p@i).
                     $$
                 +code.
                     def ap (A B: U) (f: A -> B)
@@ -123,7 +127,7 @@ block content
                     def apd (A: U) (a x: A) (B: A -> U)
                         (f: A -> B a) (b: B a) (p: Path A a x)
                       : Path (B a) (f a) (f x)
-
+                br.
                 +tex.
                     Maps a given path space between values of one type
                     to path space of another type using an encode function between types.
@@ -136,24 +140,53 @@ block content
                     $\mathbf{Definition}$ (Generalized Transport Kan Operation).
                     Transports a value of the left type to the value of the right type
                     by a given path element of the path space between left and right types.
+                +tex(true).
+                    $$
+                        \mathrm{transport} : A \rightarrow A =_{def}
+                    $$
+                +tex(true).
+                    $$
+                        \prod_{A:U}\prod_{x,y:A}\prod_{p:x=_A y}
+                    $$
+                +tex(true).
+                    $$
+                        \lambda u,[i]\mathbf{transp}([j]\mathrm{const}(A,U,A) p@j,i,u).
+                    $$
                 +code.
-                    def transp′ (A : U) (j : I)
-                        (p : (I → U) [j ↦ [(j = 1) → λ (_ : I), A ]])
-                     := transp (&lt;i> (ouc p) i) j
+                    def transp' (A: U) (x y: A) (p : PathP (&lt;_>A) x y) (i: I)
+                     := transp (&lt;i> (\(_:A),A) (p @ i)) i x
+
+                    def transpᵁ (A B: U) (p : PathP (&lt;_>U) A B) (i: I)
+                     := transp (&lt;i> (\(_:U),U) (p @ i)) i A
                 br.
                 +tex.
                     $\mathbf{Definition}$ (Homogeneous Composition Kan Operation).
+                +tex(true).
+                    $$
+                         \mathrm{composition} : A\ [r \mapsto u(0)] \rightarrow A =_{def} 
+                    $$
+                +tex(true).
+                    $$
+                         \prod_{A:U}\prod_{r:I} \prod_{u:I\rightarrow \mathbf{Partial}(A,r)}
+                    $$
+                +tex(true).
+                    $$
+                         \lambda u_0,[i]\mathbf{hcomp}(A,r,u,\mathbf{ouc}(u_0)).
+                    $$
                 +code.
-                    def hcomp′ (A : U) (r : I)
+                    def hcomp' (A : U) (r : I)
                         (u : I → Partial A r) (u₀ : A[r ↦ u 0]) : A
                      := hcomp A r u (ouc u₀)
 
+                    def hcomp-ε (A : U) (a : A)
+                     := hcomp A 0 (λ (i : I), []) a
+                br.
                 +tex.
                     $\mathbf{Theorem}$ (Substitution).
                 +code.
-                    def subst (A: U) (P: A -> U) (a b: A)
-                        (p: Path A a b) (u: P a)
-                      : P b := transp (&lt;i> P (p @ i)) 0 e
+                    def subst (A: U) (P: A -> U) (a b: A) (p: Path A a b)
+                      : P a -> P b
+                     := λ (e: P a), transp (&lt;i> P (p @ i)) 0 e
                 p.
                     Acts like transport of mapOnPath value, representing the
                     dependent function transport or substitution.
@@ -177,6 +210,9 @@ block content
                     in a connected point. The proofterm is
                     $\mathbf{comp}([i] \mathbf{Path}_A(a,q@i),p,[])$.
 
+
+                h2 Elimination
+
                 +tex.
                     $\mathbf{Theorem}$ (Contractability of Singleton).
                 +code.
@@ -188,8 +224,6 @@ block content
                 +tex.
                     Proof that singleton is contractible space. Implemented as
                     $[i] (p @ i, [j] p @ (i \land j))$.
-
-                h2 Elimination
 
                 +tex.
                     $\mathbf{Theorem}$ (J by Paulin-Mohring).

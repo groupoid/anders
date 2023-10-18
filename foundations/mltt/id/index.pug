@@ -78,7 +78,8 @@ block content
                     \mathbf{ref}_V : x =_A x =_{def} \prod_{A:V}\prod_{x:A} \mathbf{ref}_A(x)
                 $$
             +code.
-                def Id-ref (A : V) (a: A) : Id A a a := ref a
+                def Id-ref (A : V) (a: A)
+                  : Id A a a := ref a
 
             h2 Elimination
 
@@ -104,11 +105,12 @@ block content
                 such that $f(x,x,\mathbf{ref}_V(A,x)) = c(x)$.
 
             +code.
-                def =-ind (A : V) (C : Π (x y : A), Id A x y -> V)
-                       (x y : A) (c : C x x (ref x))
-                       (p : Id A x y)
-                     : C x y p
-                    := idJ A C x c y p
+                def =-ind (A : V)
+                    (C : Π (x y : A), Id A x y -> V)
+                    (x y : A) (c : C x x (ref x))
+                    (p : Id A x y)
+                  : C x y p
+                 := idJ A C x c y p
 
             +tex(true).
                $$
@@ -123,16 +125,18 @@ block content
             h2 Computation
 
             +code.
-                def Jˢ-β (A : V) (C : Π (a b : A), Id A a b -> V)
-                         (a : A) (c : C a a (ref a))
-                       : Id (C a a (ref a)) (Jˢ A C a a c (ref a)) c
-                      := ref c
+                def Jˢ-β (A : V)
+                    (C : Π (a b : A), Id A a b -> V)
+                    (a : A) (c : C a a (ref a))
+                  : Id (C a a (ref a)) (Jˢ A C a a c (ref a)) c
+                 := ref c
 
             h2 Uniqueness
 
             +code.
                 def UIP (A : V) (a b : A) (p q : Id A a b)
-                      : Id (Id A a b) p q := ref p
+                  : Id (Id A a b) p q
+                 := ref p
 
 include ../../../footer
 

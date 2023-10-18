@@ -42,6 +42,15 @@ block content
                     $$
                         \equiv\hspace{0.4em}: U =_{def} \prod_{A:U}\prod_{x,y:A} \mathbf{Path}_A(x,y).
                     $$
+                +code.
+                    def Path (A : U) (x y : A) : U
+                     := PathP (<_> A) x y
+
+                    def Pathᴵ (A : U) (x y : A)
+                     := Π (i : I),
+                        A [∂ i |-> [(i = 0) → x ,
+                                    (i = 1) → y ]]
+                br.
                 h2 Introduction
                 +tex.
                     $\mathbf{Definition}$ (Path Introduction).
@@ -81,7 +90,7 @@ block content
                     $$
                     \begin{array}{ccc}
                         a & \mapright{p} & b \\
-                        \mapupl{[i] a} &  & \mapup{p} \\
+                        \mapup{[i] a} &  & \mapup{p} \\
                         a & \mapright{[i] a} & a \\
                     \end{array}
                     $$
@@ -98,6 +107,14 @@ block content
 
                 +tex.
                     $\mathbf{Theorem}$ (Congruence).
+                +tex(true).
+                    $$
+                        \mathbf{ap} : f(a)\equiv f(b) =_{def} 
+                    $$
+                +tex(true).
+                    $$
+                        \prod_{A:U}\prod_{a,x:A}\prod_{B:A\rightarrow}\prod_{f: \Pi(A,B)}\prod_{p:a\equiv_A x}[i] f(p@i).
+                    $$
                 +code.
                     def ap (A B: U) (f: A -> B)
                         (a b: A) (p: Path A a b)
@@ -116,21 +133,27 @@ block content
                     in both cases.
 
                 +tex.
-                    $\mathbf{Definition}$ (Transport Kan Operation).
-                +code.
-                    def trans (A B: U) (p: Path U A B) (a: A) : B
-                +tex.
+                    $\mathbf{Definition}$ (Generalized Transport Kan Operation).
                     Transports a value of the left type to the value of the right type
                     by a given path element of the path space between left and right types.
-                    Defined as path composition with $[]$ of a over a path p
-                    $\mathbf{comp}(p,a,[])$.
+                +code.
+                    def transp′ (A : U) (j : I)
+                        (p : (I → U) [j ↦ [(j = 1) → λ (_ : I), A ]])
+                     := transp (&lt;i> (ouc p) i) j
+                br.
+                +tex.
+                    $\mathbf{Definition}$ (Homogeneous Composition Kan Operation).
+                +code.
+                    def hcomp′ (A : U) (r : I)
+                        (u : I → Partial A r) (u₀ : A[r ↦ u 0]) : A
+                     := hcomp A r u (ouc u₀)
 
                 +tex.
                     $\mathbf{Theorem}$ (Substitution).
                 +code.
-                    def subst (A: U) (P: A -> U)
-                              (a b: A) (p: Path A a b)
-                              (u: P a) : P b
+                    def subst (A: U) (P: A -> U) (a b: A)
+                        (p: Path A a b) (u: P a)
+                      : P b := transp (&lt;i> P (p @ i)) 0 e
                 p.
                     Acts like transport of mapOnPath value, representing the
                     dependent function transport or substitution.
@@ -140,17 +163,15 @@ block content
                 +tex(true).
                     $$
                     \begin{array}{ccc}
-                        a & \mapright{comp} & c \\
+                        a & \mapright{pcomp} & c \\
                         \mapup{[i] a} & & \mapup{q} \\
                         a & \mapright{p\ @\ i} & b \\
                     \end{array}
                     $$
-
                 +code.
-                    def composition (A: U) (a b c: A)
-                                    (p: Path A a b)
-                                    (q: Path A b c)
-                                  : Path A a c
+                    def pcomp (A: U) (a b c: A)
+                        (p: Path A a b) (q: Path A b c)
+                      : Path A a c := subst A (Path A a) b c q p
                 +tex.
                     Composition operation allows building a new path from two given paths
                     in a connected point. The proofterm is
@@ -166,7 +187,7 @@ block content
                       : Path (singl A a) (a,refl A a) (b,p)
                 +tex.
                     Proof that singleton is contractible space. Implemented as
-                    $[i] (p @ i, [j] p @ i/\backslash j)$.
+                    $[i] (p @ i, [j] p @ (i \land j))$.
 
                 h2 Elimination
 
@@ -215,7 +236,7 @@ block content
                     $\mathbf{Definition}$ (Path Computation).
                 +code.
                     def trans_comp (A: U) (a: A)
-                      : Path A a (trans A A (<_> A) a)
+                      : Path A a (trans A A (&lt;_> A) a)
 
                     def subst_comp (A: U) (P: A -> U) (a: A) (e: P a)
                       : Path (P a) e (subst A P a a (refl A a) e)

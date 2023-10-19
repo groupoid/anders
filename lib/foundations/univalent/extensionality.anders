@@ -9,11 +9,32 @@ module extensionality where
 import lib/foundations/univalent/path
 import lib/foundations/mltt/pi
 
+--- FunExt as Isomorphism
+
 def funext-form (A B: U) (f g: A → B): U := Path (A → B) f g
-def funext (A B: U) (f g: A → B) (p: Π (x: A), Path B (f x) (g x)) : funext-form A B f g := <i> λ (a: A), p a @ i
-def happly (A B: U) (f g : A → B) (p: funext-form A B f g) (x : A) : Path B (f x) (g x) := cong (A → B) B (λ (h: A → B), app A B h x) f g p
-def funext-β (A B: U) (f g: A → B) (p: Π (x: A), Path B (f x) (g x)) : Π (x: A), Path B (f x) (g x) := λ (x: A), happly A B f g (funext A B f g p) x
-def funext-η (A B: U) (f g: A → B) (p: Path (A → B) f g) : Path (Path (A → B) f g) (funext A B f g (happly A B f g p)) p := idp (Path (A → B) f g) p
+def funext (A B: U) (f g: A → B) (p: Π (x: A), Path B (f x) (g x))
+  : funext-form A B f g := <i> λ (a: A), p a @ i
+def happly (A B: U) (f g : A → B) (p: funext-form A B f g) (x : A)
+  : Path B (f x) (g x) := cong (A → B) B (λ (h: A → B), app A B h x) f g p
+def funext-β (A B: U) (f g: A → B) (p: Π (x: A), Path B (f x) (g x))
+  : Π (x: A), Path B (f x) (g x)
+ := λ (x: A), happly A B f g (funext A B f g p) x
+def funext-η (A B: U) (f g: A → B) (p: Path (A → B) f g)
+  : Path (Path (A → B) f g) (funext A B f g (happly A B f g p)) p
+ := idp (Path (A → B) f g) p
+
+--- FunExt as Identity System
+
+def funext-D (A B: U) := Π (f g : A → B), Path (A → B) f g → U
+def funext-id (A: U) : funext-form A A (id A) (id A) := <_> id A
+def funext-ind (A B: U) (f g: A → B) (C: funext-D A B)
+    (d: Π (f g: A → B), C f f (<_>\(x:A), f x))
+  : Π (h: Path (A → B) f g), C f g h
+ := \ (h: Path (A → B) f g),
+      subst (singl (A → B) f) (\ (z: singl (A → B) f), C f (z.1) (z.2))
+            (eta (A → B) f) (g, h) (contr (A → B) f g h) (d f g)
+
+--- Dependent Function Extensionality
 
 def piext (A: U) (B: A → U) (f g: Π (x: A), B x) (p: Π (x: A), Path (B x) (f x) (g x)) : Path (Π (y: A), B y) f g := <i> λ (a: A), (p a) @ i
 def setPi (A: U) (B: A → U) (h: Π (x: A), isSet (B x)) (f g: Pi A B) (p q: Path (Pi A B) f g) : Path (Path (Pi A B) f g) p q

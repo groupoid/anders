@@ -24,31 +24,54 @@ block content
                 validates full universal property in LCCC in contrast to weak one.
 
             h2 Formation
-            p.
-                HoTT 2.4.1
+            +tex.
+                $\mathbf{Definition}$ (Homotopy Formation). Homotopy is
+                the $\mathbf{Path}$ equality of functions $f,g: A \rightarrow B$.
+            +tex(true).
+                $$
+                        \sim : U =_{def} \prod_{A,B:U} \prod_{f,g: A \rightarrow B} f \equiv g
+                $$.
             +code.
                 def funext-form (A B: U) (f g: A -> B)
                   : U := Path (A -> B) f g
             br.
 
             h2 Introduction
-            p.
+            +tex.
+                $\mathbf{Definition}$ (Homotopy Introduction).
             +code.
-                def funext (A B: U) (f g: A -> B)
-                    (p: (x:A) -> Path B (f x) (g x))
-                  : Path (A -> B) f g
+                def funext (A B: U) (f g: A → B)
+                    (p: Π (x: A), Path B (f x) (g x))
+                  : funext-form A B f g
+                 := &lt;i> λ (a: A), p a @ i
+            br.
+            +tex.
+                $\mathbf{Definition}$ (Homotopy Dependent Introduction).
+            +code.
+                def piext (A: U) (B: A -> U) (f g: (x: A) -> B x)
+                    (p: (x: A) -> Path (B x) (f x) (g x))
+                  : Path ((y: A) -> B y) f g
+            br.
+            +tex.
+                $\mathbf{Definition}$ (Homotopy Identity Introduction).
+            +tex(true).
+                $$
+                    \mathrm{id}_\sim : A \sim A =_{def}
+                $$
+            +code.
+                def funext-id (A: U)
+                  : funext-form A A (id A) (id A)
+                 := &lt;_> id A
             br.
 
             h2 Elimination
-            p.
-                HoTT 5.8.6
+            +tex.
+                $\mathbf{Definition}$ (Homotopy Elimination).
             +code.
                 def happly (A B: U) (f g: A -> B)
                     (p: Path (A -> B) f g) (x: A)
                   : Path B (f x) (g x)
             br.
-
-            h2 Induction
             +tex.
                 $\mathbf{Definition}$ (Homotopy Induction Principle).
                 For any $D : (f,g: \Pi(A,B)) \rightarrow f \sim g \rightarrow U$
@@ -58,15 +81,26 @@ block content
                 $$
                   \mathbf{ind}_\sim(C,d) : (h: f\sim g) \rightarrow C(f,g,h).
                 $$
+            +code.
+                def funext-ind (A B: U) (f g: A → B) (C: funext-D A B)
+                    (d: Π (f g: A → B), C f f (<_>\(x:A), f x))
+                  : Π (h: Path (A → B) f g), C f g h
+            br.
 
             h2 Computation
+            +tex.
+                $\mathbf{Definition}$ (Homotopy Isomorphism Computation).
             +code.
                 def funext_Beta (A B: U) (f g: A -> B)
                     (p: (x:A) -> Path B (f x) (g x))
                   : (x:A) -> Path B (f x) (g x)
             br.
+            +tex.
+                $\mathbf{Definition}$ (Homotopy Induction Principle Computation).
 
             h2 Uniqueness
+            +tex.
+                $\mathbf{Definition}$ (Homotopy Isomorphism Uniqueness).
             +code.
                 def funext_Eta (A B: U) (f g: A -> B)
                     (p: Path (A -> B) f g)
@@ -74,11 +108,5 @@ block content
                          (funext A B f g (happly A B f g p)) p
             br.
 
-            h2 Dependent Version
-            +code.
-                def piext (A: U) (B: A -> U) (f g: (x: A) -> B x)
-                    (p: (x: A) -> Path (B x) (f x) (g x))
-                  : Path ((y: A) -> B y) f g
-            br.
 
 include ../../../footer

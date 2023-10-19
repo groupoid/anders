@@ -275,7 +275,7 @@ def comp-Path-assoc (A : U) (a b c d : A) (f : Path A a b) (g : Path A b c) (h :
 -- https://simhu.github.io/misc/hcomp.pdf
 
 {- CCHM Equations:
-   
+
    transpⁱ N φ u₀ = u₀
    transpⁱ U φ A = A
    transpⁱ (Π (x : A), B) φ u₀ v = transpⁱ B(x/w) φ (u₀ w(i/0)), w = tFill⁻ⁱ A φ v, v : A(i/1)

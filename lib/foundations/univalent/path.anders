@@ -171,10 +171,11 @@ def 0≥1-impl-absurd : (≥ 0 1) → 𝟎 := I-nontriv
 def seg : PathP (<_> I) 0 1 := <i> i
 def Partial-app (A : U) (i : I) (u : Partial A i) (p : 1= i) : A := u p
 def Id-path (A : U) (a b : A) : Id A a b → Path A a b := idJ A (λ (a b : A) (_ : Id A a b), Path A a b) a (<_> a) b
-def Partial′ (A : U) (i : I) := Partial A i
+def Partial' (A : U) (i : I) : V := Partial A i
 def sub (A : U) (i : I) (u : Partial A i) : V := A[i ↦ u]
 def inc′ (A : U) (i : I) (a : A) : sub A i [(i = 1) → a] := inc A i a
 def ouc′ (A : U) (i : I) (u : Partial A i) (a : A[i ↦ u]) : A := ouc a
+def ouc'' (A : U) (i : I) (u : Partial A i) : A [i ↦ u] -> A := λ (a: A[i ↦ u]), ouc a
 
 def Path′ (A : U) (a b : A) := Π (i : I), A [∂ i ↦ [(i = 0) → a, (i = 1) → b]]
 def Path-Path′ (A : U) (a b : A) (p : Path A a b) : Path′ A a b := λ (i : I), inc A (∂ i) (p @ i)
@@ -186,7 +187,8 @@ def Path′-Path-Path′ (A : U) (a b : A) (p : Path′ A a b)
 
 -- Generalized Transport
 
-def transp' (A: U) (x y: A) (p : PathP (<_>A) x y) (i: I) := transp (<i> (\(_:A),A) (p @ i)) i x
+def transp' (A: I → U) (r: I) : A 0 -> A 1 := \ (a: A 0), transp (<i>A i) 0 a
+def transp¹ (A: U) (x y: A) (p : PathP (<_>A) x y) (i: I) := transp (<i> (\(_:A),A) (p @ i)) i x
 def transpᵁ        (A B: U) (p : PathP (<_>U) A B) (i: I) := transp (<i> (\(_:U),U) (p @ i)) i A
 def transpᵋ        (A B: U) (p : PathP (<_>U) A B) := transp (<i> (\(_:U),U) (p @ i)) 0 A
 def transp⁰ (A: U) (x y: A) (p : PathP (<_>A) x y) := transp (<i> (\(_:A),A) (p @ i)) 0 x
@@ -221,7 +223,7 @@ def inv′ (A : U) (a b : A) (p : Path A a b)
 
 -- Homogeneous Composition
 
-def hcomp' (A : U) (r : I) (u : I → Partial A r) (u₀ : A[r ↦ u 0]) : A := hcomp A r u (ouc u₀)
+def hcomp' (A : U) (r : I) (u : I → Partial A r) : A[r ↦ u 0] -> A := \ (u₀ : A[r ↦ u 0]), hcomp A r u (ouc u₀)
 def hcomp-ε (A : U) (a : A) := hcomp A 0 (λ (i : I), []) a
 def hcomp-ε→id (A : U) (a : A) : Path A (hcomp-ε A a) a := <i> hcomp A i (λ (j : I), [(i = 1) → a]) a
 

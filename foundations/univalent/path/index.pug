@@ -77,6 +77,8 @@ block content
                         (p: Path A a b): A := p @ 1
                 br.
                 +tex.
+                    $\mathbf{Definition}$ (Path Connections).
+                +tex.
                     Connections allow you to build a square
                     with only one element of path: i) $[i,j] p\ @\ min(i,j)$;
                     ii) $[i,j] p\ @\ max(i,j)$.
@@ -108,7 +110,8 @@ block content
                       : PathP (&lt;x&gt; Path A a (p@x)) (&lt;i&gt; a) p
                      := &lt;x y&gt; p @ (x /\ y)
                 br.
-
+                +tex.
+                    $\mathbf{Definition}$ (Path Inversion).
                 +tex.
                     $\mathbf{Theorem}$ (Congruence).
                 +tex(true).
@@ -142,15 +145,15 @@ block content
                     by a given path element of the path space between left and right types.
                 +tex(true).
                     $$
-                        \mathrm{transport} : A \rightarrow A =_{def}
+                        \mathrm{transport} : A(0) \rightarrow A(1) =_{def}
                     $$
                 +tex(true).
                     $$
-                        \prod_{A:U}\prod_{x,y:A}\prod_{p:x=_A y}
+                        \prod_{A:I\rightarrow U}\prod_{r:I}
                     $$
                 +tex(true).
                     $$
-                        \lambda u,[i]\mathbf{transp}([j]\mathrm{const}(A,U,A) p@j,i,u).
+                        \lambda x,\mathbf{transp}([i]A(i),0,x).
                     $$
                 +code.
                     def transp' (A: U) (x y: A) (p : PathP (&lt;_>A) x y) (i: I)
@@ -160,10 +163,90 @@ block content
                      := transp (&lt;i> (\(_:U),U) (p @ i)) i A
                 br.
                 +tex.
+                    $\mathbf{Definition}$ (Partial Elements).
+                +tex(true).
+                    $$
+                         \mathrm{Partial} : V =_{def} \prod_{A:U}\prod_{i:I}\mathbf{Partial}(A,i).
+                    $$
+                +code.
+                    def Partial' (A : U) (i : I)
+                      : V := Partial A i
+                br.
+                +tex.
+                    $\mathbf{Definition}$ (Cubical Subtypes).
+                +tex(true).
+                    $$
+                         \mathrm{Subtype} : V =_{def}
+                    $$
+                +tex(true).
+                    $$
+                         \prod_{A:U}\prod_{i:I}\prod_{u:\mathbf{Partial}(A,i)}A[i \mapsto u].
+                    $$
+                +code.
+                    def sub (A : U) (i : I) (u : Partial A i)
+                      : V := A [i ↦ u]
+                br.
+                +tex.
+                    $\mathbf{Definition}$ (Cubical Elements).
+                +tex(true).
+                    $$
+                         \mathrm{inS}^i : \prod_{A:U}\prod_{i:I}\prod_{a:A} A\ [(i=1) \mapsto a ] =_{def}
+                    $$
+                +tex(true).
+                    $$
+                         \mathbf{inc}(A,i,a).
+                    $$
+                +tex(true).
+                    $$
+                         \mathrm{outS}^i : A\ [i \mapsto u] \rightarrow A =_{def} 
+                    $$
+                +tex(true).
+                    $$
+                            \prod_{A:U}\prod_{i:I}\prod_{u:\mathbf{Partial}(A,i)}
+                            \mathbf{ouc}(a).
+                    $$
+                +code.
+                    def inc′ (A : U) (i : I) (a : A)
+                      : sub A i [(i = 1) → a] := inc A i a
+
+                    def ouc′ (A : U) (i : I) (u : Partial A i)
+                      : A [i ↦ u] -> A := λ (a: A[i ↦ u]), ouc a
+                br.
+                +tex.
+                    $\mathbf{Definition}$ (Heterogeneous Composition Kan Operation).
+                +tex(true).
+                    $$
+                         \mathrm{comp}_{\mathrm{CCHM}} : A(0)\ [r \mapsto u(0)] \rightarrow A(1) =_{def} 
+                    $$
+                +tex(true).
+                    $$
+                         \prod_{A:U}\prod_{r:I} \prod_{u: \Pi_{i:I}\mathbf{Partial}(A(i),r)}
+                    $$
+                +tex(true).
+                    $$
+                         \lambda u_0, \mathbf{hcomp}(A(1),r,
+                    $$
+                +tex(true).
+                    $$
+                         \lambda i.[(r=1) \rightarrow \mathbf{transp}([j]A(i\meet j),i,u(i,1=1)) ],
+                    $$
+                +tex(true).
+                    $$
+                         \mathbf{transp}([i]A(i),0,\mathbf{ouc}(u_0))).
+                    $$
+                +code.
+                    def comp (A : I → U) (r : I)
+                        (u : Π (i : I), Partial (A i) r)
+                        (u₀ : (A 0)[r ↦ u 0]) : A 1
+                     := hcomp (A 1) r (λ (i : I),
+                        [ (r = 1) → transp (&lt;j> A (i ∨ j)) i (u i 1=1)])
+                          (transp (&lt;i> A i) 0 (ouc u₀))
+                br.
+                +tex.
                     $\mathbf{Definition}$ (Homogeneous Composition Kan Operation).
                 +tex(true).
                     $$
-                         \mathrm{composition} : A\ [r \mapsto u(0)] \rightarrow A =_{def} 
+                         \mathrm{comp}_{\mathrm{CHM}} : A\ [r \mapsto u(0)] \rightarrow A =_{def} 
                     $$
                 +tex(true).
                     $$
@@ -171,15 +254,12 @@ block content
                     $$
                 +tex(true).
                     $$
-                         \lambda u_0,[i]\mathbf{hcomp}(A,r,u,\mathbf{ouc}(u_0)).
+                         \lambda u_0, \mathbf{hcomp}(A,r,u,\mathbf{ouc}(u_0)).
                     $$
                 +code.
                     def hcomp' (A : U) (r : I)
                         (u : I → Partial A r) (u₀ : A[r ↦ u 0]) : A
                      := hcomp A r u (ouc u₀)
-
-                    def hcomp-ε (A : U) (a : A)
-                     := hcomp A 0 (λ (i : I), []) a
                 br.
                 +tex.
                     $\mathbf{Theorem}$ (Substitution).

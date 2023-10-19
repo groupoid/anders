@@ -1,10 +1,10 @@
 module proto where
 
 def ¬ (A : U) := A → 𝟎
-
 def ∘ᵀ (A B C: U) : U := (B → C) → (A → B) → (A → C)
 def ∘ (A B C : U) : ∘ᵀ A B C := λ (g : B → C) (f : A → B) (x : A), g (f x)
-
 def idᵀ (A : U) : U := A → A
 def id (A : U) (a : A) : A := a
 def const (A B : U) : A → B → A := λ (a : A) (b : B), a
+def const₁ (A : U) : A → 𝟏 := const 𝟏 A ★
+def LineP (A : I → U) : V := Π (i : I), A i

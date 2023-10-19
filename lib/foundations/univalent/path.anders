@@ -20,11 +20,6 @@
 module path where
 import lib/foundations/mltt/proto
 
--- Proto
-
-def const₁ (A : U) : A → 𝟏 := const 𝟏 A ★
-def LineP (A : I → U) : V := Π (i : I), A i
-
 -- Path Equality
 
 def Path (A : U) (x y : A) : U := PathP (<_> A) x y
@@ -90,12 +85,24 @@ def 1=1 : 1= 1 := ref 1
 def UIP (A : V) (a b : A) (p q : Id A a b) : Id (Id A a b) p q := ref p
 def Id-V (A : V) (a b : A) : V := Id A a b
 def Id-ref (A : V) (a: A) : Id A a a := ref a
+def ≤ (i j : I) := Id I (i ∧ j) i
+def ≥ (i j : I) := ≤ j i
+def ∧-split (i j : I) : Partial (1= i) (i ∧ j) := [(i = 1) (j = 1) → 1=1]
 def Jˢ (A : V) (C : Π (a x : A), Id A a x -> V) (a x : A) (c : C a a (ref a)) (p : Id A a x) : C a x p := idJ A C a c x p
 def Jˢ-β (A : V) (C : Π (a b : A), Id A a b -> V) (a : A) (c : C a a (ref a)) : Id (C a a (ref a)) (Jˢ A C a a c (ref a)) c := ref c
 def rev (A : V) (a b : A) (p : Id A a b) : Id A b a := idJ A (λ (a b : A) (_ : Id A a b), Id A b a) a (ref a) b p
 def comp-Id (A : V) (a b c : A) (p : Id A a b) (q : Id A b c) : Id A a c := idJ A (λ (b c : A) (_ : Id A b c), Id A a c) b p c q
 def cong-Id (A B : V) (f : A -> B) (a b : A) (p : Id A a b) : Id B (f a) (f b) := idJ A (λ (a b : A) (_ : Id A a b), Id B (f a) (f b)) a (ref (f a)) b p
-
+def ∨-left (i j : I) (p : 1= i) : 1= (i ∨ j) := idJ I (λ (i i′ : I) (_ : Id I i i′), Id I 1 (i′ ∨ j)) 1 1=1 i p
+def ∨-right (i j : I) (p : 1= j) : 1= (i ∨ j) := ∨-left j i p
+def ∨-max-left  (i j : I) : ≤ i (i ∨ j) := ref i
+def ∨-max-right (i j : I) : ≤ j (i ∨ j) := ref j
+def ∧-1 (i j : I) (p : 1= (i ∧ j)) : 1= i := ∧-split i j p
+def ∧-1′ (i j : I) (p : 1= (i ∧ j)) : 1= i := cong-Id I I (λ (k : I), k ∨ i) 1 (i ∧ j) p
+def ∧-min-left  (i j : I) : ≤ (i ∧ j) i := ref (i ∧ j)
+def ∧-min-right (i j : I) : ≤ (i ∧ j) j := ref (i ∧ j)
+def ∧-to-∨ (i j : I) (p : Id I (i ∧ j) i) : Id I (i ∨ j) j
+ := rev I j (i ∨ j) (cong-Id I I (λ (k : I), k ∨ j) (i ∧ j) i p)
 def φ (i : I) : Partial U₁ (i ∨ -i) := [(i = 0) → U, (i = 1) → U → U]
 def φ′ (i : I) : Partial U₁ (i ∨ -i) := [(i = 1) → U → U, (i = 0) → U]
 def ψ (i j : I) : Partial U₁ (-i ∨ i ∨ (i ∧ j)) := [(i = 1) → U, (i = 1) (j = 1) → U, (i = 0) → U → U]
@@ -106,20 +113,11 @@ def ρ (i j : I) : Partial U₁ (-i ∨ (i ∧ j)) := [(i = 0) → U, (i = 1) (j
 def κ : Partial U₁ 1 := [(1 = 1) → U]
 def θ (A B : U) (a : A) (b : B) (φ : I) : PartialP [(φ = 0) → A, (φ = 1) → B] (φ ∨ -φ) := [(φ = 0) → a, (φ = 1) → b]
 def partial-app-test (A : U) (a : A) (φ : I) (p : 1= φ) : A := [(φ = 1) → a] p
-
-def ≤ (i j : I) := Id I (i ∧ j) i
-def ≥ (i j : I) := ≤ j i
-
-def ∧-split (i j : I) : Partial (1= i) (i ∧ j) := [(i = 1) (j = 1) → 1=1]
-def ∨-left (i j : I) (p : 1= i) : 1= (i ∨ j) := idJ I (λ (i i′ : I) (_ : Id I i i′), Id I 1 (i′ ∨ j)) 1 1=1 i p
-def ∨-right (i j : I) (p : 1= j) : 1= (i ∨ j) := ∨-left j i p -- works due to commutativity of ∨
-def ∧-1 (i j : I) (p : 1= (i ∧ j)) : 1= i := ∧-split i j p
-def ∧-1′ (i j : I) (p : 1= (i ∧ j)) : 1= i := cong-Id I I (λ (k : I), k ∨ i) 1 (i ∧ j) p
-def ∧-min-left  (i j : I) : ≤ (i ∧ j) i := ref (i ∧ j)
-def ∧-min-right (i j : I) : ≤ (i ∧ j) j := ref (i ∧ j)
-def ∨-max-left  (i j : I) : ≤ i (i ∨ j) := ref i
-def ∨-max-right (i j : I) : ≤ j (i ∨ j) := ref j
-def ∧-to-∨ (i j : I) (p : Id I (i ∧ j) i) : Id I (i ∨ j) j := rev I j (i ∨ j) (cong-Id I I (λ (k : I), k ∨ j) (i ∧ j) i p)
+def 0-is-min (i : I) : ≤ 0 i := ref 0
+def 1-is-max (i : I) : ≤ i 1 := ref i
+def ε (A : U) : Partial A 0 := []
+def I-nontriv (p : Id I 0 1) : 𝟎 := ε 𝟎 (rev I 0 1 p)
+def 0≥1-impl-absurd : (≥ 0 1) → 𝟎 := I-nontriv
 
 def ≤-asymm (i j : I) (p : ≤ i j) (q : ≤ j i) : Id I i j := comp-Id I i (i ∧ j) j (rev I (i ∧ j) i p) q
 def ≤-refl (i : I) : ≤ i i := ref i
@@ -129,43 +127,34 @@ def ≤-trans (i j k : I) (p : ≤ i j) (q : ≤ j k) : ≤ i k
       (rev I (i ∧ j ∧ k) (i ∧ k) (cong-Id I I (min k) (i ∧ j) i p))
       (cong-Id I I (min i) (j ∧ k) j q)) p
 
-def 0-is-min (i : I) : ≤ 0 i := ref 0
-def 1-is-max (i : I) : ≤ i 1 := ref i
+--- Simplex Encoding
 
 def Δ² := Σ (i j : I), ≤ i j
-
 def Δ²-1 : Δ² := (0, 0, ref 0)
 def Δ²-2 : Δ² := (0, 1, ref 0)
 def Δ²-3 : Δ² := (1, 1, ref 1)
-
 def Δ²-1-2 : PathP (<_> Δ²) Δ²-1 Δ²-2 := <i> (0, i, ref 0)
 def Δ²-2-3 : PathP (<_> Δ²) Δ²-2 Δ²-3 := <i> (i, 1, ref i)
 def Δ²-1-3 : PathP (<_> Δ²) Δ²-1 Δ²-3 := <i> (i, i, ref i)
 
 def Δ³ := Σ (i j k : I), (≤ i j) × (≤ j k)
-
 def Δ³-1 : Δ³ := (0, 0, 0, ref 0, ref 0)
 def Δ³-2 : Δ³ := (0, 0, 1, ref 0, ref 0)
 def Δ³-3 : Δ³ := (0, 1, 1, ref 0, ref 1)
 def Δ³-4 : Δ³ := (1, 1, 1, ref 1, ref 1)
-
 def Δ³-1-2 : PathP (<_> Δ³) Δ³-1 Δ³-2 := <i> (0, 0, i, ref 0, ref 0)
 def Δ³-2-3 : PathP (<_> Δ³) Δ³-2 Δ³-3 := <i> (0, i, 1, ref 0, ref i)
 def Δ³-1-3 : PathP (<_> Δ³) Δ³-1 Δ³-3 := <i> (0, i, i, ref 0, ref i)
-
 def Δ³-1-4 : PathP (<_> Δ³) Δ³-1 Δ³-4 := <i> (i, i, i, ref i, ref i)
 def Δ³-2-4 : PathP (<_> Δ³) Δ³-2 Δ³-4 := <i> (i, i, 1, ref i, ref i)
 def Δ³-3-4 : PathP (<_> Δ³) Δ³-3 Δ³-4 := <i> (i, 1, 1, ref i, ref 1)
-
-def ε (A : U) : Partial A 0 := []
-def I-nontriv (p : Id I 0 1) : 𝟎 := ε 𝟎 (rev I 0 1 p)
-def 0≥1-impl-absurd : (≥ 0 1) → 𝟎 := I-nontriv
 
 -- Cubical Subtypes
 
 def seg : PathP (<_> I) 0 1 := <i> i
 def Partial-app (A : U) (i : I) (u : Partial A i) (p : 1= i) : A := u p
-def Id-path (A : U) (a b : A) : Id A a b → Path A a b := idJ A (λ (a b : A) (_ : Id A a b), Path A a b) a (<_> a) b
+def Id-path (A : U) (a b : A) : Id A a b → Path A a b
+ := idJ A (λ (a b : A) (_ : Id A a b), Path A a b) a (<_> a) b
 def Partial' (A : U) (i : I) : V := Partial A i
 def sub (A : U) (i : I) (u : Partial A i) : V := A[i ↦ u]
 def inc′ (A : U) (i : I) (a : A) : sub A i [(i = 1) → a] := inc A i a
@@ -184,9 +173,9 @@ def Path′-Path-Path′ (A : U) (a b : A) (p : Path′ A a b)
 
 def transp' (A: I → U) (r: I) : A 0 -> A 1 := \ (a: A 0), transp (<i>A i) 0 a
 def transp¹ (A: U) (x y: A) (p : PathP (<_>A) x y) (i: I) := transp (<i> (\(_:A),A) (p @ i)) i x
-def transpᵁ        (A B: U) (p : PathP (<_>U) A B) (i: I) := transp (<i> (\(_:U),U) (p @ i)) i A
-def transpᵋ        (A B: U) (p : PathP (<_>U) A B) := transp (<i> (\(_:U),U) (p @ i)) 0 A
 def transp⁰ (A: U) (x y: A) (p : PathP (<_>A) x y) := transp (<i> (\(_:A),A) (p @ i)) 0 x
+def transpᵁ (A B: U) (p : PathP (<_>U) A B) (i: I) := transp (<i> (\(_:U),U) (p @ i)) i A
+def transpᵋ (A B: U) (p : PathP (<_>U) A B) := transp (<i> (\(_:U),U) (p @ i)) 0 A
 
 def trans (A B : U) (p : PathP (<_> U) A B) : A → B := transp p 0
 def trans⁻¹ (A B : U) (p : PathP (<_> U) A B) : B → A := transp (<i> p @ -i) 0
@@ -195,7 +184,6 @@ def coerce (A B: U) (p: PathP (<_> U) A B): A → B := λ (x : A), trans A B p x
 def transId (A : U) : A → A := transp (<_> A) 1
 def pcomp (A : U) (a b c : A) (p : Path A a b) (q : Path A b c) : Path A a c
  := <i> hcomp A (∂ i) (λ (j : I), [(i = 0) → a, (i = 1) → q @ j]) (p @ i)
---- subst A (Path A a) b c q p
 
 def trans⁻¹-trans (A B : U) (p : PathP (<_> U) A B) (b : B)
   : Path B (trans A B p (trans⁻¹ A B p b)) b
@@ -384,10 +372,5 @@ def idfun′=idfun″ (A : U) : Path (A → A) (idfun′ A) (idfun″ A)
  := comp-Path (A → A) (idfun′ A) (idfun A) (idfun″ A) (<i> idfun=idfun′ A @ -i) (idfun=idfun″ A)
 
 def 𝟏-contr : Π (x : 𝟏), Path 𝟏 x ★ := ind₁ (λ (x : 𝟏), Path 𝟏 x ★) (<_> ★)
-
--- lemmas
-
-def contr-impl-prop (A : U) (H : isContr A) : isProp A :=
-λ (a b : A), <i> hcomp A (∂ i) (λ (j : I), [(i = 0) → H.2 a @ j, (i = 1) → H.2 b @ j]) H.1
-
-def Circle := Σ (base: 𝟎) (loop: Π (i : I), 𝟎 [i ∨ -i ↦ [(i = 0) → base, (i = 1) → base]]), 𝟏
+def contr-impl-prop (A : U) (H : isContr A) : isProp A
+ := λ (a b : A), <i> hcomp A (∂ i) (λ (j : I), [(i = 0) → H.2 a @ j, (i = 1) → H.2 b @ j]) H.1

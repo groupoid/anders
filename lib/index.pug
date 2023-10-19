@@ -16,20 +16,34 @@ block content
     article.main
         .exe
             section
-            h1 HOMOTOPY LIBRARY
+            h1 ОСНОВИ МАТЕМАТИКИ
             aside
-                time Published: 29 JAN 2022
+                time Published: 19 OCT 2023
             p.
-                Homotopy Library for <a href="../index.html">Anders</a>
-                proof assistant consists of two parts Foundations and Mathematics just
-                as <a href="https://homotopytypetheory.org/book/">HoTT Book</a>.
-                Before using library you may want to read
-                <a href="../intro/index.html">our intro</a> to type theory.
+                Тут представлена базова бібліотека мови Anders для курсу «Теорія типів»,
+                яка сумісна з позначеннями підручника HoTT. Серед принципів, якими
+                керуються бібліотекарі, головними є: лаконічность,
+                академічність, педагогічність. Кожна сторінка має на меті
+                повністю висвітлити компоненти типу, використовуючи тільки
+                ті типи, що були викладені попередньо, кожне визначення повинно містити
+                як математичну нотацію так і код верифікатора та бути вичерпним посібником
+                користувача мови програмування Anders та її базової бібліотеки.
+                Загалом передбачається, що бібліотека повинна відповідати підручнику HoTT,
+                та бути його практичним досліднидницьким артефактом.
+            p.
+                Короткий <a href="../intro/index.html">вступ</a>
+                в теорію типів розкриває систему спряжень у яку
+                вбудовуються фундаментальні типи, ідентифікаційні системи та модальності.
 
-            h2 Foundations
+            h2 Основи
             p.
-                Modal Univalent MLTT Foundations represent a basic
-                language primitives of HoTT, <b>Anders</b> and its base library.
+                Модальні унівалентні MLTT основи розділені на три частини.
+                Перша частина містить класичні типи MLTT системи описані Мартіном-Льофом.
+                Друга частина містить унівалентні ідентифікаційні системи.
+                Третя частина містить модальності, які використовуються в
+                диференціальній геометріїї та в теорії гомотопій. Основи пропонують
+                фундаментальний базис який використовується для формалізації
+                сучасної математики в таких системах доведення теорем як: Coq, Agda, Lean.
 
             section
                 .macro
@@ -62,9 +76,11 @@ block content
                             li: a(href='../foundations/modal/infinitesimal/index.html') Infinitesimal
                             <!-- li: a(href='../foundations/modal/process/index.html') Process -->
 
-            h2 Mathematics
+            h2 Математики
             p.
-                The second part is dedicated to mathematical models and theories internalized in this language.
+                Друга частина базової бібліотеки містить формалізації математичних теорій
+                з різних галузей математики: аналіз, алгебра, геометрія, теорія гомотопій,
+                теорія категорій.
 
             section
                 .macro

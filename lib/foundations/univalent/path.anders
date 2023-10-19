@@ -67,11 +67,6 @@ def subst_comp (A: U) (P: A → U) (a: A) (e: P a): Path (P a) e (subst A P a a 
 def J-β (A : U) (a : A) (C : D A) (d: C a a (idp A a)) : Path (C a a (idp A a)) d (J A a C d a (idp A a))
  := subst_comp (singl A a) (\ (z: singl A a), C a (z.1) (z.2)) (eta A a) d
 
--- (<i j> p @ i /\ j) @ 0 ≡ <j> p @ 0 /\ j ≡ <j> p @ 0 ≡ <_> a,
--- (<i j> p @ i /\ j) @ 1 ≡ <j> p @ 1 /\ j ≡ <j> p @ j ≡ p,
--- but it doesn’t check since <j> p @ i /\ j : Path A (p @ i /\ 0) (p @ i /\ 1) ≡ Path A a (p @ i), which is “Path A a a” only propositionally
--- def K (A : U) (a : A) (p : Path A a a) : Path (Path A a a) (<_> a) p := <i j> p @ i /\ j
-
 -- DNF solver
 
 def ∂ (i : I) := i ∨ -i
@@ -245,6 +240,8 @@ def trans-filler-p (A : U) (x y z : A) (p : Path A x y) (q : Path A y z) : PathP
  := <j i> hcomp A (-j ∨ ∂ i) (λ (k : I), [(i = 0) → x, (i = 1) → q @ (k ∧ j), (j = 0) → p @ i]) (p @ i)
 def trans-filler-q (A : U) (x y z : A) (p : Path A x y) (q : Path A y z) : PathP (<i> Path A (p @ -i) z) q (pcomp A x y z p q)
  := <j i> hcomp A (-j ∨ ∂ i) (λ (k : I), [(i = 0) → p @ -j, (i = 1) → q @ k, (j = 0) → q @ i /\ k]) (p @ i \/ -j)
+
+-- Groupoid Properties
 
 def comp-Path (A : U) (a b c : A) (p : Path A a b) (q : Path A b c) : Path A a c
  := <i> hcomp A (∂ i) (λ (j : I), [(i = 0) → a, (i = 1) → q @ j]) (p @ i)

@@ -29,7 +29,7 @@ block content
                 over base $B$.
             +tex(true).
                 $$
-                    \simeq_{A,B}\hspace{.4em}=_U\mathbf{Equiv}(A,B) : U =_{def}
+                    A\simeq B : U\hspace{.4em}=_{def}\mathbf{Equiv}(A,B) : U =_{def}
                 $$
             +tex(true).
                 $$
@@ -58,12 +58,12 @@ block content
             h2 Introduction
             +tex.
                 $\mathbf{Definition}$ (Fiberwise Reflection).
-                There is a fiberwise instance $\mathrm{idEquiv}$
-                of $\mathrm{Equiv}(A,A)$ that is derived
-                as $(\mathrm{id},\mathrm{isContrSingl}(A))$:
+                There is a fiberwise instance $\mathrm{id_\simeq}$
+                of $A\simeq A$ that is derived
+                as $(\mathrm{id}(A),\mathrm{isContrSingl}(A))$:
             +tex(true).
                 $$
-                    \mathrm{idEquiv}_A : \mathbf{Equiv}(A,A).
+                    \mathrm{id}_\simeq : \mathbf{Equiv}(A,A).
                 $$
             +code.
                 def singl (A: U) (a: A): U
@@ -86,11 +86,11 @@ block content
             +tex.
                 $\mathbf{Definition}$ (Fiberwise Induction Principle).
                 For any $C : A \rightarrow B \rightarrow \mathrm{Equiv}(A,B)\rightarrow U$
-                and it's evidence $d$ at $(a,a,\mathrm{idEquiv}_A)$
+                and it's evidence $d$ at $(a,a,\mathrm{id_\simeq}(a))$
                 there is a function:
             +tex(true).
                 $$
-                  \mathbf{ind}_{\mathrm{Equiv}}(C,d) : \mathrm{Equiv}(A,B)\rightarrow C(A,B,p).
+                  \mathbf{ind}_{\mathrm{Equiv}}(C,d) : A\simeq B \rightarrow C(A,B,p).
                 $$
             +code.
                 def ind-Equiv (A B: U)

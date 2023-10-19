@@ -63,9 +63,9 @@ def subst (A : U) (P : A -> U) (a b : A) (p : Path A a b) (e : P a) : P b := tra
 def D (A : U) : U₁ ≔ Π (x y : A), Path A x y → U
 def J (A: U) (x: A) (C: D A) (d: C x x (idp A x)) (y: A) (p: Path A x y): C x y p
  := subst (singl A x) (\ (z: singl A x), C x (z.1) (z.2)) (eta A x) (y, p) (contr A x y p) d
-def subst_comp (A: U) (P: A → U) (a: A) (e: P a): Path (P a) e (subst A P a a (idp A a) e) := trans_comp (P a) e
+def subst-comp (A: U) (P: A → U) (a: A) (e: P a): Path (P a) e (subst A P a a (idp A a) e) := trans_comp (P a) e
 def J-β (A : U) (a : A) (C : D A) (d: C a a (idp A a)) : Path (C a a (idp A a)) d (J A a C d a (idp A a))
- := subst_comp (singl A a) (\ (z: singl A a), C a (z.1) (z.2)) (eta A a) d
+ := subst-comp (singl A a) (\ (z: singl A a), C a (z.1) (z.2)) (eta A a) d
 
 -- DNF solver
 

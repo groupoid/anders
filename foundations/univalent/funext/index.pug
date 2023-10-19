@@ -22,12 +22,12 @@ block content
                 time Published: 19 OCT 2023
             +tex.
                 Here is presented two packages of homotopy, denoted as
-                $\mathbf{Htpy}(f,g)$ or $f\sim g$, between two
+                $f\sim g$, between two
                 functions $f,g: A \rightarrow B$ from function space.
                 The first is isomorphism structure with
                 $\mathbf{funext}\hspace{0.05em}\mbox{-}\mathbf{happly}$
-                encode-decode and $\mathbf{\beta}\hspace{0.1em}\mbox{-}\mathbf{\eta}$
-                as section-retract pairs; and the second is identity
+                as encode-decode functions and $\mathbf{\beta}\hspace{0.1em}\mbox{-}\mathbf{\eta}$
+                as section-retract properties of $\mathbf{Iso}(A,B)$; and the second is identity
                 system structure with reflection $\mathbf{id}_\sim$
                 and induction principle $\mathbf{ind}_\sim$.
 
@@ -37,7 +37,7 @@ block content
                 the $\mathbf{Path}$ equality of functions $f,g: A \rightarrow B$.
             +tex(true).
                 $$
-                        \sim : U =_{def} \prod_{A,B:U} \prod_{f,g: A \rightarrow B} f \equiv g
+                        \sim\hspace{0.3em} : U =_{def} \prod_{A,B:U} \prod_{f,g: A \rightarrow B} f \equiv g
                 $$.
             +code.
                 def ~ (A B: U) (f g: A -> B)
@@ -46,7 +46,7 @@ block content
 
             h2 Introduction
             +tex.
-                $\mathbf{Definition}$ (Homotopy Introduction).
+                $\mathbf{Definition}$ (Homotopy Introduction, Function Extensionality).
             +code.
                 def funext (A B: U) (f g: A → B)
                     (p: Π (x: A), Path B (f x) (g x))

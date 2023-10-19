@@ -116,7 +116,7 @@ block content
                     $\mathbf{Theorem}$ (Congruence).
                 +tex(true).
                     $$
-                        \mathrm{ap} : f(a)\equiv f(b) =_{def} 
+                        \mathrm{ap} : f(a)\equiv f(b) =_{def}
                     $$
                 +tex(true).
                     $$
@@ -190,7 +190,7 @@ block content
                     $\mathbf{Definition}$ (Cubical Elements).
                 +tex(true).
                     $$
-                         \mathrm{inS}^i :  A\ [(i=1) \mapsto a ] =_{def}
+                         \mathrm{inS} :  A\ [(i=1) \mapsto a ] =_{def}
                     $$
                 +tex(true).
                     $$
@@ -198,12 +198,12 @@ block content
                     $$
                 +tex(true).
                     $$
-                         \mathrm{outS}^i : A\ [i \mapsto u] \rightarrow A =_{def} 
+                         \mathrm{outS} : A\ [i \mapsto u] \rightarrow A =_{def}
                     $$
                 +tex(true).
                     $$
-                            \prod_{A:U}\prod_{i:I}\prod_{u:\mathbf{Partial}(A,i)}
-                            \mathbf{ouc}(a).
+                         \prod_{A:U}\prod_{i:I}\prod_{u:\mathbf{Partial}(A,i)}
+                         \mathbf{ouc}(a).
                     $$
                 +code.
                     def inS (A : U) (i : I) (a : A)
@@ -216,7 +216,7 @@ block content
                     $\mathbf{Definition}$ (Heterogeneous Composition Kan Operation).
                 +tex(true).
                     $$
-                         \mathrm{comp}_{\mathrm{CCHM}} : A(0)\ [r \mapsto u(0)] \rightarrow A(1) =_{def} 
+                         \mathrm{comp}_{\mathrm{CCHM}} : A(0)\ [r \mapsto u(0)] \rightarrow A(1) =_{def}
                     $$
                 +tex(true).
                     $$
@@ -228,7 +228,7 @@ block content
                     $$
                 +tex(true).
                     $$
-                         \lambda i.[(r=1) \rightarrow \mathbf{transp}([j]A(i\meet j),i,u(i,1=1)) ],
+                         \lambda i.[(r\hspace{0.1em}\mbox{=}1)\hspace{-0.2em}\rightarrow\hspace{-0.2em}\mathbf{transp}([j]A(i\meet j),i,u(i,1\hspace{0em}\mbox{=}1)) ],
                     $$
                 +tex(true).
                     $$
@@ -246,7 +246,7 @@ block content
                     $\mathbf{Definition}$ (Homogeneous Composition Kan Operation).
                 +tex(true).
                     $$
-                         \mathrm{comp}_{\mathrm{CHM}} : A\ [r \mapsto u(0)] \rightarrow A =_{def} 
+                         \mathrm{comp}_{\mathrm{CHM}} : A\ [r \mapsto u(0)] \rightarrow A =_{def}
                     $$
                 +tex(true).
                     $$
@@ -263,14 +263,25 @@ block content
                 br.
                 +tex.
                     $\mathbf{Theorem}$ (Substitution).
+                +tex(true).
+                    $$
+                         \mathrm{subst} : P(x) \rightarrow P(y) =_{def}
+                    $$
+                +tex(true).
+                    $$
+                         \prod_{A:U}\prod_{P:A\rightarrow U}\prod_{x,y:A}\prod_{p:x=y}
+                    $$
+                +tex(true).
+                    $$
+                         \lambda e.\mathbf{transp}([i] P (p @ i),0,e).
+                    $$
                 +code.
-                    def subst (A: U) (P: A -> U) (a b: A) (p: Path A a b)
-                      : P a -> P b
-                     := λ (e: P a), transp (&lt;i> P (p @ i)) 0 e
-                p.
-                    Acts like transport of mapOnPath value, representing the
-                    dependent function transport or substitution.
-
+                    def subst (A: U) (P: A -> U) (x y: A) (p: Path A x y)
+                      : P x -> P y
+                     := λ (e: P x), transp (&lt;i> P (p @ i)) 0 e
+                br.
+                +tex.
+                    Other synonyms are $\mathrm{mapOnPath}$ and $\mathrm{cong}$.
                 +tex.
                     $\mathbf{Theorem}$ (Path Composition).
                 +tex(true).
@@ -290,7 +301,6 @@ block content
                     in a connected point. The proofterm is
                     $\mathbf{comp}([i] \mathbf{Path}_A(a,q@i),p,[])$.
 
-
                 h2 Elimination
 
                 +tex.
@@ -299,8 +309,8 @@ block content
                     def singl (A: U) (a: A) : U
                      := Σ (x: A), Path A a x
 
-                    def contrSingl (A: U) (a b: A) (p: Path A a b)
-                      : Path (singl A a) (a,refl A a) (b,p)
+                    def contr (A: U) (a b: A) (p: Path A a b)
+                      : Path (singl A a) (a,<_>a) (b,p)
                 +tex.
                     Proof that singleton is contractible space. Implemented as
                     $[i] (p @ i, [j] p @ (i \land j))$.
@@ -317,8 +327,6 @@ block content
                     J is formulated in a form of Paulin-Mohring and implemented using
                     two facts that singletons are contractible and dependent function
                     transport.
-
-                h2 
                 +tex.
                     $\mathbf{Definition}$ (HoTT Dependent Eliminator).
                 +code.

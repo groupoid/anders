@@ -37,6 +37,11 @@ def Path-η (A : U) (x y : A) (p : Path A x y) : Path (Path A x y) p (<i> p @ i)
 def idp-left (A : U) (x y : A) (p : Path A x y) : Path (Path A x x) (<_> x) (<_> p @ 0) := <_ _> x
 def idp-right (A : U) (x y : A) (p : Path A x y) : Path (Path A y y) (<_> y) (<_> p @ 1) := <_ _> y
 def sym-sym-eq-idp (A : U) (x y : A) (p : Path A x y) : Path (Path A x y) p (sym A y x (sym A x y p)) := <_> p
+def isProp (A : U) : U := Π (a b : A), Path A a b
+def isSet (A : U) : U := Π (a b : A) (a0 b0 : Path A a b), Path (Path A a b) a0 b0
+def isGroupoid (A : U) : U := Π (a b : A) (x y : Path A a b) (i j : Path (Path A a b) x y), Path (Path (Path A a b) x y) i j
+def SET : U₁ := Σ (X : U), isSet X
+def Ω : U₁ := Σ (A : U), isProp A
 def section (A B : U) (f : A -> B) (g : B -> A) : U := Π (b : B), Path B (f (g b)) b
 def retract (A B : U) (f : A -> B) (g : B -> A) : U := Π (a : A), Path A (g (f a)) a
 def hmtpy (A : U) (x y : A) (p : Path A x y) : Path (Path A x x) (<_> x) (<i> p @ i /\ -i) := <j i> p @ j /\ i /\ -i
@@ -44,11 +49,6 @@ def plam (A : U) (f : I → A) : Path A (f 0) (f 1) := <i> f i
 def elim (A : U) (a b : A) (p : Path A a b) : I → A := λ (i : I), p @ i
 def plam-elim (A : U) (f : I → A) : Id (I → A) (elim A (f 0) (f 1) (plam A f)) f := ref f
 def elim-plam (A : U) (a b : A) (p : Path A a b) : Path (Path A a b) (plam A (elim A a b p)) p := <_> p
-def isProp (A : U) : U := Π (a b : A), Path A a b
-def isSet (A : U) : U := Π (a b : A) (a0 b0 : Path A a b), Path (Path A a b) a0 b0
-def isGroupoid (A : U) : U := Π (a b : A) (x y : Path A a b) (i j : Path (Path A a b) x y), Path (Path (Path A a b) x y) i j
-def SET : U₁ := Σ (X : U), isSet X
-def Ω : U₁ := Σ (A : U), isProp A
 
 -- Computational Properties
 
@@ -156,10 +156,10 @@ def Partial-app (A : U) (i : I) (u : Partial A i) (p : 1= i) : A := u p
 def Id-path (A : U) (a b : A) : Id A a b → Path A a b
  := idJ A (λ (a b : A) (_ : Id A a b), Path A a b) a (<_> a) b
 def Partial' (A : U) (i : I) : V := Partial A i
-def sub (A : U) (i : I) (u : Partial A i) : V := A[i ↦ u]
+def sub (A : U) (i : I) (u : Partial A i) : V := A [i ↦ u]
 def inc′ (A : U) (i : I) (a : A) : sub A i [(i = 1) → a] := inc A i a
-def ouc′ (A : U) (i : I) (u : Partial A i) (a : A[i ↦ u]) : A := ouc a
-def ouc'' (A : U) (i : I) (u : Partial A i) : A [i ↦ u] -> A := λ (a: A[i ↦ u]), ouc a
+def ouc′ (A : U) (i : I) (u : Partial A i) (a : A [i ↦ u]) : A := ouc a
+def ouc'' (A : U) (i : I) (u : Partial A i) : A [i ↦ u] -> A := λ (a: A [i ↦ u]), ouc a
 
 def Path′ (A : U) (a b : A) := Π (i : I), A [∂ i ↦ [(i = 0) → a, (i = 1) → b]]
 def Path-Path′ (A : U) (a b : A) (p : Path A a b) : Path′ A a b := λ (i : I), inc A (∂ i) (p @ i)

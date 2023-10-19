@@ -50,8 +50,7 @@ def isEquiv₁ (A : U₁) (B : U) (f : A → B) : U₁ := Π (y : B), isContr₁
 --- Equiv as Indentity System
 
 def D-equiv := Π (A B: U), equiv A B → U₁
-axiom J-equiv (A B: U) (C: D-equiv)
-    (d: C A A (idEquiv A)) (p: equiv A B) : C A B p
+axiom J-equiv (A B: U) (C: D-equiv) (d: C A A (idEquiv A)) (p: equiv A B) : C A B p
 -- := subst₁ (singl₁ U A) (\ (z: singl₁ U A), C A z.1 z.2) (A,<_>A) (B,p) (contr₁ U A B ((univ-intro A B) p)) d
 
 -- [Orton, Pitts] 2017

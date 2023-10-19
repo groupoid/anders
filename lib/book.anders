@@ -11,6 +11,7 @@ import lib/foundations/mltt/fin
 import lib/foundations/mltt/vec
 import lib/foundations/univalent/path
 import lib/foundations/univalent/prop
+import lib/foundations/univalent/extensionality
 import lib/foundations/univalent/equiv
 import lib/foundations/univalent/iso
 import lib/foundations/modal/infinitesimal

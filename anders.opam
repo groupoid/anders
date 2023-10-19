@@ -2,7 +2,7 @@ opam-version: "2.0"
 name: "anders"
 version: "1.4.0"
 maintainer: "Namdak Tonpa <maxim@synrc.com>"
-authors: [ "Groupoid Infinity @infinitystack" ]
+authors: [ "Groupoid Infinity" ]
 homepage: "https://anders.groupoid.space/"
 bug-reports: "https://github.com/groupoid/anders/issues"
 dev-repo: "https://github.com/groupoid/anders"

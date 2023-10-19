@@ -15,5 +15,5 @@ def isCCC (C: precategory): U
       (p2:    Π (A B: C.C.ob), C.C.hom (prod A B) B),
       terminal C
 
-def isLCCC (C: precategory) : U
- := Σ (slices: Π (x: C.C.ob), isCCC (sliceCat C C x (?,?,?,?,?))), unit
+--- def isLCCC (C: precategory) : U
+---  := Σ (slices: Π (x: C.C.ob), isCCC (sliceCat C C x (?,?,?,?,?))), unit

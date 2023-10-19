@@ -61,6 +61,7 @@ def z2 : List 𝟏 := cons 𝟏 ★ z1
 def append (A: U): List A -> List A -> List A
  := λ (x: List A), List-rec A (List A) x (λ (z: A) (_: List A)(zs: List A), cons A z zs)
 
+{-
 def z1=z1+z0 : Path (List 𝟏) z1 (append 𝟏 z0 z1)
  := List-ind 𝟏 (\(C: List 𝟏), Path (List 𝟏) z1 C)
                ?
@@ -73,4 +74,4 @@ def append-assoc (A: U)
                ?
                ?
                (append A xs (append A ys zs))
-
+-}

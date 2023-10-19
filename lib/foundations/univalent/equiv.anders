@@ -12,12 +12,12 @@
 module equiv where
 import lib/foundations/univalent/path
 
--- [Pelayo, Warren, Voevodsky] 2012
+--- [Pelayo, Warren, Voevodsky] 2012
 
-def fiber (A B : U) (f: A → B) (y : B): U := Σ (x : A), Path B y (f x)
+def fiber (A : U) (B: U) (f: A → B) (y : B) : U := Σ (x : A), Path B y (f x)
 def isEquiv (A B : U) (f : A → B) : U := Π (y : B), isContr (fiber A B f y)
-def equiv (A B : U) : U := Σ (f : A → B), isEquiv A B f -- 2.4.11
-def contrSingl (A : U) (a b : A) (p : Path A a b) : Path (Σ (x : A), Path A a x) (a,<_>a) (b,p) := <i> (p @ i, <j> p @ i /\ j)
+def equiv (A B : U) : U := Σ (f : A → B), isEquiv A B f
+def contrSingl (A : U) (a b : A) (p : PathP (<_>A) a b) : PathP (<_>Σ (x : A), PathP (<_>A) a x) (a,<_>a) (b,p) := <i> (p @ i, <j> p @ i /\ j)
 def idIsEquiv (A : U) : isEquiv A A (id A) := λ (a : A), ((a, <_> a), λ (z : fiber A A (id A) a), contrSingl A a z.1 z.2)
 def idEquiv (A : U) : equiv A A := (id A, isContrSingl A)
 def isInjective (A B : U) (f : A → B) : U := Π (x y : A), Path B (f x) (f y) → Path A x y
@@ -28,27 +28,8 @@ def embedding (A B : U) : U := Σ (f : A → B), isEmbedding A B f
 def inv-equiv (A B : U) (w : equiv A B) : B → A := λ (y : B), (w.2 y).1.1
 def ret-equiv (A B : U) (w : equiv A B) (y : B) : Path B (w.1 (inv-equiv A B w y)) y := <i> (w.2 y).1.2 @ -i
 def sec-equiv (A B : U) (w : equiv A B) (x : A) : Path A (inv-equiv A B w (w.1 x)) x := <i> ((w.2 (w.1 x)).2 (x, <j> w.1 x) @ i).1
-def Glue′   (A : U) (φ : I) (e : Partial (Σ (T : U), equiv T A) φ) : U := Glue A φ e
-def glue′   (A : U) (φ : I) (u : Partial (Σ (T : U), equiv T A × T) φ) (a : A[φ ↦ [(φ = 1) → (u 1=1).2.1.1 (u 1=1).2.2]]) := glue φ u (ouc a)
-def unglue′ (A : U) (φ : I) (e : Partial (Σ (T : U), equiv T A) φ) (b : Glue A φ e) : A := unglue φ e b
 
-def D-equiv := Π (A B: U), equiv A B → U
-axiom J-equiv (A B: U) (C: D-equiv)
-    (d: C A A (idEquiv A)) (p: equiv A B) : C A B p
-
-def hcomp-Glue (A : U) (φ : I) (e : Partial (Σ (T : U), equiv T A) φ)
-   (ψ : I) (u : I → Partial (Glue A φ [(φ = 1) → e 1=1]) ψ)
-   (u₀ : (Glue A φ [(φ = 1) → e 1=1])[ψ ↦ u 0]) : Glue A φ [(φ = 1) → e 1=1] :=
-hcomp (Glue A φ [(φ = 1) → e 1=1]) ψ (λ (i : I), [(ψ = 1) → u i 1=1]) (ouc u₀)
-
--- The notion of Univalence was discovered by Vladimir Voevodsky
--- as forth and back transport between fibrational equivalence
--- as contractability of fibers and homotopical multi-dimentional
--- heterogeneous path equality. The Equiv → Path type is called Univalence type,
--- where univalence intro is obtained by Glue type and elim (Path → Equiv) is
--- obtained by sigma transport from constant map.
-
--- Univalence Type (Equiv → Path)
+--- Univalence Type (Equiv → Path)
 
 def univ-formation (A B : U) := equiv A B → PathP (<_> U) A B
 def univ-intro (A B : U) : univ-formation A B := λ (e : equiv A B), <i> Glue B (∂ i) [(i = 0) → (A, e), (i = 1) → (B, idEquiv B)]
@@ -57,10 +38,40 @@ def univ-computation (A B : U) (p : PathP (<_> U) A B) : PathP (<_> PathP (<_> U
  := <j i> Glue B (j ∨ ∂ i) [(i = 0) → (A, univ-elim A B p), (i = 1) → (B, idEquiv B),
                             (j = 1) → (p @ i, univ-elim (p @ i) B (<k> p @ (i ∨ k)))]
 
+--- Nominal Lift to U₁
+
+def singl₁ (A : U₁) (a: A) : U₁ := Σ (x: A), PathP (<_>A) a x
+def contr₁ (A : U) (a b : A) (p : PathP (<_>A) a b) : PathP (<_>Σ (x : A), PathP (<_>A) a x) (a,<_>a) (b,p) := <i> (p @ i, <j> p @ i /\ j)
+def fiber₁ (A : U₁) (B: U) (f: A → B) (y : B) : U₁ := Σ (x : A), Path B y (f x)
+def subst₁ (A : U₁) (P : A -> U₁) (a b : A) (p : PathP (<_>A) a b) (e : P a) : P b := transp (<i> P (p @ i)) 0 e
+def isContr₁ (A : U₁) := Σ (x: A), Π (y: A), PathP (<_>A) x y
+def isEquiv₁ (A : U₁) (B : U) (f : A → B) : U₁ := Π (y : B), isContr₁ (fiber₁ A B f y)
+
+--- Equiv as Indentity System
+
+def D-equiv := Π (A B: U), equiv A B → U₁
+axiom J-equiv (A B: U) (C: D-equiv)
+    (d: C A A (idEquiv A)) (p: equiv A B) : C A B p
+-- := subst₁ (singl₁ U A) (\ (z: singl₁ U A), C A z.1 z.2) (A,<_>A) (B,p) (contr₁ U A B ((univ-intro A B) p)) d
+
 -- [Orton, Pitts] 2017
 
-def ua (A B : U) (p : equiv A B) : PathP (<_> U) A B := univ-intro A B p
-def ua' (A B : U) (p : PathP (<_> U) A B) : equiv A B := univ-elim A B p
---def ua'-IsEquiv (A B: U) := isEquiv (Path U A B) (equiv A B) (ua' A B)
-def ua-β (A B : U) (e : equiv A B) : Path (A → B) (trans A B (ua A B e)) e.1
+def ua  (A B : U) : equiv A B -> PathP (<_> U) A B := \ (p: equiv A B), univ-intro A B p
+def ua' (A B : U) : PathP (<_> U) A B -> equiv A B := \ (p: PathP (<_>U) A B), univ-elim A B p
+def ua'-IsEquiv (A B: U) := isEquiv₁ (PathP (<_>U) A B) (equiv A B) (ua' A B)
+def ua-β (A B : U) (e : equiv A B) : Path (A → B) (trans A B ((ua A B) e)) e.1
  := <i> λ (x : A), (idfun=idfun″ B @ -i) ((idfun=idfun″ B @ -i) ((idfun=idfun′ B @ -i) (e.1 x)))
+
+--- Primitives
+
+def Glue' (A : U) (φ : I) (e : Partial (Σ (T : U), equiv T A) φ) : U := Glue A φ e
+def glue' (A : U) (φ : I) (u : Partial (Σ (T : U), equiv T A × T) φ)
+    (a : A[φ ↦ [(φ = 1) → (u 1=1).2.1.1 (u 1=1).2.2]]) := glue φ u (ouc a)
+def unglue' (A : U) (φ : I) (e : Partial (Σ (T : U), equiv T A) φ)
+    (a : Glue A φ e) : A := unglue φ e a
+def hcomp-Glue' (A : U) (φ : I)
+    (e : Partial (Σ (T : U), equiv T A) φ)
+    (ψ : I) (u : I → Partial (Glue A φ [(φ = 1) → e 1=1]) ψ)
+    (u₀ : (Glue A φ [(φ = 1) → e 1=1])[ψ ↦ u 0]) : Glue A φ [(φ = 1) → e 1=1]
+ := hcomp (Glue A φ [(φ = 1) → e 1=1]) ψ
+          (λ (i : I), [(ψ = 1) → u i 1=1]) (ouc u₀)

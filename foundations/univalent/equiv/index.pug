@@ -87,10 +87,10 @@ block content
                 $\mathbf{Definition}$ (Fiberwise Induction Principle).
                 For any $C : A \rightarrow B \rightarrow A \simeq B \rightarrow U$
                 and it's evidence $d$ at $(A,A,\mathrm{id_\simeq}(A))$
-                there is a function:
+                there is a function $\mathbf{ind}_\simeq$. HoTT 5.8.5
             +tex(true).
                 $$
-                  \mathbf{ind}_\simeq(C,d) : A\simeq B \rightarrow C(A,B,p).
+                  \mathbf{ind}_\simeq(C,d) : (p: A\simeq B) \rightarrow C(A,B,p).
                 $$
             +code.
                 def ind-Equiv (A B: U)

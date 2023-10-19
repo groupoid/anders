@@ -89,11 +89,15 @@ block content
                 such that $f(x,x,\mathbf{ref}_V(A,x)) = c(x)$.
             +tex(true).
                $$
-                   \mathbf{ind}_{=_A} : x =_A y \rightarrow C(x,y,p) =_{def}
+                   \mathbf{ind}_{=_A} : (p: x =_A y) \rightarrow C(x,y,p) =_{def}
                $$
             +tex(true).
                $$
-                   \prod_{A:V}\prod_{C:\Pi_{x,y:A}x=y\rightarrow V}\prod_{c: C(x,x,\mathbf{ref}(x))}\prod_{p:x=y} \mathbf{J}(A,C,x,c,y,p).
+                   \prod_{A:V}\prod_{C:\Pi_{x,y:A}x=y\rightarrow V}\prod_{c: C(x,x,\mathbf{ref}(x))}
+               $$
+            +tex(true).
+               $$
+                   \lambda p.\mathbf{J}(A,C,x,c,y,p).
                $$
             +code.
                 def =-ind (A : V)

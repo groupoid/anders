@@ -14,51 +14,71 @@ block content
         <a href='https://anders.groupoid.space/'>ANDERS</a>
         <a href='https://anders.groupoid.space/lib/'>LIB</a>
         <a href='#'>FUNEXT</a>
-    article.main
-        .exe
-            section
-                h1 FUNEXT
+    article.main.list
+        section
+            h1 FUNCTION EXTENSIONALITY
+            aside
+                time Published: 25 JUL 2018
+            p.
+                From the categorical point of view functioncal extensionality
+                validates full universal property in LCCC in contrast to weak one.
 
-        aside
-            time Published: 25 JUL 2018
-        .exe
-            section
-                p.
-                    From the categorical point of view functioncal extensionality
-                    validates full universal property in LCCC in contrast to weak one.
+            h2 Formation
+            p.
+                HoTT 2.4.1
+            +code.
+                def funext-form (A B: U) (f g: A -> B)
+                  : U := Path (A -> B) f g
+            br.
 
-                h2 Constructors
-                code.
-                    funext (A B: U) (f g: A -> B)
-                           (p: (x:A) -> Path B (f x) (g x))
-                         : Path (A -> B) f g
-                p.
+            h2 Introduction
+            p.
+            +code.
+                def funext (A B: U) (f g: A -> B)
+                    (p: (x:A) -> Path B (f x) (g x))
+                  : Path (A -> B) f g
+            br.
 
-                h2 Elimination
-                code.
-                    happly (A B: U) (f g: A -> B) (p: Path (A -> B) f g) (x: A)
-                         : Path B (f x) (g x)
-                p.
+            h2 Elimination
+            p.
+                HoTT 5.8.6
+            +code.
+                def happly (A B: U) (f g: A -> B)
+                    (p: Path (A -> B) f g) (x: A)
+                  : Path B (f x) (g x)
+            br.
 
-                h2 Computation
-                code.
-                    funext_Beta (A B: U) (f g: A -> B)
-                                (p: (x:A) -> Path B (f x) (g x))
-                              : (x:A) -> Path B (f x) (g x)
-                p.
+            h2 Induction
+            +tex.
+                $\mathbf{Definition}$ (Homotopy Induction Principle).
+                For any $D : (f,g: \Pi(A,B) \rightarrow f \sim g \rightarrow U$
+                and it's evidence $d$ at $(f,f,\mathrm{id_\equiv}(f(x)))$
+                there is a function $\mathbf{ind}_\sim$. HoTT 5.8.5
+            +tex(true).
+                $$
+                  \mathbf{ind}_\sim(C,d) : (h: f\sim g) \rightarrow C(f,g,h).
+                $$
 
-                h2 Uniqueness
-                code.
-                    funext_Eta (A B: U) (f g: A -> B)
-                               (p: Path (A -> B) f g)
-                             : Path (Path (A -> B) f g) (funext A B f g (happly A B f g p)) p
-                p.
+            h2 Computation
+            +code.
+                def funext_Beta (A B: U) (f g: A -> B)
+                    (p: (x:A) -> Path B (f x) (g x))
+                  : (x:A) -> Path B (f x) (g x)
+            br.
 
-                h2 Dependent Version
-                code.
-                    piext (A: U) (B: A -> U) (f g: (x: A) -> B x)
-                          (p: (x: A) -> Path (B x) (f x) (g x))
-                        : Path ((y: A) -> B y) f g
-                p.
+            h2 Uniqueness
+            +code.
+                def funext_Eta (A B: U) (f g: A -> B)
+                    (p: Path (A -> B) f g)
+                  : Path (Path (A -> B) f g)
+                         (funext A B f g (happly A B f g p)) p
+            br.
+
+            h2 Dependent Version
+            +code.
+                def piext (A: U) (B: A -> U) (f g: (x: A) -> B x)
+                    (p: (x: A) -> Path (B x) (f x) (g x))
+                  : Path ((y: A) -> B y) f g
+            br.
 
 include ../../../footer

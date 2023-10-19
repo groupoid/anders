@@ -85,12 +85,12 @@ block content
             h2 Elimination
             +tex.
                 $\mathbf{Definition}$ (Fiberwise Induction Principle).
-                For any $C : A \rightarrow B \rightarrow \mathrm{Equiv}(A,B)\rightarrow U$
-                and it's evidence $d$ at $(a,a,\mathrm{id_\simeq}(a))$
+                For any $C : A \rightarrow B \rightarrow A \simeq B \rightarrow U$
+                and it's evidence $d$ at $(A,A,\mathrm{id_\simeq}(A))$
                 there is a function:
             +tex(true).
                 $$
-                  \mathbf{ind}_{\mathrm{Equiv}}(C,d) : A\simeq B \rightarrow C(A,B,p).
+                  \mathbf{ind}_\simeq(C,d) : A\simeq B \rightarrow C(A,B,p).
                 $$
             +code.
                 def ind-Equiv (A B: U)

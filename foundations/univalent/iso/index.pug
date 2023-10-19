@@ -21,8 +21,62 @@ block content
                 time Published: 26 NOV 2017
             +tex.
                 Just like $\mathrm{Equiv}$ notion of $\mathrm{Iso}$ represents equality
-                of types $A$ and $B$ within given universe $U$ in contrast
-                to general $\mathrm{Path}$ equality.
+                of types $A$ and $B$ within given universe $U$.
+            h2 Formation
+            +tex.
+                $\mathbf{Definition}$ (Isomorphism Formation).
+            +tex(true).
+                $$
+                    A\cong B : U\hspace{.4em}=_{def}\mathbf{Iso}(A,B) : U =_{def}
+                $$
+            +tex(true).
+                $$
+                   \sum_{f:A\rightarrow B}
+                   \sum_{g:B\rightarrow A}
+                   \Biggl(\prod_{x:A} g(f(x)) \equiv_A x \times \prod_{y:B} f(g(y)) \equiv_B y \Biggr)
+                $$
+            +code.
+                def iso (A B: U) : U :=
+                  Σ (f : A -> B) (g : B -> A)
+                    (s : section A B f g)
+                    (t : retract A B f g), 𝟏
+            br.
+            h2 Introduction
+            +tex.
+                $\mathbf{Definition}$ (Isomorphism Introduction).
+            +tex(true).
+                $$
+                    \mathrm{id}_\cong : A\cong A =_{def}
+                $$
+            +tex(true).
+                $$
+                    (id(A),id(A),\lambda x.[i]x, \lambda x.[i]x).
+                $$
+            +code.
+                def iso-intro (A: U)
+                  : iso A A
+                 := ( id A,
+                      id A,
+                      (\(x:A), <_>x),
+                      (\(x:A), <_>x),
+                      star
+                    )
+            br.
+            h2 Elimination
+            +tex.
+                $\mathbf{Definition}$ (Isomorphism Induction Principle).
+                For any $C : A \rightarrow B \rightarrow \mathrm{Iso}(A,B)\rightarrow U$
+                and it's evidence $d$ at $(A,A,\mathrm{id_\cong})$
+                there is a function:
+            +tex(true).
+                $$
+                  \mathbf{ind}_\cong(C,d) : A\cong B \rightarrow C(A,B,p).
+                $$
+            +code.
+                def ind-Iso (A B: U)
+                    (C: Π (A B: U), iso A B → U)
+                    (d: C A A (iso-Intro A)) 
+                  : (p: iso A B) -> C A B p
         section
             h1 UNIMORPHISM
             +tex.

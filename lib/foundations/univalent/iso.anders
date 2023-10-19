@@ -80,6 +80,8 @@ def iso (A B: U) : U :=
     (s : section A B f g)
     (t : retract A B f g), unit
 
+def iso-inro (A: U) : iso A A := (id A, id A, (\(x:A), <_>x), (\(x:A), <_>x), star)
+
 def isoPath (A B : U) (f : A -> B) (g : B -> A)
     (s : Π (y : B), Path B (f (g y)) y)
     (t : Π (x : A), Path A (g (f x)) x)

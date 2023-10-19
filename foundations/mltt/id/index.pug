@@ -85,41 +85,24 @@ block content
 
             +tex.
                 $\mathbf{Definition}$ ($=$-Elimination, J). Given a family
-            +tex(true).
-                $$
-                   C : \prod_{x,y:A}(x =_A y) \rightarrow V
-                $$
-            +tex.
-                and a function
-            +tex(true).
-                $$
-                   c: \prod_{x:A}C(x,x,\mathbf{ref}_V(A,x))
-                $$
-            +tex.
-                there is a function
-            +tex(true).
-                $$
-                   f: \prod_{x,y:A}\Pi_{p: x =_A y}C(x,y,p)
-                $$
-            +tex.
+                $C$ and a function $c$ there is a function $f$
                 such that $f(x,x,\mathbf{ref}_V(A,x)) = c(x)$.
-
+            +tex(true).
+               $$
+                   \mathbf{ind}_{=_A} : x =_A y \rightarrow C(x,y,p) =_{def}
+               $$
+            +tex(true).
+               $$
+                   \prod_{A:V}\prod_{C:\Pi_{x,y:A}x=y\rightarrow V}\prod_{c: C(x,x,\mathbf{ref}(x))}\prod_{p:x=y} \mathbf{J}(A,C,x,c,y,p).
+               $$
             +code.
                 def =-ind (A : V)
                     (C : Π (x y : A), Id A x y -> V)
                     (x y : A) (c : C x x (ref x))
                     (p : Id A x y)
                   : C x y p
-                 := indJ A C x c y p
-
-            +tex(true).
-               $$
-                   \mathbf{ind}_{=_A}  =_{def} \mathbf{J}_V : \prod_{A:V}\prod_{C:\Pi_{(x,y:A)}(x=_A y)\rightarrow V}
-               $$
-            +tex(true).
-               $$
-                   \prod_{x,y:A}C(x,x,\mathbf{ref}_V(a,x)) \rightarrow \prod_{p: x=_A y}C(x,y,p).
-               $$
+                := indJ A C x c y p
+            br.
 
             h2 Computation
 

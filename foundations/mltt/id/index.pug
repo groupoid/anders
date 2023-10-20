@@ -22,41 +22,10 @@ block content
             +tex.
                 $=$-type is an inductive family that contains evidence
                 of equality of two elements from that family. 
-            +tex.
-                $\mathbf{Definition}$ (Identity System). An identity system
-                over type $A$ in universe $X_i$ is a family $R : A \rightarrow A \rightarrow X_i$
-                with a function $r_0: \Pi_{a:A}R(a,a)$ such that any type family
-                $D : \Pi_{a,b:A}R(a,b) \rightarrow X_i$ and $d: \Pi_{a:A}D(a,a,r_0(a))$,
-                there exists a function $f: \Pi_{a,b:A}\Pi_{r:R(a,b)}D(a,b,r)$ such that
-                $f(a,a,r_0(a))=d(a)$ for all $a:A$.
-            +tex.
-                There are number of equality signs used in this tutorial,
-                all of them listed in the following table of identity systems:
-            +tex(true).
-                $$
-                   \begin{array}{ll} \mathrm{Sign} & \mathrm{Meaning} \\
-                         \hline
-                        =_{def} & \mathrm{Definition} \\
-                              = & \mathrm{Id} \\
-                         \equiv & \mathrm{Path} \\
-                         \simeq & \mathrm{Equivalence} \\
-                          \cong & \mathrm{Isomorphism} \\
-                           \sim & \mathrm{Homotopy} \\
-                        \approx & \mathrm{Bisimulation} \\
-                      \end{array}
-                    $$
-            +tex.
-                $\mathbf{Definition}$ (Strict Identity System). An identity system
-                over type $A$ and universe of pretypes $V_i$ is called strict identity
-                system ($=$), which respects UIP.
-            +tex.
-                $\mathbf{Definition}$ (Homotopy Identity System). An identity system
-                over type $A$ and universe of homotopy types $U_i$ is called homotopy identity
-                system ($\equiv$), which models discrete infinity groupoid.
 
             h2 Formation
             +tex.
-                $\mathbf{Definition}$ ($=$-Formation, Family). The inductive family
+                $\mathbf{Definition\ 3.1}$ ($=$-Formation, Family). The inductive family
                 $Id_V: A \rightarrow A \rightarrow V$ with domains and codomain in universe $V$
                 represents inhabitants carrying proofs that given indexed
                 elements $x,y:A$ are equal.
@@ -71,7 +40,7 @@ block content
             h2 Introduction
 
             +tex.
-                $\mathbf{Definition}$ ($=$-Intro, Reflection). The inductive family elements
+                $\mathbf{Definition\ 3.2}$ ($=$-Intro, Reflection). The inductive family elements
                 are instantiated by single constructor that carries proof that $x:A$ element are equals to itself.
             +tex(true).
                 $$
@@ -84,7 +53,7 @@ block content
             h2 Elimination
 
             +tex.
-                $\mathbf{Definition}$ ($=$-Elimination, J). Given a family
+                $\mathbf{Definition\ 3.3}$ ($=$-Elimination, J). Given a family
                 $C$ and a function $c$ there is a function $f$
                 such that $f(x,x,\mathbf{ref}_V(A,x)) = c(x)$.
             +tex(true).
@@ -110,19 +79,60 @@ block content
 
             h2 Computation
 
+            +tex.
+                $\mathbf{Definition\ 3.4}$ ($=$-Computation).
             +code.
                 def Jˢ-β (A : V)
                     (C : Π (a b : A), Id A a b -> V)
                     (a : A) (c : C a a (ref a))
                   : Id (C a a (ref a)) (Jˢ A C a a c (ref a)) c
                  := ref c
+            br.
 
             h2 Uniqueness
 
+            +tex.
+                $\mathbf{Definition\ 3.5}$ ($=$-Uniqueness).
             +code.
                 def UIP (A : V) (a b : A) (p q : Id A a b)
                   : Id (Id A a b) p q
                  := ref p
+
+            h2 THEOREMS
+
+            +tex.
+                $\mathbf{Definition}$ (Identity System). An identity system
+                over type $A$ in universe $X_i$ is a family $R : A \rightarrow A \rightarrow X_i$
+                with a function $r_0: \Pi_{a:A}R(a,a)$ such that any type family
+                $D : \Pi_{a,b:A}R(a,b) \rightarrow X_i$ and $d: \Pi_{a:A}D(a,a,r_0(a))$,
+                there exists a function $f: \Pi_{a,b:A}\Pi_{r:R(a,b)}D(a,b,r)$ such that
+                $f(a,a,r_0(a))=d(a)$ for all $a:A$.
+            +tex.
+                There are number of equality signs used in this tutorial,
+                all of them listed in the following table of identity systems:
+            +tex(true).
+                $$
+                   \begin{array}{ll} \mathrm{Sign} & \mathrm{Meaning} \\
+                         \hline
+                        =_{def} & \mathrm{Definition} \\
+                              = & \mathrm{Id} \\
+                         \equiv & \mathrm{Path} \\
+                         \simeq & \mathrm{Equivalence} \\
+                          \cong & \mathrm{Isomorphism} \\
+                           \sim & \mathrm{Homotopy} \\
+                        \approx & \mathrm{Bisimulation} \\
+                      \end{array}
+                    $$
+            +tex.
+                $\mathbf{Definition}$ (Fundamental Theorem of Identity System).
+            +tex.
+                $\mathbf{Definition}$ (Strict Identity System). An identity system
+                over type $A$ and universe of pretypes $V_i$ is called strict identity
+                system ($=$), which respects UIP.
+            +tex.
+                $\mathbf{Definition}$ (Homotopy Identity System). An identity system
+                over type $A$ and universe of homotopy types $U_i$ is called homotopy identity
+                system ($\equiv$), which models discrete infinity groupoid.
 
 include ../../../footer
 

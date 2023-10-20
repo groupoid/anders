@@ -34,7 +34,7 @@ block content
             h2 Formation
 
             +tex.
-                $\mathbf{Definition}$ ($\Sigma$-Formation, Dependent Sum). The dependent sum
+                $\mathbf{Definition\ 2.1}$ ($\Sigma$-Formation, Dependent Sum). The dependent sum
                 type is indexed over type $A$ in the sense of coproduct or disjoint union,
                 where only one fiber codomain $B(x)$ is present in pair.
             +tex(true).
@@ -51,7 +51,7 @@ block content
             h2 Introduction
 
             +tex.
-                $\mathbf{Definition}$ (Dependent Pair). The dependent pair
+                $\mathbf{Definition\ 2.2}$ (Dependent Pair). The dependent pair
                 constructor is a way to create indexed pair over type $A$
                 in the sense of coproduct or disjoint union.
             +tex(true).
@@ -70,7 +70,7 @@ block content
             h2 Elimination
 
             +tex.
-                $\mathbf{Definition}$ (Dependent Projections). The dependent projections
+                $\mathbf{Definition\ 2.3}$ (Dependent Projections). The dependent projections
                 $pr_{1}: \Sigma(A,B) \rightarrow A$ and
                 $pr_{2}: \Pi_{x: \Sigma(A,B)} B(pr_{1}(x))$ are pair deconstructors.
             +tex(true).
@@ -100,10 +100,8 @@ block content
                 If you want to access deep sigma a series of $.2$
                 accessors should be applied followed by $.1$.
 
-            h2 Induction Principle
-
-            p.
-                Dependent Elimination Principle states that
+            +tex.
+                $\mathbf{Definition\ 2.3.1}$ ($\Sigma$-Induction Principle). States that
                 if predicate holds for two projections
                 then predicate holds for total space.
 
@@ -115,6 +113,8 @@ block content
             br
 
             h2 Computation
+            +tex.
+                $\mathbf{Definition\ 2.4}$ ($\Sigma$-Computation).
 
             +code.
                 def Σ-β₁ (A : U) (B : A → U) (a : A) (b : B a)
@@ -127,6 +127,8 @@ block content
 
             h2 Uniqueness
 
+            +tex.
+                $\mathbf{Definition\ 2.5}$ ($\Sigma$-Uniqueness).
             +code.
                def Σ-η (A : U) (B : A → U) (p : Sigma A B)
                  : Path (Sigma A B) p (pr₁ A B p, pr₂ A B p)

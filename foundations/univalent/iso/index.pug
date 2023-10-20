@@ -33,7 +33,11 @@ block content
                 $$
                    \sum_{f:A\rightarrow B}
                    \sum_{g:B\rightarrow A}
-                   \Biggl(\prod_{x:A} g(f(x)) \equiv_A x \times \prod_{y:B} f(g(y)) \equiv_B y \Biggr)
+                $$
+            +tex(true).
+                $$
+                          \prod_{x:A}f\hspace{-0.1em}\cdot\hspace{-0.1em}g(x)\hspace{-0.3em}\equiv\hspace{-0.1em}x
+                   \times \prod_{y:B}g\hspace{-0.1em}\cdot\hspace{-0.2em}f(y)\hspace{-0.1em}\equiv\hspace{-0.1em}y.
                 $$
             +code.
                 def iso (A B: U) : U :=
@@ -75,8 +79,9 @@ block content
             +code.
                 def ind-Iso (A B: U)
                     (C: Π (A B: U), iso A B → U)
-                    (d: C A A (iso-Intro A)) 
+                    (d: C A A (iso-Intro A))
                   : (p: iso A B) -> C A B p
+            br.
         section
             h1 UNIMORPHISM
             +tex.
@@ -85,5 +90,13 @@ block content
                 as forth-back transport between isomorphism and path
                 equality. This notion is somehow cannonical to all
                 cubical systems and is called Unimorphism or $\mathrm{Uni}$ here.
+            h2 Formation
+            +tex.
+                $\mathbf{Definition}$ (Isomorphism Formation).
+            +tex(true).
+                $$
+                    A \cong B \rightarrow A = B : U.
+                $$
+            h2 Introduction
 
 include ../../../footer

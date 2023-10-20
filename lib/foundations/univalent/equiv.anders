@@ -41,7 +41,8 @@ def univ-computation (A B : U) (p : PathP (<_> U) A B) : PathP (<_> PathP (<_> U
 --- Nominal Lift to U₁
 
 def singl₁ (A : U₁) (a: A) : U₁ := Σ (x: A), PathP (<_>A) a x
-def contr₁ (A : U) (a b : A) (p : PathP (<_>A) a b) : PathP (<_>Σ (x : A), PathP (<_>A) a x) (a,<_>a) (b,p) := <i> (p @ i, <j> p @ i /\ j)
+def singl₁' (A : U) := Σ (X: U) (f : A → X), isEquiv A X f
+def contr₁ (A : U₁) (a b : A) (p : PathP (<_>A) a b) : PathP (<_>Σ (x : A), PathP (<_>A) a x) (a,<_>a) (b,p) := <i> (p @ i, <j> p @ i /\ j)
 def fiber₁ (A : U₁) (B: U) (f: A → B) (y : B) : U₁ := Σ (x : A), Path B y (f x)
 def subst₁ (A : U₁) (P : A -> U₁) (a b : A) (p : PathP (<_>A) a b) (e : P a) : P b := transp (<i> P (p @ i)) 0 e
 def isContr₁ (A : U₁) := Σ (x: A), Π (y: A), PathP (<_>A) x y
@@ -51,7 +52,6 @@ def isEquiv₁ (A : U₁) (B : U) (f : A → B) : U₁ := Π (y : B), isContr₁
 
 def D-equiv := Π (A B: U), equiv A B → U₁
 axiom J-equiv (A B: U) (C: D-equiv) (d: C A A (idEquiv A)) (p: equiv A B) : C A B p
--- := subst₁ (singl₁ U A) (\ (z: singl₁ U A), C A z.1 z.2) (A,<_>A) (B,p) (contr₁ U A B ((univ-intro A B) p)) d
 
 -- [Orton, Pitts] 2017
 

@@ -37,7 +37,7 @@ block content
                     </div>
                 h2 Formation
                 +tex.
-                    $\mathbf{Definition}$ (Path Formation).
+                    $\mathbf{Definition\ 5.1}$ (Path Formation).
                 +tex(true).
                     $$
                         \equiv\hspace{0.4em}: U =_{def} \prod_{A:U}\prod_{x,y:A} \mathbf{Path}_A(x,y).
@@ -53,7 +53,7 @@ block content
                 br.
                 h2 Introduction
                 +tex.
-                    $\mathbf{Definition}$ (Path Introduction).
+                    $\mathbf{Definition\ 5.2}$ (Path Introduction).
                 +tex(true).
                     $$
                        \mathrm{id_\equiv} : x \equiv_A x =_{def} \prod_{A:U}\prod_{x:A} [i] x
@@ -68,7 +68,7 @@ block content
                     syntax as $[i]x$.
 
                 +tex.
-                    $\mathbf{Definition}$ (Path Application).
+                    $\mathbf{Definition\ 5.2.1}$ (Path Application).
                 +code.
                     def at0 (A: U) (a b: A)
                         (p: Path A a b) : A := p @ 0
@@ -77,7 +77,7 @@ block content
                         (p: Path A a b): A := p @ 1
                 br.
                 +tex.
-                    $\mathbf{Definition}$ (Path Connections).
+                    $\mathbf{Definition\ 5.2.2}$ (Path Connections).
                 +tex.
                     Connections allow you to build a square
                     with only one element of path: i) $[i,j] p\ @\ min(i,j)$;
@@ -111,9 +111,9 @@ block content
                      := &lt;x y&gt; p @ (x /\ y)
                 br.
                 +tex.
-                    $\mathbf{Definition}$ (Path Inversion).
+                    $\mathbf{Definition\ 5.2.3}$ (Path Inversion).
                 +tex.
-                    $\mathbf{Theorem}$ (Congruence).
+                    $\mathbf{Theorem\ 5.2.4}$ (Congruence).
                 +tex(true).
                     $$
                         \mathrm{ap} : f(a)\equiv f(b) =_{def}
@@ -140,7 +140,7 @@ block content
                     in both cases.
 
                 +tex.
-                    $\mathbf{Definition}$ (Generalized Transport Kan Operation).
+                    $\mathbf{Definition\ 5.2.5}$ (Generalized Transport Kan Operation).
                     Transports a value of the left type to the value of the right type
                     by a given path element of the path space between left and right types.
                 +tex(true).
@@ -163,7 +163,7 @@ block content
                      := transp (&lt;i> (\(_:U),U) (p @ i)) i A
                 br.
                 +tex.
-                    $\mathbf{Definition}$ (Partial Elements).
+                    $\mathbf{Definition\ 5.2.6}$ (Partial Elements).
                 +tex(true).
                     $$
                          \mathrm{Partial} : V =_{def} \prod_{A:U}\prod_{i:I}\mathbf{Partial}(A,i).
@@ -173,7 +173,7 @@ block content
                       : V := Partial A i
                 br.
                 +tex.
-                    $\mathbf{Definition}$ (Cubical Subtypes).
+                    $\mathbf{Definition\ 5.2.7}$ (Cubical Subtypes).
                 +tex(true).
                     $$
                          \mathrm{Subtype} : V =_{def}
@@ -187,7 +187,7 @@ block content
                       : V := A [i ↦ u]
                 br.
                 +tex.
-                    $\mathbf{Definition}$ (Cubical Elements).
+                    $\mathbf{Definition\ 5.2.8}$ (Cubical Elements).
                 +tex(true).
                     $$
                          \mathrm{inS} :  A\ [(i=1) \mapsto a ] =_{def}
@@ -213,7 +213,7 @@ block content
                       : A [i ↦ u] -> A := λ (a: A[i ↦ u]), ouc a
                 br.
                 +tex.
-                    $\mathbf{Definition}$ (Heterogeneous Composition Kan Operation).
+                    $\mathbf{Definition\ 5.2.9}$ (Heterogeneous Composition Kan Operation).
                 +tex(true).
                     $$
                          \mathrm{comp}_{\mathrm{CCHM}} : A(0)\ [r \mapsto u(0)] \rightarrow A(1) =_{def}
@@ -243,7 +243,7 @@ block content
                           (transp (&lt;i> A i) 0 (ouc u₀))
                 br.
                 +tex.
-                    $\mathbf{Definition}$ (Homogeneous Composition Kan Operation).
+                    $\mathbf{Definition\ 5.2.10}$ (Homogeneous Composition Kan Operation).
                 +tex(true).
                     $$
                          \mathrm{comp}_{\mathrm{CHM}} : A\ [r \mapsto u(0)] \rightarrow A =_{def}
@@ -262,7 +262,7 @@ block content
                      := hcomp A r u (ouc u₀)
                 br.
                 +tex.
-                    $\mathbf{Theorem}$ (Substitution).
+                    $\mathbf{Theorem\ 5.2.11}$ (Substitution).
                 +tex(true).
                     $$
                          \mathrm{subst} : P(x) \rightarrow P(y) =_{def}
@@ -283,7 +283,7 @@ block content
                 +tex.
                     Other synonyms are $\mathrm{mapOnPath}$ and $\mathrm{cong}$.
                 +tex.
-                    $\mathbf{Theorem}$ (Path Composition).
+                    $\mathbf{Theorem\ 5.2.12}$ (Path Composition).
                 +tex(true).
                     $$
                     \begin{array}{ccc}
@@ -303,8 +303,22 @@ block content
 
                 h2 Elimination
 
+
                 +tex.
-                    $\mathbf{Theorem}$ (Contractability of Singleton).
+                    $\mathbf{Theorem\ 5.3}$ (J by Paulin-Mohring).
+                +code.
+                    def J (A: U)
+                          (a b: A)
+                          (P: singl A a -> U)
+                          (u: P (a,refl A a))
+                      : П (p: Path A a b), P (b,p)
+                p.
+                    J is formulated in a form of Paulin-Mohring and implemented using
+                    two facts that singletons are contractible and dependent function
+                    transport.
+
+                +tex.
+                    $\mathbf{Theorem\ 5.3.1}$ (Contractability of Singleton).
                 +code.
                     def singl (A: U) (a: A) : U
                      := Σ (x: A), Path A a x
@@ -316,19 +330,7 @@ block content
                     $[i] (p @ i, [j] p @ (i \land j))$.
 
                 +tex.
-                    $\mathbf{Theorem}$ (J by Paulin-Mohring).
-                +code.
-                    def J (A: U)
-                          (a b: A)
-                          (P: singl A a -> U)
-                          (u: P (a,refl A a))
-                      : П (p: Path A a b), P (b,p)
-                p.
-                    J is formulated in a form of Paulin-Mohring and implemented using
-                    two facts that singletons are contractible and dependent function
-                    transport.
-                +tex.
-                    $\mathbf{Definition}$ (HoTT Dependent Eliminator).
+                    $\mathbf{Definition\ 5.3.2}$ (HoTT Dependent Eliminator).
                 +code.
                     def J (A: U)
                           (a: A)
@@ -340,7 +342,7 @@ block content
                     J from HoTT book.
 
                 +tex.
-                    $\mathbf{Definition}$ (Diagonal Path Induction).
+                    $\mathbf{Definition\ 5.3.3}$ (Diagonal Path Induction).
                 +code.
                     def D (A: U) : U
                      := П (x y: A), Path A x y -> U
@@ -355,7 +357,7 @@ block content
 
                 h2 Computation
                 +tex.
-                    $\mathbf{Definition}$ (Path Computation).
+                    $\mathbf{Definition\ 5.4}$ (Path Computation).
                 +code.
                     def trans_comp (A: U) (a: A)
                       : Path A a (trans A A (&lt;_> A) a)
@@ -372,6 +374,6 @@ block content
                     Note that in HoTT there is no Eta rule, otherwise
                     Path between element would requested to be unique applying
                     UIP at any Path level which is prohibited. UIP in HoTT
-                    is defined only as instance of n-groupoid, the PROP type.
+                    is defined only as instance of n-groupoid, see the PROP type.
 
 include ../../../footer

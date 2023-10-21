@@ -11,8 +11,8 @@ block title
 
 block content
     nav
-        <a href='https://anders.groupoid.space/'>ANDERS</a>
-        <a href='https://anders.groupoid.space/lib/'>LIB</a>
+        <a href='../../../index.html'>ANDERS</a>
+        <a href='../../../lib/index.html'>LIB</a>
         <a href='#'>INDUCTIVE</a>
     article.main.list
         section
@@ -49,6 +49,94 @@ block content
                                  (λ (a: A), 𝟏) w.1 w.2
             br.
 
+            h1 W
+            +tex.
+                Well-founded trees without mutual recursion represented as $\mathrm{W}$-types.
+
+            h2 Formation
+
+            +tex.
+                $\mathbf{Definition\ 4.1}$ ($\mathrm{W}$-Formation). For $A : \mathcal{U}$ and $B : A \rightarrow \mathcal{U}$, type $\mathrm{W}$
+                is defined as $\mathrm{W}(A,B) : \mathcal{U}$ or
+            code.
+                def W' (A : U) (B : A → U) : U := W (x : A), B x
+            +tex(true).
+                $$
+                    \mathrm{W}_{(x : A)} B(x) : \mathcal{U}.
+                $$
+
+            h2 Introduction
+
+            +tex.
+                $\mathbf{Definition\ 4.2}$ ($\mathrm{W}$-Introduction). Elements of $\mathrm{W}_{(x : A)} B(x)$ are called
+                well-founded trees and created with single $\mathrm{sup}$ constructor:
+
+            code.
+                def sup' (A: U) (B: A → U) (x: A) (f: B x → W' A B)
+                  : W' A B
+                 := sup A B x f
+
+            +tex(true).
+                $$
+                    \mathrm{sup} : \mathrm{W}_{(x: A)} B(x).
+                $$
+
+            h2 Elimination
+
+            +tex.
+                $\mathbf{Definition\ 4.3}$ (Induction Principle $\mathrm{ind_W}$). The induction principle states that
+                for any types $A: \mathcal{U}$ and $B: A \rightarrow \mathcal{U}$ and type family $C$ over $\mathrm{W}(A,B)$
+                and the function $g : G$, where
+
+            +tex(true).
+                $$
+                   G = \prod_{x: A}\prod_{f: B(x) → \mathrm{W}(A,B)}\prod_{b: B(x)} C(f(b)) → C(\mathrm{sup}(x,f))
+                $$
+            p.
+                there is a dependent function:
+            +tex(true).
+                $$
+                    \mathrm{ind_W} : \prod_{C: \mathrm{W}(A,B) → \mathcal{U}}\prod_{g:G}\prod_{a: A}\prod_{f: B(a) → \mathrm{W}(A,B)}\prod_{b: B(a)}C(f(b)).
+                $$
+
+            +code.
+                def W-ind (A : U) (B : A → U)
+                    (C : (W (x : A), B x) → U)
+                    (g : Π (x : A) (f : B x → (W (x : A), B x)), (Π (b : B x), C (f b)) → C (sup A B x f))
+                    (a : A) (f : B a → (W (x : A), B x)) (b : B a) : C (f b) := indᵂ A B C g (f b)
+            br.
+
+            h2 Computation
+            +tex.
+                $\mathbf{Theorem\ 4.4}$ ($\mathrm{ind_W}$ computes). The induction principle $\mathrm{ind^W}$ satisfies
+                the equation:
+            +tex(true).
+                $$
+                    \mathrm{ind_W}\mbox{-}\beta : g(a,f,λb.\mathrm{ind^W}(g,f(b))) 
+                $$
+            +tex(true).
+                $$
+                    =_{def} \mathrm{ind_W}(g,\mathrm{sup}(a,f)).
+                $$
+            +code.
+                def indᵂ-β (A : U) (B : A → U)
+                    (C : (W (x : A), B x) → U) (g : Π (x : A)
+                    (f : B x → (W (x : A), B x)), (Π (b : B x), C (f b)) → C (sup A B x f))
+                    (a : A) (f : B a → (W (x : A), B x))
+                  : PathP (<_> C (sup A B a f))
+                          (indᵂ A B C g (sup A B a f))
+                          (g a f (λ (b : B a), indᵂ A B C g (f b)))
+                 := <_> g a f (λ (b : B a), indᵂ A B C g (f b))
+            br.
+            h2 Uniqueness
+
+            +tex.
+                $\mathbf{Theorem\ 4.5}$ ($W$-Uniqueness).
+            +tex(true).
+                $$
+                    \mathrm{ind_W}\mbox{-}\eta
+                $$
+
             h1 EMPTY
             p.
                 The Empty type represents False-type logical 𝟎, type without inhabitants, Void or ⊥ (Bottom).
@@ -56,7 +144,7 @@ block content
 
             h2 Formation
             +tex.
-                $\mathbf{Definition\ 4.1}$ (Empty). Empty-type is defined as built-in 𝟎-type:
+                $\mathbf{Definition\ 4.6}$ (Empty). Empty-type is defined as built-in 𝟎-type:
             +tex(true).
                 $$
                     𝟎 : \mathcal{U}.
@@ -64,7 +152,7 @@ block content
 
             h2 Elimination
             +tex.
-                $\mathbf{Definition\ 4.2}$ (Induction Principle $\mathrm{ind_0}$). 𝟎-type is satisfying the
+                $\mathbf{Definition\ 4.7}$ (Induction Principle $\mathrm{ind_0}$). 𝟎-type is satisfying the
                 induction principle:
 
             +code.
@@ -75,7 +163,7 @@ block content
                 $$
 
             +tex.
-                $\mathbf{Definition\ 4.2.1}$ (Negation or isEmpty). For any type A negation of A is defined as arrow from A to 𝟎:
+                $\mathbf{Definition\ 4.7.1}$ (Negation or isEmpty). For any type A negation of A is defined as arrow from A to 𝟎:
             +tex(true).
                 $$
                     \neg A := A \rightarrow 𝟎.
@@ -100,7 +188,7 @@ block content
             h2 Formation
 
             +tex.
-                $\mathbf{Definition\ 4.3}$ (Unit). Unit-type is defined as built-in 𝟏-type:
+                $\mathbf{Definition\ 4.8}$ (Unit). Unit-type is defined as built-in 𝟏-type:
             +tex(true).
                 $$
                     𝟏 : \mathcal{U}.
@@ -109,7 +197,7 @@ block content
             h2 Introduction
 
             +tex.
-                $\mathbf{Definition\ 4.4}$ (Star). 𝟏-type containts single inhabitant ★:
+                $\mathbf{Definition\ 4.9}$ (Star). 𝟏-type containts single inhabitant ★:
             +tex(true).
                 $$
                     ★ : 𝟏.
@@ -118,7 +206,7 @@ block content
             h2 Elimination
 
             +tex.
-                $\mathbf{Definition\ 4.5}$. (Induction Principle $\mathrm{ind_1}$). 𝟏-type satisfies
+                $\mathbf{Definition\ 4.10}$. (Induction Principle $\mathrm{ind_1}$). 𝟏-type satisfies
                 induction principle that for any family $C$ indexed by $x : 1$ there is a function
             +code.
                 def 1-ind (C: 𝟏 → U) (x: C ★) (z: 𝟏) : C z := ind₁ C x z
@@ -129,14 +217,14 @@ block content
 
             h2 Computation
             +tex.
-                $\mathbf{Theorem\ 4.6}$ (Unit Computes). The following equation holds:
+                $\mathbf{Theorem\ 4.11}$ (Unit Computes). The following equation holds:
             +tex(true).
                 $$
                    \mathrm{ind_1}(x,★) = x.
                 $$
             h2 Uniqueness
             +tex.
-                $\mathbf{Theorem\ 4.7}$ (Unit Unique).
+                $\mathbf{Theorem\ 4.12}$ (Unit Unique).
 
             h1 BOOL
 
@@ -147,7 +235,7 @@ block content
             h2 Formation
 
             +tex.
-                $\mathbf{Definition\ 4.8}$ (Bool). Boolean-type or 0-sphere is defined as built-in 𝟐-type:
+                $\mathbf{Definition\ 4.13}$ (Bool). Boolean-type or 0-sphere is defined as built-in 𝟐-type:
             +tex(true).
                 $$
                     𝟐 : \mathcal{U}.
@@ -156,23 +244,18 @@ block content
             h2 Introduction
 
             +tex.
-                $\mathbf{Definition\ 4.9}$ ($0_2$). false or $0_2$.
+                $\mathbf{Definition\ 4.14}$ (Bool Constructors $0_2$ and $1_2$).
+                $\mathbf{false}$ or $0_2$ and $\mathbf{true}$ or $1_2$.
             +tex(true).
                 $$
-                    0_2 : 𝟐.
-                $$
-
-            +tex.
-                $\mathbf{Definition\ 4.10}$ ($1_2$). true or $1_2$.
-            +tex(true).
-                $$
-                    1_2 : 𝟐.
+                    0_𝟐 : 𝟐.
+                    1_𝟐 : 𝟐.
                 $$
 
             h2 Elimination
 
             +tex.
-                $\mathbf{Definition\ 4.11}$ (Induction Principle $\mathrm{ind_2}$).
+                $\mathbf{Definition\ 4.15}$ (Induction Principle $\mathrm{ind_2}$).
             +code.
                 def 2-ind (C: 𝟐 → U) (x: C 0₂) (y: C 1₂) (z: 𝟐) : C z := ind₂ C x y z
             +tex(true).
@@ -181,86 +264,5 @@ block content
                 $$
             br
 
-            h1 W
-            +tex.
-                Well-founded trees without mutual recursion represented as $\mathrm{W}$-types.
-
-            h2 Formation
-
-            +tex.
-                $\mathbf{Definition\ 4.12}$ ($\mathrm{W}$-Formation). For $A : \mathcal{U}$ and $B : A \rightarrow \mathcal{U}$, type $\mathrm{W}$
-                is defined as $\mathrm{W}(A,B) : \mathcal{U}$ or
-            code.
-                def W' (A : U) (B : A → U) : U := W (x : A), B x
-            +tex(true).
-                $$
-                    \mathrm{W}_{(x : A)} B(x) : \mathcal{U}.
-                $$
-
-            h2 Introduction
-
-            +tex.
-                $\mathbf{Definition\ 4.13}$ ($\mathrm{W}$-Introduction). Elements of $\mathrm{W}_{(x : A)} B(x)$ are called
-                well-founded trees and created with single $\mathrm{sup}$ constructor:
-
-            code.
-                def sup' (A: U) (B: A → U) (x: A) (f: B x → W' A B)
-                  : W' A B
-                 := sup A B x f
-
-            +tex(true).
-                $$
-                    \mathrm{sup} : \mathrm{W}_{(x: A)} B(x).
-                $$
-
-            h2 Elimination
-
-            +tex.
-                $\mathbf{Definition\ 4.14}$ (Induction Principle $\mathrm{ind^W}$). The induction principle states that
-                for any types $A: \mathcal{U}$ and $B: A \rightarrow \mathcal{U}$ and type family $C$ over $\mathrm{W}(A,B)$
-                and the function $g : G$, where
-
-            +tex(true).
-                $$
-                   G = \prod_{x: A}\prod_{f: B(x) → \mathrm{W}(A,B)}\prod_{b: B(x)} C(f(b)) → C(\mathrm{sup}(x,f))
-                $$
-            p
-                there is a dependent function:
-
-            +code.
-                def W-ind (A : U) (B : A → U)
-                    (C : (W (x : A), B x) → U)
-                    (g : Π (x : A) (f : B x → (W (x : A), B x)), (Π (b : B x), C (f b)) → C (sup A B x f))
-                    (a : A) (f : B a → (W (x : A), B x)) (b : B a) : C (f b) := indᵂ A B C g (f b)
-
-            +tex(true).
-                $$
-                    \mathrm{ind^W} : \prod_{C: \mathrm{W}(A,B) → \mathcal{U}}\prod_{g:G}\prod_{a: A}\prod_{f: B(a) → \mathrm{W}(A,B)}\prod_{b: B(a)}C(f(b)).
-                $$
-
-
-            h2 Computation
-
-            +tex.
-                $\mathbf{Theorem\ 4.15}$ ($\mathrm{ind^W}$ computes). The induction principle $\mathrm{ind^W}$ satisfies
-                the equation:
-            +code.
-                def indᵂ-β (A : U) (B : A → U)
-                    (C : (W (x : A), B x) → U) (g : Π (x : A)
-                    (f : B x → (W (x : A), B x)), (Π (b : B x), C (f b)) → C (sup A B x f))
-                    (a : A) (f : B a → (W (x : A), B x))
-                  : PathP (<_> C (sup A B a f))
-                          (indᵂ A B C g (sup A B a f))
-                          (g a f (λ (b : B a), indᵂ A B C g (f b)))
-                 := <_> g a f (λ (b : B a), indᵂ A B C g (f b))
-            br.
-            +tex(true).
-                $$
-                    \mathrm{ind^W_\beta} : g(a,f,λb.\mathrm{ind^W}(g,f(b))) = \mathrm{ind^W}(g,\mathrm{sup}(a,f)).
-                $$
-            h2 Uniqueness
-
-            +tex.
-                $\mathbf{Theorem\ 4.16}$ ($W$-Uniqueness).
 
 include ../../../footer

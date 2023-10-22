@@ -5,8 +5,19 @@ def full (A : U) (R : A → A → U) := Σ (x y : A), R x y
 
 def quot (A : U) (R : A → A → U) := coequ (full A R) A (λ (w : full A R), w.1) (λ (w : full A R), w.2.1)
 def quot₁ (A : U) (R : A → A → U) : A → quot A R := ι₂ (full A R) A (λ (w : full A R), w.1) (λ (w : full A R), w.2.1)
-def quot₂ (A : U) (R : A → A → U) (x y : A) (ρ : R x y) : Path (quot A R) (quot₁ A R x) (quot₁ A R y)
+def quot₂ (A : U) (R : A → A → U) (x y : A) (ρ : R x y)
+  : Path (quot A R) (quot₁ A R x) (quot₁ A R y)
  := resp (full A R) A (λ (w : full A R), w.1) (λ (w : full A R), w.2.1) (x, y, ρ)
+
+def quot-mk (α: U) (r: α → α → U) (a: α) := quot₁ α r a
+def quot-sound (α: U) (r: α → α → U) (a b : α) (ρ : r a b)
+  : Path (quot α r) (quot₁ α r a) (quot₁ α r b)
+ := resp (full α r) α (λ (w : full α r), w.1) (λ (w : full α r), w.2.1) (a, b, ρ)
+
+axiom quot-elim (α: U) (r: α → α → U) (C: quot α r → U) (f: Π (a: α), C (quot-mk α r a)) : Π (q : quot α r), C q
+axiom quot-lift (α β: U) (r: α → α → U) (f: α → β) (m: Π (a b : α) (ρ : r a b), Path β (f a) (f b)) : quot α r → β
+axiom quot-comp (α β: U) (r: α → α → U) (f: α → β) (m: Π (a b : α) (ρ : r a b), Path β (f a) (f b)) (a: α)
+    : Path β (quot-lift α β r f m (quot-mk α r a)) (f a)
 
 -- [van Doorn] 2016 2-quotient
 -- Reducing higher inductive types to quotients

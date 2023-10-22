@@ -11,6 +11,7 @@
 
 module equiv where
 import lib/foundations/univalent/path
+option girard true
 
 --- [Pelayo, Warren, Voevodsky] 2012
 
@@ -38,28 +39,32 @@ def univ-computation (A B : U) (p : PathP (<_> U) A B) : PathP (<_> PathP (<_> U
  := <j i> Glue B (j ∨ ∂ i) [(i = 0) → (A, univ-elim A B p), (i = 1) → (B, idEquiv B),
                             (j = 1) → (p @ i, univ-elim (p @ i) B (<k> p @ (i ∨ k)))]
 
---- Nominal Lift to U₁
-
-def singl₁ (A : U₁) (a: A) : U₁ := Σ (x: A), PathP (<_>A) a x
-def singl₁' (A : U) := Σ (X: U) (f : A → X), isEquiv A X f
-def contr₁ (A : U₁) (a b : A) (p : PathP (<_>A) a b) : PathP (<_>Σ (x : A), PathP (<_>A) a x) (a,<_>a) (b,p) := <i> (p @ i, <j> p @ i /\ j)
-def fiber₁ (A : U₁) (B: U) (f: A → B) (y : B) : U₁ := Σ (x : A), Path B y (f x)
-def subst₁ (A : U₁) (P : A -> U₁) (a b : A) (p : PathP (<_>A) a b) (e : P a) : P b := transp (<i> P (p @ i)) 0 e
-def isContr₁ (A : U₁) := Σ (x: A), Π (y: A), PathP (<_>A) x y
-def isEquiv₁ (A : U₁) (B : U) (f : A → B) : U₁ := Π (y : B), isContr₁ (fiber₁ A B f y)
-
 --- Equiv as Indentity System
 
-def D-equiv := Π (A B: U), equiv A B → U₁
-axiom J-equiv (A B: U) (C: D-equiv) (d: C A A (idEquiv A)) (p: equiv A B) : C A B p
+def singl₁ (B : U) := Σ (A: U), equiv A B
+def subst₁ (A : U₁) (P : A -> U₁) (a b : A) (p : PathP (<_>A) a b) (e : P a) : P b := transp (<i> P (p @ i)) 0 e
 
--- [Orton, Pitts] 2017
+def EquivIsContr (B: U) : isContr (Σ (A: U), equiv A B)
+ := ?
+
+def isContr→isProp (A: U) (w: isContr A) (a b : A) : Path A a b
+ := <i> hcomp A (∂ i) (λ (j : I), [(i = 0) → a, (i = 1) → (w.2 b) @ j]) ((<i4> w.2 a @ -i) @ i)
+
+def contrSinglEquiv (A B : U) (e : equiv A B) : PathP (<_>Σ(X:U), equiv X B) (B,idEquiv B) (A,e)
+ := isContr→isProp (Σ(A: U),equiv A B) (EquivIsContr B) (B,idEquiv B) (A,e)
+
+def J-equiv (A B: U) (P: Π (A: U), equiv A B → U) (r: P B (idEquiv B)) : Π (e: equiv A B), P A e
+ := λ (e: equiv A B), subst₁ (singl₁ B) (\ (z: singl₁ B), P z.1 z.2) (B,idEquiv B) (A,e) (contrSinglEquiv A B e) r
 
 def ua  (A B : U) : equiv A B -> PathP (<_> U) A B := \ (p: equiv A B), univ-intro A B p
 def ua' (A B : U) : PathP (<_> U) A B -> equiv A B := \ (p: PathP (<_>U) A B), univ-elim A B p
-def ua'-IsEquiv (A B: U) := isEquiv₁ (PathP (<_>U) A B) (equiv A B) (ua' A B)
 def ua-β (A B : U) (e : equiv A B) : Path (A → B) (trans A B ((ua A B) e)) e.1
  := <i> λ (x : A), (idfun=idfun″ B @ -i) ((idfun=idfun″ B @ -i) ((idfun=idfun′ B @ -i) (e.1 x)))
+
+def isContr₁ (A : U₁) := Σ (x: A), Π (y: A), PathP (<_>A) x y
+def fiber₁ (A : U₁) (B: U) (f: A → B) (y : B) : U₁ := Σ (x : A), Path B y (f x)
+def isEquiv₁ (A : U₁) (B : U) (f : A → B) : U₁ := Π (y : B), isContr₁ (fiber₁ A B f y)
+def ua'-IsEquiv (A B: U) := isEquiv₁ (PathP (<_>U) A B) (equiv A B) (ua' A B)
 
 --- Primitives
 

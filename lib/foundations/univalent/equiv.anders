@@ -39,20 +39,16 @@ def univ-computation (A B : U) (p : PathP (<_> U) A B) : PathP (<_> PathP (<_> U
  := <j i> Glue B (j ∨ ∂ i) [(i = 0) → (A, univ-elim A B p), (i = 1) → (B, idEquiv B),
                             (j = 1) → (p @ i, univ-elim (p @ i) B (<k> p @ (i ∨ k)))]
 
---- Equiv as Indentity System
+--- Equiv as Identity System
 
 def singl₁ (B : U) := Σ (A: U), equiv A B
 def subst₁ (A : U₁) (P : A -> U₁) (a b : A) (p : PathP (<_>A) a b) (e : P a) : P b := transp (<i> P (p @ i)) 0 e
-
 def EquivIsContr (B: U) : isContr (Σ (A: U), equiv A B)
  := ?
-
 def isContr→isProp (A: U) (w: isContr A) (a b : A) : Path A a b
  := <i> hcomp A (∂ i) (λ (j : I), [(i = 0) → a, (i = 1) → (w.2 b) @ j]) ((<i4> w.2 a @ -i) @ i)
-
 def contrSinglEquiv (A B : U) (e : equiv A B) : PathP (<_>Σ(X:U), equiv X B) (B,idEquiv B) (A,e)
  := isContr→isProp (Σ(A: U),equiv A B) (EquivIsContr B) (B,idEquiv B) (A,e)
-
 def J-equiv (A B: U) (P: Π (A: U), equiv A B → U) (r: P B (idEquiv B)) : Π (e: equiv A B), P A e
  := λ (e: equiv A B), subst₁ (singl₁ B) (\ (z: singl₁ B), P z.1 z.2) (B,idEquiv B) (A,e) (contrSinglEquiv A B e) r
 

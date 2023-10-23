@@ -65,8 +65,11 @@ block content
                     $$
 
                 +code.
-                    def lambda (A: U) (B: A → U) (b: Pi A B) : Pi A B := λ (x : A), b x
-                    def lam (A B: U) (f: A → B) : A → B := λ (x : A), f x
+                    def lambda (A: U) (B: A → U) (b: Pi A B)
+                      : Pi A B := λ (x : A), b x
+
+                    def lam (A B: U) (f: A → B)
+                      : A → B := λ (x : A), f x
                 br.
 
                 +tex.
@@ -77,7 +80,19 @@ block content
                 h2 Elimination
 
                 +tex.
-                    $\mathbf{Definition\ 1.3}$ ($\lambda$-application).
+                    $\mathbf{Definition\ 1.3}$ ($\Pi$-Induction Principle). States that
+                    if predicate holds for lambda function
+                    then there is a function from function space to the space of predicate.
+                +code.
+                    def П-ind (A : U) (B : A -> U)
+                        (C : Pi A B → U)
+                        (g: Π (x: Pi A B), C x)
+                      : П (p: Pi A B), C p
+                     := \ (p: Pi A B), g p
+                br.
+
+                +tex.
+                    $\mathbf{Definition\ 1.3.1}$ ($\lambda$-application).
                     Application reduces the term by using recursive substitution.
 
                 +tex(true).
@@ -86,16 +101,23 @@ block content
                     $$
 
                 +code.
-                    def apply (A: U) (B: A → U) (f: Pi A B) (a: A) : B a := f a
-                    def app (A B: U) (f: A → B) (x: A): B := f x
+                    def apply (A: U) (B: A → U)
+                        (f: Pi A B) (a: A) : B a := f a
+
+                    def app (A B: U) (f: A → B)
+                        (x: A): B := f x
+                br.
 
                 +tex.
-                    $\mathbf{Definition\ 1.3.1}$ (Composition).
+                    $\mathbf{Definition\ 1.3.2}$ (Composition).
                     Composition is using application of appropriate singnatures.
 
                 +code.
-                    def ∘ᵀ (α β γ: U) : U := (β → γ) → (α → β) → (α → γ)
-                    def ∘ (α β γ : U) : ∘ᵀ α β γ := λ (g: β → γ) (f: α → β) (x: α), g (f x)
+                    def ∘ᵀ (α β γ: U) : U
+                      := (β → γ) → (α → β) → (α → γ)
+
+                    def ∘ (α β γ : U) : ∘ᵀ α β γ
+                      := λ (g: β → γ) (f: α → β) (x: α), g (f x)
                 br.
 
                 h2 Computation
@@ -141,8 +163,8 @@ block content
                     This property behaves functoriality as if paths are groupoid morphisms and types are objects.
 
                 +code.
-                    FiberPi (B: U) (F: B -> U) (y: B)
-                          : Path U (fiber (Sigma B F) B (pi1 B F) y) (F y)
+                    def FiberPi (B: U) (F: B -> U) (y: B)
+                      : Path U (fiber (Sigma B F) B (pi1 B F) y) (F y)
 
                 +tex.
                     $\mathbf{Theorem\ 1.7}$ (Trivial Fiber equals Family of Sets).
@@ -154,29 +176,33 @@ block content
                     homotopies between them, then these homotopies are equal.
 
                 +code.
-                    setPi (A: U) (B: A -> U) (h: (x: A) -> isSet (B x)) (f g: Pi A B)
-                          (p q: Path (Pi A B) f g) : Path (Path (Pi A B) f g) p q
+                    def setPi (A: U) (B: A -> U)
+                        (h: П (x: A), isSet (B x)) (f g: Pi A B)
+                        (p q: Path (Pi A B) f g)
+                      : Path (Path (Pi A B) f g) p q
+                br.
 
                 +tex.
                     $\mathbf{Theorem\ 1.9}$ (HomSet). If codomain is set then space of sections is a set.
 
                 +code.
-                    setFun (A B : U) (_: isSet B) : isSet (A -> B)
+                    def setFun (A B : U) (_: isSet B) : isSet (A -> B)
+                br.
 
                 +tex.
                     $\mathbf{Theorem\ 1.10}$ (Contractability). If domain and codomain is contractible then
                     the space of sections is contractible.
 
                 +code.
-                    piIsContr (A: U) (B: A -> U) (u: isContr A)
-                              (q: (x: A) -> isContr (B x))
-                            : isContr (Pi A B)
+                    def piIsContr (A: U) (B: A -> U) (u: isContr A)
+                        (q: П (x: A), isContr (B x))
+                      : isContr (Pi A B)
                 br
 
                 +code.
-                    pathPi (A:U) (B:A->U) (f g : Pi A B)
-                         : Path U (Path (Pi A B) f g)
-                                  ((x:A) -> Path (B x) (f x) (g x))
+                    def pathPi (A: U) (B: A -> U) (f g : Pi A B)
+                      : Path U (Path (Pi A B) f g)
+                               ((x:A) -> Path (B x) (f x) (g x))
                 br
 
                 h1 Interpretations

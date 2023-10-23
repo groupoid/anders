@@ -7,7 +7,6 @@
                 lib/foundations/mltt/pi.anders
                 lib/foundations/mltt/sigma.anders
                 lib/foundations/univalent/path.anders
-                lib/foundations/univalent/prop.anders
                 lib/foundations/univalent/equiv.anders
                 lib/foundations/univalent/iso.anders
                 lib/foundations/modal/infinitesimal.anders
@@ -17,10 +16,7 @@
                 lib/mathematics/categories/functor.anders
                 lib/mathematics/categories/abelian.anders
                 lib/mathematics/categories/groupoid.anders
-                lib/mathematics/topoi/topos.anders
-                lib/mathematics/meta/favonia.anders
-                lib/mathematics/meta/awodey.anders
-                lib/mathematics/meta/kraus.anders
+                lib/mathematics/categories/topos.anders
                 lib/mathematics/geometry/bundle.anders
                 lib/mathematics/geometry/etale.anders
                 lib/mathematics/geometry/formalDisc.anders

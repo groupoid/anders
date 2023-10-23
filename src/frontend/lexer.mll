@@ -78,7 +78,7 @@ rule main = parse
   match s with
   | "/\\"                    | "\xE2\x88\xA7"    -> AND    (* ∧ *)
   | "\\/"                    | "\xE2\x88\xA8"    -> OR     (* ∨ *)
-  | "forall"                 | "\xCE\xA0"        -> PI     (* Π *)
+  | "forall"                 | "\xCE\xA0" | "П"  -> PI     (* Π *)
   | "summa"                  | "\xCE\xA3"        -> SIGMA  (* Σ *)
   | "\\"                     | "\xCE\xBB"        -> LAM    (* λ *)
   | "ind-W"                  | "ind\xE1\xB5\x82" -> INDW   (* indᵂ *)

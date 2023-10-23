@@ -85,24 +85,28 @@ block content
             h2 Elimination
             +tex.
                 $\mathbf{Definition}$ (Fiberwise Induction Principle).
-                For any $C : A \rightarrow B \rightarrow A \simeq B \rightarrow U$
-                and it's evidence $d$ at $(A,A,\mathrm{id_\simeq}(A))$
+                For any $P : A \rightarrow B \rightarrow A \simeq B \rightarrow U$
+                and it's evidence $d$ at $(B,B,\mathrm{id_\simeq}(B))$
                 there is a function $\mathbf{ind}_\simeq$. HoTT 5.8.5
             +tex(true).
                 $$
-                  \mathbf{ind}_\simeq(C,d) : (p: A\simeq B) \rightarrow C(A,B,p).
+                  \mathbf{ind}_\simeq(P,d) : (p: A\simeq B) \rightarrow P(A,B,p).
                 $$
             +code.
-                def ind-Equiv (A B: U)
-                    (C: Π (A B: U), equiv A B → U)
-                    (d: C A A (idEquiv A)) 
-                  : (p: equiv A B) -> C A B p
+                def J-equiv (A B: U)
+                    (P: Π (A B: U), equiv A B → U)
+                    (d: P B B (idEquiv B))
+                  : Π (e: equiv A B), P A B e
+                 := λ (e: equiv A B),
+                      subst (single B) (\ (z: single B), P z.1 B z.2)
+                            (B,idEquiv B) (A,e)
+                            (contrSinglEquiv A B e) d
             br.
             h2 Computation
             +tex.
                 $\mathbf{Definition}$ (Fiberwise Computation of Induction Principle).
             +code.
-                def compute-Equiv (A : U) 
+                def compute-Equiv (A : U)
                     (C : Π (A B: U), equiv A B → U)
                     (d: C A A (idEquiv A))
                   : Path (C A A (idEquiv A)) d
@@ -113,7 +117,7 @@ block content
             h1 UNIVALENCE
             +tex.
                 The notion of univalence represents
-                transport between fibrational equivalence 
+                transport between fibrational equivalence
                 as contractability of fibers and homotopical
                 multi-dimentional
                 heterogeneous path equality (HoTT 2.10):

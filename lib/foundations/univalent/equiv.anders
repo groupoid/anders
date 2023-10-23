@@ -54,9 +54,9 @@ def isContr→isProp (A: U) (w: isContr A) (a b : A) : Path A a b
 def contrSinglEquiv (A B : U) (e : equiv A B)
   : Path (single B) (B,idEquiv B) (A,e)
  := isContr→isProp (single B) (EquivIsContr B) (B,idEquiv B) (A,e)
-def J-equiv (A B: U) (P: Π (A: U), equiv A B → U) (r: P B (idEquiv B))
-  : Π (e: equiv A B), P A e
- := λ (e: equiv A B), subst (single B) (\ (z: single B), P z.1 z.2)
+def J-equiv (A B: U) (P: Π (A B: U), equiv A B → U) (r: P B B (idEquiv B))
+  : Π (e: equiv A B), P A B e
+ := λ (e: equiv A B), subst (single B) (\ (z: single B), P z.1 B z.2)
                             (B,idEquiv B) (A,e) (contrSinglEquiv A B e) r
 
 --- [Pitts] 2016

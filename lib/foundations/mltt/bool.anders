@@ -1,11 +1,3 @@
-{- Run-time Homotopy-inductive types:
-   - Bool type (0-Sphere).
-   - Theorems are in bool_theory module.
-
-   HoTT 1.8 The type of booleans
-
-   Copyright (c) Groupoid Infinity, 2014-2022. -}
-
 module bool where
 
 import lib/foundations/mltt/either

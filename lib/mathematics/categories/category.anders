@@ -25,11 +25,6 @@ def isPrecategory (C: cat) : U := Σ
 
 def precategory: U₁ := Σ (C: cat) (P: isPrecategory C), unit
 
-def catproduct (A B: precategory): precategory
- := ((prod A.C.ob B.C.ob,(\(x y: prod A.C.ob B.C.ob), prod (A.C.hom x.1 y.1) (B.C.hom x.2 y.2)), star),
-    (?,?,?,?,?,?,star),
-    star)
-
 def catᵒᵖ (P: precategory) : precategory :=
     ((P.C.ob, (λ (A B: P.C.ob), P.C.hom B A), P.C.2.2),
      ((λ (A : P.C.ob), P.P.id A),

@@ -32,24 +32,32 @@ def sec-equiv (A B : U) (w : equiv A B) (x : A) : Path A (inv-equiv A B w (w.1 x
 
 --- Univalence Type (Equiv → Path) [Voevodsky] 2014
 
-def univ-formation (A B : U) := equiv A B → PathP (<_> U) A B
-def univ-intro (A B : U) : univ-formation A B := λ (e : equiv A B), <i> Glue B (∂ i) [(i = 0) → (A, e), (i = 1) → (B, idEquiv B)]
-def univ-elim (A B : U) (p : PathP (<_> U) A B) : equiv A B := transp (<i> equiv A (p @ i)) 0 (idEquiv A)
-def univ-computation (A B : U) (p : PathP (<_> U) A B) : PathP (<_> PathP (<_> U) A B) (univ-intro A B (univ-elim A B p)) p
+def univ-formation (A B : U)
+ := equiv A B → PathP (<_> U) A B
+def univ-intro (A B : U) : univ-formation A B
+ := λ (e : equiv A B), <i> Glue B (∂ i) [(i = 0) → (A, e), (i = 1) → (B, idEquiv B)]
+def univ-elim (A B : U) (p : PathP (<_> U) A B) : equiv A B
+ := transp (<i> equiv A (p @ i)) 0 (idEquiv A)
+def univ-computation (A B : U) (p : PathP (<_> U) A B)
+  : PathP (<_> PathP (<_> U) A B) (univ-intro A B (univ-elim A B p)) p
  := <j i> Glue B (j ∨ ∂ i) [(i = 0) → (A, univ-elim A B p), (i = 1) → (B, idEquiv B),
                             (j = 1) → (p @ i, univ-elim (p @ i) B (<k> p @ (i ∨ k)))]
 
 --- Equiv as Identity System [Escardó] 2014
 
 def single (B : U) : U := Σ (A: U), equiv A B
-def EquivIsContr (B: U) : isContr (Σ (A: U), equiv A B)
+def EquivIsContr (B: U) : isContr (single B)
  := ?
 def isContr→isProp (A: U) (w: isContr A) (a b : A) : Path A a b
- := <i> hcomp A (∂ i) (λ (j : I), [(i = 0) → a, (i = 1) → (w.2 b) @ j]) ((<i4> w.2 a @ -i) @ i)
-def contrSinglEquiv (A B : U) (e : equiv A B) : PathP (<_>Σ(X:U), equiv X B) (B,idEquiv B) (A,e)
- := isContr→isProp (Σ(A: U),equiv A B) (EquivIsContr B) (B,idEquiv B) (A,e)
-def J-equiv (A B: U) (P: Π (A: U), equiv A B → U) (r: P B (idEquiv B)) : Π (e: equiv A B), P A e
- := λ (e: equiv A B), subst (single B) (\ (z: single B), P z.1 z.2) (B,idEquiv B) (A,e) (contrSinglEquiv A B e) r
+ := <i> hcomp A (∂ i) (λ (j : I), [(i = 0) → a, (i = 1) → (w.2 b) @ j])
+                      ((<i4> w.2 a @ -i) @ i)
+def contrSinglEquiv (A B : U) (e : equiv A B)
+  : Path (single B) (B,idEquiv B) (A,e)
+ := isContr→isProp (single B) (EquivIsContr B) (B,idEquiv B) (A,e)
+def J-equiv (A B: U) (P: Π (A: U), equiv A B → U) (r: P B (idEquiv B))
+  : Π (e: equiv A B), P A e
+ := λ (e: equiv A B), subst (single B) (\ (z: single B), P z.1 z.2)
+                            (B,idEquiv B) (A,e) (contrSinglEquiv A B e) r
 
 --- [Pitts] 2016
 

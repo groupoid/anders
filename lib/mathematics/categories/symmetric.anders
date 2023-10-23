@@ -3,6 +3,11 @@ import lib/mathematics/categories/category
 import lib/mathematics/categories/functor
 import lib/mathematics/categories/natural
 
+def catproduct (A B: precategory): precategory
+ := ((prod A.C.ob B.C.ob,(\(x y: prod A.C.ob B.C.ob), prod (A.C.hom x.1 y.1) (B.C.hom x.2 y.2)), star),
+    (?,?,?,?,?,?,star),
+    star)
+
 axiom flipBifunctor (X Y Z: precategory) (F: catfunctor (catproduct X Y) Z)
     : catfunctor (catproduct Y X) Z
 

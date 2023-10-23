@@ -1,9 +1,9 @@
-{- Pi Type:
+{- Pi Type: https://anders.groupoid.space/foundations/mltt/pi/
    - Pi.
 
    HoTT 1.5 Product types
 
-   Copyright (c) Groupoid Infinity, 2014-2022. -}
+   Copyright (c) Groupoid Infinity, 2014-2023. -}
 
 module pi where
 import lib/foundations/univalent/path
@@ -12,8 +12,11 @@ def Pi (A : U) (B : A → U) : U := Π (x : A), B x
 def Fun (A B: U) : U := П (x : A), B
 def lam (A B: U) (f: A → B) : Fun A B ≔ λ (x : A), f x
 def app (A B: U) (f: A → B) (x: A): B := f x
-def П-lambda (A: U) (B: A → U) (b: Pi A B) : Pi A B := λ (x : A), b x
-def П-apply (A: U) (B: A → U) (f: Pi A B) (a: A) : B a := f a
-def П-β (A : U) (B : A → U) (a : A) (f : Pi A B) : Path (B a) (П-apply A B (П-lambda A B f) a) (f a) := idp (B a) (f a)
-def П-η (A : U) (B : A → U) (a : A) (f : Pi A B) : Path (Pi A B) f (λ (x : A), f x) := idp (Pi A B) f
-def П-ind (A : U) (B : A -> U) (C : Pi A B → U) (g: Π (x: Pi A B), C x) : П (p: Pi A B), C p := \ (p: Pi A B), g p
+def Π-lambda (A: U) (B: A → U) (b: Pi A B) : Pi A B := λ (x : A), b x
+def Π-apply (A: U) (B: A → U) (f: Pi A B) (a: A) : B a := f a
+def Π-β (A : U) (B : A → U) (a : A) (f : Pi A B)
+  : Path (B a) (Π-apply A B (Π-lambda A B f) a) (f a) := idp (B a) (f a)
+def Π-η (A : U) (B : A → U) (a : A) (f : Pi A B)
+  : Path (Pi A B) f (λ (x : A), f x) := idp (Pi A B) f
+def Π-ind (A : U) (B : A -> U) (C : Pi A B → U) (g: Π (x: Pi A B), C x)
+  : Π (p: Pi A B), C p := \ (p: Pi A B), g p

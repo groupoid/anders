@@ -1,3 +1,8 @@
+{- Vector Type: https://anders.groupoid.space/foundations/mltt/vec/
+   - Vec.
+
+   Copyright (c) Groupoid Infinity, 2014-2023. -}
+
 module vec where
 import lib/foundations/mltt/nat
 import lib/foundations/mltt/sigma
@@ -18,10 +23,10 @@ def Vec-ind (A : U)
           (λ (k : ℕ) (f : Π (x : Vec A k), T k x)
              (y : Vec A (succ k)), s k y.1 y.2 (f y.2)) m
 
-def Vec-rec (A B : U) (z : B) (s : Π (n : ℕ), A → Vec A n → B → B) (m : ℕ) : Vec A m → B
- := Vec-ind A (λ (n : ℕ) (_ : Vec A n), B) z s m
+def Vec-rec (A B : U) (z : B) (s : Π (n : ℕ), A → Vec A n → B → B) (m : ℕ)
+  : Vec A m → B := Vec-ind A (λ (n : ℕ) (_ : Vec A n), B) z s m
 
-def Vec-map (A B : U) (f : A → B) (n : ℕ) : Vec A n → Vec B n
- := Vec-ind A (λ (k : ℕ) (_ : Vec A k), Vec B k) ★ (λ (k : ℕ) (x : A) (_ : Vec A k), vsucc B k (f x)) n
-
-def Vec-X : U := Vec (bool × U₀) three
+def Vec-map (A B : U) (f : A → B) (n : ℕ)
+  : Vec A n → Vec B n
+ := Vec-ind A (λ (k : ℕ) (_ : Vec A k), Vec B k) ★ (λ (k : ℕ)
+              (x : A) (_ : Vec A k), vsucc B k (f x)) n

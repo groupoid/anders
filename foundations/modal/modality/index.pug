@@ -36,21 +36,23 @@ block content
                     $\mathbf{Definition}$ (Modality System).
 
                 +code.
-                    Modality : U
-                     = (isModal : U -> U)
-                     * (isPropIsModal : (A : U) -> isProp (isModal A))
-                     * (modality: U -> U)
-                     * (modalityIsModal : (A : U) -> isModal (modality A))
-                     * (eta: (A : U) -> A -> modality A)
-                     * (elim: (A : U) (B : modality A -> U)
-                         (BModal : (x : modality A) -> isModal (B x))
-                         (f: (x : A) -> (B (eta A x))) -> ((x : modality A) -> B x))
-                     * (elimBeta : (A : U) (B : modality A -> U)
-                         (BModal : (x : modality A) -> isModal (B x))
-                         (f : (x : A) -> (B (eta A x)))
-                         (a : A) -> Path (B (eta A a)) (elim A B BModal f (eta A a)) (f a))
-                     * (isModal: (A : U) (x y : modality A) -> isModal (Path (modality A) x y))
-                     * unit
+                    def Modality :=
+                      Σ (modality: U → U)
+                        (isModal : U → U)
+                        (eta:      Π (A : U), A → modality A)
+                        (elim:     Π (A : U) (B : modality A → U)
+                                     (B-Modal : Π (x : modality A), isModal (B x))
+                                     (f: П (x : A), (B (eta A x))),
+                                     (Π (x : modality A), B x))
+                        (elim-β :  Π (A : U) (B : modality A → U)
+                                     (B-Modal : Π (x : modality A), isModal (B x))
+                                     (f : Π (x : A), (B (eta A x))) (a : A),
+                                     PathP (<_>B (eta A a)) (elim A B B-Modal f (eta A a)) (f a))
+                        (modalityIsModal : Π (A : U), isModal (modality A))
+                        (propIsModal : Π (A : U), Π (a b : isModal A),
+                                         PathP (<_>isModal A) a b)
+                        (=-Modal : Π (A : U) (x y : modality A),
+                                     isModal (PathP (<_>modality A) x y)), 𝟏
                 br.
 
                 h1 LITERATURE

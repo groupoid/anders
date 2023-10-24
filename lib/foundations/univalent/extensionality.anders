@@ -1,10 +1,10 @@
 {- FunExt Type: https://anders.groupoid.space/foundations/univalent/funext
-   - Homotopy
-   - Identity System
-   - Function Extensionality
-   - FunExt as Isomorphism
+   — Homotopy;
+   — Identity System;
+   — Function Extensionality;
+   — FunExt as Isomorphism.
 
-   HoTT 2.9 Pi-types and the function extensionality axiom.
+   HoTT 2.9 Pi-types and the function extensionality axiom
 
    Copyright (c) Groupoid Infinity, 2014-2023. -}
 

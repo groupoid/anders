@@ -1,13 +1,16 @@
 {- Equivalence: https://anders.groupoid.space/foundations/univalent/equiv
    — Fibers;
    — Contractability of Fibers and Singletons;
-   — Equivalence.
+   — Equivalence;
    — Surjective, Injective, Embedding, Hae;
-   — Univalence.
-   — Theorems, Gluing;
-   Copyright (c) Groupoid Infinity, 2014-2023.
+   — Univalence;
+   — Theorems, Gluing.
 
-   HoTT 4.6 Surjections and Embedding -}
+   HoTT 4.2.4 Fiber
+   HoTT 4.6 Surjections and Embedding
+   HoTT 5.8.5 Equivalence Induction
+
+   Copyright (c) Groupoid Infinity, 2014-2023. -}
 
 module equiv where
 import lib/foundations/univalent/path

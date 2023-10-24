@@ -1,6 +1,8 @@
 {- Vector Type: https://anders.groupoid.space/foundations/mltt/vec/
    - Vec.
 
+   HoTT 5.7 Generalization of inductive types
+
    Copyright (c) Groupoid Infinity, 2014-2023. -}
 
 module vec where

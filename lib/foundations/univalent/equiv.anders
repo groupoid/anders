@@ -2,11 +2,14 @@
    — Fibers;
    — Contractability of Fibers and Singletons;
    — Equivalence;
-   — Surjective, Injective, Embedding, Hae;
+   — Surjective, Injective, Embedding
+   - Half-adjoint equivalence;
    — Univalence;
    — Theorems, Gluing.
 
+   HoTT 2.10 Universes and univalence axiom
    HoTT 4.2.4 Fiber
+   HoTT 4.4 Contractible Fibers
    HoTT 4.6 Surjections and Embedding
    HoTT 5.8.5 Equivalence Induction
 

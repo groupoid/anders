@@ -2,7 +2,8 @@
    - Sigma.
    - Total, Axiom of Choice.
 
-   HoTT 1.5 Product types
+   HoTT 2.6 Cartesian Product
+   HoTT 2.7 Sigma Types
 
    Copyright (c) Groupoid Infinity, 2014-2023. -}
 

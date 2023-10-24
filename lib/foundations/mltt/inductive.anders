@@ -2,7 +2,11 @@
    - 0, 1, 2, W types;
 
    HoTT 1.8 The type of booleans
+   HoTT 2.8 Unit type
+   HoTT 5.1 Induction to inductive types
    HoTT 5.3 W-Types
+   HoTT 5.4 Inductive types are initial algebras
+   HoTT 5.5 Homotopy-in
 
    Copyright (c) Groupoid Infinity, 2014-2023. -}
 
@@ -34,12 +38,15 @@ def 1-η (z: 𝟏) : Path 𝟏 ★ z := idp 𝟏 ★ -- 𝟏-irrelevance enabled
 
 def 2-ind (C: 𝟐 → U) (x: C 0₂) (y: C 1₂) : П (z: 𝟐), C z := ind₂ C x y
 def 2-rec (C: U) (x y: C) : П (z: bool), C := ind₂ (\(_:𝟐), C) x y
+
 def 2-β₁ (C : 𝟐 → U) (f : Π (x : 𝟐), C 0₂) (g : Π (y : 𝟐), C 1₂)
   : PathP (<_>C 0₂) (f 0₂) (ind₂ (λ (x : 𝟐), C x) (f 0₂) (g 1₂) 0₂)
  := <_> f 0₂
+
 def 2-β₂ (C : 𝟐 → U) (f : Π (x : 𝟐), C 0₂) (g : Π (y : 𝟐), C 1₂)
   : PathP (<_>C 1₂) (g 1₂) (ind₂ (λ (x : 𝟐), C x) (f 0₂) (g 1₂) 1₂)
  := <_> g 1₂
+
 def 2-η (c : 𝟐) : + (PathP (<_> 𝟐) c 0₂) (PathP (<_> 𝟐) c 1₂)
  := ind₂ (λ (c : 𝟐), + (PathP (<_> 𝟐) c 0₂) (PathP (<_> 𝟐) c 1₂))
          (0₂, <_> 0₂) (1₂, <_> 1₂) c

@@ -1,4 +1,4 @@
-{- Path Type: https://anders.groupoid.space/foundations/univalent/path
+{- Path: https://anders.groupoid.space/foundations/univalent/path
    - Path Equality;
    - Computational properties;
    - Interval and De Morgan laws;
@@ -11,6 +11,7 @@
    HoTT 1.12.1 Path induction
    HoTT 2.1 Types are higher groupoids
    HoTT 2.11 Identity type
+   HoTT 2.2 Functions are functors
    HoTT 3.11 Contractibility
    HoTT 5.8 Identity types and identity systems
    HoTT 6.2 Induction principles and dependent paths.

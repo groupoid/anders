@@ -1,9 +1,9 @@
-{- The modality of shape infinitesimal: https://anders.groupoid.space/foundations/modal/infinitesimal/
-   - \Im modality type.
+{- Im: https://anders.groupoid.space/foundations/modal/infinitesimal/
+   — Im modality of shape infinitesimal.
 
    HoTT 7.7 Modalities
 
-   Copyright (c) Groupoid Infinity, 2014-2022. -}
+   Copyright (c) Groupoid Infinity, 2014-2023. -}
 
 module infinitesimal where
 import lib/foundations/univalent/path

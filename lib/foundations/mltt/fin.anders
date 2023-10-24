@@ -1,5 +1,7 @@
 {- Finite Set Type: https://anders.groupoid.space/foundations/mltt/fin/
-   - Vec.
+   - Fin.
+
+   HoTT 1.9 Exercise
 
    Copyright (c) Groupoid Infinity, 2014-2023. -}
 
@@ -52,8 +54,10 @@ def 2₆ : 𝟔 := inl 𝟑 𝟑 2₃
 def 3₆ : 𝟔 := inr 𝟑 𝟑 0₃
 def 4₆ : 𝟔 := inr 𝟑 𝟑 1₃
 def 5₆ : 𝟔 := inr 𝟑 𝟑 2₃
-def ind₆ (C : 𝟔 → U) (c₀ : C 0₆) (c₁ : C 1₆) (c₂ : C 2₆) (c₃ : C 3₆) (c₄ : C 4₆) (c₅ : C 5₆) : Π (x : 𝟔), C x
- := +-ind 𝟑 𝟑 C (ind₃ (λ (x : 𝟑), C (0₂, x)) c₀ c₁ c₂) (ind₃ (λ (x : 𝟑), C (1₂, x)) c₃ c₄ c₅)
+def ind₆ (C : 𝟔 → U) (c₀ : C 0₆) (c₁ : C 1₆) (c₂ : C 2₆)
+         (c₃ : C 3₆) (c₄ : C 4₆) (c₅ : C 5₆) : Π (x : 𝟔), C x
+ := +-ind 𝟑 𝟑 C (ind₃ (λ (x : 𝟑), C (0₂, x)) c₀ c₁ c₂)
+                (ind₃ (λ (x : 𝟑), C (1₂, x)) c₃ c₄ c₅)
 
 def 𝟕 : U := + 𝟑 𝟒
 def 0₇ : 𝟕 := inl 𝟑 𝟒 0₃

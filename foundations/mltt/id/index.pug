@@ -108,6 +108,20 @@ block content
                 $D : \Pi_{a,b:A}R(a,b) \rightarrow X_i$ and $d: \Pi_{a:A}D(a,a,r_0(a))$,
                 there exists a function $f: \Pi_{a,b:A}\Pi_{r:R(a,b)}D(a,b,r)$ such that
                 $f(a,a,r_0(a))=d(a)$ for all $a:A$.
+            +code.
+                def IdentitySystem (A : U) : U ≔
+                  Σ (=-form : A → A → U)
+                    (=-ctor : Π (a : A), =-form a a)
+                    (=-elim : Π (a : A) (C: Π (x y : A)
+                                (p : =-form x y), U)
+                                (d : C a a (=-ctor a)) (y : A)
+                                (p : =-form a y), C a y p)
+                    (=-comp : Π (a : A) (C: Π (x y : A)
+                                (p : =-form x y), U)
+                                (d : C a a (=-ctor a)),
+                                Path (C a a (=-ctor a)) d
+                                     (=-elim a C d a (=-ctor a))), 𝟏
+            br.
             +tex.
                 There are number of equality signs used in this tutorial,
                 all of them listed in the following table of identity systems:

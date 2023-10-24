@@ -9,9 +9,21 @@ module mltt where
 import lib/foundations/mltt/pi
 import lib/foundations/mltt/sigma
 import lib/foundations/univalent/path
+option girard true
 
-def MLTT (A : U) : U₁ ≔ Σ
-    (Π-form  : Π (B : A → U), U)
+def IdentitySystem (A: U) : U ≔
+  Σ (=-form : A → A → U)
+    (=-ctor : Π (a : A), =-form a a)
+    (=-elim : Π (a : A) (C: Π (x y: A) (p: =-form x y), U)
+                (d: C a a (=-ctor a)) (y: A)
+                (p: =-form a y), C a y p)
+    (=-comp : Π (a : A) (C: Π (x y: A) (p: =-form x y), U)
+                (d: C a a (=-ctor a)),
+                Path (C a a (=-ctor a)) d
+                     (=-elim a C d a (=-ctor a))), 𝟏
+
+def MLTT (A : U) : U₁ ≔
+  Σ (Π-form  : Π (B : A → U), U)
     (Π-ctor₁ : Π (B : A → U), Pi A B → Pi A B)
     (Π-elim₁ : Π (B : A → U), Pi A B → Pi A B)
     (Π-comp₁ : Π (B : A → U) (a : A) (f : Pi A B), Path (B a) (Π-elim₁ B (Π-ctor₁ B f) a) (f a))
@@ -33,7 +45,7 @@ def MLTT (A : U) : U₁ ≔ Σ
 
 def internalizing (A : U)
   : MLTT A
- := ( Pi A, lambda A, apply A, Π-β A, Π-η A,
+ := ( Pi A, Π-lambda A, Π-apply A, Π-β A, Π-η A,
       Sigma A, pair A, pr₁ A, pr₂ A, Σ-β₁ A, Σ-β₂ A, Σ-η A,
       Path A, idp A, J A, J-β A,
       ★

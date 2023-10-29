@@ -80,7 +80,13 @@ block content
                 def ind-Iso (A B: U)
                     (C: Π (A B: U), iso A B → U)
                     (d: C A A (iso-Intro A))
-                  : (p: iso A B) -> C A B p
+                  : Π (e: iso A B), P A B e
+                 := λ (e: iso A B),
+                      subst (iso-single B)
+                            (\ (z: iso-single B), P z.1 B z.2)
+                            (B,iso-intro B)
+                            (A,e)
+                            (iso-contrSinglEquiv A B e) r
             br.
         section
             h1 UNIMORPHISM
@@ -92,11 +98,52 @@ block content
                 cubical systems and is called Unimorphism or $\mathrm{Uni}$ here.
             h2 Formation
             +tex.
-                $\mathbf{Definition}$ (Isomorphism Formation).
+                $\mathbf{Definition}$ (Unimorphism Formation).
             +tex(true).
                 $$
                     A \cong B \rightarrow A = B : U.
                 $$
             h2 Introduction
+            +tex.
+                $\mathbf{Definition}$ (Unimorphism Introduction).
+            +tex(true).
+                $$
+                    \mathrm{uni} : \prod_{A,B:U}\prod_{x:\mathrm{Iso}} A = B =_{def}
+                $$
+            +tex(true).
+                $$
+                    \mathbf{Glue}_B\ \delta_i
+                    \begin{cases}
+                      i\mbox{=}0 \rightarrow(A,x.\hspace{-0.2em}f,\mathrm{isoToEquiv}(x)) \\
+                      i\mbox{=}1 \rightarrow(B,\mathrm{id}_B,\mathrm{idIsEquiv}_B)
+                    \end{cases}
+                $$
+            +code.
+                def iso→Path (A B : U)
+                    (f : A -> B) (g : B -> A)
+                    (s : Π (y : B), Path B (f (g y)) y)
+                    (t : Π (x : A), Path A (g (f x)) x)
+                  : PathP (&lt;_> U) A B
+                 := &lt;i> Glue B (∂ i)
+                    [ (i = 0) -> (A,f, isoToEquiv A B f g s t),
+                      (i = 1) -> (B,id B, idIsEquiv B)]
+            br.
+            h2 Elimination
+            +tex.
+                $\mathbf{Definition}$ (Unimorphism Elimination).
+            +tex(true).
+                $$
+                $$
+            +code.
+                def uni-Elim (A B : U)
+                  : PathP (&lt;_> U) A B -> iso A B
+                 := λ (p : PathP (&lt;_> U) A B),
+                      ( coerce A B p,
+                        coerce B A (&lt;i> p @ -i),
+                        trans⁻¹-trans A B p, λ (a : A),
+                        &lt;k> trans-trans⁻¹ A B p a @ -k,
+                        ★
+                      )
+            br.
 
 include ../../../footer

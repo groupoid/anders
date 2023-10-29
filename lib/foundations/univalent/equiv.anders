@@ -49,14 +49,12 @@ def univ-computation (A B : U) (p : PathP (<_> U) A B)
  := <j i> Glue B (j ∨ ∂ i) [(i = 0) → (A, univ-elim A B p), (i = 1) → (B, idEquiv B),
                             (j = 1) → (p @ i, univ-elim (p @ i) B (<k> p @ (i ∨ k)))]
 
---- Equiv as Identity System [Escardó] 2014
+--- Equiv as [Right] Identity System [Escardó] 2014
 
 def single (B : U) : U := Σ (A: U), equiv A B
-def EquivIsContr (B: U) : isContr (single B)
- := ?
+def EquivIsContr (B: U) : isContr (single B) := ?
 def isContr→isProp (A: U) (w: isContr A) (a b : A) : Path A a b
- := <i> hcomp A (∂ i) (λ (j : I), [(i = 0) → a, (i = 1) → (w.2 b) @ j])
-                      ((<i4> w.2 a @ -i) @ i)
+ := <i> hcomp A (∂ i) (λ (j : I), [(i = 0) → a, (i = 1) → (w.2 b) @ j]) ((<i4> w.2 a @ -i) @ i)
 def contrSinglEquiv (A B : U) (e : equiv A B)
   : Path (single B) (B,idEquiv B) (A,e)
  := isContr→isProp (single B) (EquivIsContr B) (B,idEquiv B) (A,e)
@@ -88,3 +86,13 @@ def hcomp-Glue' (A : U) (φ : I)
           (λ (i : I), [(ψ = 1) → u i 1=1]) (ouc u₀)
 --- def Glue-computation
 --- def Glue-uniqueness
+
+-- The other notion of equality such as Half Adjoint Equivalence and
+-- Bi-Invertible Equivalences could be introduced and encoded as isomorphism by analogy.
+
+def isHae (A B : U) (f : A -> B): U :=
+  Σ (g : B -> A) (eta_: Path (idᵀ A) (∘ A B A g f) (id A)) (eps_: Path (idᵀ B) (∘ B A B f g) (id B)),
+  Π (x : A), Path B (f ((eta_ @ 0) x)) ((eps_ @ 0) (f x))
+
+def hae (A B : U) : U := Σ (f : A -> B), isHae A B f
+

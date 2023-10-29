@@ -69,12 +69,20 @@ block content
                     збігається (доводиться в самій теорії) з простором шляхів.
 
                 +code.
-                    isContr (A: U): U := Σ (x: A), Π (y: A), Path A x y
-                    fiber (A B: U) (f: A → B) (y: B): U := Σ (x: A), Path B y (f x)
-                    isEquiv (A B: U) (f: A → B): U := Π (y: B), isContr (fiber A B f y)
-                    equiv(X Y: U): U := Σ (f: X → Y), isEqiv X Y f
-                    ua (A B : U) (p : Path U A B) : equiv A B
-                       := transp (&lt;i> equiv A (p @ i)) 0 (idEquiv A)
+                    def isContr (A: U) : U
+                     := Σ (x: A), Π (y: A), Path A x y
+
+                    def fiber (A B: U) (f: A → B) (y: B): U
+                     := Σ (x: A), Path B y (f x)
+
+                    def isEquiv (A B: U) (f: A → B): U
+                     := Π (y: B), isContr (fiber A B f y)
+
+                    def equiv(X Y: U): U
+                     := Σ (f: X → Y), isEqiv X Y f
+
+                    def ua (A B : U) (p : Path U A B) : equiv A B
+                     := transp (&lt;i> equiv A (p @ i)) 0 (idEquiv A)
                 br.
                 p.
                     Завдяки відсутності ета-правила у рівності,

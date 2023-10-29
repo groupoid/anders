@@ -82,34 +82,27 @@ def iso (A B: U) : U :=
     (t : retract A B f g),
     𝟏
 
-def iso-intro (A: U)
-  : iso A A
- := ( id A,
-      id A,
-      (\(x:A), <_>x),
-      (\(x:A), <_>x),
-      ★
-    )
-
-def iso-single (B : U) : U := Σ (A: U), iso A B
-def iso-EquivIsContr (B: U) : isContr (iso-single B) := ?
-def iso-isContr→isProp (A: U) (w: isContr A) (a b : A) : Path A a b
- := <i> hcomp A (∂ i) (λ (j : I), [(i = 0) → a, (i = 1) → (w.2 b) @ j])
-                      ((<i4> w.2 a @ -i) @ i)
-def iso-contrSinglEquiv (A B : U) (e : iso A B)
-  : Path (iso-single B) (B,iso-intro B) (A,e)
- := isContr→isProp (iso-single B) (iso-EquivIsContr B) (B,iso-intro B) (A,e)
-def iso-J (A B: U) (P: Π (A B: U), iso A B → U) (r: P B B (iso-intro B))
-  : Π (e: iso A B), P A B e
- := λ (e: iso A B), subst (iso-single B) (\ (z: iso-single B), P z.1 B z.2)
-                            (B,iso-intro B) (A,e) (iso-contrSinglEquiv A B e) r
-
 def iso→Path (A B : U) (f : A -> B) (g : B -> A)
     (s : Π (y : B), Path B (f (g y)) y)
     (t : Π (x : A), Path A (g (f x)) x)
   : PathP (<_> U) A B
  := <i> Glue B (∂ i) [(i = 0) -> (A, f, isoToEquiv A B f g s t),
                       (i = 1) -> (B, id B, idIsEquiv B)]
+
+--- Iso as [Right] Identity System [Sokhatsky]
+
+def iso-intro (A: U) : iso A A := ( id A, id A, (\(x:A), <_>x), (\(x:A), <_>x), ★)
+def iso-single (B : U) : U := Σ (A: U), iso A B
+def iso-EquivIsContr (B: U) : isContr (iso-single B) := ?
+def iso-isContr→isProp (A: U) (w: isContr A) (a b : A) : Path A a b
+ := <i> hcomp A (∂ i) (λ (j : I), [(i = 0) → a, (i = 1) → (w.2 b) @ j]) ((<i4> w.2 a @ -i) @ i)
+def iso-contrSinglEquiv (A B : U) (e : iso A B)
+  : Path (iso-single B) (B,iso-intro B) (A,e)
+ := isContr→isProp (iso-single B) (iso-EquivIsContr B) (B,iso-intro B) (A,e)
+def iso-J (A B: U) (P: Π (A B: U), iso A B → U) (r: P B B (iso-intro B))
+  : Π (e: iso A B), P A B e
+ := λ (e: iso A B), subst (iso-single B) (\ (z: iso-single B), P z.1 B z.2)
+                          (B,iso-intro B) (A,e) (iso-contrSinglEquiv A B e) r
 
 -- Similar to Fibrational Equivalence the notion of Retract/Section based Isomorphism could be introduced
 -- as forth-back transport between isomorphism and path equality. This notion is somehow cannonical to all
@@ -120,7 +113,13 @@ def iso→Path (A B : U) (f : A -> B) (g : B -> A)
 def uni-Form (A B: U) : U₁ := iso A B -> PathP (<_>U) A B
 def uni-Intro (A B: U) : uni-Form A B := \ (x : iso A B), iso→Path A B x.f x.g x.s x.t
 def uni-Elim (A B : U) : PathP (<_> U) A B -> iso A B
- := λ (p : PathP (<_> U) A B), ( coerce A B p, coerce B A (<i> p @ -i), trans⁻¹-trans A B p, λ (a : A), <k> trans-trans⁻¹ A B p a @ -k, star )
+ := λ (p : PathP (<_> U) A B),
+      ( coerce A B p,
+        coerce B A (<i> p @ -i),
+        trans⁻¹-trans A B p, λ (a : A),
+        <k> trans-trans⁻¹ A B p a @ -k,
+        ★
+      )
 
 -- The notion of Minivalence as forth-back map between fibrational equivalence
 -- and section/retract-based isomorphism is mentioned in Cubical Agda sources.
@@ -130,13 +129,4 @@ def uni-Elim (A B : U) : PathP (<_> U) A B -> iso A B
 def mini-Form (A B : U) : U := iso A B -> equiv A B
 def mini-Intro (A B : U) : mini-Form A B := \ (x : iso A B), univ-elim A B (iso→Path A B x.f x.g x.s x.t)
 def mini-Elim (A B : U) : equiv A B -> iso A B := \ (x : equiv A B), ( x.f, inv-equiv A B x, ret-equiv A B x, sec-equiv A B x, star)
-
--- The other notion of equality such as Half Adjoint Equivalence and
--- Bi-Invertible Equivalences could be introduced and encoded as isomorphism by analogy.
-
-def isHae (A B : U) (f : A -> B): U :=
-  Σ (g : B -> A) (eta_: Path (idᵀ A) (∘ A B A g f) (id A)) (eps_: Path (idᵀ B) (∘ B A B f g) (id B)),
-  Π (x : A), Path B (f ((eta_ @ 0) x)) ((eps_ @ 0) (f x))
-
-def hae (A B : U) : U := Σ (f : A -> B), isHae A B f
 

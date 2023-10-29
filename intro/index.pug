@@ -92,14 +92,14 @@ block content
                     інфініті-групоїда.
 
                 +code.
-                    isProp (A : U) : U := Π (a b : A),
-                        Path A a b
+                    def isProp (A : U) : U
+                     := Π (a b : A), Path A a b
 
-                    isSet (A : U) : U := Π (a b : A)
-                        (a0 b0 : Path A a b),
+                    def isSet (A : U) : U
+                     := Π (a b : A) (a0 b0 : Path A a b),
                         Path (Path A a b) a0 b0
 
-                    isGroupoid (A : U) : U
+                    def isGroupoid (A : U) : U
                      := Π (a b : A) (x y : Path A a b)
                         (i j : Path (Path A a b) x y),
                         Path (Path (Path A a b) x y) i j
@@ -108,19 +108,19 @@ block content
                     Групоїдна інтерпретація теорії типів ставить питання про існування мови,
                     в якій можна довести механічно всі всластивості категорного визначення групоїда.
                 +code.
-                    CatGroupoid (X : U) (G : isGroupoid X)
-                       : isCatGroupoid (PathCat X)
-                      := ( idp X,
-                           comp-Path X,
-                           G,
-                           sym X,
-                           comp-inv-Path⁻¹ X,
-                           comp-inv-Path X,
-                           comp-Path-left X,
-                           comp-Path-right X,
-                           comp-Path-assoc X,
-                           star
-                         )
+                    def CatGroupoid (X : U) (G : isGroupoid X)
+                      : isCatGroupoid (PathCat X)
+                     := ( idp X,
+                          comp-Path X,
+                          G,
+                          sym X,
+                          comp-inv-Path⁻¹ X,
+                          comp-inv-Path X,
+                          comp-Path-left X,
+                          comp-Path-right X,
+                          comp-Path-assoc X,
+                          ★
+                        )
                 +tex.
                     За цей час були перепробувані глобулярні та сімліціальні моделі, але
                     аксіома унівалентності конструктивно валідується тільки в кубічних множинах,

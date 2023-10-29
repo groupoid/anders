@@ -20,7 +20,10 @@ block content
                 foldNat  Zero    f x = x
                 foldNat (Succ m) f x = f (foldNat m f x)
 
-                data IO r = PutStrLn String (IO r) | GetLine (String -> IO r) | Return r
+                data IO r
+                   = PutStrLn String (IO r)
+                   | GetLine (String -> IO r)
+                   | Return r
 
                 putStrLn : String -> IO U
                 putStrLn str = PutStrLn str (Return Unit)
@@ -36,7 +39,8 @@ block content
 
                 replicateM : Nat -> IO U -> IO U
                 replicateM n io = foldNat n (io >>) (return Unit)
-                io : IO U
+
+                recursion : IO U -- over Nat
                    = replicateM 5 (getLine >>= putStrLn)
 
 include ../../../footer

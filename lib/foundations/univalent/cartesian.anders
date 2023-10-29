@@ -1,0 +1,15 @@
+module cartesian where
+import lib/foundations/univalent/path
+
+--- AFH, ABCFHL
+
+def coe0→1  (A : I → U) (a : A 0) : A 1 := transp (<i> A i) 0 a
+def coe0→i  (A : I → U) (r : I) (a : A 0) : A r := transp (<j> A (r ∧ j)) (-r) a
+def coe0→i1 (A : I → U) (a : A 0) : Path (A 1) (coe0→i A 1 a) (coe0→1 A a) := <_> (coe0→1 A a)
+def coe0→i0 (A : I → U) (a : A 0) : Path (A 0) (coe0→i A 0 a) a := <_> a
+def coe1→0  (A : I → U) (a: A 1) : A 0 := transp (<i> A (-i)) 0 a
+def coe1→i  (A : I → U) (i : I) (a : A 1) : A i := transp (<j> A (i ∨ -j)) i a
+def coei→0  (A : I → U) (i : I) (a : A i) : A 0 := transp (<j> A (i ∧ -j)) (-i) a
+def coei0→0 (A : I → U) (a : A 0) : Path (A 0) (coei→0 A 0 a) a := <_> a
+def coei1→0 (A : I → U) (a : A 1) : Path (A 0) (coei→0 A 1 a) (coe1→0 A a) := <_> (coe1→0 A a)
+

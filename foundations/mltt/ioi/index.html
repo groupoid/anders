@@ -12,10 +12,30 @@ use[data-c]{stroke-width:3px}
    | GetLine <span class="h__symbol">(</span>String -> s<span class="h__symbol">)</span>
    | Return r
 
+maybe <span class="h__symbol">:</span> <span class="h__symbol">(</span>a -> b<span class="h__symbol">)</span> -> b -> Maybe a -> b
+Just <span class="h__symbol">:</span> a -> Maybe a
+
 data IOI r
    <span class="h__symbol">=</span> forall s . MkIO s <span class="h__symbol">(</span>s -> IOF r s<span class="h__symbol">)</span>
 
-io <span class="h__symbol">:</span> IOI
-   <span class="h__symbol">=</span> MkIO Nothing <span class="h__symbol">(</span>maybe <span class="h__symbol">(</span>\str -> PutStrLn str Nothing<span class="h__symbol">)</span>
-                         <span class="h__symbol">(</span>GetLine Just<span class="h__symbol">))</span>
-</code></section></article><footer class="footer"><a href="https://5ht.co/license/"><img class="footer__logo" src="https://longchenpa.guru/seal.png" width="50"></a><span class="footer__copy">2021&mdash;2023 &copy; <a href="//groupoid.space/" style="color:Lavender;">Groupoïd Infinity</a></span></footer>
+corecursion <span class="h__symbol">:</span> IOI <span class="h__symbol">()</span>
+   <span class="h__symbol">=</span> MkIO
+     Nothing
+     <span class="h__symbol">(</span>maybe <span class="h__symbol">(</span>\ s -> PutStrLn s Nothing<span class="h__symbol">)</span>
+            <span class="h__symbol">(</span>GetLine Just<span class="h__symbol">))</span></code><br><p>In pure functions:</p><code>   \ <span class="h__symbol">(</span>r <span class="h__symbol">:</span> *1<span class="h__symbol">)</span>
+-> #IOI/MkIO r
+   <span class="h__symbol">(</span>#Maybe/@ #IOI/data<span class="h__symbol">)</span>
+   <span class="h__symbol">(</span>#Maybe/Nothing #IOI/data<span class="h__symbol">)</span>
+   <span class="h__symbol">(</span> \ <span class="h__symbol">(</span>m <span class="h__symbol">:</span> #Maybe/@ #IOI/data<span class="h__symbol">)</span>
+    -> #Maybe/maybe #IOI/data m
+       <span class="h__symbol">(</span>#IOI/F r <span class="h__symbol">(</span>#Maybe/@ #IOI/data<span class="h__symbol">))</span>
+       <span class="h__symbol">(</span> \ <span class="h__symbol">(</span>str <span class="h__symbol">:</span> #IOI/data<span class="h__symbol">)</span>
+        -> #IOI/putLine r
+           <span class="h__symbol">(</span>#Maybe/@ #IOI/data<span class="h__symbol">)</span> str
+           <span class="h__symbol">(</span>#Maybe/Nothing #IOI/data<span class="h__symbol">)</span>
+       <span class="h__symbol">)</span>
+       <span class="h__symbol">(</span> #IOI/getLine r
+         <span class="h__symbol">(</span>#Maybe/@ #IOI/data<span class="h__symbol">)</span>
+         <span class="h__symbol">(</span>#Maybe/Just #IOI/data<span class="h__symbol">)</span>
+       <span class="h__symbol">)</span>
+  <span class="h__symbol">)</span></code><br></section></article><footer class="footer"><a href="https://5ht.co/license/"><img class="footer__logo" src="https://longchenpa.guru/seal.png" width="50"></a><span class="footer__copy">2021&mdash;2023 &copy; <a href="//groupoid.space/" style="color:Lavender;">Groupoïd Infinity</a></span></footer>

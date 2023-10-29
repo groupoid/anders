@@ -11,7 +11,10 @@ use[data-c]{stroke-width:3px}
 foldNat  Zero    f x <span class="h__symbol">=</span> x
 foldNat <span class="h__symbol">(</span>Succ m<span class="h__symbol">)</span> f x <span class="h__symbol">=</span> f <span class="h__symbol">(</span>foldNat m f x<span class="h__symbol">)</span>
 
-data IO r <span class="h__symbol">=</span> PutStrLn String <span class="h__symbol">(</span>IO r<span class="h__symbol">)</span> | GetLine <span class="h__symbol">(</span>String -> IO r<span class="h__symbol">)</span> | Return r
+data IO r
+   <span class="h__symbol">=</span> PutStrLn String <span class="h__symbol">(</span>IO r<span class="h__symbol">)</span>
+   | GetLine <span class="h__symbol">(</span>String -> IO r<span class="h__symbol">)</span>
+   | Return r
 
 putStrLn <span class="h__symbol">:</span> String -> IO <span class="h__keyword">U</span>
 putStrLn str <span class="h__symbol">=</span> PutStrLn str <span class="h__symbol">(</span>Return Unit<span class="h__symbol">)</span>
@@ -27,6 +30,7 @@ Return r        >><span class="h__symbol">=</span> f <span class="h__symbol">=</
 
 replicateM <span class="h__symbol">:</span> Nat -> IO <span class="h__keyword">U</span> -> IO <span class="h__keyword">U</span>
 replicateM n io <span class="h__symbol">=</span> foldNat n <span class="h__symbol">(</span>io >><span class="h__symbol">)</span> <span class="h__symbol">(</span>return Unit<span class="h__symbol">)</span>
-io <span class="h__symbol">:</span> IO <span class="h__keyword">U</span>
+
+recursion <span class="h__symbol">:</span> IO <span class="h__keyword">U</span> -- over Nat
    <span class="h__symbol">=</span> replicateM 5 <span class="h__symbol">(</span>getLine >><span class="h__symbol">=</span> putStrLn<span class="h__symbol">)</span>
 </code></section></article><footer class="footer"><a href="https://5ht.co/license/"><img class="footer__logo" src="https://longchenpa.guru/seal.png" width="50"></a><span class="footer__copy">2021&mdash;2023 &copy; <a href="//groupoid.space/" style="color:Lavender;">Groupoïd Infinity</a></span></footer>

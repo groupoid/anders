@@ -1,0 +1,78 @@
+include ../../../header
+
+html
+    head
+        meta(property='og:title'       content='GLUE')
+        meta(property='og:description' content='Glue Types')
+        meta(property='og:url'         content='https://anders.groupoid.space/foundations/univalent/glue/')
+
+block title
+    title GLUE
+
+block content
+    nav
+        <a href='../../../index.html'>ANDERS</a>
+        <a href='../../../lib/index.html'>LIB</a>
+        <a href='#'>GLUE</a>
+
+    article.main.list
+        section
+            h1 GLUE
+            aside
+                time Published: 29 OCT 2023
+            h2 Formation
+            +tex.
+                $\mathbf{Definition\ 6.1}$ (Glue Formation).
+            +tex(true).
+                $$
+                    \mathbf{Glue}(A,\varphi,e) : U.
+                $$
+            +code.
+                def Glue' (A : U) (φ : I)
+                    (e : Partial (Σ (T : U), equiv T A) φ) : U
+                 := Glue A φ e
+            br.
+            h2 Introduction
+            +tex.
+                $\mathbf{Definition\ 6.2}$ (Glue Introduction).
+            +tex(true).
+                $$
+                    \mathbf{glue}\ \varphi\ u\ (\mathbf{ouc}\ a) : \mathbf{Glue}\ A\ [\varphi\mbox{=}1 \mapsto (T,f)].
+                $$
+            +code.
+                def glue' (A : U) (φ : I)
+                    (u : Partial (Σ (T : U), equiv T A × T) φ)
+                    (a : A [φ ↦ [(φ = 1) → (u 1=1).2.1.1 (u 1=1).2.2]])
+                 := glue φ u (ouc a)
+            br.
+            h2 Elimination
+            +tex.
+                $\mathbf{Definition\ 6.3}$ (Glue Elimination).
+            +tex(true).
+                $$
+                    \mathbf{unglue}(b) : A\ [\varphi \mapsto f(b) ].
+                $$
+            +code.
+                def unglue' (A : U) (φ : I)
+                    (e : Partial (Σ (T : U), equiv T A) φ)
+                    (a : Glue A φ e) : A
+                 := unglue φ e a
+            br.
+            h2 Computation
+            +tex.
+                $\mathbf{Definition\ 6.4}$ (Glue Computation).
+            +tex(true).
+                $$
+                      b = \mathbf{glue}\ [\varphi \mapsto b]\ (\mathbf{unglue}\ b).
+                $$
+            h2 Uniqueness
+            +tex.
+                $\mathbf{Definition\ 6.5}$ (Glue Uniqueness).
+            +tex(true).
+                $$
+                      \mathbf{unglue}\ (\mathbf{glue}\ [\varphi \mapsto t]\ a) = a : A.
+                $$
+            br.
+
+include ../../../footer
+

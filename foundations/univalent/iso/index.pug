@@ -21,7 +21,22 @@ block content
                 time Published: 26 NOV 2017
             +tex.
                 Just like $\mathrm{Equiv}$ notion of $\mathrm{Iso}$ represents equality
-                of types $A$ and $B$ within given universe $U$.
+                of types $A$ and $B$ within given universe $U$. However instead of Fibration it
+                uses Section and Retract for its definition and unlike equivalence
+                isomorphism predicate is not a proposition:
+            +tex(true).
+                $$
+                    \prod_{f : A \rightarrow B}\mathrm{isProp}\ (\mathrm{isEquiv}_f),
+                $$
+            +tex(true).
+                $$
+                    \prod_{f : \Pi(x:S^1), x\equiv x} \neg \mathrm{isProp}\ (\mathrm{isIso}_f).
+                $$
+            +tex.
+                This difference was one of the main drivers for developing
+                cubical interpretation of equivalence/univalence as
+                isomorphism/unimorphism is unsatisfactory candidate for basic notion
+                of multidimensional inequality due to loss of propositional preservation.
             h2 Formation
             +tex.
                 $\mathbf{Definition}$ (Isomorphism Formation).

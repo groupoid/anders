@@ -17,7 +17,6 @@
 
 module equiv where
 import lib/foundations/univalent/path
-option girard true
 
 --- [Pelayo, Warren] 2012
 
@@ -50,6 +49,8 @@ def univ-computation (A B : U) (p : PathP (<_> U) A B)
                             (j = 1) → (p @ i, univ-elim (p @ i) B (<k> p @ (i ∨ k)))]
 
 --- Equiv as [Right] Identity System [Escardó] 2014
+
+option girard true
 
 def single (B : U) : U := Σ (A: U), equiv A B
 def idEquiv≡ (A : U) (y : single A) : Path (single A) (A, idEquiv A) y := ?

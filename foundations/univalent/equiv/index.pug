@@ -21,7 +21,7 @@ block content
                 time Published: 30 DEC 2018
             h2 Formation
             +tex.
-                $\mathbf{Definition}$ (Fiberwise Equivalence).
+                $\mathbf{Definition\ 8.1}$ (Fiberwise Equivalence).
                 Fiberwise equivalence $\simeq$ or $\mathrm{Equiv}$
                 of function $f: A \rightarrow B$
                 represents internal equality of types $A$ and $B$
@@ -34,7 +34,7 @@ block content
             +tex(true).
                 $$
                         \sum_{f: A \rightarrow B}
-                        \prod_{y:B} 
+                        \prod_{y:B}
                         \sum_{x: \Sigma_{x:A} y =_B f(x)}
                         \sum_{w: \Sigma_{x:A} y =_B f(x)}
                 $$
@@ -57,7 +57,7 @@ block content
             br.
             h2 Introduction
             +tex.
-                $\mathbf{Definition}$ (Fiberwise Reflection).
+                $\mathbf{Definition\ 8.2}$ (Fiberwise Reflection).
                 There is a fiberwise instance $\mathrm{id_\simeq}$
                 of $A\simeq A$ that is derived
                 as $(\mathrm{id}(A),\mathrm{isContrSingl}(A))$:
@@ -84,7 +84,7 @@ block content
             br.
             h2 Elimination
             +tex.
-                $\mathbf{Definition}$ (Fiberwise Induction Principle).
+                $\mathbf{Definition\ 8.3}$ (Fiberwise Induction Principle).
                 For any $P : A \rightarrow B \rightarrow A \simeq B \rightarrow U$
                 and it's evidence $d$ at $(B,B,\mathrm{id_\simeq}(B))$
                 there is a function $\mathbf{ind}_\simeq$. HoTT 5.8.5
@@ -104,7 +104,7 @@ block content
             br.
             h2 Computation
             +tex.
-                $\mathbf{Definition}$ (Fiberwise Computation of Induction Principle).
+                $\mathbf{Definition\ 8.4}$ (Fiberwise Computation of Induction Principle).
             +code.
                 def compute-Equiv (A : U)
                     (C : Π (A B: U), equiv A B → U)
@@ -137,7 +137,7 @@ block content
                 is obtained by $\Sigma$ transport from constant map.
             h2 Formation
             +tex.
-                $\mathbf{Definition}$ (Univalence Formation).
+                $\mathbf{Definition\ 8.5}$ (Univalence Formation).
             +tex(true).
                 $$
                     (A \simeq B) \rightarrow (A =_U B) : U.
@@ -148,7 +148,7 @@ block content
             br.
             h2 Introduction
             +tex.
-                $\mathbf{Definition}$ (Univalence Intro).
+                $\mathbf{Definition\ 8.6}$ (Univalence Intro).
                 Glueing $A$ onto $B$ is an operation when $\varphi\mbox{=}0$ using $e$
                 and $B$ onto itself when $\varphi\mbox{=}1$ using the identity
                 equivalence. The term ua(e) is a path from $A$ to $B$ as the $\mathbf{Glue}$ type
@@ -168,7 +168,7 @@ block content
             br.
             h2 Elimination
             +tex.
-                $\mathbf{Definition}$ (Univalence Elimination).
+                $\mathbf{Definition\ 8.7}$ (Univalence Elimination).
             +tex(true).
                 $$
                     \mathbf{ua}^{-1} \equiv \mathbf{transp}\ ([i] \simeq_A(p@i)\ 0\ \mathrm{idEquiv}_A.
@@ -182,14 +182,14 @@ block content
             br.
             h2 Computation
             +tex.
-                $\mathbf{Definition}$ (Univalence Computation).
+                $\mathbf{Definition\ 8.8}$ (Univalence Computation).
             +tex(true).
                 $$
                     \mathbf{transp}(\mathbf{ua}(f),x) \equiv f(x).
                 $$
             h2 Uniqueness
             +tex.
-                $\mathbf{Definition}$ (Univalence Uniqueness).
+                $\mathbf{Definition\ 8.9}$ (Univalence Uniqueness).
             +tex(true).
                 $$
                     p \equiv \mathbf{ua}(\mathbf{transp}(p)).
@@ -214,11 +214,15 @@ block content
                 isomorphism is mentioned in Cubical Agda sources.
 
             h2 Formation
+            +tex.
+                $\mathbf{Definition\ 8.10}$ (Minivalence Formation).
             +code.
                 def mini-Form (A B : U) : U
                  := iso A B -> equiv A B
             br.
             h2 Introduction
+            +tex.
+                $\mathbf{Definition\ 8.11}$ (Minivalence Introduction).
             +code.
                 def mini-Intro (A B : U)
                   : mini-Form A B
@@ -228,6 +232,8 @@ block content
             br.
 
             h2 Elimination
+            +tex.
+                $\mathbf{Definition\ 8.12}$ (Minivalence Elimination).
             +code.
                 def mini-Elim (A B : U)
                   : equiv A B -> iso A B

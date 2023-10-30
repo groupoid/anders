@@ -33,7 +33,7 @@ block content
 
             h2 Formation
             +tex.
-                $\mathbf{Definition}$ (Homotopy Formation). Homotopy is
+                $\mathbf{Definition\ 10.1}$ (Homotopy Formation). Homotopy is
                 the $\mathbf{Path}$ equality of functions $f,g: A \rightarrow B$.
             +tex(true).
                 $$
@@ -46,7 +46,7 @@ block content
 
             h2 Introduction
             +tex.
-                $\mathbf{Definition}$ (Homotopy Introduction, Function Extensionality).
+                $\mathbf{Definition\ 10.2}$ (Homotopy Introduction, Function Extensionality).
             +code.
                 def funext (A B: U) (f g: A → B)
                     (p: Π (x: A), Path B (f x) (g x))
@@ -54,7 +54,7 @@ block content
                  := &lt;i> λ (a: A), p a @ i
             br.
             +tex.
-                $\mathbf{Definition}$ (Homotopy Dependent Introduction).
+                $\mathbf{Definition\ 10.2.1}$ (Homotopy Dependent Introduction).
             +code.
                 def piext (A: U) (B: A -> U) (f g: (x: A) -> B x)
                     (p: (x: A) -> Path (B x) (f x) (g x))
@@ -62,7 +62,7 @@ block content
                  := &lt;i> λ (a: A), p a @ i
             br.
             +tex.
-                $\mathbf{Definition}$ (Homotopy Reflection).
+                $\mathbf{Definition\ 10.2.2}$ (Homotopy Reflection).
             +tex(true).
                 $$
                     \mathbf{id}_\sim : A \sim A =_{def} [i]\lambda x.x.
@@ -75,7 +75,7 @@ block content
 
             h2 Elimination
             +tex.
-                $\mathbf{Definition}$ (Homotopy Elimination).
+                $\mathbf{Definition\ 10.3}$ (Homotopy Elimination).
             +code.
                 def happly (A B: U) (f g: A -> B)
                     (p: Path (A -> B) f g) (x: A)
@@ -84,7 +84,7 @@ block content
                          (λ (h: A → B), app A B h x) f g p
             br.
             +tex.
-                $\mathbf{Definition}$ (Homotopy Induction).
+                $\mathbf{Definition\ 10.3.1}$ (Homotopy Induction).
                 For any $D : (f,g: \Pi(A,B)) \rightarrow f \sim g \rightarrow U$
                 and it's evidence $d$ at $(f,f,\mathrm{id_\sim}(f(x)))$
                 there is a function $\mathbf{ind}_\sim$. HoTT 5.8.5
@@ -107,7 +107,7 @@ block content
 
             h2 Computation
             +tex.
-                $\mathbf{Definition}$ (Homotopy Isomorphism Computation).
+                $\mathbf{Definition\ 10.4}$ (Homotopy Isomorphism Computation).
             +code.
                 def funext-β (A B: U) (f g: A → B)
                     (p: Π (x: A), Path B (f x) (g x))
@@ -115,7 +115,7 @@ block content
                  := λ (x: A), happly A B f g (funext A B f g p) x
             br.
             +tex.
-                $\mathbf{Definition}$ (Homotopy Induction Principle Computation).
+                $\mathbf{Definition\ 10.4.1}$ (Homotopy Induction Principle Computation).
             +code.
                 def funext-ind-β (A B: U) (f g : A → B) (C : funext-D A B)
                     (d: Π (f g: A → B), C f f (<_>\(x:A), f x))
@@ -128,7 +128,7 @@ block content
 
             h2 Uniqueness
             +tex.
-                $\mathbf{Definition}$ (Homotopy Isomorphism Uniqueness).
+                $\mathbf{Definition\ 10.5}$ (Homotopy Isomorphism Uniqueness).
             +code.
                 def funext-η (A B: U) (f g: A → B)
                     (p: Path (A → B) f g)

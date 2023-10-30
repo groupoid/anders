@@ -46,13 +46,29 @@ block content
                 $$
             +tex(true).
                 $$
-                   \sum_{f:A\rightarrow B}
-                   \sum_{g:B\rightarrow A}
+                   \sum_{f:A\rightarrow B} \mathrm{isiso}_f
+                $$
+            +tex.
+                $\mathbf{Definition\ 9.1.1}$ (Isomorphism Path Predicate).
+            +tex(true).
+                $$
+                    \mathrm{isiso}_f : U =_{def} \sum_{g:B\rightarrow A}
                 $$
             +tex(true).
                 $$
                           \prod_{x:A}f\hspace{-0.1em}\cdot\hspace{-0.1em}g(x)\hspace{-0.3em}\equiv\hspace{-0.1em}x
                    \times \prod_{y:B}g\hspace{-0.1em}\cdot\hspace{-0.2em}f(y)\hspace{-0.1em}\equiv\hspace{-0.1em}y.
+                $$
+            +tex.
+                $\mathbf{Definition\ 9.1.2}$ (Isomorphism Homotopy Predicate).
+            +tex(true).
+                $$
+                    \mathrm{isqinv}_f : U =_{def} \sum_{g:B\rightarrow A}
+                $$
+            +tex(true).
+                $$
+                          \prod_{x:A}f\hspace{-0.1em}\cdot\hspace{-0.1em}g\hspace{-0.1em}\sim\hspace{-0.1em}\mathrm{id}_A
+                   \times \prod_{y:B}g\hspace{-0.0em}\cdot\hspace{-0.2em}f\hspace{-0.1em}\sim\hspace{-0.1em}\mathrm{id}_B.
                 $$
             +code.
                 def iso (A B: U) : U :=

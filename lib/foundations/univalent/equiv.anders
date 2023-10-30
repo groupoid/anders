@@ -2,13 +2,16 @@
    — Fibers;
    — Contractability of Fibers and Singletons;
    — Equivalence;
-   — Surjective, Injective, Embedding
-   - Half-adjoint equivalence;
+   — Surjective, Injective, Embedding;
+   — Half-adjoint equivalence;
+   — Bi-invertible;
    — Univalence;
    — Theorems, Gluing.
 
    HoTT 2.10 Universes and univalence axiom
+   HoTT 4.2 Half-adjoint equivalence
    HoTT 4.2.4 Fiber
+   HoTT 4.3 Bi-invertible maps
    HoTT 4.4 Contractible Fibers
    HoTT 4.6 Surjections and Embedding
    HoTT 5.8.5 Equivalence Induction
@@ -90,12 +93,37 @@ def hcomp-Glue' (A : U) (φ : I)
 --- def Glue-computation
 --- def Glue-uniqueness
 
--- The other notion of equality such as Half Adjoint Equivalence and
--- Bi-Invertible Equivalences could be introduced and encoded as isomorphism by analogy.
+--- The Half-adjoint equivalence from Homotopy Theory
 
-def isHae (A B : U) (f : A -> B): U :=
-  Σ (g : B -> A) (eta_: Path (idᵀ A) (∘ A B A g f) (id A)) (eps_: Path (idᵀ B) (∘ B A B f g) (id B)),
-  Π (x : A), Path B (f ((eta_ @ 0) x)) ((eps_ @ 0) (f x))
+def τ (A B : U) (f : A → B) (g : B → A)
+    (η: Path (idᵀ A) (∘ A B A g f) (id A))
+    (ε: Path (idᵀ B) (∘ B A B f g) (id B)) : U
+ := Π (x : A), Path B (f ((η @ 0) x)) ((ε @ 0) (f x))
 
-def hae (A B : U) : U := Σ (f : A -> B), isHae A B f
+def ν (A B : U) (f : A → B) (g : B → A)
+    (η: Path (idᵀ A) (∘ A B A g f) (id A))
+    (ε: Path (idᵀ B) (∘ B A B f g) (id B)) : U
+ := Π (y : B), Path A (g ((ε @ 0) y)) ((η @ 0) (g y))
+
+def isHae (A B : U) (f : A → B): U :=
+  Σ (g : B → A)
+    (η: Path (idᵀ A) (∘ A B A g f) (id A))
+    (ε: Path (idᵀ B) (∘ B A B f g) (id B)), τ A B f g η ε
+
+def isHae' (A B : U) (f : A → B): U :=
+  Σ (g : B → A)
+    (η: Path (idᵀ A) (∘ A B A g f) (id A))
+    (ε: Path (idᵀ B) (∘ B A B f g) (id B)), ν A B f g η ε
+
+def isHae=isHae' (A B : U) (f : A → B) : U := Path U (isHae A B f) (isHae' A B f)
+
+def hae (A B : U) : U := Σ (f : A → B), isHae A B f
+
+def isHae'' (A B : U) (f : A → B) : U :=
+  Σ (g : B → A)
+    (linv : Π (a : A), Path A a (g (f a)))
+    (rinv : Π (b : B), Path B b (f (g b))),
+  Π (a: A), Path B (cong A B f a (g (f a)) (linv a) @ 0) (rinv (f a) @ 0)
+
+--- Bi-invertible maps [Joyal]
 

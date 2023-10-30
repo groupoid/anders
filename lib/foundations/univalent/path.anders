@@ -33,6 +33,7 @@ def isContr (A: U) : U := Σ (x: A), Π (y: A), Path A x y
 def isContrSingl (A : U) (a : A) : isContr (singl A a) := ((a,idp A a),(\ (z:singl A a), contr A a z.1 z.2))
 def cong (A B : U) (f : A → B) (a b : A) (p : Path A a b) : Path B (f a) (f b) := <i> f (p @ i)
 def ap (A: U) (a x: A) (B: A → U) (f: A → B a) (b: B a) (p: Path A a x): Path (B a) (f a) (f x) := <i> f (p @ i)
+def mapOnPath (A: U) (B: A → U) (a: A) (f: A → B a) (b: B a) (x: A) (p: Path A a x): Path (B a) (f a) (f x) := <i> f (p @ i)
 def inv (A: U) (a b: A) (p: Path A a b): Path A b a := <i> p @ -i
 def Path-η (A : U) (x y : A) (p : Path A x y) : Path (Path A x y) p (<i> p @ i) := <_> p
 def idp-left (A : U) (x y : A) (p : Path A x y) : Path (Path A x x) (<_> x) (<_> p @ 0) := <_ _> x

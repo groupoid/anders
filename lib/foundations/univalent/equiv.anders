@@ -52,7 +52,9 @@ def univ-computation (A B : U) (p : PathP (<_> U) A B)
 --- Equiv as [Right] Identity System [Escardó] 2014
 
 def single (B : U) : U := Σ (A: U), equiv A B
-def EquivIsContr (B: U) : isContr (single B) := ?
+def idEquiv≡ (A : U) (y : single A) : Path (single A) (A, idEquiv A) y := ?
+def unglueEquiv (A : U) (φ : I) (f : Partial (single A) φ) : equiv (Glue A φ f) A := ?
+def EquivIsContr (B: U) : isContr (single B) := ((B, idEquiv B), idEquiv≡ B)
 def isContr→isProp (A: U) (w: isContr A) (a b : A) : Path A a b
  := <i> hcomp A (∂ i) (λ (j : I), [(i = 0) → a, (i = 1) → (w.2 b) @ j]) ((<i4> w.2 a @ -i) @ i)
 def contrSinglEquiv (A B : U) (e : equiv A B)

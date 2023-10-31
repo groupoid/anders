@@ -20,6 +20,7 @@
 
 module equiv where
 import lib/foundations/univalent/path
+option girard true
 
 --- [Pelayo, Warren] 2012
 
@@ -69,21 +70,17 @@ def hcomp-Glue' (A : U) (φ : I)
 
 --- Equiv as [Right] Identity System [Escardó] 2014
 
-option girard true
-
-def single (B : U) : U := Σ (A: U), equiv A B
-def part (A: U) (i : I) (w : single A) : Partial (single A) (-i ∨ i) := [ (i = 0) → (A, idEquiv A), (i = 1) → w ]
-axiom unglueIsEquiv (A : U) (φ : I) (f : Partial (single A) φ) : isEquiv (Glue A φ f) A (unglue' A φ f)
-def unglueEquiv (A : U) (φ : I) (f : Partial (single A) φ) : equiv (Glue A φ f) A := (unglue' A φ f, unglueIsEquiv A φ f)
-axiom idEquiv≡ (A : U) (w : single A) : Path (single A) (A, idEquiv A) w
--- := <i> (Glue' A (∂ i) (part A (∂ i) w), unglueEquiv A (∂ i) (part A (∂ i) w))
-def EquivIsContr (A: U) : isContr (single A) := ((A, idEquiv A), idEquiv≡ A)
+def single (A : U) : U := Σ (B: U), equiv A B
+def single2 (A : U) : U := Σ (B: U), equiv B A
+axiom contrEquiv (A B : U) (p : equiv A B) : Path (single A) (A,idEquiv A) (B,p)
+-- := <i> ((univ-intro B A p) @ i, <j> univ-intro B A p @ i /\ j)
+def EquivIsContr (A: U) : isContr (single A) := ((A, idEquiv A), \(z:single A), (contrEquiv A z.1 z.2))
 def isContr→isProp (A: U) (w: isContr A) (a b : A) : Path A a b
  := <i> hcomp A (∂ i) (λ (j : I), [(i = 0) → a, (i = 1) → (w.2 b) @ j]) ((<i4> w.2 a @ -i) @ i)
-def contrSinglEquiv (A B : U) (e : equiv A B) : Path (single B) (B,idEquiv B) (A,e)
- := isContr→isProp (single B) (EquivIsContr B) (B,idEquiv B) (A,e)
-def J-equiv (A B: U) (P: Π (A B: U), equiv A B → U) (r: P B B (idEquiv B)) : Π (e: equiv A B), P A B e
- := λ (e: equiv A B), subst (single B) (\ (z: single B), P z.1 B z.2) (B,idEquiv B) (A,e) (contrSinglEquiv A B e) r
+def contrSinglEquiv (A B : U) (p : equiv A B) : Path (single A) (A,idEquiv A) (B,p)
+ := isContr→isProp (single A) (EquivIsContr A) (A,idEquiv A) (B,p)
+def J-equiv (A B: U) (P: Π (A B: U), equiv A B → U) (r: P A A (idEquiv A)) : Π (e: equiv A B), P A B e
+ := λ (e: equiv A B), subst (single A) (\ (z: single A), P A z.1 z.2) (A,idEquiv A) (B,e) (contrSinglEquiv A B e) r
 
 --- [Pitts] 2016
 

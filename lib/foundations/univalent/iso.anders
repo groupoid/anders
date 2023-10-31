@@ -103,10 +103,6 @@ def iso-J (A B: U) (P: Π (A B: U), iso A B → U) (r: P B B (iso-intro B))
  := λ (e: iso A B), subst (iso-single B) (\ (z: iso-single B), P z.1 B z.2)
                           (B,iso-intro B) (A,e) (iso-contrSinglEquiv A B e) r
 
--- Similar to Fibrational Equivalence the notion of Retract/Section based Isomorphism could be introduced
--- as forth-back transport between isomorphism and path equality. This notion is somehow cannonical to all
--- cubical systems and is called Unimorphism here.
-
 -- Unimorphism Type (Iso -> Path)
 
 def uni-Form (A B: U) : U₁ := iso A B -> PathP (<_>U) A B

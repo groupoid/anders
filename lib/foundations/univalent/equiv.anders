@@ -73,20 +73,17 @@ option girard true
 
 def single (B : U) : U := Σ (A: U), equiv A B
 def part (A: U) (i : I) (w : single A) : Partial (single A) (-i ∨ i) := [ (i = 0) → (A, idEquiv A), (i = 1) → w ]
-def unglueIsEquiv (A : U) (φ : I) (f : Partial (single A) φ) : isEquiv (Glue A φ f) A (unglue' A φ f) := ?
+axiom unglueIsEquiv (A : U) (φ : I) (f : Partial (single A) φ) : isEquiv (Glue A φ f) A (unglue' A φ f)
 def unglueEquiv (A : U) (φ : I) (f : Partial (single A) φ) : equiv (Glue A φ f) A := (unglue' A φ f, unglueIsEquiv A φ f)
 axiom idEquiv≡ (A : U) (w : single A) : Path (single A) (A, idEquiv A) w
---- := <i> (Glue' A (∂ i) (part A (∂ i) w), unglueEquiv A (∂ i) (part A (∂ i) w))
-def EquivIsContr (B: U) : isContr (single B) := ((B, idEquiv B), idEquiv≡ B)
+-- := <i> (Glue' A (∂ i) (part A (∂ i) w), unglueEquiv A (∂ i) (part A (∂ i) w))
+def EquivIsContr (A: U) : isContr (single A) := ((A, idEquiv A), idEquiv≡ A)
 def isContr→isProp (A: U) (w: isContr A) (a b : A) : Path A a b
  := <i> hcomp A (∂ i) (λ (j : I), [(i = 0) → a, (i = 1) → (w.2 b) @ j]) ((<i4> w.2 a @ -i) @ i)
-def contrSinglEquiv (A B : U) (e : equiv A B)
-  : Path (single B) (B,idEquiv B) (A,e)
+def contrSinglEquiv (A B : U) (e : equiv A B) : Path (single B) (B,idEquiv B) (A,e)
  := isContr→isProp (single B) (EquivIsContr B) (B,idEquiv B) (A,e)
-def J-equiv (A B: U) (P: Π (A B: U), equiv A B → U) (r: P B B (idEquiv B))
-  : Π (e: equiv A B), P A B e
- := λ (e: equiv A B), subst (single B) (\ (z: single B), P z.1 B z.2)
-                            (B,idEquiv B) (A,e) (contrSinglEquiv A B e) r
+def J-equiv (A B: U) (P: Π (A B: U), equiv A B → U) (r: P B B (idEquiv B)) : Π (e: equiv A B), P A B e
+ := λ (e: equiv A B), subst (single B) (\ (z: single B), P z.1 B z.2) (B,idEquiv B) (A,e) (contrSinglEquiv A B e) r
 
 --- [Pitts] 2016
 
@@ -95,7 +92,6 @@ def ua' (A B : U) : PathP (<_> U) A B -> equiv A B := \ (p: PathP (<_>U) A B), u
 def ua-β (A B : U) (e : equiv A B) : Path (A → B) (trans A B ((ua A B) e)) e.1
  := <i> λ (x : A), (idfun=idfun″ B @ -i) ((idfun=idfun″ B @ -i) ((idfun=idfun′ B @ -i) (e.1 x)))
 def ua'-IsEquiv (A B: U) := isEquiv (PathP (<_>U) A B) (equiv A B) (ua' A B)
-
 
 --- The Half-adjoint equivalence from Homotopy Theory
 --- as if f anf g are adjoint functors.

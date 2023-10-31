@@ -155,8 +155,7 @@ def Δ³-3-4 : PathP (<_> Δ³) Δ³-3 Δ³-4 := <i> (i, 1, 1, ref i, ref 1)
 
 def seg : PathP (<_> I) 0 1 := <i> i
 def Partial-app (A : U) (i : I) (u : Partial A i) (p : 1= i) : A := u p
-def Id-path (A : U) (a b : A) : Id A a b → Path A a b
- := idJ A (λ (a b : A) (_ : Id A a b), Path A a b) a (<_> a) b
+def Id-path (A : U) (a b : A) : Id A a b → Path A a b := idJ A (λ (a b : A) (_ : Id A a b), Path A a b) a (<_> a) b
 def Partial' (A : U) (i : I) : V := Partial A i
 def sub (A : U) (i : I) (u : Partial A i) : V := A [i ↦ u]
 def inc′ (A : U) (i : I) (a : A) : sub A i [(i = 1) → a] := inc A i a
@@ -280,8 +279,8 @@ def comp-Path-assoc (A : U) (a b c d : A) (f : Path A a b) (g : Path A b c) (h :
     hcompⁱ (Π (x : A), B) [φ ↦ u] u₀ v = hcompⁱ B(x/v) [φ ↦ u v] (u₀ v)
     hcompⁱ (Σ (x : A), B) [φ ↦ u] u₀ = (v(i/1), compⁱ B(x/v) [φ ↦ u.2] u₀.2), v = hFillⁱ A [φ ↦ u.1] u₀.1
     hcompⁱ (Pathʲ A v w) [φ ↦ u] u₀ = 〈j〉 hcompⁱ A [ φ ↦ u j, (j = 0) ↦ v, (j = 1) ↦ w ] (u₀ j)
-    hcompⁱ G [ψ ↦ u] u₀ = glue [φ ↦ t₁] a₁ : G, G = Glue [φ ↦ (T,w)] A
-           t₁ = u(i/1) : T, a₁ = unglue u(i/1) : A, glue [φ ↦ t₁] a1 = t₁ : T
+    hcompⁱ G [ψ ↦ u] u₀ = glue [φ ↦ t₁] a₁ : G, G = Glue [φ ↦ (T,w)] A, t₁ = u(i/1) : T,
+           a₁ = unglue u(i/1) : A, glue [φ ↦ t₁] a1 = t₁ : T
 
     tFillⁱ A φ u₀ = transpʲ A(i/i∧j) (φ∨(i=0)) u₀ : A
     hFillⁱ A [φ ↦ u] u₀ = hcompʲ A [φ ↦ u(i/i∧j), (i=0) ↦ u₀] u₀ : A
@@ -365,7 +364,7 @@ def transp′′  (A : U) (j : I) (p : (I → U) [j ↦ [(j = 1) → λ (_ : I),
 def transp′′′ (A : U) (j : I) (p : (I → U) [j ↦ [(j = 1) → λ (_ : I), A]]) := transp (<i> (λ (_ : I), A) i) j
 
 def idfun  (A : U) : A → A := λ (a : A), a
-def idfun′ (A : U) : A → A := transp (<_> A) 0
+def idfun′ (A : U) : A → A := transp (<i> A) 0
 def idfun″ (A : U) : A → A := λ (a : A), hcomp A 0 (λ (i : I), []) a
 
 def idfun=idfun′  (A : U) : Path (A → A) (idfun A)  (idfun′ A) := <i> transp (<_> A) -i

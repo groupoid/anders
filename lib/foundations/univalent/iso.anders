@@ -73,13 +73,13 @@ def isoToEquiv (A B : U) (f : A -> B) (g : B -> A)
       \ (z : fiber A B f y),
         lemIso A B f g s t (g y) z.1 y (<i> s y @ -i) z.2)
 
--- [Cohen, Coquand, Huber, Mörtberg, Joyal] 2016
-
 def isIso (A B: U) (f: A → B) : U := Σ (g : B → A) (s : section A B f g ) (t : retract A B f g ), 𝟏
 def isBiInv (A B: U) (f: A → B) : U := Σ (g₁ g₂ : B → A) (s : section A B f g₁) (t : retract A B f g₂), 𝟏
 
 def iso (A B: U) : U := Σ (f : A → B), isIso A B f
 def biinv (A B: U) : U := Σ (f : A → B), isBiInv A B f
+
+-- [Cohen, Coquand, Huber, Mörtberg, Joyal] 2016
 
 def iso→Path (A B : U) (f : A -> B) (g : B -> A)
     (s : Π (y : B), Path B (f (g y)) y)

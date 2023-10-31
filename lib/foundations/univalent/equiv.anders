@@ -51,13 +51,32 @@ def univ-computation (A B : U) (p : PathP (<_> U) A B)
  := <j i> Glue B (j ∨ ∂ i) [(i = 0) → (A, univ-elim A B p), (i = 1) → (B, idEquiv B),
                             (j = 1) → (p @ i, univ-elim (p @ i) B (<k> p @ (i ∨ k)))]
 
+--- Glue Primitive [CCHM] 2016
+
+def Glue' (A : U) (φ : I) (e : Partial (Σ (T : U), equiv T A) φ) : U := Glue A φ e
+def glue' (A : U) (φ : I) (u : Partial (Σ (T : U), equiv T A × T) φ)
+    (a : A[φ ↦ [(φ = 1) → (u 1=1).2.1.1 (u 1=1).2.2]]) := glue φ u (ouc a)
+def unglue' (A : U) (φ : I) (e : Partial (Σ (T : U), equiv T A) φ)
+    (a : Glue A φ e) : A := unglue φ e a
+def hcomp-Glue' (A : U) (φ : I)
+    (e : Partial (Σ (T : U), equiv T A) φ)
+    (ψ : I) (u : I → Partial (Glue A φ [(φ = 1) → e 1=1]) ψ)
+    (u₀ : (Glue A φ [(φ = 1) → e 1=1])[ψ ↦ u 0]) : Glue A φ [(φ = 1) → e 1=1]
+ := hcomp (Glue A φ [(φ = 1) → e 1=1]) ψ
+          (λ (i : I), [(ψ = 1) → u i 1=1]) (ouc u₀)
+--- def Glue-computation
+--- def Glue-uniqueness
+
 --- Equiv as [Right] Identity System [Escardó] 2014
 
 option girard true
 
 def single (B : U) : U := Σ (A: U), equiv A B
-def idEquiv≡ (A : U) (y : single A) : Path (single A) (A, idEquiv A) y := ?
-def unglueEquiv (A : U) (φ : I) (f : Partial (single A) φ) : equiv (Glue A φ f) A := ?
+def part (A: U) (i : I) (w : single A) : Partial (single A) (-i ∨ i) := [ (i = 0) → (A, idEquiv A), (i = 1) → w ]
+def unglueIsEquiv (A : U) (φ : I) (f : Partial (single A) φ) : isEquiv (Glue A φ f) A (unglue' A φ f) := ?
+def unglueEquiv (A : U) (φ : I) (f : Partial (single A) φ) : equiv (Glue A φ f) A := (unglue' A φ f, unglueIsEquiv A φ f)
+axiom idEquiv≡ (A : U) (w : single A) : Path (single A) (A, idEquiv A) w
+--- := <i> (Glue' A (∂ i) (part A (∂ i) w), unglueEquiv A (∂ i) (part A (∂ i) w))
 def EquivIsContr (B: U) : isContr (single B) := ((B, idEquiv B), idEquiv≡ B)
 def isContr→isProp (A: U) (w: isContr A) (a b : A) : Path A a b
  := <i> hcomp A (∂ i) (λ (j : I), [(i = 0) → a, (i = 1) → (w.2 b) @ j]) ((<i4> w.2 a @ -i) @ i)
@@ -77,23 +96,9 @@ def ua-β (A B : U) (e : equiv A B) : Path (A → B) (trans A B ((ua A B) e)) e.
  := <i> λ (x : A), (idfun=idfun″ B @ -i) ((idfun=idfun″ B @ -i) ((idfun=idfun′ B @ -i) (e.1 x)))
 def ua'-IsEquiv (A B: U) := isEquiv (PathP (<_>U) A B) (equiv A B) (ua' A B)
 
---- Glue Primitive [CCHM] 2016
-
-def Glue' (A : U) (φ : I) (e : Partial (Σ (T : U), equiv T A) φ) : U := Glue A φ e
-def glue' (A : U) (φ : I) (u : Partial (Σ (T : U), equiv T A × T) φ)
-    (a : A[φ ↦ [(φ = 1) → (u 1=1).2.1.1 (u 1=1).2.2]]) := glue φ u (ouc a)
-def unglue' (A : U) (φ : I) (e : Partial (Σ (T : U), equiv T A) φ)
-    (a : Glue A φ e) : A := unglue φ e a
-def hcomp-Glue' (A : U) (φ : I)
-    (e : Partial (Σ (T : U), equiv T A) φ)
-    (ψ : I) (u : I → Partial (Glue A φ [(φ = 1) → e 1=1]) ψ)
-    (u₀ : (Glue A φ [(φ = 1) → e 1=1])[ψ ↦ u 0]) : Glue A φ [(φ = 1) → e 1=1]
- := hcomp (Glue A φ [(φ = 1) → e 1=1]) ψ
-          (λ (i : I), [(ψ = 1) → u i 1=1]) (ouc u₀)
---- def Glue-computation
---- def Glue-uniqueness
 
 --- The Half-adjoint equivalence from Homotopy Theory
+--- as if f anf g are adjoint functors.
 
 def τ (A B : U) (f : A → B) (g : B → A)
     (η: Path (idᵀ A) (∘ A B A g f) (id A))
@@ -115,15 +120,12 @@ def isHae' (A B : U) (f : A → B): U :=
     (η: Path (idᵀ A) (∘ A B A g f) (id A))
     (ε: Path (idᵀ B) (∘ B A B f g) (id B)), ν A B f g η ε
 
-def isHae=isHae' (A B : U) (f : A → B) : U := Path U (isHae A B f) (isHae' A B f)
-
-def hae (A B : U) : U := Σ (f : A → B), isHae A B f
-
 def isHae'' (A B : U) (f : A → B) : U :=
   Σ (g : B → A)
     (linv : Π (a : A), Path A a (g (f a)))
     (rinv : Π (b : B), Path B b (f (g b))),
   Π (a: A), Path B (cong A B f a (g (f a)) (linv a) @ 0) (rinv (f a) @ 0)
 
---- Bi-invertible maps [Joyal]
+def isHae=isHae' (A B : U) (f : A → B) : U := Path U (isHae A B f) (isHae' A B f)
 
+def hae (A B : U) : U := Σ (f : A → B), isHae A B f

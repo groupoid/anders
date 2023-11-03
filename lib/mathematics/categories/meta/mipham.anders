@@ -1,0 +1,76 @@
+module mipham where
+import lib/foundations/mltt/vec
+option irrelevance true
+
+--- Формальна філософія
+--- Theories Index
+
+def Eye   : U := unit -- 01 -- Гедоністичний (rab tu dga’ ba).
+def Ear   : U := unit -- 02 -- Міцний (dri ma med pa).
+def Nose  : U := unit -- 03 -- Ілюмінуючий (’od byed pa).
+def Mouth : U := unit -- 04 -- Радіантний (’od ’phro can).
+def Body  : U := unit -- 05 -- Незворотній (shin tu sbyang dka’ ba).
+def Sems  : U := unit -- 06 -- Ясний (mngon du gyur ba).
+def Nyid3 : U := unit -- 07 -- Прогресуючий (ring du song ba).
+def Nyid2 : U := unit -- 08 -- Непорушний (mi gyo ba).
+def Nyid1 : U := unit -- 09 -- Неперевершений (legs pa’i blo gros).
+def Nyid0 : U := unit -- 10 -- Хмари Дхарми (chos kyi sprin).
+
+def nyid3 : Vec U zero := star
+
+def HomotopyTheory       : U := unit
+def HomologicalAlgebra   : U := unit
+def AlgebraicGeometry    : U := unit
+def DifferentialGeometry : U := unit
+def SuperGeometry        : U := unit
+
+def nyid2 : Vec U five
+ := vsucc U four HomotopyTheory
+  ( vsucc U three HomologicalAlgebra
+  ( vsucc U two AlgebraicGeometry
+  ( vsucc U one DifferentialGeometry
+  ( vsucc U zero SuperGeometry
+  ( vzero U )))))
+
+def Abelian   : U := unit
+def Derived   : U := unit
+def Model     : U := unit
+def Spectra   : U := unit
+def T-Spectra : U := unit
+def Yogas     : U := unit
+
+def nyid1 : Vec U six
+ := vsucc U five Abelian
+  ( vsucc U four Derived
+  ( vsucc U three Model
+  ( vsucc U two Spectra
+  ( vsucc U one T-Spectra
+  ( vsucc U zero Yogas
+  ( vzero U ))))))
+
+def Infinity : U := unit
+def Diagram : U := unit
+def LocalCartesianClosed : U := unit
+def SymmetricMonoidal : U := unit
+
+def nyid0 : Vec U four
+ := vsucc U three Infinity
+  ( vsucc U two Diagram
+  ( vsucc U one LocalCartesianClosed
+  ( vsucc U zero SymmetricMonoidal
+  ( vzero U ))))
+
+def к := summa (X: U), X
+
+def Being : Vec к ten
+ := vsucc к nine  (Vec U four, nyid0)
+  ( vsucc к eight (Vec U six,  nyid1)
+  ( vsucc к seven (Vec U five, nyid2)
+  ( vsucc к six   (Vec U zero, nyid3)
+  ( vsucc к five  (Sems,  star)
+  ( vsucc к four  (Body,  star)
+  ( vsucc к three (Mouth, star)
+  ( vsucc к two   (Nose,  star)
+  ( vsucc к one   (Ear,   star)
+  ( vsucc к zero  (Eye,   star)
+  ( vzero U ))))))))))

@@ -38,6 +38,11 @@ def two : ℕ := succ one
 def three : ℕ := succ two
 def four : ℕ := succ three
 def five : ℕ := succ four
+def six : ℕ := succ five
+def seven : ℕ := succ six
+def eight : ℕ := succ seven
+def nine : ℕ := succ eight
+def ten : ℕ := succ nine
 
 def 5′ : ℕ := plus two three
 def 10′ : ℕ := mult 5′ two

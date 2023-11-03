@@ -70,10 +70,15 @@ def hcomp-Glue' (A : U) (φ : I)
 
 --- Equiv as [Right] Identity System [Escardó] 2014
 
+--- def singl (A: U) (a: A): U := Σ (x: A), Path A a x
+--- def isContr (A: U) : U := Σ (x: A), Π (y: A), Path A x y
+--- def contr (A : U) (a b : A) (p : Path A a b) : Path (singl A a) (eta A a) (b, p) := <i> (p @ i, <j> p @ i /\ j)
+--- def isContrSingl (A : U) (a : A) : isContr (singl A a) := ((a,idp A a),(\ (z:singl A a), contr A a z.1 z.2))
+
 def single (A : U) : U := Σ (B: U), equiv A B
 def single2 (A : U) : U := Σ (B: U), equiv B A
 axiom contrEquiv (A B : U) (p : equiv A B) : Path (single A) (A,idEquiv A) (B,p)
--- := <i> ((univ-intro B A p) @ i, <j> univ-intro B A p @ i /\ j)
+-- := (<i> ((univ-intro A B p) @ i, <j> univ-intro A B p @ i /\ j))
 def EquivIsContr (A: U) : isContr (single A) := ((A, idEquiv A), \(z:single A), (contrEquiv A z.1 z.2))
 def isContr→isProp (A: U) (w: isContr A) (a b : A) : Path A a b
  := <i> hcomp A (∂ i) (λ (j : I), [(i = 0) → a, (i = 1) → (w.2 b) @ j]) ((<i4> w.2 a @ -i) @ i)

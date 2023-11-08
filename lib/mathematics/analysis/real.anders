@@ -31,6 +31,7 @@
 -- https://www.cs.bham.ac.uk/~mhe/agda-new/UF-SIP-IntervalObject.html
 
 module real where
+import lib/foundations/mltt/nat
 import lib/foundations/univalent/path
 import lib/foundations/mltt/inductive
 
@@ -39,6 +40,9 @@ def is-decreasing (α : ℕ → 𝟐) : U := Π (i : ℕ), ≤₂ (α (succ i)) 
 def ℕ∞ : U := Σ (α : ℕ → 𝟐), is-decreasing α
 def incl (α : ℕ∞) : ℕ → 𝟐 := α.1
 def tail∞ (A : U) (a : ℕ → A) : ℕ → A := \ (n : ℕ), a (succ n)
+
+axiom Non-Countable-TCS : ℕ → (ℕ → 𝟐)
+axiom Non-Countable-TCF : ℕ → (ℕ → ℕ)
 
 def midpoint-alg (A : U) (O : A → A → A) : U₁ :=
   Σ (isSet : isSet A)

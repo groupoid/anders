@@ -8,8 +8,15 @@
 module mltt where
 import lib/foundations/mltt/pi
 import lib/foundations/mltt/sigma
+import lib/foundations/mltt/list
 import lib/foundations/univalent/path
 option girard true
+
+def Definition : U :=
+  Σ (name: List ℕ)
+    (telescope: List (Σ(A:U),A))
+    (landing: U)
+    (body: U), 𝟏
 
 def IdentitySystem (A: U) : U ≔
   Σ (=-form : A → A → U)
@@ -21,6 +28,20 @@ def IdentitySystem (A: U) : U ≔
                 (d: C a a (=-ctor a)),
                 Path (C a a (=-ctor a)) d
                      (=-elim a C d a (=-ctor a))), 𝟏
+
+def FibrationalSystem (A : U) : U₁ ≔
+  Σ (Π-form  : Π (B : A → U), U)
+    (Π-ctor₁ : Π (B : A → U), Pi A B → Pi A B)
+    (Π-elim₁ : Π (B : A → U), Pi A B → Pi A B)
+    (Π-comp₁ : Π (B : A → U) (a : A) (f : Pi A B), Path (B a) (Π-elim₁ B (Π-ctor₁ B f) a) (f a))
+    (Π-comp₂ : Π (B : A → U) (a : A) (f : Pi A B), Path (Pi A B) f (λ (x : A), f x))
+    (Σ-form  : Π (B : A → U), U)
+    (Σ-ctor₁ : Π (B : A → U) (a : A) (b : B a) , Sigma A B)
+    (Σ-elim₁ : Π (B : A → U) (p : Sigma A B), A)
+    (Σ-elim₂ : Π (B : A → U) (p : Sigma A B), B (pr₁ A B p))
+    (Σ-comp₁ : Π (B : A → U) (a : A) (b: B a), Path A a (Σ-elim₁ B (Σ-ctor₁ B a b)))
+    (Σ-comp₂ : Π (B : A → U) (a : A) (b: B a), Path (B a) b (Σ-elim₂ B (a, b)))
+    (Σ-comp₃ : Π (B : A → U) (p : Sigma A B), Path (Sigma A B) p (pr₁ A B p, pr₂ A B p)), 𝟏
 
 def MLTT (A : U) : U₁ ≔
   Σ (Π-form  : Π (B : A → U), U)

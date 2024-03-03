@@ -1,0 +1,15 @@
+module pythagor where
+
+def pred (A: U) := A -> U
+def relx (A: U) (R : A -> A -> U) (P : pred A) (x: A) : U := Π (y : A), R y x -> P y
+def domain (A : U) (R : A -> A -> U) (P : pred A) : U := Π (x: A), (relx A R P x) -> P x
+def codom (A : U) (P : pred A) : U := Π (x : A), P x
+def noether (A : U) (R : A -> A -> U) : U₁ := Π (P: pred A), domain A R P -> codom A P
+def not (A: U) : U := A -> 𝟎
+def prime (A: U) := ? -- \ (x: A), ...
+def multiple (A: U) (R : A -> A -> U) (P : pred A) (x: A) : A -> A -> U := ? -- \ (x y: A), A
+def isNotSquare (A: U) (R : A -> A -> U) (P : pred A) (x: A) : pred A := ? -- \ (x: A), A
+
+theorem Sq2 (A: U) (R : A -> A -> U) (P : A -> U) (x : A)
+  : prime A -> noether A (multiple A R P x) -> isNotSquare A R P x
+ := ?

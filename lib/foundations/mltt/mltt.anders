@@ -59,7 +59,8 @@ def MLTT (A : U) : U₁ ≔
     (=-form  : Π (a : A), A → U)
     (=-ctor₁ : Π (a : A), Path A a a)
     (=-elim₁ : Π (a : A) (C: D A) (d: C a a (=-ctor₁ a)) (y: A) (p: Path A a y), C a y p)
-    (=-comp₁ : Π (a : A) (C: D A) (d: C a a (=-ctor₁ a)), Path (C a a (=-ctor₁ a)) d (=-elim₁ a C d a (=-ctor₁ a))), 𝟏
+    (=-comp₁ : Π (a : A) (C: D A) (d: C a a (=-ctor₁ a)),
+               Path (C a a (=-ctor₁ a)) d (=-elim₁ a C d a (=-ctor₁ a))), 𝟏
 
 --- Self-aware MLTT:
 --- Theorem. Id β-rule is derivable from generalized transport

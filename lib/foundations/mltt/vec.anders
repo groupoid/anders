@@ -31,4 +31,4 @@ def Vec-rec (A B : U) (z : B) (s : Π (n : ℕ), A → Vec A n → B → B) (m :
 def Vec-map (A B : U) (f : A → B) (n : ℕ)
   : Vec A n → Vec B n
  := Vec-ind A (λ (k : ℕ) (_ : Vec A k), Vec B k) ★ (λ (k : ℕ)
-              (x : A) (_ : Vec A k), vsucc B k (f x)) n
+                 (x : A) (_ : Vec A k), vsucc B k (f x)) n

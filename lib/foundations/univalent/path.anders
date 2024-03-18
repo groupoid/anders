@@ -118,8 +118,8 @@ def partial-app-test (A : U) (a : A) (φ : I) (p : 1= φ) : A := [(φ = 1) → a
 def 0-is-min (i : I) : ≤ 0 i := ref 0
 def 1-is-max (i : I) : ≤ i 1 := ref i
 def ε (A : U) : Partial A 0 := []
-def I-nontriv (p : Id I 0 1) : 𝟎 := ε 𝟎 (rev I 0 1 p)
-def 0≥1-impl-absurd : (≥ 0 1) → 𝟎 := I-nontriv
+-- def I-nontriv (p : Id I 0 1) : 𝟎 := ε 𝟎 (rev I 0 1 p)
+-- def 0≥1-impl-absurd : (≥ 0 1) → 𝟎 := I-nontriv
 
 def ≤-asymm (i j : I) (p : ≤ i j) (q : ≤ j i) : Id I i j := comp-Id I i (i ∧ j) j (rev I (i ∧ j) i p) q
 def ≤-refl (i : I) : ≤ i i := ref i

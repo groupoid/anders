@@ -5,7 +5,7 @@ module topology where
 
 def Path₁ (A : U₁) (x y : A) := PathP (<_> A) x y
 def isProp₁ (A : U₁) := Π (a b : A), Path₁ A a b
-def isSet₁ (A : U₁) := Π (a b : A) (a0 b0 : Path₁ A a b), Path₁ (Path₁ A a b) a0 b0
+def isSet₁ (A : U₁) := Π (a b : A) (x y : Path₁ A a b), Path₁ (Path₁ A a b) x y
 def Ω := U → 𝟐
 def ℙ (X: U₁) := X → Ω
 axiom isSet-ℙ (X: U₁) : isSet₁ (ℙ X)

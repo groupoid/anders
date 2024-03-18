@@ -557,7 +557,7 @@ and conv v1 v2 : bool = traceConv v1 v2;
 
 and convWithSystem = function
   | v, VApp (VSystem ts, _) | VApp (VSystem ts, _), v ->
-    System.for_all (fun mu -> conv (upd mu v)) ts
+    not (System.is_empty ts) && System.for_all (fun mu -> conv (upd mu v)) ts
   | _, _ -> false
 
 and convProofIrrel v1 v2 =

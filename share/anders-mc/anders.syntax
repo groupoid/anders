@@ -73,7 +73,10 @@ context default
     keyword whole axiom cyan
     keyword whole theorem cyan
     keyword whole summa cyan
+    keyword whole forone cyan
     keyword whole import cyan
+    keyword whole inductive cyan
+    keyword whole do cyan
     keyword whole option cyan
     keyword whole true cyan
     keyword whole false cyan

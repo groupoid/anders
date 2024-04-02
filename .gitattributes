@@ -4,5 +4,6 @@ Makefile linguist-detectable=false
 *.ml linguist-language=OCaml
 *.js linguist-detectable=false
 *.css linguist-detectable=false
+*.pug linguist-detectable=false
 *.scss linguist-detectable=false
 *.html linguist-detectable=false

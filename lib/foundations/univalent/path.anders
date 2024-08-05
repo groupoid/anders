@@ -359,12 +359,12 @@ def hcomp-Path-is-correct (A : U) (v w : A) (r : I) (u : I → Partial (Path A v
 
 --- Id functions
 
-def transp′   (A : U) (j : I) (p : (I → U) [j ↦ [(j = 1) → λ (_ : I), A]]) := id A
-def transp′′  (A : U) (j : I) (p : (I → U) [j ↦ [(j = 1) → λ (_ : I), A]]) := transp (<i> (ouc p) i) j
-def transp′′′ (A : U) (j : I) (p : (I → U) [j ↦ [(j = 1) → λ (_ : I), A]]) := transp (<i> (λ (_ : I), A) i) j
+def transp′   (A : U) (j : I) (p : (I → U) [j ↦ [(j = 1) → λ (_ : I), A]]) := λ (x: A), x
+def transp′′  (A : U) (j : I) (p : (I → U) [j ↦ [(j = 1) → λ (_ : I), A]]) := λ (x: A), transp (<i> (ouc p) i) j x
+def transp′′′ (A : U) (j : I) (p : (I → U) [j ↦ [(j = 1) → λ (_ : I), A]]) := λ (x: A), transp (<i> (λ (_ : I), A) i) j x
 
 def idfun  (A : U) : A → A := λ (a : A), a
-def idfun′ (A : U) : A → A := transp (<i> A) 0
+def idfun′ (A : U) : A → A := λ (a : A), transp (<i> A) 0 a
 def idfun″ (A : U) : A → A := λ (a : A), hcomp A 0 (λ (i : I), []) a
 
 def idfun=idfun′  (A : U) : Path (A → A) (idfun A)  (idfun′ A) := <i> transp (<_> A) -i

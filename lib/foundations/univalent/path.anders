@@ -43,7 +43,7 @@ def isProp (A : U) : U := Π (a b : A), Path A a b
 def isSet (A : U) : U := Π (a b : A) (a0 b0 : Path A a b), Path (Path A a b) a0 b0
 def isGroupoid (A : U) : U := Π (a b : A) (x y : Path A a b) (i j : Path (Path A a b) x y), Path (Path (Path A a b) x y) i j
 def SET : U₁ := Σ (X : U), isSet X
-def Ω : U₁ := Σ (A : U), isProp A
+def Ω' : U₁ := Σ (A : U), isProp A
 def section (A B : U) (f : A -> B) (g : B -> A) : U := Π (b : B), Path B (f (g b)) b
 def retract (A B : U) (f : A -> B) (g : B -> A) : U := Π (a : A), Path A (g (f a)) a
 def hmtpy (A : U) (x y : A) (p : Path A x y) : Path (Path A x x) (<_> x) (<i> p @ i /\ -i) := <j i> p @ j /\ i /\ -i
@@ -360,7 +360,7 @@ def hcomp-Path-is-correct (A : U) (v w : A) (r : I) (u : I → Partial (Path A v
 --- Id functions
 
 def transp′   (A : U) (j : I) (p : (I → U) [j ↦ [(j = 1) → λ (_ : I), A]]) := λ (x: A), x
-def transp′′  (A : U) (j : I) (p : (I → U) [j ↦ [(j = 1) → λ (_ : I), A]]) := λ (x: A), transp (<i> (ouc p) i) j x
+def transp′′  (A : U) (j : I) (p : (I → U) [j ↦ [(j = 1) → λ (_ : I), A]]) := transp (<i> (ouc p) i) j
 def transp′′′ (A : U) (j : I) (p : (I → U) [j ↦ [(j = 1) → λ (_ : I), A]]) := λ (x: A), transp (<i> (λ (_ : I), A) i) j x
 
 def idfun  (A : U) : A → A := λ (a : A), a
@@ -375,3 +375,25 @@ def idfun′=idfun″ (A : U) : Path (A → A) (idfun′ A) (idfun″ A)
 def 𝟏-contr : Π (x : 𝟏), Path 𝟏 x ★ := ind₁ (λ (x : 𝟏), Path 𝟏 x ★) (<_> ★)
 def contr-impl-prop (A : U) (H : isContr A) : isProp A
  := λ (a b : A), <i> hcomp A (∂ i) (λ (j : I), [(i = 0) → H.2 a @ j, (i = 1) → H.2 b @ j]) H.1
+
+def th722 (A: U) (R: A -> A -> U) (r: Π(x: A), R x x) (h: Π(x y: A), isProp (R x y)) (f: Π (x y: A), R x y -> Path A x y) : isSet A
+ := λ(a b: A), λ (p q: Path A a b), <i j> hcomp A (∂ i ∨ ∂ j) (λ (l : I), [(i = 0) -> p @ l /\ j,
+                                                                           (i = 1) -> q @ l /\ j,
+                                                                           (j = 0) -> f (p @ j) (q @ j) (h (p @ j) (q @ j) (r a) (r (p @ i /\ j)) @ j) @ -l \/ -j,
+                                                                           (j = 1) -> f a b (transp (<i> R a (q @ i)) 0 (r a)) @ l]) a
+
+def cor723 (A: U) (h: Π (x y: A), ((Path A x y -> 𝟎) -> 𝟎) -> Path A x y) : isSet A
+ := th722 A (λ (x y: A), (Path A x y -> 𝟎) -> 𝟎) (λ (x: A) (g: Path A x x -> 𝟎), g (<i0> x))
+            (λ(x y: A) (a b: (Path A x y -> 𝟎) -> 𝟎), <j> λ (p: Path A x y -> 𝟎), ind₀ (Path 𝟎 (a p) (b p)) (a p) @ j) h
+
+def ffineqtt (h: Path 𝟐 0₂ 1₂) : 𝟎
+ := transp (<i> ind₂ (λ(_: 𝟐), U) 𝟎 𝟏 (h @ -i)) 0 ★
+
+def boolset : isSet 𝟐
+ := cor723 𝟐 (ind₂ (λ (x: 𝟐), Π (y: 𝟐), ((Path 𝟐 x y -> 𝟎) ->𝟎) -> Path 𝟐 x y)
+               (ind₂ (λ (y: 𝟐), ((Path 𝟐 0₂ y -> 𝟎) -> 𝟎) -> Path 𝟐 0₂ y)
+                 (λ (h00: ((Path 𝟐 0₂ 0₂ -> 𝟎) -> 𝟎)), <i1> 0₂)
+                   (λ (h01: ((Path 𝟐 0₂ 1₂ -> 𝟎) -> 𝟎)), ind₀ (Path 𝟐 0₂ 1₂) (h01 ffineqtt)))
+               (ind₂ (λ (y: 𝟐), ((Path 𝟐 1₂ y -> 𝟎) ->𝟎) -> Path 𝟐 1₂ y)
+                 (λ (h10: ((Path 𝟐 1₂ 0₂ -> 𝟎) -> 𝟎)), ind₀ (Path 𝟐 1₂ 0₂) (h10 (λ (g: Path 𝟐 1₂ 0₂), ffineqtt (<l> g @ -l))))
+                   (λ (h11: ((Path 𝟐 1₂ 1₂ -> 𝟎) -> 𝟎)), <j> 1₂)))

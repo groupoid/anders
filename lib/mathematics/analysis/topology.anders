@@ -1,4 +1,6 @@
 module topology where
+import lib/foundations/univalent/path
+import lib/foundations/mltt/bool
 
 --- Kang Rongji, 2022-2023
 --- Classical Topology
@@ -6,16 +8,32 @@ module topology where
 def Path₁ (A : U₁) (x y : A) := PathP (<_> A) x y
 def isProp₁ (A : U₁) := Π (a b : A), Path₁ A a b
 def isSet₁ (A : U₁) := Π (a b : A) (x y : Path₁ A a b), Path₁ (Path₁ A a b) x y
+
+def isPropPi₁ (A: U₁) (B: A → U₁) (h: Π (x: A), isProp₁ (B x)) : isProp₁ (Π (x: A), B x)
+ := λ (f g: Π (x: A), B x), <i> λ (x: A), h x (f x) (g x) @ i
+
+def isPropPi₁' (A: U₁) (B: A → U) (h: Π (x: A), isProp (B x)) : isProp₁ (Π (x: A), B x)
+ := λ (f g: Π (x: A), B x), <i> λ (x: A), h x (f x) (g x) @ i
+
+def isSetPi₁ (A: U₁) (B: A → U₁) (h: Π (x: A), isSet₁ (B x)) : isSet₁ (Π (x: A), B x)
+ := λ (f g: Π (x: A), B x) (p q: Path₁ (Π (x: A), B x) f g), <i j> λ (x: A), h x (f x) (g x) (<j1> (p @ j1) x) (<j2> (q @ j2) x) @ i @ j
+
+def isSetPi₁' (A: U₁) (B: A → U) (h: Π (x: A), isSet (B x)) : isSet₁ (Π (x: A), B x)
+ := λ (f g: Π (x: A), B x) (p q: Path₁ (Π (x: A), B x) f g), <i j> λ (x: A), h x (f x) (g x) (<j1> (p @ j1) x) (<j2> (q @ j2) x) @ i @ j
+
 def Ω := U → 𝟐
 def ℙ (X: U₁) := X → Ω
-axiom isSet-ℙ (X: U₁) : isSet₁ (ℙ X)
+def isSet-ℙ (X: U₁) : isSet₁ (ℙ X)
+ := isSetPi₁ X (λ (x: X), Ω) (λ (x: X), isSetPi₁' U (λ (_: U), 𝟐) (λ (_: U), boolset))
 axiom specify (X: U₁) : (X → Ω) → ℙ X
 def ∅ (X: U₁) : ℙ X := \ (_: X) (_: U), false
 def total (X: U₁) : ℙ X := \ (_: X) (_: U), true
 def ∈ (X: U₁) (el: X) (set: ℙ X) : U₁ := Path₁ (U → 𝟐) (set el) (\(_: U), true)
 def ∉ (X: U₁) (el: X) (set: ℙ X) : U₁ := Path₁ (U → 𝟐) (set el) (\(_: U), false)
 def ⊆ (X: U₁) (A B: ℙ X) := Π (x: X), (∈ X x A) × (∈ X x B)
-axiom ∁ (X: U₁) : ℙ X → ℙ X       -- not (complement)
-axiom ∪ (X: U₁) : ℙ X → ℙ X → ℙ X -- or (union)
-axiom ∩ (X: U₁) : ℙ X → ℙ X → ℙ X -- and (intersection)
-
+def ∁ (X: U₁) : ℙ X → ℙ X -- not (complement)
+ := λ (h: ℙ X), λ (x: X) (Y: U), not (h x Y)
+def ∪ (X: U₁) : ℙ X → ℙ X → ℙ X -- or (union)
+ := λ (h1: ℙ X) (h2: ℙ X), λ (x: X) (Y: U), or (h1 x Y) (h2 x Y)
+def ∩ (X: U₁) : ℙ X → ℙ X → ℙ X -- and (intersection)
+ := λ (h1: ℙ X) (h2: ℙ X), λ (x: X) (Y: U), and (h1 x Y) (h2 x Y)

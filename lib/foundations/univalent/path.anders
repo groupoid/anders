@@ -360,8 +360,8 @@ def hcomp-Path-is-correct (A : U) (v w : A) (r : I) (u : I → Partial (Path A v
 --- Id functions
 
 def transp′   (A : U) (j : I) (p : (I → U) [j ↦ [(j = 1) → λ (_ : I), A]]) := λ (x: A), x
-def transp′′  (A : U) (j : I) (p : (I → U) [j ↦ [(j = 1) → λ (_ : I), A]]) := λ (x: A), transp (<i> (ouc p) i) j x
-def transp′′′ (A : U) (j : I) (p : (I → U) [j ↦ [(j = 1) → λ (_ : I), A]]) := λ (x: A), transp (<i> (λ (_ : I), A) i) j x
+def transp′′  (A : U) (j : I) (p : (I → U) [j ↦ [(j = 1) → λ (_ : I), A]]) := transp (<i> (ouc p) i) j
+def transp′′′ (A : U) (j : I) (p : (I → U) [j ↦ [(j = 1) → λ (_ : I), A]]) := transp (<i> (λ (_ : I), A) i) j
 
 def idfun  (A : U) : A → A := λ (a : A), a
 def idfun′ (A : U) : A → A := λ (a : A), transp (<i> A) 0 a

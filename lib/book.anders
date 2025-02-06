@@ -17,6 +17,7 @@ import lib/foundations/univalent/iso
 import lib/foundations/modal/infinitesimal
 import lib/mathematics/algebra/algebra
 import lib/mathematics/analysis/real
+import lib/mathematics/analysis/topology
 import lib/mathematics/geometry/bundle
 import lib/mathematics/geometry/etale
 import lib/mathematics/geometry/formalDisc

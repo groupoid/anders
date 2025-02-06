@@ -66,7 +66,7 @@ and \textbf{repl} (to enter the proof shell).
 Anders is fast, idiomatic and educational (think of optimized Mini-TT). We carefully draw the favourite Lean-compatible
 syntax to fit 200 LOC in Menhir. The CHM kernel is 1K LOC. Whole Anders compiles under 2
 seconds and checks all the base library under 1 second [i7-8700]. Anders proof assistant
-as Homotopy Type System comes with its own Homotopy Library\footnote{\url{https://anders.groupoid.space/library/}}.
+as Homotopy Type System comes with its own Homotopy Library\footnote{\url{https://anders.groupoid.space/lib/}}.
 
 \section{Syntax}
 
@@ -373,13 +373,13 @@ in the core of type checker along with De Morgan algebra on built-in interval ty
 \end{tabular}
 \end{table}
 
-\begin{definition}[Cubical Presheaf $\mathbb{I}$].
+\begin{definition}[Cubical Presheaf $\mathbb{I}$]
 The identity types modeled with another presheaf, the presheaf on Lawvere
 category of distributive lattices (theory of De Morgan algebras) denoted
 with $\Box$ — $\textbf{I} : \Box^{op} \rightarrow \textrm{Set}$.
 \end{definition}
 
-\begin{definition}[Properties of $\textbf{I}$. The presheaf $\textbf{I}$]:
+\begin{definition}[Properties of $\textbf{I}$] The presheaf $\textbf{I}$:
 i) has to distinct global elements $0$ and $1$ (B$_1$);
 ii) $\textbf{I}$(I) has a decidable equality for each $I$ (B$_2$);
 iii) $\textbf{I}$ is tiny so the path functor $X \mapsto X^\textbf{I}$ has right adjoint (B$_3$).;
@@ -391,8 +391,9 @@ associated De Morgan algebra ($\wedge$, $\vee$, -, 0, 1, I) is enough to
 perform DNF normalization and proving some basic statements about path, including:
 contractability of singletons, homotopy transport, congruence, functional
 extensionality; it is not enough for proving $\beta$ rule for Path type or path composition.
-
-$\textbf{Generalized\ Transport}$. Generalized transport transp adresses
+\\
+\\
+\indent $\textbf{Generalized\ Transport}$. Generalized transport transp adresses
 first problem of deriving the computational $\beta$ rule for Path types:
 
 \begin{table}[ht]

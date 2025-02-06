@@ -377,10 +377,11 @@ def contr-impl-prop (A : U) (H : isContr A) : isProp A
  := λ (a b : A), <i> hcomp A (∂ i) (λ (j : I), [(i = 0) → H.2 a @ j, (i = 1) → H.2 b @ j]) H.1
 
 def th722 (A: U) (R: A -> A -> U) (r: Π(x: A), R x x) (h: Π(x y: A), isProp (R x y)) (f: Π (x y: A), R x y -> Path A x y) : isSet A
- := λ(a b: A), λ (p q: Path A a b), <i j> hcomp A (∂ i ∨ ∂ j) (λ (l : I), [(i = 0) -> p @ l /\ j,
-                                                                           (i = 1) -> q @ l /\ j,
-                                                                           (j = 0) -> f (p @ j) (q @ j) (h (p @ j) (q @ j) (r a) (r (p @ i /\ j)) @ j) @ -l \/ -j,
-                                                                           (j = 1) -> f a b (transp (<i> R a (q @ i)) 0 (r a)) @ l]) a
+ := λ (a b: A), λ (p q: Path A a b),
+    <i j> hcomp A (∂ i ∨ ∂ j) (λ (l : I), [(i = 0) -> p @ l /\ j,
+                                           (i = 1) -> q @ l /\ j,
+                                           (j = 0) -> f (p @ j) (q @ j) (h (p @ j) (q @ j) (r a) (r (p @ i /\ j)) @ j) @ -l \/ -j,
+                                           (j = 1) -> f a b (transp (<i> R a (q @ i)) 0 (r a)) @ l]) a
 
 def cor723 (A: U) (h: Π (x y: A), ((Path A x y -> 𝟎) -> 𝟎) -> Path A x y) : isSet A
  := th722 A (λ (x y: A), (Path A x y -> 𝟎) -> 𝟎) (λ (x: A) (g: Path A x x -> 𝟎), g (<i0> x))

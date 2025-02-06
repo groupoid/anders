@@ -52,6 +52,7 @@ Features
 * Infinitesimal Shape Modality (de Rham Stack)
 * Parser in 80 LOC
 * Lexer in 80 LOC
+* Small Kernel in 1000 LOC
 * UTF-8 support including universe levels
 * Lean syntax for ΠΣW
 * Poor man's records as Σ with named accessors to telescope variables
@@ -88,7 +89,7 @@ hcomp A (∂ r) (λ (j : I), [(r = 1) → u j 1=1, (r = 0) → ouc u₀]) (ouc u
 ```
 
 ```shell
-$ anders check library/book.anders
+$ anders check lib/book.anders
 ```
 
 MLTT
@@ -138,14 +139,14 @@ Infinitesimal Modality was added for direct support of Synthetic Differential Ge
 Benchmarks
 ----------
 
-Intel i5-12400.
+Intel i5-12400. Compilation under second, full library type check under 1/3 of a second.
 
 ```
 $ time dune build
 
-real    0m0.985s
-user    0m1.917s
-sys     0m0.570s
+real    0m0.796s
+user    0m1.912s
+sys     0m0.416s
 ```
 
 ```
@@ -205,7 +206,8 @@ anders.groupoid.space/mathematics/
 │   ├── homology/
 │   └── algebra/
 ├── analysis/
-│   └── real/
+│   ├── real/
+│   └── topology/
 ├── categories/
 │   ├── abelian/
 │   ├── category/

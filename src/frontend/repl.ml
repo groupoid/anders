@@ -16,8 +16,7 @@ Information about command line options can be found at ‘anders help’."
 
 let banner =
   Printf.sprintf "Anders Proof Assistant version %Ld.%Ld.%Ld
-Copyright © 2021–2022 Groupoid Infinity."
-    Fuze.year Fuze.month Fuze.patch
+Copyright © 2021–2022 Groupoid Infinity." 1L 4L 0L
 
 let loaded : Files.t ref = ref Files.empty
 

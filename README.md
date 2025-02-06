@@ -138,22 +138,22 @@ Infinitesimal Modality was added for direct support of Synthetic Differential Ge
 Benchmarks
 ----------
 
-Intel i7-8700.
+Intel i5-12400.
 
 ```
 $ time dune build
 
-real    0m1.456s
-user    0m2.794s
-sys     0m0.564s
+real    0m0.985s
+user    0m1.917s
+sys     0m0.570s
 ```
 
 ```
-$ time dune exec anders check library/book.anders
+$ time dune exec anders check lib/book.anders
 
-real    0m0.468s
-user    0m0.051s
-sys     0m0.032s
+real    0m0.268s
+user    0m0.017s
+sys     0m0.017s
 ```
 
 # Anders: Homotopy Library

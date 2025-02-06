@@ -12,6 +12,7 @@
                 lib/foundations/modal/infinitesimal.anders
                 lib/mathematics/algebra/algebra.anders
                 lib/mathematics/analysis/real.anders
+                lib/mathematics/analysis/topology.anders
                 lib/mathematics/categories/category.anders
                 lib/mathematics/categories/functor.anders
                 lib/mathematics/categories/abelian.anders

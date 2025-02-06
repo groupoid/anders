@@ -4,9 +4,9 @@ Changelog
 14 APR 2022 Version 1.4.0 Microkernel Pipeline:
 
 * Microkernel Architecture: Kernel, Proof Shell, and Tactics Server with open binary protocols
-* NixOS package /applications/science/logic/anders/ [@suhr]
-* Homotopy Library Manual: https://anders.groupoid.space/library/
-* CNAME Alias HOMOTOPY DEV
+* NixOS package /applications/science/logic/anders/
+* Homotopy Library Manual: https://anders.groupoid.space/lib/
+* CNAME Alias HOMOTOPY.DEV
 
 27 JAN 2022 Version 1.1.1 Univalence:
 

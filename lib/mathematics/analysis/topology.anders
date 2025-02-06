@@ -23,17 +23,18 @@ def isSetPi₁' (A: U₁) (B: A → U) (h: Π (x: A), isSet (B x)) : isSet₁ (�
 
 def Ω := U → 𝟐
 def ℙ (X: U₁) := X → Ω
-def isSet-ℙ (X: U₁) : isSet₁ (ℙ X)
+
+def isSet-ℙ (X: U₁)
+  : isSet₁ (ℙ X)
  := isSetPi₁ X (λ (x: X), Ω) (λ (x: X), isSetPi₁' U (λ (_: U), 𝟐) (λ (_: U), boolset))
+
 axiom specify (X: U₁) : (X → Ω) → ℙ X
+
 def ∅ (X: U₁) : ℙ X := \ (_: X) (_: U), false
 def total (X: U₁) : ℙ X := \ (_: X) (_: U), true
 def ∈ (X: U₁) (el: X) (set: ℙ X) : U₁ := Path₁ (U → 𝟐) (set el) (\(_: U), true)
 def ∉ (X: U₁) (el: X) (set: ℙ X) : U₁ := Path₁ (U → 𝟐) (set el) (\(_: U), false)
 def ⊆ (X: U₁) (A B: ℙ X) := Π (x: X), (∈ X x A) × (∈ X x B)
-def ∁ (X: U₁) : ℙ X → ℙ X -- not (complement)
- := λ (h: ℙ X), λ (x: X) (Y: U), not (h x Y)
-def ∪ (X: U₁) : ℙ X → ℙ X → ℙ X -- or (union)
- := λ (h1: ℙ X) (h2: ℙ X), λ (x: X) (Y: U), or (h1 x Y) (h2 x Y)
-def ∩ (X: U₁) : ℙ X → ℙ X → ℙ X -- and (intersection)
- := λ (h1: ℙ X) (h2: ℙ X), λ (x: X) (Y: U), and (h1 x Y) (h2 x Y)
+def ∁ (X: U₁) : ℙ X → ℙ X := λ (h: ℙ X), λ (x: X) (Y: U), not (h x Y)
+def ∪ (X: U₁) : ℙ X → ℙ X → ℙ X := λ (h1: ℙ X) (h2: ℙ X), λ (x: X) (Y: U), or (h1 x Y) (h2 x Y)
+def ∩ (X: U₁) : ℙ X → ℙ X → ℙ X := λ (h1: ℙ X) (h2: ℙ X), λ (x: X) (Y: U), and (h1 x Y) (h2 x Y)

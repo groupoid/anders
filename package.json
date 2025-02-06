@@ -4,7 +4,7 @@
   "description": "Anders: Modal Homotopy Type System",
   "main": "",
   "scripts": {
-    "start": "node-sass ./styles -o ./ && pug -O ./framework.js ./foundations ./mathematics ./intro ./spec ./lib",
+    "start": "node-sass ./styles -o ./ && pug -O ./framework.js ./foundations ./mathematics ./intro ./spec ./lib index.pug",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {

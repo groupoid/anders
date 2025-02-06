@@ -41,7 +41,7 @@ block content
                     with domain in $A$ and codomain in type family $B : A \rightarrow U$ over $A$.
                 +tex(true).
                     $$
-                       \Pi : U =_{def} \prod_{x:A}B(x).
+                       \Pi : U =_{def} \prod_{A:U}\prod_{x:A}B(x).
                     $$
                 +code.
                     def Pi (A : U) (B : A → U) : U

@@ -250,7 +250,7 @@ For help type ‘:h’.
 Mentions
 --------
 
-* Maxim Sokhatsky. <a href="https://www.youtube.com/watch?v=KHDgytozLv4">Презентація кубічного CCHM прувера Anders 0.7.2</a>. 2021-07-18
-* Maxim Sokhatsky. <a href="https://tonpa.guru/stream/2022/2022-01-17%20Anders.htm">Anders: верификатор математики</a>. 2022-01-17
-* Maxim Sokhatsky. <a href="https://groupoid.github.io/anders/doc/anders.pdf">Anders: Modal Homotopy Type System</a>. 2022-01-17
-* Maxim Sokhatsky. <a href="https://axio.groupoid.space">Система формальних мов Групоїд Інфініті</a>. 2024-11-26
+* Максим Сохацький. <a href="https://www.youtube.com/watch?v=KHDgytozLv4">Презентація кубічного CCHM прувера Anders 0.7.2</a>. 2021-07-18
+* Максим Сохацький. <a href="https://tonpa.guru/stream/2022/2022-01-17%20Anders.htm">Anders: верификатор математики</a>. 2022-01-17
+* Максим Сохацький. <a href="https://groupoid.github.io/anders/doc/anders.pdf">Anders: Modal Homotopy Type System</a>. 2022-01-17
+* Максим Сохацький. <a href="https://axio.groupoid.space">Система формальних мов Групоїд Інфініті</a>. 2024-11-26

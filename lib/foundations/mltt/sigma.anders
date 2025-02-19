@@ -25,7 +25,7 @@ def Σ-ind (A : U) (B : A -> U) (C : Π (s: Σ (x: A), B x), U)
 def ac (A B: U) (R: A -> B -> U) (g: Π (x: A), Σ (y: B), R x y)
   : Σ (f: A -> B), Π (x: A), R x (f x) := (\(i:A),(g i).1,\(j:A),(g j).2)
 
-def total (A:U) (B C : A -> U) (f : Π (x:A), B x -> C x) (w: Σ(x: A), B x)
+def total-space (A:U) (B C : A -> U) (f : Π (x:A), B x -> C x) (w: Σ(x: A), B x)
   : Σ (x: A), C x := (w.1,f (w.1) (w.2))
 
 def funDepTr (A: U) (P: A -> U) (a0 a1: A) (p: PathP (<_>A) a0 a1) (u0: P a0) (u1: P a1)

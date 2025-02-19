@@ -243,6 +243,8 @@ paths, making it hard to guarantee that each term will have a canonical form.
 
 ### Is This a Dead End, or Can It Be Fixed?
 
+It is a dead and and can be fixed!
+
 There are established results in type theory, particularly in homotopy
 type theory and constructive type theories, which show that the use of
 higher inductive types can break syntactical canonicity. In fact, this

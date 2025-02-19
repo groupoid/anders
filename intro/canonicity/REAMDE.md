@@ -150,13 +150,13 @@ natural numbers reduce to either 0 or succ n for some n. In this case,
 however, the terms seem to fail syntactic canonicity because of the way
 they involve higher inductive types and path spaces.
 
-* PathP: There is use of path types, which introduces potential non-canonical forms.
+* `PathP`: There is use of path types, which introduces potential non-canonical forms.
   For example, the `ind₀ (PathP (<_> ℕ) ...`) terms are path-dependent terms,
   where the result depends on the path between natural numbers. This creates
   a situation where the terms cannot necessarily be reduced directly to 0 or
   succ n since the path spaces themselves may involve complex terms.
 
-* W: The definition of `ℕ` using `W` introduces a recursive structure.
+* `W`: The definition of `ℕ` using `W` introduces a recursive structure.
   This is a higher inductive type, meaning that ℕ will involve non-canonical
   terms due to the nature of the recursion and the transport between
   different levels of the inductive structure.
@@ -164,8 +164,8 @@ they involve higher inductive types and path spaces.
 ## Failures in Canonicity
 
 * Non-normalizing terms: Because of the presence of path-dependent
-  types (PathP) and recursive definitions involving higher inductive
-  types (like W), the terms may not always reduce to a simple form
+  types `PathP` and recursive definitions involving higher inductive
+  types like `W`, the terms may not always reduce to a simple form
   like 0 or succ n.
 
 * Complexity in path spaces: The presence of path spaces (PathP)

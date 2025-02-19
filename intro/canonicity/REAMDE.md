@@ -42,19 +42,29 @@ Formally, in HoTT: `Π (t: ℕ), Σ (n: ℕ), Path ℕ t n`
 |HoTT       |         No| Yes         | Yes (Bocquet, Kapulkin, Sattler)  |
 |CCHM       |        Yes| Yes         | Yes (Coquand, Huber, Sattler)     |
 
-3. Proof Sketches of Canonicity Results
+# Proof Sketches of Canonicity Results
 
-3.1 Failure of Syntactic Canonicity in HoTT
+## Failure of Syntactic Canonicity in HoTT
 
-In Homotopy Type Theory, function extensionality and univalence introduce higher-inductive types, making reduction ambiguous for closed terms. Specifically, closed terms of Nat may contain elements that do not normalize to a numeral but are still provably equal to one in homotopy.
+In Homotopy Type Theory, function extensionality and univalence introduce
+higher-inductive types, making reduction ambiguous for closed terms.
+Specifically, closed terms of Nat may contain elements that do not
+normalize to a numeral but are still provably equal to one in homotopy.
 
-3.2 Proof Idea for Propositional Canonicity in HoTT
+## Proof Idea for Propositional Canonicity in HoTT
 
-Bocquet and Kapulkin-Sattler established that every term of Nat is propositionally equal to a numeral. The idea is to use a strict Rezk completion of the syntactic model to construct a fibrant replacement where each closed term can be shown to be propositionally equal to a numeral.
+Bocquet and Kapulkin-Sattler established that every term of Nat is
+propositionally equal to a numeral. The idea is to use a strict Rezk
+completion of the syntactic model to construct a fibrant replacement
+where each closed term can be shown to be propositionally equal to a numeral.
 
-3.3 Proof Idea for Homotopy Canonicity in Cubical Type Theory
+## Proof Idea for Homotopy Canonicity in Cubical Type Theory
 
-Coquand, Huber, and Sattler proved homotopy canonicity using cubical models, where paths (identity types) are explicitly represented as maps over the interval type I. The crucial tool here is homogeneous composition (hcomp), which ensures that any term in Nat is homotopically equivalent to a numeral, enforcing canonicity in a structured manner.
+Coquand, Huber, and Sattler proved homotopy canonicity using cubical models,
+where paths (identity types) are explicitly represented as maps over the
+interval type I. The crucial tool here is homogeneous composition (hcomp),
+which ensures that any term in Nat is homotopically equivalent to a numeral,
+enforcing canonicity in a structured manner.
 
 Table 2: Mechanisms Ensuring Canonicity in Different Type Theories
 

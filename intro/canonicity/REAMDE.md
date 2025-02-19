@@ -1,6 +1,26 @@
 Canonicity
 ==========
 
+# Prolog
+
+Я називаю це трьома станами в'язкості (синтаксичне, пропозиційне і гомотопічне) мислення,
+які існують у чотирьох глибинах (категорії, йоги гротендіка, когомології, супергеометрія).
+
+Спочатку зі стану MLTT де мислення залізобетонне (тому що обмежене) і в мандалі ви відчуваєте фібраційне дихання ви занурюєтеся в ідентифікаційні простори, а потім згодом відзнаходите числення у самих ідентифікаціях розуміючи шо мислення існує з дірками, які не обчислюються.
+
+Де закони нормалізації ускладнюють візерунки так швидко і так складно, що психіка наче тоне у болоті гомотопічної в'язкості.
+
+Останній спосіб мислення ілімінує повністю всі гомотопічні рівності в цій системі бескінечних всесвітів двох типів.
+
+Загалом наше мислення може робити помилки тільки таких типів:
+1) помилки фібраційного мислення;
+2) помилки ідентифікаційного мислення;
+3) помилки індуктивного мислення;
+4) помилки геометричного мислення;
+5) помилки лінійного мислення (квантова механіка і лінійна HoTT).
+
+Істота яка елімінувала всі ізоморфізми аж до гомотопічної канонічності в системі нескінченних всесвітів бачить реальність такою як вона є.
+
 # Definitions
 
 ## 1.1 Syntactic Canonicity
@@ -130,13 +150,13 @@ natural numbers reduce to either 0 or succ n for some n. In this case,
 however, the terms seem to fail syntactic canonicity because of the way
 they involve higher inductive types and path spaces.
 
-* PathP: There is use of path types, which introduces potential non-canonical forms.
+* `PathP`: There is use of path types, which introduces potential non-canonical forms.
   For example, the `ind₀ (PathP (<_> ℕ) ...`) terms are path-dependent terms,
   where the result depends on the path between natural numbers. This creates
   a situation where the terms cannot necessarily be reduced directly to 0 or
   succ n since the path spaces themselves may involve complex terms.
 
-* W: The definition of `ℕ` using `W` introduces a recursive structure.
+* `W`: The definition of `ℕ` using `W` introduces a recursive structure.
   This is a higher inductive type, meaning that ℕ will involve non-canonical
   terms due to the nature of the recursion and the transport between
   different levels of the inductive structure.
@@ -144,8 +164,8 @@ they involve higher inductive types and path spaces.
 ## Failures in Canonicity
 
 * Non-normalizing terms: Because of the presence of path-dependent
-  types (PathP) and recursive definitions involving higher inductive
-  types (like W), the terms may not always reduce to a simple form
+  types `PathP` and recursive definitions involving higher inductive
+  types like `W`, the terms may not always reduce to a simple form
   like 0 or succ n.
 
 * Complexity in path spaces: The presence of path spaces (PathP)
@@ -232,14 +252,14 @@ reduce directly to canonical forms.
 
 More specifically, the failure of canonicity is often a consequence of the following:
 
-Path spaces and homotopies: When `W` and path-dependent types are used,
-it introduces an extra layer of complexity, meaning terms in `ℕ` might
-reduce to non-normal forms, and paths between elements in `ℕ` can be non-trivial.
+* Path spaces and homotopies: When `W` and path-dependent types are used,
+  it introduces an extra layer of complexity, meaning terms in `ℕ` might
+  reduce to non-normal forms, and paths between elements in `ℕ` can be non-trivial.
 
-Higher inductive types: The construction of `ℕ` via `W` leads to a
-structure that does not admit a simple reduction to 0 or succ n.
-The recursion over `W` induces terms that involve complex higher-dimensional
-paths, making it hard to guarantee that each term will have a canonical form.
+* Higher inductive types: The construction of `ℕ` via `W` leads to a
+  structure that does not admit a simple reduction to 0 or succ n.
+  The recursion over `W` induces terms that involve complex higher-dimensional
+  paths, making it hard to guarantee that each term will have a canonical form.
 
 ### Is This a Dead End, or Can It Be Fixed?
 

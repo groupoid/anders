@@ -252,14 +252,14 @@ reduce directly to canonical forms.
 
 More specifically, the failure of canonicity is often a consequence of the following:
 
-Path spaces and homotopies: When `W` and path-dependent types are used,
-it introduces an extra layer of complexity, meaning terms in `ℕ` might
-reduce to non-normal forms, and paths between elements in `ℕ` can be non-trivial.
+* Path spaces and homotopies: When `W` and path-dependent types are used,
+  it introduces an extra layer of complexity, meaning terms in `ℕ` might
+  reduce to non-normal forms, and paths between elements in `ℕ` can be non-trivial.
 
-Higher inductive types: The construction of `ℕ` via `W` leads to a
-structure that does not admit a simple reduction to 0 or succ n.
-The recursion over `W` induces terms that involve complex higher-dimensional
-paths, making it hard to guarantee that each term will have a canonical form.
+* Higher inductive types: The construction of `ℕ` via `W` leads to a
+  structure that does not admit a simple reduction to 0 or succ n.
+  The recursion over `W` induces terms that involve complex higher-dimensional
+  paths, making it hard to guarantee that each term will have a canonical form.
 
 ### Is This a Dead End, or Can It Be Fixed?
 

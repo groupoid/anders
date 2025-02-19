@@ -9,7 +9,7 @@ module hilbert where
 import lib/foundations/univalent/path
 import lib/foundations/mltt/proto
 
--- [Schönfinkel]
+-- [Schönfinkel] Ukraine, Dnipro
 
 def K := Π (p q: Ω) (x: p.1), q.1 → p.1
 def S := Π (p q r: Ω) (x: p.1 → q.1 → r.1) (y: p.1 → q.1), p.1 → r.1

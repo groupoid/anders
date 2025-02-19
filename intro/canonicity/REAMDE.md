@@ -215,7 +215,7 @@ Inductive structures involving path spaces (e.g., `PathP`) may not reduce
 directly to canonical forms (like 0 or succ n) due to the presence of
 higher-dimensional structures.
 
-Recursion using W introduces non-trivial paths and depends on how the
+Recursion using `W` introduces non-trivial paths and depends on how the
 recursion unfolds, which can result in terms that do not have simple normal forms.
 
 Homotopy-theoretic aspects (like `hcomp`, `ind₂`) typically introduce more
@@ -238,7 +238,7 @@ reduce to non-normal forms, and paths between elements in `ℕ` can be non-trivi
 
 Higher inductive types: The construction of `ℕ` via `W` leads to a
 structure that does not admit a simple reduction to 0 or succ n.
-The recursion over W induces terms that involve complex higher-dimensional
+The recursion over `W` induces terms that involve complex higher-dimensional
 paths, making it hard to guarantee that each term will have a canonical form.
 
 ### Is This a Dead End, or Can It Be Fixed?
@@ -251,7 +251,7 @@ higher inductive types can break syntactical canonicity. In fact, this
 has been the subject of study, and there are theorems stating that higher
 inductive types generally do not preserve syntactical canonicity.
 
-However, this does not mean that expressing natural numbers via W and
+However, this does not mean that expressing natural numbers via `W` and
 path-dependent constructions is entirely unworkable. Instead, it means that:
 
 * You may need to reconsider how you define your natural numbers
@@ -259,7 +259,7 @@ path-dependent constructions is entirely unworkable. Instead, it means that:
   want to maintain syntactic canonicity.
 
 * It might be possible to use simple inductive types or other definitions
-  of ℕ that avoid the pitfalls of higher inductive types while still
+  of `ℕ` that avoid the pitfalls of higher inductive types while still
   respecting constructive and homotopical principles.
 
 * Direct inductive definition of `ℕ`: One way to preserve canonicity is to define

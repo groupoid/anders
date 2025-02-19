@@ -9,7 +9,7 @@ Syntactic canonicity (sometimes referred to as computational canonicity)
 states that every closed term of a certain type reduces to a canonical
 form using the internal reduction rules of the type theory. Specifically,
 for the type of natural numbers (Nat), syntactic canonicity means that
-every closed term t : Nat reduces to a numeral n (i.e., t ⇓ n where n ∈ ℕ).
+every closed term t : Nat reduces to a numeral n (i.e., `t ⇓ n` where `n ∈ ℕ`).
 
 Formally: `Π (t: ℕ), Σ (n: ℕ), t ->* n`
 
@@ -17,12 +17,12 @@ Formally: `Π (t: ℕ), Σ (n: ℕ), t ->* n`
 
 Propositional canonicity weakens syntactic canonicity by allowing
 the equality between a closed term and a numeral to hold only up
-to propositional equality (≡), rather than requiring direct computational reduction.
+to propositional equality `≡`, rather than requiring direct computational reduction.
 
 Formally: `Π (t: ℕ), Σ (n: ℕ), t ≡ n`
 
 This means that, while t may not reduce directly to n, there
-exists a derivable equality proof p : t ≡ n in the type theory.
+exists a derivable equality proof `p : t ≡ n` in the type theory.
 
 ## 1.3 Homotopy Canonicity
 
@@ -85,7 +85,7 @@ applications of type theory.
 
 # Example of Violating Syntactic Canonicity
 
-`ℕ` defined in CCHM through W, 0, 1, 2 doesn't compute numerals expressions to same terms,
+`ℕ` defined in CCHM through `W`, `0`, `1`, `2` doesn't compute numerals expressions to same terms,
 however they are propotionally canonical in CCHM though `hcomp`.
 
 ```
@@ -125,18 +125,18 @@ def ℕ-ind (C : ℕ → U) (z : C zero) (s : Π (n : ℕ), C n → C (succ n)) 
 
 ## Syntactic Canonicity
 
-In the case of natural numbers through W, 0, 1, 2, this would mean that terms involving
+In the case of natural numbers through `W`, `0`, `1`, `2`, this would mean that terms involving
 natural numbers reduce to either 0 or succ n for some n. In this case,
 however, the terms seem to fail syntactic canonicity because of the way
 they involve higher inductive types and path spaces.
 
 * PathP: There is use of path types, which introduces potential non-canonical forms.
-  For example, the ind₀ (PathP (<_> ℕ) ...) terms are path-dependent terms,
+  For example, the `ind₀ (PathP (<_> ℕ) ...`) terms are path-dependent terms,
   where the result depends on the path between natural numbers. This creates
   a situation where the terms cannot necessarily be reduced directly to 0 or
   succ n since the path spaces themselves may involve complex terms.
 
-* W: The definition of ℕ using W introduces a recursive structure.
+* W: The definition of `ℕ` using `W` introduces a recursive structure.
   This is a higher inductive type, meaning that ℕ will involve non-canonical
   terms due to the nature of the recursion and the transport between
   different levels of the inductive structure.
@@ -158,13 +158,13 @@ they involve higher inductive types and path spaces.
 To reformulate canonicity for natural numbers built using this approach, consider the following:
 
 1) Explicit normal forms: Instead of using higher inductive types and path
-   spaces directly in the constructors of ℕ, you could attempt to define
+   spaces directly in the constructors of `ℕ`, you could attempt to define
    explicit normal forms for each level of recursion. For example, if `ℕ`
    is constructed inductively, the recursion should be designed to
    ensure that each term reduces to a canonical form (either 0 or succ n).
 
 2) Defining a simplification rule: You could introduce simplification rules
-   for the terms involving PathP and ind₂. For example, if the term involves
+   for the terms involving `PathP` and `ind₂`. For example, if the term involves
    a path between two elements of the same type, it could simplify based on
    the structure of that path.
 
@@ -184,7 +184,7 @@ To reformulate canonicity for natural numbers built using this approach, conside
 
 In summary, the failure of syntactic canonicity in the given example arises
 due to the complexity introduced by path types, homotopy composition, and
-the recursive definition via W. To reformulate it for canonicity, consider
+the recursive definition via `W`. To reformulate it for canonicity, consider
 reducing the reliance on path-dependent constructions and focusing on
 explicit normal forms and simpler recursive definitions. Alternatively,
 you could introduce simplification mechanisms for the terms involving
@@ -192,10 +192,11 @@ path spaces to ensure they normalize to canonical forms.
 
 In the context of Constructive Cubical Higher Modalities (CCHM) and the
 question of preserving syntactical canonicity when expressing natural
-numbers (ℕ) using the type constructors W, 0, 1, and 2 (which are
+numbers `ℕ` using the type constructors `W`, `0`, `1`, and `2` (which are
 typically used in higher inductive type theory), there are significant
 challenges. However, understanding these challenges in detail can help
-identify potential paths to express natural numbers while preserving syntactical canonicity.
+identify potential paths to express natural numbers while preserving
+syntactical canonicity.
 
 ### Understanding the Problem with Syntactical Canonicity
 
@@ -205,12 +206,12 @@ This is important because it ensures that terms can be reduced deterministically
 and without ambiguity, which is often a crucial feature of constructive type theories.
 
 When natural numbers are expressed using higher inductive
-types (like W in your example), path-dependent types and
-the recursive constructions involving homotopy (e.g., W,
-PathP, and ind₂) can introduce significant complexity. This
+types (like `W` in your example), path-dependent types and
+the recursive constructions involving homotopy (e.g., `W`,
+`PathP`, and `ind₂`) can introduce significant complexity. This
 complexity can lead to the failure of syntactical canonicity, because:
 
-Inductive structures involving path spaces (e.g., PathP) may not reduce
+Inductive structures involving path spaces (e.g., `PathP`) may not reduce
 directly to canonical forms (like 0 or succ n) due to the presence of
 higher-dimensional structures.
 
@@ -223,19 +224,19 @@ maintaining syntactic canonicity more difficult.
 
 ### Can Nat in W, 0, 1, 2 Preserve Syntactical Canonicity in CCHM?
 
-Expressing natural numbers (ℕ) using the approach you’ve described (via W, 0, 1,
-and 2 constructors) does not preserve syntactical canonicity in the standard
+Expressing natural numbers `ℕ` using the approach you’ve described (via `W`, `0`, `1`,
+and `2` constructors) does not preserve syntactical canonicity in the standard
 sense within CCHM. The introduction of higher inductive types, especially
 the use of path-dependent terms, creates structures that do not always
 reduce directly to canonical forms.
 
 More specifically, the failure of canonicity is often a consequence of the following:
 
-Path spaces and homotopies: When W and path-dependent types are used,
-it introduces an extra layer of complexity, meaning terms in ℕ might
-reduce to non-normal forms, and paths between elements in ℕ can be non-trivial.
+Path spaces and homotopies: When `W` and path-dependent types are used,
+it introduces an extra layer of complexity, meaning terms in `ℕ` might
+reduce to non-normal forms, and paths between elements in `ℕ` can be non-trivial.
 
-Higher inductive types: The construction of ℕ via W leads to a
+Higher inductive types: The construction of `ℕ` via `W` leads to a
 structure that does not admit a simple reduction to 0 or succ n.
 The recursion over W induces terms that involve complex higher-dimensional
 paths, making it hard to guarantee that each term will have a canonical form.
@@ -259,5 +260,5 @@ path-dependent constructions is entirely unworkable. Instead, it means that:
   of ℕ that avoid the pitfalls of higher inductive types while still
   respecting constructive and homotopical principles.
 
-* Direct inductive definition of ℕ: One way to preserve canonicity is to define
+* Direct inductive definition of `ℕ`: One way to preserve canonicity is to define
 

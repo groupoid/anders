@@ -3,25 +3,40 @@ Canonicity
 
 # Prolog
 
-I describe this as the three states of cognitive viscosity—syntactic, propositional,
-and homotopical—each of which manifests across four levels of depth: category theory,
-Grothendieck yoga, cohomology, and supergeometry.
+I describe this process as the three states of cognitive viscosity—syntactic,
+propositional, and homotopical—each of which manifests across four levels of
+depth: category theory, Grothendieck yoga, cohomology, and supergeometry.
 
-Initially, within the framework of MLTT, thinking is rigid and constrained, akin to reinforced concrete.
-As one progresses through the mandala, experiencing the fibrational “breathing” of type structures,
-one begins to immerse in identification spaces. Over time, the calculus emerges not merely within
-these identifications but as an intrinsic feature of their structure, revealing the presence of
-computationally intractable gaps—holes in thought that cannot be computed. The laws of normalization
-accelerate pattern complexity to such a degree that the psyche seems to sink into a quagmire of
-homotopical viscosity. Ultimately, the final mode of reasoning eliminates all homotopical equalitie
-within the system of infinite universes of two distinct types.
+Initially, within the framework of Martin-Löf Type Theory (MLTT), thinking
+is rigid and constrained, resembling reinforced concrete. As one progresses
+through the mandala (a metaphor for a structured path of thought or reasoning),
+the experience of fibrational "breathing" (the dynamic, flexible interaction
+of type structures) becomes apparent. This process involves immersion in
+identification spaces (equivalence classes of types or structures, where
+different representations are seen as equivalent). Over time, the calculus
+of types and structures emerges, not merely within these identifications but
+as an intrinsic feature of their structure. This reveals the presence of
+computationally intractable gaps—holes in thought that cannot be computed,
+referencing undecidable problems or phenomena that resist formalization or
+computation within the system. The laws of normalization (reducing complex
+terms to a simpler or canonical form) accelerate the complexity of patterns
+to such a degree that the system approaches a state of homotopical viscosity,
+where the reasoning becomes increasingly entangled and resistant to further simplification.
 
-In general, our reasoning can only fall into errors of the following types: Errors in fibrational reasoning;
-Errors in identification reasoning; Errors in inductive reasoning; Errors in geometric reasoning;
-Errors in linear reasoning (quantum mechanics and linear HoTT).
+Ultimately, the final mode of reasoning eliminates all homotopical equalities (removing
+redundancies between topologically equivalent structures) within the system of infinite
+universes of two distinct types (a reference to type hierarchies and universe
+polymorphism in type theory, where multiple "levels" of types exist).
 
-A being that has eliminated all isomorphisms up to homotopical canonicity,
-within the system of infinite universes, perceives reality as it truly is.
+A being that has eliminated all isomorphisms up to homotopical canonicity (removing
+redundancies in the types and structures that preserve their topological or higher-order
+identity) within the system of infinite universes (infinite hierarchies of types)
+perceives reality as it truly is. This claim refers to the idea that, by resolving
+all equivalences and redundancies in mathematical systems, one may approach the ultimate,
+most refined understanding of the structures governing reality. "As it truly is" refers
+to the idea of a reality whose structure is perfectly captured by these refined, canonical
+mathematical models, unencumbered by the computational and cognitive limitations that
+typically obscure such understanding.
 
 # Definitions
 

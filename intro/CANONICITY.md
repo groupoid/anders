@@ -38,7 +38,7 @@ to the idea of a reality whose structure is perfectly captured by these refined,
 mathematical models, unencumbered by the computational and cognitive limitations that
 typically obscure such understanding.
 
-## Definitions
+## Coda
 
 ### 1.1 Syntactic Canonicity
 
@@ -71,15 +71,13 @@ behave coherently up to homotopy.
 
 Formally, in HoTT: `Π (t: ℕ), Σ (n: ℕ), Path ℕ t n`
 
-## Canonicity Across Type Theories
+### 1.4 Canonicity Across Type Theories
 
 |Type Theory|Syntactical|Propositional|Homotopy                           |
 |-----------|-----------|-------------|-----------------------------------|
 |MLTT       |        Yes| Yes         | Yes                               |
 |HoTT       |         No| Yes         | Yes (Bocquet, Kapulkin, Sattler)  |
 |CCHM       |        Yes| Yes         | Yes (Coquand, Huber, Sattler)     |
-
-## Proof Sketches of Canonicity Results
 
 Different type-theoretic frameworks impose different levels of canonicity.
 While MLTT has full syntactic, propositional, and homotopy canonicity, HoTT
@@ -88,21 +86,21 @@ restores full canonicity using its explicit cubical structure. Understanding
 these distinctions is crucial for developing computational and proof-theoretic
 applications of type theory.
 
-### Failure of Syntactic Canonicity in HoTT
+#### Failure of Syntactic Canonicity in HoTT
 
 In Homotopy Type Theory, function extensionality and univalence introduce
 higher-inductive types, making reduction ambiguous for closed terms.
 Specifically, closed terms of Nat may contain elements that do not
 normalize to a numeral but are still provably equal to one in homotopy.
 
-### Proof Idea for Propositional Canonicity in HoTT
+#### Proof Idea for Propositional Canonicity in HoTT
 
 Bocquet and Kapulkin-Sattler established that every term of Nat is
 propositionally equal to a numeral. The idea is to use a strict Rezk
 completion of the syntactic model to construct a fibrant replacement
 where each closed term can be shown to be propositionally equal to a numeral.
 
-### Proof Idea for Homotopy Canonicity in Cubical Type Theory
+#### Proof Idea for Homotopy Canonicity in Cubical Type Theory
 
 Coquand, Huber, and Sattler proved homotopy canonicity using cubical models,
 where paths (identity types) are explicitly represented as maps over the
@@ -118,7 +116,7 @@ Table 2: Mechanisms Ensuring Canonicity in Different Type Theories
 | HoTT        | Homotopical fibrant replacement (propositional & homotopy canonicity) |
 | CCHM        | Cubical paths + hcomp enforcing structured identity types             |
 
-## Example of Violating Syntactic Canonicity
+### 1.5 Example of Violating Syntactic Canonicity
 
 `ℕ` defined in CCHM through `W`, `0`, `1`, `2` doesn't compute numerals expressions to same terms,
 however they are propotionally canonical in CCHM though `hcomp`.
@@ -142,7 +140,7 @@ def ℕ-ind (C : ℕ → U) (z : C zero) (s : Π (n : ℕ), C n → C (succ n)) 
           (λ (f : 𝟏 → ℕ) (g : Π (x : 𝟏), C (f x)), 𝟏⟶ℕ C f (s (f ★) (g ★))))
 ```
 
-### The Code
+#### The Code
 
 * `ℕ-ctor` is defined as a two-point inductive type,
   which is essentially the structure of natural numbers,
@@ -158,7 +156,7 @@ def ℕ-ind (C : ℕ → U) (z : C zero) (s : Π (n : ℕ), C n → C (succ n)) 
 * The terms `𝟎⟶ℕ` and `𝟏⟶ℕ` define the transport functions for zero and successor cases,
   respectively, using transposition (transp).
 
-### Syntactic Canonicity
+#### Syntactic Canonicity
 
 In the case of natural numbers through `W`, `0`, `1`, `2`, this would mean that terms involving
 natural numbers reduce to either 0 or succ n for some n. In this case,
@@ -176,7 +174,7 @@ they involve higher inductive types and path spaces.
   terms due to the nature of the recursion and the transport between
   different levels of the inductive structure.
 
-### Failures in Canonicity
+#### Failures in Canonicity
 
 * Non-normalizing terms: Because of the presence of path-dependent
   types `PathP` and recursive definitions involving higher inductive
@@ -188,7 +186,7 @@ they involve higher inductive types and path spaces.
   to their normal form, especially if the path spaces themselves
   are complicated or not trivially reducible.
 
-### Reformulating Canonicity for Natural Numbers
+#### Reformulating Canonicity for Natural Numbers
 
 To reformulate canonicity for natural numbers built using this approach, consider the following:
 

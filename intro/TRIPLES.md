@@ -52,7 +52,6 @@ provides a logical foundation for interpreting these types in categorical models
     <li>Given a fibration p: E &rarr; B, the &Sigma; type represents the total space E,
         while the &Pi; type represents the space of sections &Pi;<sub>x</sub> P(x),
         which generalizes function spaces in homotopy theory.</li>
-
     <li>The key homotopy-theoretic result is the isomorphism:<br> &Pi;<sub>x</sub> P(x) &cong; Hom(B, E)</li>
 </ul>
 

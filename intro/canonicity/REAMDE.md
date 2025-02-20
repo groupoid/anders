@@ -282,5 +282,5 @@ path-dependent constructions is entirely unworkable. Instead, it means that:
   of `ℕ` that avoid the pitfalls of higher inductive types while still
   respecting constructive and homotopical principles.
 
-* Direct inductive definition of `ℕ`: One way to preserve canonicity is to define
+* Direct inductive definition of `ℕ`: One way to preserve canonicity is to define by general induction or built-in.
 

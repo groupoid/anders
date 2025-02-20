@@ -236,14 +236,16 @@ systems up to synthetic language of homotopy type theory. Each layer corresponds
 separate configuration for universe hierarchies.
 \begin{table}[ht]
 \tabstyle
-\begin{tabular}{rcl}
- \textbf{inductive} lang : \textbf{U} & := & UNI: cosmos $\rightarrow$ lang \\
-   & | & PI: pure lang $\rightarrow$ lang \\
-   & | & SIGMA: total lang $\rightarrow$ lang \\
-   & | & ID: uip lang $\rightarrow lang$ \\
-   & | & PATH: homotopy lang $\rightarrow$ lang \\
-   & | & GLUE: gluening lang $\rightarrow$ lang \\
-   & | & HIT: hit lang $\rightarrow$ lang \\
+\begin{tabular}{rl}
+     \textbf{def} & lang :\textbf{U} := \textbf{inductive} \\
+               \{ & UNI: cosmos $\rightarrow$ lang \\
+               |  & PI: pure lang $\rightarrow$ lang \\
+               |  & SIGMA: total lang $\rightarrow$ lang \\
+               |  & ID: strict lang $\rightarrow lang$ \\
+               |  & PATH: homotopy lang $\rightarrow$ lang \\
+               |  & GLUE: glue lang $\rightarrow$ lang \\
+               |  & INDUCTIVE: w012 lang $\rightarrow$ lang \\
+               \} & \\
 \end{tabular}
 \end{table}
 We want to mention here with homage to its authors all categorical models of dependent type theory:
@@ -267,13 +269,15 @@ Large elimination to upper universes is prohibited. This is extendable to Agda m
 
 \begin{table}[ht]
 \tabstyle
-\begin{tabular}{rcl}
-  \textbf{inductive} cosmos : \textbf{U}& := & prop: nat $\rightarrow$ cosmos \\
-   &|& fibrant: nat \\
-   &|& pretypes: nat \\
-   &|& strict: nat \\
-   &|& omega \\
-   &|& lock \\
+\begin{tabular}{rl}
+     \textbf{def} & cosmos : \textbf{U} := \textbf{inductive} \\
+               \{ & prop: nat $\rightarrow$ cosmos \\
+               |  & fibrant: nat \\
+               |  & pretypes: nat \\
+               |  & strict: nat \\
+               |  & omega \\
+               |  & lock \\
+               \} & \\
 \end{tabular}
 \end{table}
 
@@ -303,10 +307,12 @@ for $f : J \rightarrow I$ such that $(w_f u)g=w_{f\ g}(u\ g)$ when $u:A(J)$ and 
 \end{definition}
 \begin{table}[ht]
 \tabstyle
-\begin{tabular}{rcl}
-  \textbf{inductive} pure (lang : U) : \textbf{U}& := & pi: name $\rightarrow$ nat $\rightarrow$ lang $\rightarrow$ lang $\rightarrow$ pure lang \\
-  &|& lambda: name $\rightarrow$ nat $\rightarrow$ lang $\rightarrow$ lang \\
-  &|& app: lang $\rightarrow$ lang \\
+\begin{tabular}{rl}
+  \textbf{def} & pure (lang : U) : \textbf{U} := \textbf{inductive} \\
+            \{ & pi: name $\rightarrow$ nat $\rightarrow$ lang $\rightarrow$ lang $\rightarrow$ pure lang \\
+             | & lambda: name $\rightarrow$ nat $\rightarrow$ lang $\rightarrow$ lang \\
+             | & app: lang $\rightarrow$ lang \\
+            \} & \\
 \end{tabular}
 \end{table}
 
@@ -315,11 +321,13 @@ The set $\Sigma(x:A)B(x)$ is the set of pairs $(u,v)$ when $u:A(I),v:B(I,u)$ and
 \end{definition}
 \begin{table}[ht]
 \tabstyle
-\begin{tabular}{rcl}
-  \textbf{inductive} total (lang : U) : \textbf{U}& := & sigma: name $\rightarrow$ lang $\rightarrow$ total lang \\
-  &|& pair: lang $\rightarrow$ lang \\
-  &|& fst: lang \\
-  &|& snd: lang \\
+\begin{tabular}{rl}
+  \textbf{def} & total (lang : U) : \textbf{U} := \textbf{inductive} \\
+            \{ & sigma: name $\rightarrow$ lang $\rightarrow$ total lang \\
+             | & pair: lang $\rightarrow$ lang \\
+             | & fst: lang \\
+             | & snd: lang \\
+            \} & \\
 \end{tabular}
 \end{table}
 
@@ -327,20 +335,20 @@ The presheaf with only Pi and Sigma is called \textbf{MLTT-72} \cite{MLTT72}. It
 
 \begin{table}[ht!]
 \tabstyle
-\begin{tabular}{l}
-\textbf{def} MLTT-72 (A : U) (B : A $\rightarrow$ U) : U := $\Sigma$ \\
-\ \ \ \ ($\Pi$-form$_1$ : U) \\
-\ \ \ \ ($\Pi$-ctor$_1$ : Pi A B $\rightarrow$ Pi A B) \\
-\ \ \ \ ($\Pi$-elim$_1$ : Pi A B $\rightarrow$ Pi A B) \\
-\ \ \ \ ($\Pi$-comp$_1$ : (a : A) (f : Pi A B), $\Pi$-elim$_1$ ($\Pi$-ctor$_1$ f) a = f a) \\
-\ \ \ \ ($\Pi$-comp$_2$ : (a : A) (f : Pi A B), f = $\lambda$ (x : A), f x) \\
-\ \ \ \ ($\Sigma$-form$_1$ : U) \\
-\ \ \ \ ($\Sigma$-ctor$_1$ : $\Pi$ (a : A) (b : B a) , Sigma A B) \\
-\ \ \ \ ($\Sigma$-elim$_1$ : $\Pi$ (p : Sigma A B), A) \\
-\ \ \ \ ($\Sigma$-elim$_2$ : $\Pi$ (p : Sigma A B), B (pr$_1$ A B p)) \\
-\ \ \ \ ($\Sigma$-comp$_1$ : $\Pi$ (a : A) (b: B a), a = $\Sigma$-elim$_1$ ($\Sigma$-ctor$_1$ a b)) \\
-\ \ \ \ ($\Sigma$-comp$_2$ : $\Pi$ (a : A) (b: B a), b = $\Sigma$-elim$_2$ (a, b)) \\
-\ \ \ \ ($\Sigma$-comp$_3$ : $\Pi$ (p : Sigma A B), p = (pr$_1$ A B p, pr$_2$ A B p)), \textbf{1}
+\begin{tabular}{rl}
+\textbf{def} & MLTT-72 (A : U) (B : A $\rightarrow$ U) : U := $\Sigma$ \\
+             & ($\Pi$-form$_1$ : U) \\
+             & ($\Pi$-ctor$_1$ : Pi A B $\rightarrow$ Pi A B) \\
+             & ($\Pi$-elim$_1$ : Pi A B $\rightarrow$ Pi A B) \\
+             & ($\Pi$-comp$_1$ : (a : A) (f : Pi A B), $\Pi$-elim$_1$ ($\Pi$-ctor$_1$ f) a = f a) \\
+             & ($\Pi$-comp$_2$ : (a : A) (f : Pi A B), f = $\lambda$ (x : A), f x) \\
+             & ($\Sigma$-form$_1$ : U) \\
+             & ($\Sigma$-ctor$_1$ : $\Pi$ (a : A) (b : B a) , Sigma A B) \\
+             & ($\Sigma$-elim$_1$ : $\Pi$ (p : Sigma A B), A) \\
+             & ($\Sigma$-elim$_2$ : $\Pi$ (p : Sigma A B), B (pr$_1$ A B p)) \\
+             & ($\Sigma$-comp$_1$ : $\Pi$ (a : A) (b: B a), a = $\Sigma$-elim$_1$ ($\Sigma$-ctor$_1$ a b)) \\
+             & ($\Sigma$-comp$_2$ : $\Pi$ (a : A) (b: B a), b = $\Sigma$-elim$_2$ (a, b)) \\
+             & ($\Sigma$-comp$_3$ : $\Pi$ (p : Sigma A B), p = (pr$_1$ A B p, pr$_2$ A B p)), \textbf{1}
 \end{tabular}
 \end{table}
 
@@ -353,23 +361,25 @@ in the core of type checker along with De Morgan algebra on built-in interval ty
 
 \begin{table}[ht]
 \tabstyle
-\begin{tabular}{rcl}
-  \textbf{inductive} homotopy (lang : U) : U & := & PathP: lang $\rightarrow$ lang $\rightarrow$ lang \\
-  &|& plam: name $\rightarrow$ lang $\rightarrow$ lang \\
-  &|& papp: lang $\rightarrow$ lang \\
-  &|& I \\
-  &|& zero \\
-  &|& one \\
-  &|& meet: lang $\rightarrow$ lang \\
-  &|& join: lang $\rightarrow$ lang \\
-  &|& neg: lang \\
-  &|& system: lang \\
-  &|& Partial: lang \\
-  &|& transp: lang $\rightarrow$ lang \\
-  &|& hcomp: lang \\
-  &|& Sub: lang \\
-  &|& inc: lang \\
-  &|& ouc: lang \\
+\begin{tabular}{rl}
+     \textbf{def} & homotopy (lang : U) : \textbf{U} := \textbf{inductive} \\
+               \{ & PathP: lang $\rightarrow$ lang $\rightarrow$ lang \\
+  |& plam: name $\rightarrow$ lang $\rightarrow$ lang \\
+  |& papp: lang $\rightarrow$ lang \\
+  |& I \\
+  |& zero \\
+  |& one \\
+  |& meet: lang $\rightarrow$ lang \\
+  |& join: lang $\rightarrow$ lang \\
+  |& neg: lang \\
+  |& system: lang \\
+  |& Partial: lang \\
+  |& transp: lang $\rightarrow$ lang \\
+  |& hcomp: lang \\
+  |& Sub: lang \\
+  |& inc: lang \\
+  |& ouc: lang \\
+ \}& \\
 \end{tabular}
 \end{table}
 
@@ -398,12 +408,12 @@ first problem of deriving the computational $\beta$ rule for Path types:
 
 \begin{table}[ht]
 \tabstyle
-\begin{tabular}{l}
-\textbf{theorem} Path$_\beta$ (A : U) (a : A) (C : D A) (d: C a a (refl A a)) \\
-\ \ \ \ : Equ (C a a (refl A a)) d (J A a C d a (refl A a)) \\
-\ \ \ \ := $\lambda$ (A : U), $\lambda$ (a : A), \\
-\ \ \ \ \ \ \ $\lambda$ (C : $\Pi$ (x : A), $\Pi$ (y : A), PathP (<\_> A) x y $\rightarrow$ U), \\
-\ \ \ \ \ \ \ $\lambda$ (d : C a a (<\_> a)), <j> transp (<\_> C a a (<\_> a)) -j d \\
+\begin{tabular}{rl}
+\textbf{theorem} & Path$_\beta$ (A : U) (a : A) (C : D A) (d: C a a (refl A a)) \\
+               : & Equ (C a a (refl A a)) d (J A a C d a (refl A a)) \\
+              := & $\lambda$ (A : U), $\lambda$ (a : A), \\
+                 & $\lambda$ (C : $\Pi$ (x : A), $\Pi$ (y : A), PathP (<\_> A) x y $\rightarrow$ U), \\
+                 & $\lambda$ (d : C a a (<\_> a)), <j> transp (<\_> C a a (<\_> a)) -j d \\
 \end{tabular}
 \end{table}
 
@@ -471,14 +481,8 @@ hcomp$^i$ N [$\phi$ $\mapsto$ S u] (S u$_0$) = S (hcomp$^i$ N [$\phi$ $\mapsto$ 
 hcomp$^i$ U [$\phi$ $\mapsto$ E] A = Glue [$\phi$ $\mapsto$ (E(i/1), equiv$^i$ E(i/1-i))] A \\
 hcomp$^i$ ($\Pi$ (x : A), B) [$\phi$ $\mapsto$ u] u$_0$ v = hcomp$^i$ B(x/v) [$\phi$ $\mapsto$ u v] (u$_0$ v) \\
 hcomp$^i$ ($\Sigma$ (x : A), B) [$\phi$ $\mapsto$ u] u$_0$ = (v(i/1), comp$^i$ B(x/v) [$\phi$ $\mapsto$ u.2] u$_0$.2) \\
-\\
-hcomp$^i$ (Path$^j$ A v w) [$\phi$ $\mapsto$ u] u$_0$ \\
-\ \ \ \ \ \ \ = <j> hcomp$^i$ A[$\phi$ $\mapsto$ u j, (j=0) $\mapsto$ v, (j=1) $\mapsto$ w] (u$_0$ j) \\
-\\
-hcomp$^i$ (Glue [$\phi$ $\mapsto$ (T,w)] A) [$\psi$ $\mapsto$ u] u$_0$ \\
-\ \ \ \ \ \ \ = glue [$\phi$ $\mapsto$ t$_1$] a$_1$ \\
-\ \ \ \ \ \ \ = glue [$\phi$ $\mapsto$ u(i/1)] (unglue u(i/1)) \\
-\ \ \ \ \ \ \ = u(i/1) : Glue [$\phi$ $\mapsto$ (T,w)] A
+hcomp$^i$ (Path$^j$ A v w) [$\phi$ $\mapsto$ u] u$_0$ = <j> hcomp$^i$ A[$\phi$ $\mapsto$ u j, (j=0) $\mapsto$ v, (j=1) $\mapsto$ w] (u$_0$ j) \\
+hcomp$^i$ (Glue [$\phi$ $\mapsto$ (T,w)] A) [$\psi$ $\mapsto$ u] u$_0$ = glue [$\phi$ $\mapsto$ u(i/1)] (unglue u(i/1)) \\
 \end{tabular}
 \end{table}
 
@@ -489,10 +493,12 @@ equalities live in pretypes universes.
 
 \begin{table}[ht!]
 \tabstyle
-\begin{tabular}{rcl}
-  \textbf{inductive} strict (lang : U) : U & := & Id: name $\rightarrow$ lang \\
-  &|& ref: lang $\rightarrow$ lang \\
-  &|& idJ: lang $\rightarrow$ lang $\rightarrow$ lang \\
+\begin{tabular}{rl}
+     \textbf{def} & strict (lang : U) : \textbf{U} := \textbf{inductive} \\\
+ \{ & Id: name $\rightarrow$ lang \\
+  |& ref: lang $\rightarrow$ lang \\
+  |& idJ: lang $\rightarrow$ lang $\rightarrow$ lang \\
+                         \} & \\
 \end{tabular}
 \end{table}
 
@@ -512,10 +518,12 @@ out of equivalences.
 
 \begin{table}[ht]
 \tabstyle
-\begin{tabular}{rcl}
-  \textbf{inductive} glue (lang : U) : U & := & Glue: lang $\rightarrow$ lang $\rightarrow$ lang \\
-  &|& glue: lang $\rightarrow$ lang \\
-  &|& unglue: lang $\rightarrow$ lang \\
+\begin{tabular}{rl}
+     \textbf{def} & glue (lang : U) : \textbf{U} := \textbf{inductive} \\
+ \{ & Glue: lang $\rightarrow$ lang $\rightarrow$ lang \\
+  |& glue: lang $\rightarrow$ lang \\
+  |& unglue: lang $\rightarrow$ lang \\
+                         \} & \\
 \end{tabular}
 \end{table}
 

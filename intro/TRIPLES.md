@@ -63,7 +63,7 @@ provides a logical foundation for interpreting these types in categorical models
 
 <p>In the intensional theory of types, the type of equality is also built in
    as type-theoretical primitives of the categorical meta-theoretical model
-   of conjugations of three Jacobs-Lavir functors:</p>
+   of conjugations of three Jacobs-Lawvere functors:</p>
 
 <ul>
     <li>Factor space (Q)</li>

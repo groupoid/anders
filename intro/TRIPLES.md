@@ -30,9 +30,12 @@ while dependent sum types correspond to left adjoints. This perspective,
 pioneered by Kock-Wright, provides a logical foundation for interpreting
 these types in categorical models of type theory.
 
-* The adjunctions can be explicitly formulated as triples (Σf ⊢ f* ⊢ Πf): Given a fibration p: E → B, the Σ type corresponds to the left adjoint Σf,
-the base change functor f* is the middle functor, and the Π type corresponds to the right adjoint Πf.
-* This aligns with the categorical interpretation of Π as an exponential object BA in a suitable category and Σ as a dependent coproduct.
+* The adjunctions can be explicitly formulated as triples (Σf ⊢ f* ⊢ Πf):
+  Given a fibration p: E → B, the Σ type corresponds to the left adjoint Σf,
+  the base change functor f* is the middle functor, and the Π type corresponds
+  to the right adjoint Πf.
+* This aligns with the categorical interpretation of Π as an exponential
+  object BA in a suitable category and Σ as a dependent coproduct.
   
 ## 2. Set-Theoretic Perspective: Σ and Constructive Axiom of Choice
 
@@ -54,13 +57,16 @@ In homotopy type theory, Π and Σ types correspond to fiberwise constructions i
 In the intensional theory of types, the type of equality is also built in as
 type-theoretical primitives of the categorical meta-theoretical model of
 conjugations of three Jacobs-Lawvere functors:
+
 * Factor space (`Q`)
 * Identification system (`=`)
 * Contractible space (`C`)
 
 These functors form another adjunction:
-* (`Q` ⊢ `=` ⊢ `C`): The factor space functor Q is the left adjoint, the identification system `=`
-  serves as the base functor, and the contractible space functor C is the right adjoint.
+
+* (`Q` ⊢ `=` ⊢ `C`): The factor space functor Q is the left adjoint,
+  the identification system `=` serves as the base functor,
+  and the contractible space functor C is the right adjoint.
 
 # Conclusion
 

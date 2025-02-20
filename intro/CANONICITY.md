@@ -3,23 +3,25 @@ Canonicity
 
 # Prolog
 
-Я називаю це трьома станами в'язкості (синтаксичне, пропозиційне і гомотопічне) мислення,
-які існують у чотирьох глибинах (категорії, йоги Гротендіка, когомології, супергеометрія).
+I describe this as the three states of cognitive viscosity—syntactic, propositional,
+and homotopical—each of which manifests across four levels of depth: category theory,
+Grothendieck yoga, cohomology, and supergeometry.
 
-Спочатку зі стану MLTT де мислення залізобетонне (тому що обмежене) і в мандалі ви відчуваєте
-фібраційне дихання ви занурюєтеся в ідентифікаційні простори, а потім згодом відзнаходите
-числення у самих ідентифікаціях розуміючи шо мислення існує з дірками, які не обчислюються.
-Де закони нормалізації ускладнюють візерунки так швидко і так складно, що психіка наче тоне у болоті гомотопічної в'язкості.
-Останній спосіб мислення ілімінує повністю всі гомотопічні рівності в цій системі бескінечних всесвітів двох типів.
+Initially, within the framework of MLTT, thinking is rigid and constrained, akin to reinforced concrete.
+As one progresses through the mandala, experiencing the fibrational “breathing” of type structures,
+one begins to immerse in identification spaces. Over time, the calculus emerges not merely within
+these identifications but as an intrinsic feature of their structure, revealing the presence of
+computationally intractable gaps—holes in thought that cannot be computed. The laws of normalization
+accelerate pattern complexity to such a degree that the psyche seems to sink into a quagmire of
+homotopical viscosity. Ultimately, the final mode of reasoning eliminates all homotopical equalitie
+within the system of infinite universes of two distinct types.
 
-Загалом наше мислення може робити помилки тільки таких типів:
-1) помилки фібраційного мислення;
-2) помилки ідентифікаційного мислення;
-3) помилки індуктивного мислення;
-4) помилки геометричного мислення;
-5) помилки лінійного мислення (квантова механіка і лінійна HoTT).
+In general, our reasoning can only fall into errors of the following types: Errors in fibrational reasoning;
+Errors in identification reasoning; Errors in inductive reasoning; Errors in geometric reasoning;
+Errors in linear reasoning (quantum mechanics and linear HoTT).
 
-Істота яка елімінувала всі ізоморфізми аж до гомотопічної канонічності в системі нескінченних всесвітів бачить реальність такою як вона є.
+A being that has eliminated all isomorphisms up to homotopical canonicity,
+within the system of infinite universes, perceives reality as it truly is.
 
 # Definitions
 

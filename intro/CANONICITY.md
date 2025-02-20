@@ -1,29 +1,46 @@
 Canonicity
 ==========
 
-# Prolog
+## Prolog
 
-Я називаю це трьома станами в'язкості (синтаксичне, пропозиційне і гомотопічне) мислення,
-які існують у чотирьох глибинах (категорії, йоги Гротендіка, когомології, супергеометрія).
+I describe this process as the three states of cognitive viscosity—syntactic,
+propositional, and homotopical—each of which manifests across four levels of
+depth: category theory, Grothendieck yoga, cohomology, and supergeometry.
 
-Спочатку зі стану MLTT де мислення залізобетонне (тому що обмежене) і в мандалі ви відчуваєте
-фібраційне дихання ви занурюєтеся в ідентифікаційні простори, а потім згодом відзнаходите
-числення у самих ідентифікаціях розуміючи шо мислення існує з дірками, які не обчислюються.
-Де закони нормалізації ускладнюють візерунки так швидко і так складно, що психіка наче тоне у болоті гомотопічної в'язкості.
-Останній спосіб мислення ілімінує повністю всі гомотопічні рівності в цій системі бескінечних всесвітів двох типів.
+Initially, within the framework of Martin-Löf Type Theory (MLTT), thinking
+is rigid and constrained, resembling reinforced concrete. As one progresses
+through the mandala (a metaphor for a structured path of thought or reasoning),
+the experience of fibrational "breathing" (the dynamic, flexible interaction
+of type structures) becomes apparent. This process involves immersion in
+identification spaces (equivalence classes of types or structures, where
+different representations are seen as equivalent). Over time, the calculus
+of types and structures emerges, not merely within these identifications but
+as an intrinsic feature of their structure. This reveals the presence of
+computationally intractable gaps—holes in thought that cannot be computed,
+referencing undecidable problems or phenomena that resist formalization or
+computation within the system. The laws of normalization (reducing complex
+terms to a simpler or canonical form) accelerate the complexity of patterns
+to such a degree that the system approaches a state of homotopical viscosity,
+where the reasoning becomes increasingly entangled and resistant to further simplification.
 
-Загалом наше мислення може робити помилки тільки таких типів:
-1) помилки фібраційного мислення;
-2) помилки ідентифікаційного мислення;
-3) помилки індуктивного мислення;
-4) помилки геометричного мислення;
-5) помилки лінійного мислення (квантова механіка і лінійна HoTT).
+Ultimately, the final mode of reasoning eliminates all homotopical equalities (removing
+redundancies between topologically equivalent structures) within the system of infinite
+universes of two distinct types (a reference to type hierarchies and universe
+polymorphism in type theory, where multiple "levels" of types exist).
 
-Істота яка елімінувала всі ізоморфізми аж до гомотопічної канонічності в системі нескінченних всесвітів бачить реальність такою як вона є.
+A being that has eliminated all isomorphisms up to homotopical canonicity (removing
+redundancies in the types and structures that preserve their topological or higher-order
+identity) within the system of infinite universes (infinite hierarchies of types)
+perceives reality as it truly is. This claim refers to the idea that, by resolving
+all equivalences and redundancies in mathematical systems, one may approach the ultimate,
+most refined understanding of the structures governing reality. "As it truly is" refers
+to the idea of a reality whose structure is perfectly captured by these refined, canonical
+mathematical models, unencumbered by the computational and cognitive limitations that
+typically obscure such understanding.
 
-# Definitions
+## Coda
 
-## 1.1 Syntactic Canonicity
+### 1.1 Syntactic Canonicity
 
 Syntactic canonicity (sometimes referred to as computational canonicity)
 states that every closed term of a certain type reduces to a canonical
@@ -33,7 +50,7 @@ every closed term t : Nat reduces to a numeral n (i.e., `t ⇓ n` where `n ∈ �
 
 Formally: `Π (t: ℕ), Σ (n: ℕ), t ->* n`
 
-## 1.2 Propositional canonicity
+### 1.2 Propositional canonicity
 
 Propositional canonicity weakens syntactic canonicity by allowing
 the equality between a closed term and a numeral to hold only up
@@ -44,7 +61,7 @@ Formally: `Π (t: ℕ), Σ (n: ℕ), t ≡ n`
 This means that, while t may not reduce directly to n, there
 exists a derivable equality proof `p : t ≡ n` in the type theory.
 
-## 1.3 Homotopy Canonicity
+### 1.3 Homotopy Canonicity
 
 Homotopy canonicity is even weaker. Instead of requiring a definitional
 or propositional equality, it only guarantees that every closed term is
@@ -54,7 +71,7 @@ behave coherently up to homotopy.
 
 Formally, in HoTT: `Π (t: ℕ), Σ (n: ℕ), Path ℕ t n`
 
-# Canonicity Across Type Theories
+### 1.4 Canonicity Across Type Theories
 
 |Type Theory|Syntactical|Propositional|Homotopy                           |
 |-----------|-----------|-------------|-----------------------------------|
@@ -62,23 +79,28 @@ Formally, in HoTT: `Π (t: ℕ), Σ (n: ℕ), Path ℕ t n`
 |HoTT       |         No| Yes         | Yes (Bocquet, Kapulkin, Sattler)  |
 |CCHM       |        Yes| Yes         | Yes (Coquand, Huber, Sattler)     |
 
-# Proof Sketches of Canonicity Results
+Different type-theoretic frameworks impose different levels of canonicity.
+While MLTT has full syntactic, propositional, and homotopy canonicity, HoTT
+lacks syntactic canonicity but retains homotopy canonicity. Cubical HoTT
+restores full canonicity using its explicit cubical structure. Understanding
+these distinctions is crucial for developing computational and proof-theoretic
+applications of type theory.
 
-## Failure of Syntactic Canonicity in HoTT
+#### Failure of Syntactic Canonicity in HoTT
 
 In Homotopy Type Theory, function extensionality and univalence introduce
 higher-inductive types, making reduction ambiguous for closed terms.
 Specifically, closed terms of Nat may contain elements that do not
 normalize to a numeral but are still provably equal to one in homotopy.
 
-## Proof Idea for Propositional Canonicity in HoTT
+#### Proof Idea for Propositional Canonicity in HoTT
 
 Bocquet and Kapulkin-Sattler established that every term of Nat is
 propositionally equal to a numeral. The idea is to use a strict Rezk
 completion of the syntactic model to construct a fibrant replacement
 where each closed term can be shown to be propositionally equal to a numeral.
 
-## Proof Idea for Homotopy Canonicity in Cubical Type Theory
+#### Proof Idea for Homotopy Canonicity in Cubical Type Theory
 
 Coquand, Huber, and Sattler proved homotopy canonicity using cubical models,
 where paths (identity types) are explicitly represented as maps over the
@@ -94,16 +116,7 @@ Table 2: Mechanisms Ensuring Canonicity in Different Type Theories
 | HoTT        | Homotopical fibrant replacement (propositional & homotopy canonicity) |
 | CCHM        | Cubical paths + hcomp enforcing structured identity types             |
 
-# Conclusion
-
-Different type-theoretic frameworks impose different levels of canonicity.
-While MLTT has full syntactic, propositional, and homotopy canonicity, HoTT
-lacks syntactic canonicity but retains homotopy canonicity. Cubical HoTT
-restores full canonicity using its explicit cubical structure. Understanding
-these distinctions is crucial for developing computational and proof-theoretic
-applications of type theory.
-
-# Example of Violating Syntactic Canonicity
+### 1.5 Example of Violating Syntactic Canonicity
 
 `ℕ` defined in CCHM through `W`, `0`, `1`, `2` doesn't compute numerals expressions to same terms,
 however they are propotionally canonical in CCHM though `hcomp`.
@@ -127,7 +140,7 @@ def ℕ-ind (C : ℕ → U) (z : C zero) (s : Π (n : ℕ), C n → C (succ n)) 
           (λ (f : 𝟏 → ℕ) (g : Π (x : 𝟏), C (f x)), 𝟏⟶ℕ C f (s (f ★) (g ★))))
 ```
 
-## The Code
+#### The Code
 
 * `ℕ-ctor` is defined as a two-point inductive type,
   which is essentially the structure of natural numbers,
@@ -143,7 +156,7 @@ def ℕ-ind (C : ℕ → U) (z : C zero) (s : Π (n : ℕ), C n → C (succ n)) 
 * The terms `𝟎⟶ℕ` and `𝟏⟶ℕ` define the transport functions for zero and successor cases,
   respectively, using transposition (transp).
 
-## Syntactic Canonicity
+#### Syntactic Canonicity
 
 In the case of natural numbers through `W`, `0`, `1`, `2`, this would mean that terms involving
 natural numbers reduce to either 0 or succ n for some n. In this case,
@@ -161,7 +174,7 @@ they involve higher inductive types and path spaces.
   terms due to the nature of the recursion and the transport between
   different levels of the inductive structure.
 
-## Failures in Canonicity
+#### Failures in Canonicity
 
 * Non-normalizing terms: Because of the presence of path-dependent
   types `PathP` and recursive definitions involving higher inductive
@@ -173,7 +186,7 @@ they involve higher inductive types and path spaces.
   to their normal form, especially if the path spaces themselves
   are complicated or not trivially reducible.
 
-## Reformulating Canonicity for Natural Numbers
+#### Reformulating Canonicity for Natural Numbers
 
 To reformulate canonicity for natural numbers built using this approach, consider the following:
 
@@ -200,7 +213,7 @@ To reformulate canonicity for natural numbers built using this approach, conside
    number terms without relying on path-dependent constructs, focusing
    on simpler inductive rules.
 
-## Conclusion
+## Epilog
 
 In summary, the failure of syntactic canonicity in the given example arises
 due to the complexity introduced by path types, homotopy composition, and

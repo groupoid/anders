@@ -42,7 +42,9 @@ provides a logical foundation for interpreting these types in categorical models
 
 <h2>2. Set-Theoretic Perspective: &Sigma; and Constructive Axiom of Choice</h2>
 
-<p>In classical set theory, &Sigma; types naturally model the totality of relations by encoding dependent pairs (x, y) where y depends on x. This is crucial in constructive mathematics, where the axiom of choice does not hold unrestrictedly.</p>
+<p>In classical set theory, &Sigma; types naturally model the totality of relations by
+   encoding dependent pairs (x, y) where y depends on x. This is crucial in constructive
+   mathematics, where the axiom of choice does not hold unrestrictedly.</p>
 
 <h2>3. Homotopical Perspective: &Pi; Types as Fiber Bundles</h2>
 
@@ -52,7 +54,7 @@ provides a logical foundation for interpreting these types in categorical models
     <li>Given a fibration p: E &rarr; B, the &Sigma; type represents the total space E,
         while the &Pi; type represents the space of sections &Pi;<sub>x</sub> P(x),
         which generalizes function spaces in homotopy theory.</li>
-    <li>The key homotopy-theoretic result is the isomorphism:<br> &Pi;<sub>x</sub> P(x) &cong; Hom(B, E)</li>
+    <li>The key homotopy-theoretic result is the isomorphism: &Pi;<sub>x</sub> P(x) &cong; Hom(B, E)</li>
 </ul>
 
 <h1>Identification setting</h1>

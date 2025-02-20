@@ -213,7 +213,7 @@ To reformulate canonicity for natural numbers built using this approach, conside
    number terms without relying on path-dependent constructs, focusing
    on simpler inductive rules.
 
-## Conclusion
+## Epilog
 
 In summary, the failure of syntactic canonicity in the given example arises
 due to the complexity introduced by path types, homotopy composition, and

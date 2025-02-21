@@ -1,0 +1,23 @@
+{- Loop Space: https://anders.groupoid.space/mathematics/homotopy/loop/
+
+   HoTT 6.11 Algebra
+   HoTT 8.1 0-Truncations Loop Space of Circle
+   HoTT 8.4 Fiber Sequence and long exact sequence
+
+   Copyright (c) Groupoid Infinity, 2014-2025. -}
+
+module loop where
+import lib/foundations/univalent/path
+
+def Ω (A : U) (a₀ : A) : U := Path A a₀ a₀
+
+def Ω-refl (A : U) (a₀ : A) : Ω A a₀ := idp A a₀
+
+def Ω-ind (A : U) (a₀ : A) (P : Π (γ : Ω A a₀), U) (base : P (Ω-refl A a₀)) (γ : Ω A a₀) : P γ := ?
+
+def Ω-comp (A : U) (a₀ : A) (P : Π (γ : Ω A a₀), U) (base : P (Ω-refl A a₀))
+  : PathP (<_> P (Ω-refl A a₀)) (Ω-ind A a₀ P base (Ω-refl A a₀)) base := ?
+
+def Ω-uniq (A : U) (a₀ : A) (P : Π (γ : Ω A a₀), U) (f : Π (γ : Ω A a₀), P γ)
+    (h-comp :  Π (γ : Ω A a₀), PathP (<_> P (Ω-refl A a₀)) (f (Ω-refl A a₀)) (Ω-ind A a₀ P (f (Ω-refl A a₀)) (Ω-refl A a₀)))
+  : PathP (<_> Π (γ : Ω A a₀), P γ) f (Ω-ind A a₀ P (f (Ω-refl A a₀))) := ?

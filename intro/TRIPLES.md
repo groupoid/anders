@@ -22,7 +22,7 @@ while the Σ type models dependent pairs. Their interpretations extend into vari
 branches of mathematics, each highlighting a distinct perspective on their structural role.
 Below, we explore four such perspectives: categorical, set-theoretic, homotopical, and groupoidal.
 
-## 1. Categorical Perspective: Π and Σ as Adjunctions (Kock-Wright Interpretation)
+## 1. Categorical Perspective: Π and Σ as Adjunctions (Kock-Wraith Interpretation)
 
 From a categorical viewpoint, Π and Σ types arise naturally through adjunctions.
 The key idea is that dependent function types correspond to right adjoints,

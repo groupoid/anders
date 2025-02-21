@@ -29,6 +29,7 @@ import lib/mathematics/homotopy/hubSpokes
 import lib/mathematics/homotopy/quotient
 import lib/mathematics/homotopy/truncation
 import lib/mathematics/homotopy/suspension
+import lib/mathematics/homotopy/loop
 import lib/mathematics/homotopy/S1
 import lib/mathematics/homotopy/Sn
 import lib/mathematics/homotopy/KGn

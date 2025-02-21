@@ -39,10 +39,13 @@ Here is presented a reincarnation of \textbf{cubicaltt} called \textbf{anders}.
 
 \textbf{Anders} is a Modal HoTT proof assistant based on: classical MLTT-80 \cite{MLTT80}
 with 0, 1, 2, W types; CCHM \cite{CCHM} in CHM \cite{CHM} flavour as cubical type system with
-hcomp/transp Kan operations; HTS \cite{HTS} strict equality on pretypes; de Rham \cite{deRham}
-stack modality primitives. We tend not to touch general recursive higher inductive schemes yet,
-instead we will try to express as much HIT as possible through W, Coequlizer and HubSpokes
-Disc in the style of HoTT/Coq homotopy library and Three-HIT theorem.
+hcomp/transp Kan operations; HTS \cite{HTS} strict equality on pretypes in Voevodsky style;
+de Rham \cite{deRham} stack modality primitives for infinitesimal differential geometry purposes.
+We tend not to touch general recursive higher inductive schemes,
+instead we will try to express as much HIT as possible through Suspensions, Truncations,
+Quotients primitives built into type checker core.
+Anders also aims to support simplicial types Simplex along with Hopf Fibrations
+built into core for sphere homotopy groups processing. This modification is called \textbf{Hopf}.
 
 The HTS language proposed by Voevodsky exposes two different presheaf models of type theory:
 the inner one is homotopy type system presheaf that models HoTT and the outer one is
@@ -259,11 +262,11 @@ We will use here the Coquand's notation for Presheaf Type Theories in terms of r
 Language supports Agda-style hierarchy of universes: prop, fibrant (U), interval pretypes (V) and
 strict omega with explicit level manipulation. All universes are bounded with preorder
 \begin{equation}
-Prop_i \prec Fibrant_j \prec Pretypes_k \prec Strict_l,
+Fibrant_j \prec Pretypes_k
 \end{equation}
-in which $i,j,k,l$ are bounded with equation:
+in which $j,k$ are bounded with equation:
 \begin{equation}
-i < j < k < l.
+j < k.
 \end{equation}
 Large elimination to upper universes is prohibited. This is extendable to Agda model:
 
@@ -271,12 +274,8 @@ Large elimination to upper universes is prohibited. This is extendable to Agda m
 \tabstyle
 \begin{tabular}{rl}
      \textbf{def} & cosmos : \textbf{U} := \textbf{inductive} \\
-               \{ & prop: nat $\rightarrow$ cosmos \\
-               |  & fibrant: nat \\
+               \{ & fibrant: nat \\
                |  & pretypes: nat \\
-               |  & strict: nat \\
-               |  & omega \\
-               |  & lock \\
                \} & \\
 \end{tabular}
 \end{table}
@@ -503,8 +502,8 @@ equalities live in pretypes universes.
 \end{table}
 
 We use strict equality in HTS for pretypes and partial elements which live in V.
-The presheaf configuration with Pi, Sigma and Id is called \textbf{MLTT-73} \cite{MLTT73}. The presheaf
-configuration with Pi, Sigma, Id and Path is called \textbf{HTS}.
+The presheaf configuration with Pi, Sigma and Id is called \textbf{MLTT-75} \cite{MLTT75}. The presheaf
+configuration with Pi, Sigma, Id and Path is called \textbf{HTS} (Homotopy Type System).
 
 \newpage
 \subsection{Glue Types}
@@ -653,12 +652,67 @@ Geometric Modal HoTT Framework: Infinitesimal Proximity, Formal Disk, Formal Dis
 \end{table}
 
 \newpage
-\subsection{Higher Inductive Types}
+\subsection{Inductive Types}
 
 Anders currently don’t support Lean-compatible generic inductive schemes
 definition. So instead of generic inductive schemes Anders supports well-founded trees (W-types).
 Basic data types like List, Nat, Fin, Vec are implemented as W-types in base library.
-As for higher inductive types Anders has Three-HIT basis (Coequalizer, HubSpoke and Colimit) to express other HIT.
+
+\begin{itemize}
+\item W, 0, 1, 2 basis of MLTT-80 (Martin-L\"{o}f)
+\item General Schemes of Inductive Types (Paulin-Mohring)
+\end{itemize}
+
+\subsection{Higher Inductive Types}
+
+As for higher inductive types Anders has Three-HIT foundation (Coequalizer, Path Coequalizer and Colimit)
+to express other HITs. Also there are other foundations to consider motivated by typical tasks in homotopy (type) theory:
+
+\begin{itemize}
+\item Coequalizer, Path Coequalizer and Colimit (van der Weide)
+\item Suspension, Truncation, Quotient (Groupoid Infinity)
+\item General Schemes of Higher Inductive Types (Cubical Agda)
+\end{itemize}
+
+\subsection{Simplicial Types}
+
+Modification of Anders with Simplicial types and Hopf Fibrations built intro the core of type checker
+is called \textbf{Hopf} with following recursive syntax (having $f$ as Simplecies and $coh$ as Path-coherence functions):
+
+\begin{table}[ht]
+\tabstyle
+\begin{tabular}{l}
+   \textbf{simplex} n [v$_0$ .. v$_n$] \{ f$_0$, f$_1$, ..., f$_n$ | coh i$_1$ i$_2$ ... i$_n$ \} : Simplex
+\end{tabular}
+\end{table}
+
+and instantiation example:
+
+\begin{table}[ht]
+\tabstyle
+\begin{tabular}{rl}
+
+\textbf{def} & $\Delta-$mobius : Simplex := \textbf{simplex} 2 [a b c] \{ \\
+ &  \ \ \ \   \textbf{simplex} 1 [b c] \{ \textbf{simplex} 0 [c] \{ \}, \textbf{simplex} 0 [b] \{ \} | bc \}, \\
+ &  \ \ \ \   \textbf{simplex} 1 [a c] \{ \textbf{simplex} 0 [c] \{ \}, \textbf{simplex} 0 [a] \{ \} | ac \}, \\
+ &  \ \ \ \   \textbf{simplex} 1 [a b] \{ \textbf{simplex} 0 [b] \{ \}, \textbf{simplex} 0 [a] \{ \} | twist \} \\
+ &  \ \ \ \ | coh \\
+ & \} where \{ \\
+ &  \ \ \ \  a : Simplex \\
+ &  \ \ \ \  b : Simplex \\
+ &  \ \ \ \  c : Simplex \\
+ &  \ \ \ \  bc : PathP ($\lambda$ i $\rightarrow$ Simplex) b c \\
+ &  \ \ \ \  ac : PathP ($\lambda$ i $\rightarrow$ Simplex) a c \\
+ &  \ \ \ \  twist : PathP ($\lambda$ i $\rightarrow$ Simplex) a b \\
+ &  \ \ \ \  coh : PathP ($\lambda$ i $\rightarrow$ PathP ($\lambda$ j $\rightarrow$ Simplex) (bc i) (ac i)) twist \\
+ & \} 
+\end{tabular}
+\end{table}
+
+\newpage
+\section{Properties}
+
+\section{Conclusion}
 
 \bibliography{anders}
 

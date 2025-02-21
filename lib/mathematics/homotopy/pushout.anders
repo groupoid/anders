@@ -1,3 +1,9 @@
+{- Homotopy Pushout: https://anders.groupoid.space/mathematics/homotopy/pushout/
+
+   HoTT 6.8 Pushouts
+
+   Copyright (c) Groupoid Infinity, 2014-2025. -}
+
 module pushout where
 import lib/foundations/mltt/either
 import lib/mathematics/homotopy/coequalizer
@@ -9,3 +15,4 @@ def po₁ (A B C: U) (f: C → A) (g: C → B) (a: A) : pushout A B C f g := ι�
 def po₂ (A B C: U) (f: C → A) (g: C → B) (b: B) : pushout A B C f g := ι₂ C (+ A B) (∘ C A (+ A B) (inl A B) f) (∘ C B (+ A B) (inr A B) g) (inr A B b)
 def po₃ (A B C: U) (f: C → A) (g: C → B) (c: C) : Path (pushout A B C f g) (po₁ A B C f g (f c)) (po₂ A B C f g (g c))
  := resp C (+ A B) (∘ C A (+ A B) (inl A B) f) (∘ C B (+ A B) (inr A B) g) c
+

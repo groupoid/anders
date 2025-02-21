@@ -11,5 +11,6 @@ axiom hub₋₂ (S A : U) (x y : A) (p : S → Path A x y) : Path (hs S A) (cent
 axiom spoke₋₂ (S A : U) (x y : A) (p : S → Path A x y) (s : S) : Path (hs S A) (hub₋₂ S A x y p @ 0) (center S A (p s @ 1))
 
 axiom isNull (S A : U) : U
-axiom hs-ind (S A : U) (B : hs S A → U) (nB : Π (x : hs S A), isNull S (B x))
+axiom hs-ind (S A : U) (B : hs S A → U)
+      (nB : Π (x : hs S A), isNull S (B x))
       (nC : Π (a : A), B (center S A a)) (x : hs S A) : B x

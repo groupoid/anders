@@ -1,10 +1,17 @@
+{- Truncation: https://anders.groupoid.space/mathematics/homotopy/truncation/
+
+   HoTT 6.9 Truncations
+   HoTT 7.3 Truncations
+
+   Copyright (c) Groupoid Infinity, 2014-2025. -}
+
 module truncation where
 import lib/mathematics/homotopy/Sn
 import lib/mathematics/homotopy/hubSpokes
 
 {- Generic ℕ-indexed Truncations -}
 
-def trunc (A : U) (n : ℕ) : U := hs (sphere n) A
+def trunc  (A : U) (n : ℕ) : U := hs (sphere n) A
 def trunc₁ (A : U) (n : ℕ) (x : A) : trunc A n := center (sphere n) A x
 def trunc₂ (A : U) (n : ℕ) (f : sphere n → trunc A n) : trunc A n := hub (sphere n) A f
 def trunc₃ (A : U) (n : ℕ) (f : sphere n → trunc A n) (s : sphere n)

@@ -21,14 +21,14 @@ def isSetPi₁ (A: U₁) (B: A → U₁) (h: Π (x: A), isSet₁ (B x)) : isSet�
 def isSetPi₁' (A: U₁) (B: A → U) (h: Π (x: A), isSet (B x)) : isSet₁ (Π (x: A), B x)
  := λ (f g: Π (x: A), B x) (p q: Path₁ (Π (x: A), B x) f g), <i j> λ (x: A), h x (f x) (g x) (<j1> (p @ j1) x) (<j2> (q @ j2) x) @ i @ j
 
-def Ω := U → 𝟐
-def ℙ (X: U₁) := X → Ω
+def Prop := U → 𝟐
+def ℙ (X: U₁) := X → Prop
 
 def isSet-ℙ (X: U₁)
   : isSet₁ (ℙ X)
- := isSetPi₁ X (λ (x: X), Ω) (λ (x: X), isSetPi₁' U (λ (_: U), 𝟐) (λ (_: U), boolset))
+ := isSetPi₁ X (λ (x: X), Prop) (λ (x: X), isSetPi₁' U (λ (_: U), 𝟐) (λ (_: U), boolset))
 
-axiom specify (X: U₁) : (X → Ω) → ℙ X
+axiom specify (X: U₁) : (X → Prop) → ℙ X
 
 def ∅ (X: U₁) : ℙ X := \ (_: X) (_: U), false
 def total (X: U₁) : ℙ X := \ (_: X) (_: U), true

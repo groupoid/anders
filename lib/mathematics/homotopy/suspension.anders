@@ -1,3 +1,9 @@
+{- Suspension: https://anders.groupoid.space/mathematics/homotopy/suspension/
+
+   HoTT 2.15
+
+   Copyright (c) Groupoid Infinity, 2014-2025. -}
+
 module suspension where
 import lib/mathematics/homotopy/pushout
 
@@ -7,3 +13,9 @@ def 𝚺 (A: U) : U := pushout 𝟏 𝟏 A (const₁ A) (const₁ A)
 def 𝜎₁ (A: U): 𝚺 A := po₁ 𝟏 𝟏 A (const₁ A) (const₁ A) ★
 def 𝜎₂ (A: U): 𝚺 A := po₂ 𝟏 𝟏 A (const₁ A) (const₁ A) ★
 def 𝜎₃ (A: U) (a: A) : Path (𝚺 A) (𝜎₁ A) (𝜎₂ A) := po₃ 𝟏 𝟏 A (const₁ A) (const₁ A) a
+
+axiom 𝚺-ind (X : U) (P : 𝚺 X → U)
+    (north : P (𝜎₁ X))
+    (south : P (𝜎₂ X))
+    (merid : Π (x: X), PathP (<i> P (𝜎₃ X x @ i)) (north) (south)) (y: 𝚺 X) : P y
+

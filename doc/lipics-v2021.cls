@@ -890,7 +890,7 @@ pdfsubject={LIPIcs, Vol.\@SeriesVolume, \@EventShortTitle; Copyright (C) \ifx\au
 \let\@subjclass\@empty
 \def\subjclassHeading{%
   \textcolor{lipicsGray}{\fontsize{9}{12}\sffamily\bfseries
-                       2012 ACM Subject Classification\enskip}}
+                       2025 ACM Subject Classification\enskip}}
 \def\doiHeading{%
   \textcolor{lipicsGray}{\fontsize{9}{12}\sffamily\bfseries
                        Digital Object Identifier\enskip}}

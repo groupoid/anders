@@ -27,7 +27,7 @@ Below, we explore four such perspectives: categorical, set-theoretic, homotopica
 From a categorical viewpoint, Π and Σ types arise naturally through adjunctions.
 The key idea is that dependent function types correspond to right adjoints,
 while dependent sum types correspond to left adjoints. This perspective,
-pioneered by Kock-Wright, provides a logical foundation for interpreting
+pioneered by Kock-Wraith , provides a logical foundation for interpreting
 these types in categorical models of type theory.
 
 * The adjunctions can be explicitly formulated as triples (Σf ⊢ f* ⊢ Πf):

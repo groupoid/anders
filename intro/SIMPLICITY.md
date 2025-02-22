@@ -50,18 +50,22 @@ def cat : Category := П (context), conditions ⊢ n (objects | morphisms | cohe
 <superscript> ::= "¹" | "²" | "³" | "⁴" | "⁵" | "⁶" | "⁷" | "⁸" | "⁹"
 <n> ::= <digit> | <digit> <n>
 <context> ::= <hypothesis> | <hypothesis> "," <context>
-<hypothesis> ::= <id> ":" <type-term> | "(" <decl-list> ")" | <id> "=" <t> "<" <t> | <id> "=" <t> "∘" <t>
-<decl-list> ::= <id> ":" <type-term> | <identifier> ":" <type-term> "," <decl-list>
+<hypothesis> ::= <id> ":" <type-term>              % Single declaration, e.g., a : Simplex
+               | "(" <id-list> ":" <type-term> ")" % Grouped declaration, e.g., (a b c : Simplex)
+               | <id> "=" <t> "<" <t>              % Map, e.g., ∂₁ = C₂ < C₃
+               | <id> "=" <t> "∘" <t>              % Equality, e.g., ac = ab ∘ bc
+<id-list> ::= <id> | <id> <id-list>                % e.g., a b c
 <elements> ::= <element-list> | ε
 <element-list> ::= <id> | <id> "," <element-list>
 <constraints> ::= <constraint-list> | ε
 <constraint-list> ::= <constraint> | <constraint> "," <constraint-list>
-<constraint> ::= <t> "=" <t> | <id> "<" <id>   % Equality (e.g., a ∘ a = e) | Map (e.g., ∂₁ < C₂)
-<t> ::= <id>                                   % e.g., a
-      | <t> "∘" <t>                            % e.g., a ∘ b
-      | <t> "^-1"                              % e.g., a^-1
-      | <t> "^" <superscript>                  % e.g., a³
-      | "e"                                    % identity
+<constraint> ::= <t> "=" <t>                      % Equality (e.g., a ∘ a = e)
+               | <id> "<" <id>                    % Map (e.g., ∂₁ < C₂)
+<t> ::= <id>                                      % e.g., a
+      | <t> "∘" <t>                               % e.g., a ∘ b
+      | <t> "^-1"                                 % e.g., a^-1
+      | <t> "^" <superscript>                     % e.g., a³
+      | "e"                                       % identity
 ```
 
 Meaning of <n> Across Types:

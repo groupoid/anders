@@ -24,7 +24,7 @@ Incorporating into CCHM/CHM HTS Anders core.
 ### General Definition
 
 ```
-def <name> : Simple := <context> ⊢ n [v₀ .. vₙ] { f₀, ..., fₙ } 
+def <name> : Simplex := <context> ⊢ n [v₀ .. vₙ] { f₀, ..., fₙ } 
 ```
 
 ### Formal BNF

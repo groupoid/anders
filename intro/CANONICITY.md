@@ -1,42 +1,20 @@
 Canonicity
 ==========
 
-## Prolog
+## Abstract
 
-I describe this process as the three states of cognitive viscosity—syntactic,
-propositional, and homotopical—each of which manifests across four levels of
-depth: category theory, Grothendieck yoga, cohomology, and supergeometry.
-
-Initially, within the framework of Martin-Löf Type Theory (MLTT), thinking
-is rigid and constrained, resembling reinforced concrete. As one progresses
-through the mandala (a metaphor for a structured path of thought or reasoning),
-the experience of fibrational "breathing" (the dynamic, flexible interaction
-of type structures) becomes apparent. This process involves immersion in
-identification spaces (equivalence classes of types or structures, where
-different representations are seen as equivalent). Over time, the calculus
-of types and structures emerges, not merely within these identifications but
-as an intrinsic feature of their structure. This reveals the presence of
-computationally intractable gaps—holes in thought that cannot be computed,
-referencing undecidable problems or phenomena that resist formalization or
-computation within the system. The laws of normalization (reducing complex
-terms to a simpler or canonical form) accelerate the complexity of patterns
-to such a degree that the system approaches a state of homotopical viscosity,
-where the reasoning becomes increasingly entangled and resistant to further simplification.
-
-Ultimately, the final mode of reasoning eliminates all homotopical equalities (removing
-redundancies between topologically equivalent structures) within the system of infinite
-universes of two distinct types (a reference to type hierarchies and universe
-polymorphism in type theory, where multiple "levels" of types exist).
-
-A being that has eliminated all isomorphisms up to homotopical canonicity (removing
-redundancies in the types and structures that preserve their topological or higher-order
-identity) within the system of infinite universes (infinite hierarchies of types)
-perceives reality as it truly is. This claim refers to the idea that, by resolving
-all equivalences and redundancies in mathematical systems, one may approach the ultimate,
-most refined understanding of the structures governing reality. "As it truly is" refers
-to the idea of a reality whose structure is perfectly captured by these refined, canonical
-mathematical models, unencumbered by the computational and cognitive limitations that
-typically obscure such understanding.
+This document examines canonicity in the context of Anders, a theorem prover built
+on a CCHM/CHM HST-based core, integrating cubical type theory (CCHM in CHM flavor)
+with strict equality on pretypes. Canonicity ensures that every closed, well-typed
+term in Anders reduces to a unique canonical form, such as true or false for booleans
+or numerals like 0 or 1 for natural numbers. The text distinguishes normal forms—fully
+evaluated terms—from canonical forms, noting that neutral terms (e.g., those with free
+variables) do not achieve canonicity. For closed terms, this property is essential,
+particularly within Anders’ intensional type system and its support for inductive
+types. Challenges in proving canonicity arise in complex settings like cubical type
+theory, potentially requiring additional axioms. In Anders, canonicity underpins
+reliable computation and proof construction, aligning its theoretical foundations
+with practical implementation.
 
 ## Intro
 
@@ -77,7 +55,6 @@ However, in more complex systems—such as those with undecidable type checking
 or advanced features like cubical type theory—establishing canonicity can be
 difficult and may require additional computational rules or axioms. Despite
 these challenges, canonicity remains a cornerstone of reliable computation.
-
 
 ## Coda
 
@@ -344,3 +321,39 @@ By guaranteeing that terms reduce to unique, standard forms, it underpins
 trustworthy programming languages and formal proofs. Rooted in HoTT, its
 principles extend to broader system design, shaping how we reason about and build computational frameworks.
 
+## Prolog
+
+I describe this process as the three states of cognitive viscosity—syntactic,
+propositional, and homotopical—each of which manifests across four levels of
+depth: category theory, Grothendieck yoga, cohomology, and supergeometry.
+
+Initially, within the framework of Martin-Löf Type Theory (MLTT), thinking
+is rigid and constrained, resembling reinforced concrete. As one progresses
+through the mandala (a metaphor for a structured path of thought or reasoning),
+the experience of fibrational "breathing" (the dynamic, flexible interaction
+of type structures) becomes apparent. This process involves immersion in
+identification spaces (equivalence classes of types or structures, where
+different representations are seen as equivalent). Over time, the calculus
+of types and structures emerges, not merely within these identifications but
+as an intrinsic feature of their structure. This reveals the presence of
+computationally intractable gaps—holes in thought that cannot be computed,
+referencing undecidable problems or phenomena that resist formalization or
+computation within the system. The laws of normalization (reducing complex
+terms to a simpler or canonical form) accelerate the complexity of patterns
+to such a degree that the system approaches a state of homotopical viscosity,
+where the reasoning becomes increasingly entangled and resistant to further simplification.
+
+Ultimately, the final mode of reasoning eliminates all homotopical equalities (removing
+redundancies between topologically equivalent structures) within the system of infinite
+universes of two distinct types (a reference to type hierarchies and universe
+polymorphism in type theory, where multiple "levels" of types exist).
+
+A being that has eliminated all isomorphisms up to homotopical canonicity (removing
+redundancies in the types and structures that preserve their topological or higher-order
+identity) within the system of infinite universes (infinite hierarchies of types)
+perceives reality as it truly is. This claim refers to the idea that, by resolving
+all equivalences and redundancies in mathematical systems, one may approach the ultimate,
+most refined understanding of the structures governing reality. "As it truly is" refers
+to the idea of a reality whose structure is perfectly captured by these refined, canonical
+mathematical models, unencumbered by the computational and cognitive limitations that
+typically obscure such understanding.

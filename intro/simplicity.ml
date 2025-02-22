@@ -24,13 +24,15 @@ type hypothesis =
   | Equality of string * term * term  (* e.g., ac = ab ∘ bc *)
   | Mapping of string * term * term   (* e.g., ∂₁ = C₂ < C₃ *)
 
+type rank = Finite of int | Infinite  (* Updated to support ∞ *)
+
 type type_def = {
   name : string;
   typ : type_name;
   context : hypothesis list;
-  rank : int;                  (* <n> *)
-  elements : string list;      (* <elements> *)
-  constraints : constrain list (* <constraints> *)
+  rank : rank;                        (* <n> *)
+  elements : string list;             (* <elements> *)
+  constraints : constrain list        (* <constraints> *)
 }
 
 (* Parsing helpers *)
@@ -38,7 +40,9 @@ let parse_superscript = function
   | "¹" -> S1 | "²" -> S2 | "³" -> S3 | "⁴" -> S4 | "⁵" -> S5
   | "⁶" -> S6 | "⁷" -> S7 | "⁸" -> S8 | "⁹" -> S9 | _ -> failwith "Invalid superscript"
 
-let parse_n s = int_of_string s
+let parse_n s = match s with
+  | "∞" -> Infinite
+  | n -> Finite (int_of_string n)
 
 (* Type checking algorithm *)
 let check_type_def defn =
@@ -53,7 +57,7 @@ let check_type_def defn =
           else Hashtbl.add env id typ
         ) ids
     | Equality (id, t1, t2) -> Hashtbl.add env id Simplex (* Assume Simplex for now *)
-    | Mapping (id, t1, t2) -> Hashtbl.add env id Simplex (* Assume Simplex for maps *)
+    | Mapping (id, t1, t2) ->  Hashtbl.add env id Simplex (* Assume Simplex for maps *)
   ) defn.context;
   
   (* Check elements *)
@@ -84,12 +88,15 @@ let check_type_def defn =
   ) defn.constraints;
   
   (* Type-specific rank check *)
-  (match defn.typ with
-   | Simplex -> if List.length defn.elements <> defn.rank + 1 then failwith "Simplex rank mismatch"
-   | Group | Monoid -> if List.length defn.elements <> defn.rank then failwith "Group/Monoid rank mismatch (n = generator count)"
-   | Simplicial -> if defn.rank < 0 then failwith "Simplicial rank must be non-negative (max dimension)"
-   | Chain -> if defn.rank < 0 then failwith "Chain rank must be non-negative (chain length)"
-   | Category -> if List.length defn.elements < defn.rank then failwith "Category rank mismatch (n = object count)"
+  (match defn.typ, defn.rank with
+   | Simplex, Finite n -> if List.length defn.elements <> n + 1 then failwith "Simplex rank mismatch"
+   | Simplex, Infinite -> failwith "Simplex cannot have infinite rank (use Simplicial)"
+   | Group, Finite n | Monoid, Finite n -> if List.length defn.elements <> n then failwith "Group/Monoid rank mismatch (n = generator count)"
+   | Group, Infinite | Monoid, Infinite -> failwith "Group/Monoid cannot have infinite rank"
+   | Simplicial, Finite n | Chain, Finite n -> if n < 0 then failwith "Simplicial/Chain rank must be non-negative"
+   | Simplicial, Infinite | Chain, Infinite -> () (* Infinite dimensions allowed *)
+   | Category, Finite n -> if List.length defn.elements < n then failwith "Category rank mismatch (n = object count)"
+   | Category, Infinite -> failwith "Category cannot have infinite rank"
   );
   
   (* Success *)
@@ -104,7 +111,7 @@ let singular_cone = {
     Decl (["qrs"; "prs"; "pqs"], Simplex);
     Equality ("pqr", Comp (Id "pqs", Id "qrs"), Id "pqr")
   ];
-  rank = 3;
+  rank = Finite 3;
   elements = ["p"; "q"; "r"; "s"];
   constraints = [Eq (Id "pqr", Comp (Id "pqs", Id "qrs"))]
 }
@@ -117,7 +124,7 @@ let mobius = {
     Decl (["bc"; "ac"], Simplex);
     Equality ("ab", Comp (Id "bc", Id "ac"), Id "ab")
   ];
-  rank = 2;
+  rank = Finite 2;
   elements = ["a"; "b"; "c"];
   constraints = [Eq (Id "ab", Comp (Id "bc", Id "ac"))]
 }
@@ -131,7 +138,7 @@ let degen_tetra = {
     Decl (["qrs"; "prs"; "pqs"], Simplex);
     Equality ("pqr", Comp (Id "pqs", Id "qrs"), Id "pqr")
   ];
-  rank = 3;
+  rank = Finite 3;
   elements = ["p"; "q"; "r"; "s"];
   constraints = [Eq (Id "pqr", Comp (Id "pqs", Id "qrs"))]
 }
@@ -145,7 +152,7 @@ let twisted_annulus_1 = {
     Equality ("ab", Comp (Id "bc", Id "ac"), Id "ab");
     Equality ("cd", Comp (Id "ac", Id "bd"), Id "cd")
   ];
-  rank = 2;
+  rank = Finite 2;
   elements = ["a"; "b"; "c"];
   constraints = [Eq (Id "ab", Comp (Id "bc", Id "ac"))]
 }
@@ -159,7 +166,7 @@ let twisted_annulus_2 = {
     Equality ("ab", Comp (Id "bc", Id "ac"), Id "ab");
     Equality ("cd", Comp (Id "ac", Id "bd"), Id "cd")
   ];
-  rank = 2;
+  rank = Finite 2;
   elements = ["b"; "c"; "d"];
   constraints = [Eq (Id "cd", Comp (Id "ac", Id "bd"))]
 }
@@ -173,7 +180,7 @@ let degen_triangle = {
     Decl (["bc"; "ac"], Simplex);
     Equality ("ab", Comp (Id "bc", Id "ac"), Id "ab")
   ];
-  rank = 2;
+  rank = Finite 2;
   elements = ["a"; "b"; "c"];
   constraints = [Eq (Id "ab", Comp (Id "bc", Id "ac"))]
 }
@@ -187,7 +194,7 @@ let singular_prism = {
     Equality ("qrs", Id "qrs", Id "qrs");
     Equality ("pqr", Comp (Id "pqt", Id "qrs"), Id "pqr")
   ];
-  rank = 3;
+  rank = Finite 3;
   elements = ["p"; "q"; "r"; "s"];
   constraints = [Eq (Id "pqr", Comp (Id "pqt", Id "qrs"))]
 }
@@ -202,7 +209,7 @@ let path_z2_category = {
     Equality ("a2", Pow (Id "a", S2), Id "e");
     Equality ("h", Comp (Id "f", Id "g"), Id "h")
   ];
-  rank = 2;  (* 2 objects: x, y *)
+  rank = Finite 2;  (* 2 objects: x, y *)
   elements = ["x"; "y"];
   constraints = [Eq (Id "h", Comp (Id "f", Id "g"))]
 }
@@ -215,7 +222,7 @@ let nat_monoid = {
     Equality ("sz", Comp (Id "s", Id "z"), Id "s");
     Equality ("zs", Comp (Id "z", Id "s"), Id "s")
   ];
-  rank = 2;  (* 2 generators: z, s *)
+  rank = Finite 2;  (* 2 generators: z, s *)
   elements = ["z"; "s"];
   constraints = [
     Eq (Id "sz", Comp (Id "s", Id "z"));
@@ -233,7 +240,7 @@ let triangle_chain = {
     Equality ("∂₁₂", Id "e12", Id "∂₁₂");
     Equality ("∂₂", Id "t", Id "∂₂")
   ];
-  rank = 2;  (* Chain length: 0 -> 1 -> 2 *)
+  rank = Finite 2;  (* Chain length: 0 -> 1 -> 2 *)
   elements = ["v0"; "v1"; "v2"; "e01"; "e02"; "e12"; "t"];
   constraints = [
     Eq (Id "∂₁₀", Id "e01");
@@ -252,7 +259,7 @@ let circle = {
     Equality ("∂₁₁", Id "v", Id "∂₁₁");
     Equality ("s₀", Id "e", Id "s₀")
   ];
-  rank = 1;  (* Max dimension: 1 *)
+  rank = Finite 1;  (* Max dimension: 1 *)
   elements = ["v"; "e"];
   constraints = [
     Eq (Id "∂₁₀", Id "v");
@@ -268,40 +275,31 @@ let z3 = {
     Decl (["e"; "a"], Simplex);
     Equality ("a3", Pow (Id "a", S3), Id "e")
   ];
-  rank = 1;  (* 1 generator: a *)
+  rank = Finite 1;  (* 1 generator: a *)
   elements = ["a"];
   constraints = [Eq (Id "a3", Pow (Id "a", S3))]
 }
 
-(*
-
-  Let’s model the circle S1 as a simple ∞-groupoid—base point v,
-  loop e—with face maps (∂1,0=v, ∂1,1=v) and degeneracy (s0:v→e).
-  In HoTT, S1 has π1=Z, representable via loops — our Simplicial
-  type can encode this finitely.
-
-  def s1_infty : Simplicial
-   := П (v e : Simplex),
-        ∂₁₀ = v, ∂₁₁ = v, s₀ < v
-      ⊢ 1 (v, e | ∂₁₀ ∂₁₁, s₀)
-
-*)
-
+(* Infinite S¹ ∞-groupoid *)
 let s1_infty = {
   name = "s1_infty";
   typ = Simplicial;
   context = [
-    Decl (["v"; "e"], Simplex);
+    Decl (["v"; "e"], Simplex);  (* Base point and loop *)
     Equality ("∂₁₀", Id "v", Id "∂₁₀");
     Equality ("∂₁₁", Id "v", Id "∂₁₁");
-    Equality ("s₀", Id "e", Id "s₀")
+    Equality ("s₀", Id "e", Id "s₀");
+    Equality ("∂₂₀", Comp (Id "e", Id "e"), Id "∂₂₀");  (* 2-cell: e ∘ e *)
+    Equality ("s₁₀", Id "∂₂₀", Id "s₁₀")  (* Degeneracy for 2-cell *)
   ];
-  rank = 1;  (* Max dimension: 1 *)
-  elements = ["v"; "e"];
+  rank = Infinite;  (* Unbounded dimensions *)
+  elements = ["v"; "e"; "∂₂₀"];  (* Finite truncation: 0-, 1-, 2-cells *)
   constraints = [
     Eq (Id "∂₁₀", Id "v");
     Eq (Id "∂₁₁", Id "v");
-    Map ("s₀", ["v"])
+    Map ("s₀", ["v"]);
+    Eq (Id "∂₂₀", Comp (Id "e", Id "e"));
+    Map ("s₁₀", ["∂₂₀"])
   ]
 }
 

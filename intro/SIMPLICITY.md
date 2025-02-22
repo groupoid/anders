@@ -43,26 +43,25 @@ def cat : Category := П (context), conditions ⊢ n (objects | morphisms | cohe
 
 ```
 <program> ::= <definition> | <definition> <program>
-<definition> ::= "def" <identifier> ":" <type-name> ":=" <type-term>
+<definition> ::= "def" <id> ":" <type-name> ":=" <type-term>
 <type-name> ::= "Simplex" | "Group" | "Simplicial" | "Chain" | "Category" | "Monoid"
 <type-term> ::= "П" "(" <context> ")" "⊢" <n> "(" <elements> "|" <constraints> ")" 
 <digit> ::= "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9"
 <superscript> ::= "¹" | "²" | "³" | "⁴" | "⁵" | "⁶" | "⁷" | "⁸" | "⁹"
 <n> ::= <digit> | <digit> <n>
 <context> ::= <hypothesis> | <hypothesis> "," <context>
-<hypothesis> ::= <identifier> ":" "Simplex" | "(" <decl-list> ")" | <identifier> "=" <term> "<" <term> | <identifier> "=" <term> "∘" <term>
-<decl-list> ::= <identifier> ":" "Simplex" | <identifier> ":" "Simplex" "," <decl-list>
+<hypothesis> ::= <id> ":" <type-term> | "(" <decl-list> ")" | <id> "=" <t> "<" <t> | <id> "=" <t> "∘" <t>
+<decl-list> ::= <id> ":" <type-term> | <identifier> ":" <type-term> "," <decl-list>
 <elements> ::= <element-list> | ε
-<element-list> ::= <identifier> | <identifier> "," <element-list>
+<element-list> ::= <id> | <id> "," <element-list>
 <constraints> ::= <constraint-list> | ε
 <constraint-list> ::= <constraint> | <constraint> "," <constraint-list>
-<constraint> ::= <term> "=" <term> | <identifier> "<" <identifier>      % Equality (e.g., a ∘ a = e) | Map (e.g., ∂₁ < C₂)
-<term> ::= <identifier>                                                 % e.g., a
-         | <term> "∘" <term>                                            % e.g., a ∘ b
-         | <term> "^-1"                                                 % e.g., a^-1
-         | <term> "^" <superscript>                                     % e.g., a³
-         | "e"                                                          % identity
-
+<constraint> ::= <t> "=" <t> | <id> "<" <id>   % Equality (e.g., a ∘ a = e) | Map (e.g., ∂₁ < C₂)
+<t> ::= <id>                                   % e.g., a
+      | <t> "∘" <t>                            % e.g., a ∘ b
+      | <t> "^-1"                              % e.g., a^-1
+      | <t> "^" <superscript>                  % e.g., a³
+      | "e"                                    % identity
 ```
 
 Meaning of <n> Across Types:

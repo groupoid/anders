@@ -204,33 +204,6 @@ they involve higher inductive types and path spaces.
   to their normal form, especially if the path spaces themselves
   are complicated or not trivially reducible.
 
-#### Reformulating Canonicity for Natural Numbers
-
-To reformulate canonicity for natural numbers built using this approach, consider the following:
-
-1) Explicit normal forms: Instead of using higher inductive types and path
-   spaces directly in the constructors of `ℕ`, you could attempt to define
-   explicit normal forms for each level of recursion. For example, if `ℕ`
-   is constructed inductively, the recursion should be designed to
-   ensure that each term reduces to a canonical form (either 0 or succ n).
-
-2) Defining a simplification rule: You could introduce simplification rules
-   for the terms involving `PathP` and `ind₂`. For example, if the term involves
-   a path between two elements of the same type, it could simplify based on
-   the structure of that path.
-
-3) Weakening of transport functions: The use of transport
-   functions (`𝟎⟶ℕ` and `𝟏⟶ℕ`) could be streamlined or simplified,
-   possibly by ensuring that the terms they produce are more
-   straightforward, avoiding the creation of complex path-dependent terms.
-
-4) Avoiding path dependencies in constructors: If path dependencies
-   are introduced in terms like `ℕ-ctor` x, ensuring they do not lead
-   to terms that require higher reductions may help maintain
-   syntactic canonicity. This might involve constructing the natural
-   number terms without relying on path-dependent constructs, focusing
-   on simpler inductive rules.
-
 ## Epilog
 
 In summary, the failure of syntactic canonicity in the given example arises

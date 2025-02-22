@@ -5,22 +5,24 @@
    Copyright (c) 2025 Groupoid Infinity
 *)
 
+(* Types *)
 type type_name = Simplex | Group | Simplicial | Chain | Category | Monoid
+
 type superscript = S1 | S2 | S3 | S4 | S5 | S6 | S7 | S8 | S9
 
 type term =
-  | Id of string                      (* e.g., a *)
-  | Comp of term * term               (* e.g., a ∘ b *)
-  | Inv of term                       (* e.g., a^-1 *)
-  | Pow of term * superscript         (* e.g., a³ *)
-  | E                                 (* identity: e *)
+  | Id of string                  (* e.g., a *)
+  | Comp of term * term           (* e.g., a ∘ b *)
+  | Inv of term                   (* e.g., a^-1 *)
+  | Pow of term * superscript     (* e.g., a³ *)
+  | E                             (* identity: e *)
 
 type constrain =
-  | Eq of term * term                 (* e.g., a ∘ a = e *)
-  | Map of string * string list       (* e.g., ∂₁ < [e01; e02; e12] *)
+  | Eq of term * term             (* e.g., a ∘ a = e *)
+  | Map of string * string list   (* e.g., ∂₁ < [e01; e02; e12] *)
 
 type hypothesis =
-  | Decl of string list * type_name   (* e.g., (a b c : Simplex) *)
+  | Decl of string list * type_name  (* e.g., (a b c : Simplex) *)
   | Equality of string * term * term  (* e.g., ac = ab ∘ bc *)
   | Mapping of string * term * term   (* e.g., ∂₁ = C₂ < C₃ *)
 
@@ -30,9 +32,10 @@ type type_def = {
   name : string;
   typ : type_name;
   context : hypothesis list;
-  rank : rank;                        (* <n> *)
-  elements : string list;             (* <elements> *)
-  constraints : constrain list        (* <constraints> *)
+  rank : rank;                  (* <n> *)
+  elements : string list;       (* <elements> *)
+  faces : string list option;   (* Optional: only for Simplex *)
+  constraints : constrain list (* <constraints> *)
 }
 
 (* Parsing helpers *)
@@ -56,14 +59,24 @@ let check_type_def defn =
           if Hashtbl.mem env id then failwith ("Duplicate declaration: " ^ id)
           else Hashtbl.add env id typ
         ) ids
-    | Equality (id, t1, t2) -> Hashtbl.add env id Simplex (* Assume Simplex for now *)
-    | Mapping (id, t1, t2) ->  Hashtbl.add env id Simplex (* Assume Simplex for maps *)
+    | Equality (id, t1, t2) ->
+        Hashtbl.add env id Simplex (* Assume Simplex for now *)
+    | Mapping (id, t1, t2) ->
+        Hashtbl.add env id Simplex (* Assume Simplex for maps *)
   ) defn.context;
   
   (* Check elements *)
   List.iter (fun el ->
     if not (Hashtbl.mem env el) then failwith ("Undeclared element: " ^ el)
   ) defn.elements;
+  
+  (* Check faces if present *)
+  (match defn.faces with
+   | Some faces ->
+       List.iter (fun f ->
+         if not (Hashtbl.mem env f) then failwith ("Undeclared face: " ^ f)
+       ) faces
+   | None -> ());
   
   (* Check constraints *)
   List.iter (fun c ->
@@ -79,21 +92,41 @@ let check_type_def defn =
         in
         check_term t1; check_term t2
     | Map (id1, ids2) ->
-        if not (Hashtbl.mem env id1) then failwith ("Undeclared map source: " ^ id1);
-        List.iter (fun id2 -> if not (Hashtbl.mem env id2) then failwith ("Undeclared map target: " ^ id2)
+        if not (Hashtbl.mem env id1) then
+          failwith ("Undeclared map source: " ^ id1);
+        List.iter (fun id2 ->
+          if not (Hashtbl.mem env id2) then
+            failwith ("Undeclared map target: " ^ id2)
         ) ids2
   ) defn.constraints;
   
   (* Type-specific rank check *)
   (match defn.typ, defn.rank with
-   | Simplex, Finite n -> if List.length defn.elements <> n + 1 then failwith "Simplex rank mismatch"
-   | Simplex, Infinite -> failwith "Simplex cannot have infinite rank (use Simplicial)"
-   | Group, Finite n | Monoid, Finite n -> if List.length defn.elements <> n then failwith "Group/Monoid rank mismatch (n = generator count)"
-   | Group, Infinite | Monoid, Infinite -> failwith "Group/Monoid cannot have infinite rank"
-   | Simplicial, Finite n | Chain, Finite n -> if n < 0 then failwith "Simplicial/Chain rank must be non-negative"
-   | Simplicial, Infinite | Chain, Infinite -> () (* Infinite dimensions allowed *)
-   | Category, Finite n -> if List.length defn.elements < n then failwith "Category rank mismatch (n = object count)"
-   | Category, Infinite -> failwith "Category cannot have infinite rank"
+   | Simplex, Finite n ->
+       if List.length defn.elements <> n + 1 then
+         failwith "Simplex rank mismatch (elements)";
+       (match defn.faces with
+        | Some faces ->
+            if List.length faces <> n + 1 then
+              failwith "Simplex rank mismatch (faces)"
+        | None -> failwith "Simplex requires faces")
+   | Simplex, Infinite ->
+       failwith "Simplex cannot have infinite rank (use Simplicial)"
+   | Group, Finite n | Monoid, Finite n ->
+       if List.length defn.elements <> n then
+         failwith "Group/Monoid rank mismatch (n = generator count)"
+   | Group, Infinite | Monoid, Infinite ->
+       failwith "Group/Monoid cannot have infinite rank"
+   | Simplicial, Finite n | Chain, Finite n ->
+       if n < 0 then
+         failwith "Simplicial/Chain rank must be non-negative"
+   | Simplicial, Infinite | Chain, Infinite ->
+       ()
+   | Category, Finite n ->
+       if List.length defn.elements < n then
+         failwith "Category rank mismatch (n = object count)"
+   | Category, Infinite ->
+       failwith "Category cannot have infinite rank"
   );
   
   (* Success *)
@@ -110,6 +143,7 @@ let singular_cone = {
   ];
   rank = Finite 3;
   elements = ["p"; "q"; "r"; "s"];
+  faces = Some ["qrs"; "prs"; "pqs"; "pqr"];
   constraints = [Eq (Id "pqr", Comp (Id "pqs", Id "qrs"))]
 }
 
@@ -123,6 +157,7 @@ let mobius = {
   ];
   rank = Finite 2;
   elements = ["a"; "b"; "c"];
+  faces = Some ["bc"; "ac"; "ab"];
   constraints = [Eq (Id "ab", Comp (Id "bc", Id "ac"))]
 }
 
@@ -137,6 +172,7 @@ let degen_tetra = {
   ];
   rank = Finite 3;
   elements = ["p"; "q"; "r"; "s"];
+  faces = Some ["qrs"; "prs"; "pqs"; "pqr"];
   constraints = [Eq (Id "pqr", Comp (Id "pqs", Id "qrs"))]
 }
 
@@ -151,6 +187,7 @@ let twisted_annulus_1 = {
   ];
   rank = Finite 2;
   elements = ["a"; "b"; "c"];
+  faces = Some ["bc"; "ac"; "ab"];
   constraints = [Eq (Id "ab", Comp (Id "bc", Id "ac"))]
 }
 
@@ -165,6 +202,7 @@ let twisted_annulus_2 = {
   ];
   rank = Finite 2;
   elements = ["b"; "c"; "d"];
+  faces = Some ["bc"; "bd"; "cd"];
   constraints = [Eq (Id "cd", Comp (Id "ac", Id "bd"))]
 }
 
@@ -179,6 +217,7 @@ let degen_triangle = {
   ];
   rank = Finite 2;
   elements = ["a"; "b"; "c"];
+  faces = Some ["bc"; "ac"; "ab"];
   constraints = [Eq (Id "ab", Comp (Id "bc", Id "ac"))]
 }
 
@@ -193,6 +232,7 @@ let singular_prism = {
   ];
   rank = Finite 3;
   elements = ["p"; "q"; "r"; "s"];
+  faces = Some ["qrs"; "prs"; "pqt"; "pqr"];
   constraints = [Eq (Id "pqr", Comp (Id "pqt", Id "qrs"))]
 }
 
@@ -208,6 +248,7 @@ let path_z2_category = {
   ];
   rank = Finite 2;  (* 2 objects: x, y *)
   elements = ["x"; "y"];
+  faces = None;  (* No faces for Category *)
   constraints = [Eq (Id "h", Comp (Id "f", Id "g"))]
 }
 
@@ -221,6 +262,7 @@ let nat_monoid = {
   ];
   rank = Finite 2;  (* 2 generators: z, s *)
   elements = ["z"; "s"];
+  faces = None;  (* No faces for Monoid *)
   constraints = [
     Eq (Id "sz", Comp (Id "s", Id "z"));
     Eq (Id "zs", Comp (Id "z", Id "s"))
@@ -239,6 +281,7 @@ let triangle_chain = {
   ];
   rank = Finite 2;  (* Chain length: 0 -> 1 -> 2 *)
   elements = ["v0"; "v1"; "v2"; "e01"; "e02"; "e12"; "t"];
+  faces = None;  (* No faces for Chain *)
   constraints = [
     Eq (Id "∂₁₀", Id "e01");
     Eq (Id "∂₁₁", Id "e02");
@@ -258,6 +301,7 @@ let circle = {
   ];
   rank = Finite 1;  (* Max dimension: 1 *)
   elements = ["v"; "e"];
+  faces = None;  (* No faces for Simplicial *)
   constraints = [
     Eq (Id "∂₁₀", Id "v");
     Eq (Id "∂₁₁", Id "v");
@@ -274,33 +318,24 @@ let z3 = {
   ];
   rank = Finite 1;  (* 1 generator: a *)
   elements = ["a"];
+  faces = None;  (* No faces for Group *)
   constraints = [Eq (Id "a3", Pow (Id "a", S3))]
 }
-
-(*
-
-  Infinite S¹ ∞-groupoid
-
-def s1_infty : Simplicial := П (v e : Simplex),
-       ∂₁₀ = v, ∂₁₁ = v, s₀ < v,
-       ∂₂₀ = e ∘ e, s₁₀ < ∂₂₀
-       ⊢ ∞ (v, e, ∂₂₀ | ∂₁₀ ∂₁₁, s₀, ∂₂₀, s₁₀)
-
-*)
 
 let s1_infty = {
   name = "s1_infty";
   typ = Simplicial;
   context = [
-    Decl (["v"; "e"], Simplex);  (* Base point and loop *)
+    Decl (["v"; "e"], Simplex);
     Equality ("∂₁₀", Id "v", Id "∂₁₀");
     Equality ("∂₁₁", Id "v", Id "∂₁₁");
     Equality ("s₀", Id "e", Id "s₀");
-    Equality ("∂₂₀", Comp (Id "e", Id "e"), Id "∂₂₀");  (* 2-cell: e ∘ e *)
-    Equality ("s₁₀", Id "∂₂₀", Id "s₁₀")  (* Degeneracy for 2-cell *)
+    Equality ("∂₂₀", Comp (Id "e", Id "e"), Id "∂₂₀");
+    Equality ("s₁₀", Id "∂₂₀", Id "s₁₀")
   ];
   rank = Infinite;  (* Unbounded dimensions *)
-  elements = ["v"; "e"; "∂₂₀"];  (* Finite truncation: 0-, 1-, 2-cells *)
+  elements = ["v"; "e"; "∂₂₀"];
+  faces = None;  (* No faces for Simplicial *)
   constraints = [
     Eq (Id "∂₁₀", Id "v");
     Eq (Id "∂₁₁", Id "v");
@@ -310,10 +345,12 @@ let s1_infty = {
   ]
 }
 
+(* Test all examples *)
 let examples = [
   singular_cone; mobius; degen_tetra; twisted_annulus_1; twisted_annulus_2;
   degen_triangle; singular_prism; path_z2_category; nat_monoid; triangle_chain;
   circle; z3; s1_infty
 ]
 
-let () = List.iter check_type_def examples
+let () =
+  List.iter check_type_def examples

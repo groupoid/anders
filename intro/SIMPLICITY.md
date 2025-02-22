@@ -1,6 +1,21 @@
 # Simplicial HoTT
 
-Groupoid Infinity Simplicial HoTT pure algebraїc opetope implementation with explicit syntaxt for fastest type checking.
+TLDR: Groupoid Infinity Simplicial HoTT pure algebraїc opetope implementation with explicit syntaxt for fastest type checking.
+
+## Abstract
+
+We present a domain-specific language (DSL) extension to Cubical Homotopy Type Theory (CCHM) for simplicial structures,
+designed as a fast type checker with a focus on algebraic purity. Built on the Cohen-Coquand-Huber-Mörtberg (CCHM)
+framework, our DSL employs a Lean/Anders-like sequent syntax (П (context) ⊢ k [v₀ .. vₖ] { f₀, ..., fₗ } : Simplex) to define 
+k-dimensional simplices via explicit contexts, vertex lists, and face relations, eschewing geometric coherence terms
+in favor of compositional constraints (e.g., f=g∘h). The semantics, formalized as inference rules in a Martin-Löf
+Type Theory (MLTT)-like setting, include Formation, Introduction, Elimination, Composition, Computational, and
+Uniqueness rules, ensuring a lightweight, deterministic computational model with linear-time type checking (O(k + m + n),
+where k is vertices, m is faces, and n is relations). Inspired by opetopic purity, our system avoids cubical
+path-filling (e.g., PathP), aligning with syntactic approaches to higher structures while retaining CCHM’s
+type-theoretic foundation. Compared to opetopic sequent calculi and the Rzk prover, our DSL balances algebraic
+simplicity with practical efficiency, targeting simplicial constructions over general ∞-categories,
+and achieves a fast, pure checker suitable for formal proofs and combinatorial reasoning.
 
 ## Syntax
 
@@ -225,3 +240,20 @@ Checking:
 * Relations: qrs = qrs (O(1)), pqr = pqt ∘ qrs (O(1)) — O(2).
 * Total: O(10) — linear, fast despite degeneracy.
 
+## Conclusion
+
+Both avoid geometric filling—our DSL uses explicit face compositions (e.g., ab = bc ∘ ac),
+akin to opetopic grafting, while opetopes rely on tree-based pasting (e.g., Γ ⊢ o).
+We’re purer than traditional simplicial sets (no coh). Opetopes lack computational
+reductions—ours adds MLTT-like rules (∂_i → f_i), diverging from static syntax but enhancing usability in CCHM.
+
+A lightweight, fast type checker—O(k + m + n)—balancing opetopic purity (algebraic,
+no geometry) with CCHM’s computational power (reductions, uniqueness). It’s less
+expressive than Rzk (no ∞-categories) and less flexible than opetopes (fixed faces vs. trees),
+but excels at simplicial tasks. Ours is O(k + m + n)—faster than potential O(n log n) tree
+traversals in opetopic derivations, due to fixed structure and no recursion.
+
+Our CCHM DSL is a fast, pure simplicial checker—aligned with opetopic purity in its algebraic core,
+but distinct in its fixed-face simplicial structure and CCHM reductions. Compared to Rzk, it sacrifices
+generality for speed and simplicity, embedding a lean DSL in a type-theoretic framework. It’s a sweet
+spot—opetopic-inspired, MLTT-rigorous, and CCHM-efficient—ideal for compact, non-trivial simplicial constructions.

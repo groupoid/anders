@@ -1,6 +1,7 @@
 # Simplicial HoTT
 
-TLDR: Groupoid Infinity Simplicial HoTT pure algebraїc opetope implementation with explicit syntaxt for fastest type checking.
+Groupoid Infinity Simplicial HoTT pure algebraїc opetope implementation with explicit syntaxt for fastest type checking.
+It supports following extensions: Chain, Simplex, Simplicial, Category, Monoid, Group.
 
 ## Abstract
 
@@ -21,24 +22,57 @@ and achieves a fast, pure checker suitable for formal proofs and combinatorial r
 
 Incorporating into CCHM/CHM HTS Anders core.
 
-### General Definition
+###  Definition
+
+General:
 
 ```
-def <name> : Simplex := <context> ⊢ n [v₀ .. vₙ] { f₀, ..., fₙ } 
+def <name> : <type> := П (context), conditions ⊢ <n> (elements | constraints)
+```
+
+Instances:
+
+```
+def chain : Chain := П (context), conditions ⊢ n (C₀, C₁, ..., Cₙ | ∂₀, ∂₁, ..., ∂ₙ₋₁)
+def simplicial : Simplicial := П (context), conditions ⊢ n (s₀, s₁, ..., sₙ | facemaps, degeneracies)
+def group : Group := П (context), conditions ⊢ n (generators | relations)
+def cat : Category := П (context), conditions ⊢ n (objects | morphisms | coherence)
 ```
 
 ### Formal BNF
 
 ```
-<program> ::= "def" <identifier> ":" "Simplex" ":=" <sequent-term>
-<sequent-term> ::= "П" "(" <context> ")" <simplex-def> "⊢" <number> "[" <vertex-list> "]" "{" <face-list> "}"
+<program> ::= <definition> | <definition> <program>
+<definition> ::= "def" <identifier> ":" <type-name> ":=" <type-term>
+<type-name> ::= "Simplex" | "Group" | "Simplicial" | "Chain" | "Category" | "Monoid"
+<type-term> ::= "П" "(" <context> ")" "⊢" <n> "(" <elements> "|" <constraints> ")" 
+<digit> ::= "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9"
+<superscript> ::= "¹" | "²" | "³" | "⁴" | "⁵" | "⁶" | "⁷" | "⁸" | "⁹"
+<n> ::= <digit> | <digit> <n>
 <context> ::= <hypothesis> | <hypothesis> "," <context>
-<hypothesis> ::= <identifier> ":" "Simplex" | "(" <face-decls> ")" | <identifier> "=" <identifier> "∘" <identifier>
-<face-decls> ::= <identifier> ":" "Simplex" | <identifier> ":" "Simplex" "," <face-decls>
-<vertex-list> ::= <identifier> | <identifier> <vertex-list>
-<face-list> ::= <face> | <face> "," <face-list>
-<face> ::= <identifier>
+<hypothesis> ::= <identifier> ":" "Simplex" | "(" <decl-list> ")" | <identifier> "=" <term> "<" <term> | <identifier> "=" <term> "∘" <term>
+<decl-list> ::= <identifier> ":" "Simplex" | <identifier> ":" "Simplex" "," <decl-list>
+<elements> ::= <element-list> | ε
+<element-list> ::= <identifier> | <identifier> "," <element-list>
+<constraints> ::= <constraint-list> | ε
+<constraint-list> ::= <constraint> | <constraint> "," <constraint-list>
+<constraint> ::= <term> "=" <term> | <identifier> "<" <identifier>      % Equality (e.g., a ∘ a = e) | Map (e.g., ∂₁ < C₂)
+<term> ::= <identifier>                                                 % e.g., a
+         | <term> "∘" <term>                                            % e.g., a ∘ b
+         | <term> "^-1"                                                 % e.g., a^-1
+         | <term> "^" <superscript>                                     % e.g., a³
+         | "e"                                                          % identity
+
 ```
+
+Meaning of <n> Across Types:
+
+* Simplex: Dimension of the simplex—e.g., n=2 for a triangle (2-simplex).
+* Group: Number of generators—e.g., n=1 for Z/3Z (one generator a).
+* Simplicial: Maximum dimension of the simplicial set—e.g., n=1 for S1 (up to 1-simplices).
+* Chain: Length of the chain (number of levels minus 1)—e.g., n=2 for a triangle chain (0, 1, 2 levels).
+* Category: Number of objects—e.g., n=2 for a path category (two objects x,y).
+* Monoid: Number of generators—e.g., n=2 for N (zero and successor).
 
 ## Semantics
 

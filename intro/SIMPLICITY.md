@@ -76,13 +76,23 @@ Meaning of <n> Across Types:
 
 ## Semantics
 
-### Formation
+### Chain
+
+### Category
+
+### Monoid
+
+### Simplicial
+
+### Simplex
+
+#### Formation
 
 ```
 \frac{}{\Gamma \vdash \text{Simplex} : \text{Set}} \quad (\text{Simplex-Form})
 ```
 
-### Introduction
+#### Introduction
 
 ```
 \frac{
@@ -97,14 +107,14 @@ Meaning of <n> Across Types:
 } \quad (\text{Simplex-Intro})
 ```
 
-### Elimination (Simplex-Face)
+#### Elimination (Simplex-Face)
 
 ```
 \frac{ \Gamma \vdash k [v_0 \, \dots \, v_k] \{ f_0, \dots, f_l \} : \text{Simplex} \quad i : \text{Fin}(k+1)}
      { \Gamma \vdash \partial_i \, (k [v_0 \, \dots \, v_k] \{ f_0, \dots, f_l \}) \Rightarrow f_i } \quad (\text{Simplex-Face})
 ```
 
-### Composition 
+#### Composition 
 
 ```
 \frac{\Gamma \vdash g : \text{Simplex} \quad \Gamma \vdash h : \text{Simplex} \\
@@ -112,7 +122,7 @@ Meaning of <n> Across Types:
      {\Gamma \vdash g \circ h : \text{Simplex}} \quad (\text{Composition})
 ```
 
-### Computation
+#### Computation
 
 Face Extraction:
 
@@ -140,7 +150,7 @@ Base Case:
 0 [v] \{ \} \to v
 ```
 
-### Uniqueness
+#### Uniqueness
 
 Uniqueness of Face Extraction (Simplex-Uniqueness-Face):
 

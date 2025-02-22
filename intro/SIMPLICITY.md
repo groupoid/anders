@@ -149,6 +149,7 @@ def singular_cone : Simplex
 ```
 
 Context: p, q, r, s: Simplex (vertices), qrs, prs, pqs : Simplex (faces), pqr = pqs ∘ qrs.
+
 Simplex: Dimension 3, 4 faces.
 
 ### Möbius Piece
@@ -161,6 +162,7 @@ def Möbius : Simplex
 ```
 
 Context: a, b, c : Simplex (vertices), bc, ac : Simplex (faces), ab = bc ∘ ac (relation).
+
 Simplex: Dimension 2, 3 faces.
 
 ### Degenerate Tetrahedron
@@ -173,7 +175,9 @@ def degen_tetra : Simplex
 ```
 
 Context: p, q, r, s : Simplex, q = r (degeneracy), qrs, prs, pqs : Simplex, pqr = pqs ∘ qrs.
+
 Simplex: Dimension 3, 4 faces—degeneracy implies a collapsed edge.
+
 Non-Triviality: q = r flattens the structure algebraically, testing composition under equality.
 
 ### Twisted Annulus
@@ -189,9 +193,11 @@ Context:
 * Vertices:  a, b, c, d.
 * Faces: bc, ac, bd.
 * Relations: ab = bc ∘ ac,  cd = ac ∘ bd  (twist via composition).
+  
 Simplices:
 * [a b c] { bc, ac, ab }: First triangle.
 * [b c d] { bc, bd, cd }: Second triangle, sharing bc.
+  
 Checking:
 * Vertices: a, b, c, d ∈ Γ — O(4).
 * Faces: bc, ac, ab (O(3)), bc, bd, cd (O(3)) — total O(6).
@@ -211,8 +217,10 @@ Context:
 * Vertices: a, b, c, with b = c.
 * Faces: bc, ac.
 * Relation: ab = bc ∘ ac.
+
 Simplex:
 * [a b c] { bc, ac, ab } — 3 faces, despite degeneracy.
+
 Checking:
 * Vertices: a, b, c ∈ Γ, b = c — O(3).
 * Faces: bc, ac, ab ∈ Γ — O(3).
@@ -232,8 +240,10 @@ Context:
 * Vertices: p, q, r, s, t.
 * Faces: qrs, prs, pqt.
 * Relations: qrs = qrs (degenerate identity), pqr = pqt ∘ qrs.
+
 Simplex: 
 * [p q r s] { qrs, prs, pqt, pqr } — 4 faces, one degenerate.
+
 Checking:
 * Vertices: p, q, r, s ∈ Γ (t unused, valid) — O(4).
 * Faces: qrs, prs, pqt, pqr ∈ Γ — O(4).

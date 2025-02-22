@@ -79,11 +79,8 @@ let check_type_def defn =
         in
         check_term t1; check_term t2
     | Map (id1, ids2) ->
-        if not (Hashtbl.mem env id1) then
-          failwith ("Undeclared map source: " ^ id1);
-        List.iter (fun id2 ->
-          if not (Hashtbl.mem env id2) then
-            failwith ("Undeclared map target: " ^ id2)
+        if not (Hashtbl.mem env id1) then failwith ("Undeclared map source: " ^ id1);
+        List.iter (fun id2 -> if not (Hashtbl.mem env id2) then failwith ("Undeclared map target: " ^ id2)
         ) ids2
   ) defn.constraints;
   

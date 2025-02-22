@@ -321,7 +321,7 @@ By guaranteeing that terms reduce to unique, standard forms, it underpins
 trustworthy programming languages and formal proofs. Rooted in HoTT, its
 principles extend to broader system design, shaping how we reason about and build computational frameworks.
 
-## Prolog
+## Dedication
 
 I describe this process as the three states of cognitive viscosity—syntactic,
 propositional, and homotopical—each of which manifests across four levels of

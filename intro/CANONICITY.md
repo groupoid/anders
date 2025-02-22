@@ -298,13 +298,12 @@ maintaining syntactic canonicity more difficult.
 
 ### Can Nat in W, 0, 1, 2 Preserve Syntactical Canonicity in CCHM?
 
-Expressing natural numbers `ℕ` using the approach you’ve described (via `W`, `0`, `1`,
-and `2` constructors) does not preserve syntactical canonicity in the standard
+Expressing natural numbers `ℕ` using the approach via `W`, `0`, `1`, and `2` constructors
+does not preserve syntactical canonicity in the standard
 sense within CCHM. The introduction of higher inductive types, especially
 the use of path-dependent terms, creates structures that do not always
-reduce directly to canonical forms.
-
-More specifically, the failure of canonicity is often a consequence of the following:
+reduce directly to canonical forms. More specifically, the failure of
+canonicity is often a consequence of the following:
 
 * Path spaces and homotopies: When `W` and path-dependent types are used,
   it introduces an extra layer of complexity, meaning terms in `ℕ` might
@@ -318,7 +317,6 @@ More specifically, the failure of canonicity is often a consequence of the follo
 ### Is This a Dead End, or Can It Be Fixed?
 
 It is a dead and and can be fixed!
-
 There are established results in type theory, particularly in homotopy
 type theory and constructive type theories, which show that the use of
 higher inductive types can break syntactical canonicity. In fact, this
@@ -336,7 +334,8 @@ path-dependent constructions is entirely unworkable. Instead, it means that:
   of `ℕ` that avoid the pitfalls of higher inductive types while still
   respecting constructive and homotopical principles.
 
-* Direct inductive definition of `ℕ`: One way to preserve canonicity is to define by general induction or built-in.
+* Direct inductive definition of `ℕ`: One way to preserve
+  canonicity is to define by general induction or built-in.
 
 ## Conclusion
 

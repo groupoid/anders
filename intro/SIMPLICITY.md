@@ -186,13 +186,80 @@ Uniqueness of Degeneracy (Degeneracy-Uniqueness):
 
 ## Examples
 
+### N-Monoid
+
+```
+def nat_monoid : Monoid := П (z s : Simplex),
+         s ∘ z = s, z ∘ s = s
+         ⊢ 2 (z s | s ∘ z = s, z ∘ s = s)
+```
+
+O(5).
+
+### Category with Group (Path Category with Z/2Z)
+
+```
+text
+def path_z2_category : Category
+ := П (x y : Simplex),
+      (f g h : Simplex),
+      (z2 : Group(П (e a : Simplex), a² = e ⊢ 1 (a | a² = e))),
+      f ∘ g = h
+    ⊢ 2 (x y | f g h | f ∘ g = h)
+```
+
+O(8)—5 context + 2 nested group + 1 constraint—linear with nesting.
+
+### Triangle Chain
+
+```
+def triangle_chain : Chain
+ := П (v₀ v₁ v₂ e₀₁ e₀₂ e₁₂ t : Simplex),
+      ∂₁₀ = e₀₁, ∂₁₁ = e₀₂, ∂₁₂ = e₁₂, ∂₂ < e₀₁ e₀₂ e₁₂
+    ⊢ 2 (v₀ v₁ v₂, e₀₁ e₀₂ e₁₂, t | ∂₁₀ ∂₁₁ ∂₁₂, ∂₂)
+```
+
+O(11).
+
+### Simplicial Circle
+
+```
+def circle : Simplicial
+ := П (v e : Simplex),
+       ∂₁₀ = v, ∂₁₁ = v, s₀ < v
+     ⊢ 1 (v, e | ∂₁₀ ∂₁₁, s₀)
+```
+
+O(5).
+
+### Z/3Z
+
+```
+def z3 : Group
+ := П (e a : Simplex),
+      a³ = e
+    ⊢ 1 (a | a³ = e)
+```
+
+O(4).
+
+### Triangle
+
+```
+def triangle : Simplex := П (a b c : Simplex),
+         (ab bc ca : Simplex), ac = ab ∘ bc
+         ⊢ 2 (a b c | ab bc ca)
+```
+
+O(7).
+
 ### Singular Cone
 
 ```
 def singular_cone : Simplex
- := П (p q r s : Simplex), 
-      (qrs prs pqs : Simplex), pqr = pqs ∘ qrs 
-    ⊢ 3 [p q r s] { qrs, prs, pqs, pqr }
+ := П (p q r s : Simplex),
+      (qrs prs pqs : Simplex), pqr = pqs ∘ qrs
+    ⊢ 3 (p q r s | qrs prs pqs pqr)
 ```
 
 Context: p, q, r, s: Simplex (vertices), qrs, prs, pqs : Simplex (faces), pqr = pqs ∘ qrs.
@@ -203,9 +270,9 @@ Simplex: Dimension 3, 4 faces.
 
 ```
 def Möbius : Simplex
- := П (a b c : Simplex), 
-      (bc ac : Simplex), ab = bc ∘ ac 
-    ⊢ 2 [a b c] { bc, ac, ab }
+ := П (a b c : Simplex),
+      (bc ac : Simplex), ab = bc ∘ ac
+    ⊢ 2 (a b c | bc ac ab)
 ```
 
 Context: a, b, c : Simplex (vertices), bc, ac : Simplex (faces), ab = bc ∘ ac (relation).
@@ -216,9 +283,9 @@ Simplex: Dimension 2, 3 faces.
 
 ```
 def degen_tetra : Simplex
- := П (p q r s : Simplex, q = r), 
-      (qrs prs pqs : Simplex), pqr = pqs ∘ qrs 
-    ⊢ 3 [p q r s] { qrs, prs, pqs, pqr }
+ := П (p q r s : Simplex, q = r),
+      (qrs prs pqs : Simplex), pqr = pqs ∘ qrs
+    ⊢ 3 (p q r s | qrs prs pqs pqr)
 ```
 
 Context: p, q, r, s : Simplex, q = r (degeneracy), qrs, prs, pqs : Simplex, pqr = pqs ∘ qrs.
@@ -231,9 +298,9 @@ Non-Triviality: q = r flattens the structure algebraically, testing composition 
 
 ```
 def twisted_annulus : Simplex
-  := П (a b c d : Simplex), 
-       (bc ac bd : Simplex), ab = bc ∘ ac, cd = ac ∘ bd
-     ⊢ 2 [a b c] { bc, ac, ab }, 2 [b c d] { bc, bd, cd }
+ := П (a b c d : Simplex),
+      (bc ac bd : Simplex), ab = bc ∘ ac, cd = ac ∘ bd
+    ⊢ 2 (a b c | bc ac ab), 2 (b c d | bc bd cd)
 ```
 
 Context:
@@ -255,9 +322,9 @@ Checking:
 
 ```
 def degen_triangle : Simplex
- := П (a b c : Simplex, b = c), 
-      (bc ac : Simplex), ab = bc ∘ ac 
-    ⊢ 2 [a b c] { bc, ac, ab }
+ := П (a b c : Simplex, b = c),
+      (bc ac : Simplex), ab = bc ∘ ac
+    ⊢ 2 (a b c | bc ac ab)
 ```
 
 Context: 
@@ -278,9 +345,9 @@ Checking:
 
 ```
 def singular_prism : Simplex
- := П (p q r s t : Simplex), 
-      (qrs prs pqt : Simplex, qrs = qrs), pqr = pqt ∘ qrs 
-    ⊢ 3 [p q r s] { qrs, prs, pqt, pqr }
+ := П (p q r s t : Simplex),
+      (qrs prs pqt : Simplex, qrs = qrs), pqr = pqt ∘ qrs
+    ⊢ 3 (p q r s | qrs prs pqt pqr)
 ```
 
 Context: 

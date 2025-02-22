@@ -1,7 +1,7 @@
 # Simplicial HoTT
 
 Groupoid Infinity Simplicial HoTT pure algebraїc implementation with explicit syntaxt for fastest type checking.
-It supports following extensions: Chain, Simplex, Simplicial, Category, Monoid, Group.
+It supports following extensions: Chain, Simplex, Simplicial, Category, Monoid, Group. Simplicial HoTT is a Rezk and GAP at the same time incorporated into CCHM/CHM/HTS Agda-like core.
 
 ## Abstract
 

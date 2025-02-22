@@ -38,6 +38,47 @@ to the idea of a reality whose structure is perfectly captured by these refined,
 mathematical models, unencumbered by the computational and cognitive limitations that
 typically obscure such understanding.
 
+## Intro
+
+### Introduction to Canonicity
+
+In programming languages and type theory, canonicity is the property that ensures every
+well-typed term—a valid expression in a system—can be reduced to a unique, standard
+representation called its canonical form. This idea is central to homotopy type theory (HoTT),
+a framework that blends type theory with topological concepts. For example, in a system with
+a boolean type, canonicity guarantees that any term of type Bool evaluates to either true or
+false, not some ambiguous or intermediate value.
+
+### Normal Forms and Evaluation
+
+To grasp canonicity, we need to understand normal forms. A normal form is a term that
+cannot be simplified further through computation. In HoTT, terms are reduced step-by-step
+using evaluation rules. For instance, 1 + 2 might simplify to 3, its normal form. However,
+not all normal forms are canonical. Neutral terms, such as x + 1 where x is an unknown
+variable, remain unreduced because they depend on unresolved elements. Canonicity applies
+specifically to closed terms—those without free variables—ensuring they reduce to a unique,
+predictable value.
+
+### The Canonicity Property in Practice
+
+The canonicity property guarantees that any closed term of a specific type, like
+a natural number (Nat), evaluates to a concrete numeral such as 0, 1, or 2, rather
+than an arbitrary normal form. This is vital for both theoretical consistency and
+practical programming. For example, it ensures that a function returning a Nat always
+yields a definite number, making program outcomes reliable. In HoTT systems with inductive
+types (e.g., natural numbers defined by constructors like zero and succ), proving
+canonicity confirms that terms behave as intended.
+
+### Challenges and Implications
+
+In intensional type theories like HoTT, where equality between terms is strict,
+canonicity ensures that closed terms have a single, standard representation.
+However, in more complex systems—such as those with undecidable type checking
+or advanced features like cubical type theory—establishing canonicity can be
+difficult and may require additional computational rules or axioms. Despite
+these challenges, canonicity remains a cornerstone of reliable computation.
+
+
 ## Coda
 
 ### 1.1 Syntactic Canonicity
@@ -296,4 +337,11 @@ path-dependent constructions is entirely unworkable. Instead, it means that:
   respecting constructive and homotopical principles.
 
 * Direct inductive definition of `ℕ`: One way to preserve canonicity is to define by general induction or built-in.
+
+## Conclusion
+
+Canonicity links abstract type theory to concrete computational results.
+By guaranteeing that terms reduce to unique, standard forms, it underpins
+trustworthy programming languages and formal proofs. Rooted in HoTT, its
+principles extend to broader system design, shaping how we reason about and build computational frameworks.
 

@@ -253,10 +253,7 @@ Our DSL currently handles finite-dimensional simplices (e.g., k-simplices with k
 Adding ∞-category support akin to the Rzk prover to our Lean/Anders-like simplicial
 DSL in CCHM would significantly impact type checking speed, shifting it from our
 current lightweight, linear-time design (O(k + m + n)) to a more complex system
-with potentially higher computational costs. Let’s analyze the pain points by examining
-what ∞-category support entails (drawing from Rzk’s approach), how it would alter our
-DSL’s semantics and syntax, and the resulting effects on type checking performance.
-We’ll quantify the slowdown and discuss mitigation strategies, keeping our focus on algebraic purity and CCHM’s framework.
+with potentially higher computational costs. 
 
 Our CCHM DSL is a fast, pure simplicial checker—aligned with opetopic purity in its algebraic core,
 but distinct in its fixed-face simplicial structure and CCHM reductions. Compared to Rzk, it sacrifices

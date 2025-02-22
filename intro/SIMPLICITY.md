@@ -99,7 +99,8 @@ Meaning of <n> Across Types:
 
 ```
 \frac{
-  \Gamma = v_0 : \text{Simplex}, \dots, v_k : \text{Simplex}, e_1, \dots, e_p, f_0 : \text{Simplex}, \dots, f_m : \text{Simplex}, r_1, \dots, r_n \\
+  \Gamma = v_0 : \text{Simplex}, \dots, v_k : \text{Simplex}, e_1, \dots,
+   e_p, f_0 : \text{Simplex}, \dots, f_m : \text{Simplex}, r_1, \dots, r_n \\
   \{ v_0, \dots, v_k \} = \text{vertices in } [v_0 \, \dots \, v_k] \text{ after applying equalities } e_i \\
   \{ f_0, \dots, f_l \} = \{ f_0, \dots, f_m \} \cup \{ f_i \mid r_j = f_i = g \circ h \} \\
   |\text{set } \{ f_0, \dots, f_l \}| = k + 1 \\
@@ -114,7 +115,8 @@ Meaning of <n> Across Types:
 
 ```
 \frac{ \Gamma \vdash k [v_0 \, \dots \, v_k] \{ f_0, \dots, f_l \} : \text{Simplex} \quad i : \text{Fin}(k+1)}
-     { \Gamma \vdash \partial_i \, (k [v_0 \, \dots \, v_k] \{ f_0, \dots, f_l \}) \Rightarrow f_i } \quad (\text{Simplex-Face})
+     { \Gamma \vdash \partial_i \, (k [v_0 \, \dots \, v_k] \{ f_0, \dots, f_l \})
+       \Rightarrow f_i } \quad (\text{Simplex-Face})
 ```
 
 #### Composition 
@@ -178,7 +180,8 @@ Uniqueness of Degeneracy (Degeneracy-Uniqueness):
 
 ```
 \frac{ \Gamma \vdash s = k [v_0 \, \dots \, v_i \, v_{i+1} \, \dots \, v_k] \{ f_0, \dots, f_l \} : \text{Simplex} \\
-       \Gamma \vdash t = (k-1) [v_0 \, \dots \, v_{i-1} \, v_{i+1} \, \dots \, v_k] \{ f_0', \dots, f_{l-1}' \} : \text{Simplex} \\
+       \Gamma \vdash t = (k-1) [v_0 \, \dots \, v_{i-1} \, v_{i+1} \, \dots \, v_k] \{ f_0', \dots, f_{l-1}' \}
+     : \text{Simplex} \\
        \Gamma \vdash v_i = v_{i+1} \\
        \Gamma \vdash \partial_j s = \partial_j t \quad (\text{for all } j, \text{ adjusted indices}) }
      { \Gamma \vdash s = t } \quad (\text{Degeneracy-Uniqueness})
@@ -189,9 +192,10 @@ Uniqueness of Degeneracy (Degeneracy-Uniqueness):
 ### N-Monoid
 
 ```
-def nat_monoid : Monoid := П (z s : Simplex),
-         s ∘ z = s, z ∘ s = s
-         ⊢ 2 (z s | s ∘ z = s, z ∘ s = s)
+def nat_monoid : Monoid
+ := П (z s : Simplex),
+      s ∘ z = s, z ∘ s = s
+    ⊢ 2 (z s | s ∘ z = s, z ∘ s = s)
 ```
 
 O(5).
@@ -199,7 +203,6 @@ O(5).
 ### Category with Group (Path Category with Z/2Z)
 
 ```
-text
 def path_z2_category : Category
  := П (x y : Simplex),
       (f g h : Simplex),

@@ -1,6 +1,6 @@
 # Simplicial HoTT
 
-Groupoid Infinity Simplicial HoTT pure algebraїc opetope implementation with explicit syntaxt for fastest type checking.
+Groupoid Infinity Simplicial HoTT pure algebraїc implementation with explicit syntaxt for fastest type checking.
 It supports following extensions: Chain, Simplex, Simplicial, Category, Monoid, Group.
 
 ## Abstract

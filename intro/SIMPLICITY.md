@@ -7,13 +7,13 @@ It supports following extensions: Chain, Simplex, Simplicial, Category, Monoid, 
 
 We present a domain-specific language (DSL) extension to Cubical Homotopy Type Theory (CCHM) for simplicial structures,
 designed as a fast type checker with a focus on algebraic purity. Built on the Cohen-Coquand-Huber-Mörtberg (CCHM)
-framework, our DSL employs a Lean/Anders-like sequent syntax (П (context) ⊢ k [v₀ .. vₖ] { f₀, ..., fₗ } : Simplex) to define 
+framework, our DSL employs a Lean/Anders-like sequent syntax `П (context) ⊢ k (v₀ .. vₖ | f₀, ..., fₗ )` to define 
 k-dimensional simplices via explicit contexts, vertex lists, and face relations, eschewing geometric coherence terms
-in favor of compositional constraints (e.g., f=g∘h). The semantics, formalized as inference rules in a Martin-Löf
-Type Theory (MLTT)-like setting, include Formation, Introduction, Elimination, Composition, Computational, and
+in favor of compositional constraints (e.g., `f = g ∘ h`). The semantics, formalized as inference rules in a Martin-Löf
+Type Theory MLTT-like setting, include Formation, Introduction, Elimination, Composition, Computational, and
 Uniqueness rules, ensuring a lightweight, deterministic computational model with linear-time type checking (O(k + m + n),
 where k is vertices, m is faces, and n is relations). Inspired by opetopic purity, our system avoids cubical
-path-filling (e.g., PathP), aligning with syntactic approaches to higher structures while retaining CCHM’s
+path-filling (e.g., `PathP`), aligning with syntactic approaches to higher structures while retaining CCHM’s
 type-theoretic foundation. Compared to opetopic sequent calculi and the Rzk prover, our DSL balances algebraic
 simplicity with practical efficiency, targeting simplicial constructions over general ∞-categories,
 and achieves a fast, pure checker suitable for formal proofs and combinatorial reasoning.

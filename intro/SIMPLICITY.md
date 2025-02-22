@@ -7,7 +7,7 @@ It supports following extensions: Chain, Simplex, Simplicial, Category, Monoid, 
 
 We present a domain-specific language (DSL) extension to Cubical Homotopy Type Theory (CCHM) for simplicial structures,
 designed as a fast type checker with a focus on algebraic purity. Built on the Cohen-Coquand-Huber-Mörtberg (CCHM)
-framework, our DSL employs a Lean/Anders-like sequent syntax `П (context) ⊢ k (v₀ .. vₖ | f₀, ..., fₗ )` to define 
+framework, our DSL employs a Lean/Anders-like sequent syntax `П (context) ⊢ k (v₀, ..., vₖ | f₀, ..., fₗ | ... )` to define 
 k-dimensional simplices via explicit contexts, vertex lists, and face relations, eschewing geometric coherence terms
 in favor of compositional constraints (e.g., `f = g ∘ h`). The semantics, formalized as inference rules in a Martin-Löf
 Type Theory MLTT-like setting, include Formation, Introduction, Elimination, Composition, Computational, and

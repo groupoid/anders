@@ -277,7 +277,17 @@ let z3 = {
   constraints = [Eq (Id "a3", Pow (Id "a", S3))]
 }
 
-(* Infinite S¹ ∞-groupoid *)
+(*
+
+  Infinite S¹ ∞-groupoid
+
+def s1_infty : Simplicial := П (v e : Simplex),
+       ∂₁₀ = v, ∂₁₁ = v, s₀ < v,
+       ∂₂₀ = e ∘ e, s₁₀ < ∂₂₀
+       ⊢ ∞ (v, e, ∂₂₀ | ∂₁₀ ∂₁₁, s₀, ∂₂₀, s₁₀)
+
+*)
+
 let s1_infty = {
   name = "s1_infty";
   typ = Simplicial;

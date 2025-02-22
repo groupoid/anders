@@ -368,6 +368,43 @@ Checking:
 * Relations: qrs = qrs (O(1)), pqr = pqt ∘ qrs (O(1)) — O(2).
 * Total: O(10) — linear, fast despite degeneracy.
 
+### S¹ as ∞-Groupoid
+
+```
+def s1_infty : Simplicial
+ := П (v e : Simplex),
+      ∂₁₀ = v, ∂₁₁ = v, s₀ < v,
+      ∂₂₀ = e ∘ e, s₁₀ < ∂₂₀
+    ⊢ ∞ (v, e, ∂₂₀ | ∂₁₀ ∂₁₁, s₀, ∂₂₀, s₁₀)
+```
+
+AST:
+
+```
+(* Infinite S¹ ∞-groupoid *)
+let s1_infty = {
+  name = "s1_infty";
+  typ = Simplicial;
+  context = [
+    Decl (["v"; "e"], Simplex);  (* Base point and loop *)
+    Equality ("∂₁₀", Id "v", Id "∂₁₀");
+    Equality ("∂₁₁", Id "v", Id "∂₁₁");
+    Equality ("s₀", Id "e", Id "s₀");
+    Equality ("∂₂₀", Comp (Id "e", Id "e"), Id "∂₂₀");  (* 2-cell: e ∘ e *)
+    Equality ("s₁₀", Id "∂₂₀", Id "s₁₀")  (* Degeneracy for 2-cell *)
+  ];
+  rank = Infinite;  (* Unbounded dimensions *)
+  elements = ["v"; "e"; "∂₂₀"];  (* Finite truncation: 0-, 1-, 2-cells *)
+  constraints = [
+    Eq (Id "∂₁₀", Id "v");
+    Eq (Id "∂₁₁", Id "v");
+    Map ("s₀", ["v"]);
+    Eq (Id "∂₂₀", Comp (Id "e", Id "e"));
+    Map ("s₁₀", ["∂₂₀"])
+  ]
+}
+```
+
 ## Conclusion
 
 Rzk supports synthetic ∞-categories via simplicial Homotopy Type Theory (sHoTT), extending MLTT with:

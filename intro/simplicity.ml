@@ -3,11 +3,12 @@
    $ ocamlopt -o simplicity simplicity.ml
 
    Copyright (c) 2025 Groupoid Infinity
+
+   STATUS: early bird prototype (achieved 20 rewrites)
 *)
 
-(* Types *)
-type type_name = Simplex | Group | Simplicial | Chain | Category | Monoid
 
+type type_name = Simplex | Group | Simplicial | Chain | Category | Monoid
 type superscript = S1 | S2 | S3 | S4 | S5 | S6 | S7 | S8 | S9
 
 type term =
@@ -117,16 +118,11 @@ let check_type_def defn =
          failwith "Group/Monoid rank mismatch (n = generator count)"
    | Group, Infinite | Monoid, Infinite ->
        failwith "Group/Monoid cannot have infinite rank"
-   | Simplicial, Finite n | Chain, Finite n ->
+   | Simplicial, Finite n | Chain, Finite n | Category, Finite n ->
        if n < 0 then
-         failwith "Simplicial/Chain rank must be non-negative"
-   | Simplicial, Infinite | Chain, Infinite ->
+         failwith "Simplicial/Chain/Category rank must be non-negative"
+   | Simplicial, Infinite | Chain, Infinite | Category, Infinite ->
        ()
-   | Category, Finite n ->
-       if List.length defn.elements < n then
-         failwith "Category rank mismatch (n = object count)"
-   | Category, Infinite ->
-       failwith "Category cannot have infinite rank"
   );
   
   (* Success *)
@@ -345,12 +341,28 @@ let s1_infty = {
   ]
 }
 
-(* Test all examples *)
+let cube_infty = {
+  name = "cube_infty";
+  typ = Category;
+  context = [
+    Decl (["a"; "b"; "c"], Simplex);
+    Decl (["f"; "g"; "h"], Simplex);
+    Equality ("cube2", Comp (Id "g", Id "f"), Id "h");
+    Equality ("cube3", Comp (Id "cube2", Id "f"), Id "cube3");
+  ];
+  rank = Infinite; 
+  elements = ["a"; "b"; "c"];
+  faces = Some ["cube2"; "cube3"];
+  constraints = [
+    Eq (Id "cube2", Comp (Id "g", Id "f"));
+    Eq (Id "cube3", Comp (Id "cube2", Id "f"))
+  ]
+}
+
 let examples = [
   singular_cone; mobius; degen_tetra; twisted_annulus_1; twisted_annulus_2;
   degen_triangle; singular_prism; path_z2_category; nat_monoid; triangle_chain;
-  circle; z3; s1_infty
+  circle; z3; s1_infty; cube_infty
 ]
 
-let () =
-  List.iter check_type_def examples
+let () = List.iter check_type_def examples

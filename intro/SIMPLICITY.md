@@ -1,15 +1,17 @@
-# Simplicial HoTT
+# Dan Kan: Simplicial HoTT
 
 Groupoid Infinity Simplicial HoTT pure algebraїc implementation with explicit syntaxt for fastest type checking.
-It supports following extensions: Chain, Simplex, Simplicial, Category, Monoid, Group.
-Simplicial HoTT is a Rezk/GAP replacement incorporated into CCHM/CHM/HTS Agda-like Anders core.
+It supports following extensions: `Chain`, `Simplex`, `Simplicial`, `Category`, `Monoid`, `Group`.
+Simplicial HoTT is a Rezk/GAP replacement incorporated into CCHM/CHM/HTS Agda-like Anders/Dan core.
+
+<img src="https://dan.groupoid.space/styles/Daniel_Kan.JPG"></img>
 
 ## Abstract
 
 We present a domain-specific language (DSL) extension to Cubical Homotopy Type Theory (CCHM) for simplicial structures,
 designed as a fast type checker with a focus on algebraic purity. Built on the Cohen-Coquand-Huber-Mörtberg (CCHM)
 framework, our DSL employs a Lean/Anders-like sequent syntax `П (context) ⊢ k (v₀, ..., vₖ | f₀, ..., fₗ | ... )` to define 
-k-dimensional simplices via explicit contexts, vertex lists, and face relations, eschewing geometric coherence terms
+k-dimensional `0, ..., n, ∞` simplices via explicit contexts, vertex lists, and face relations, eschewing geometric coherence terms
 in favor of compositional constraints (e.g., `f = g ∘ h`). The semantics, formalized as inference rules in a Martin-Löf
 Type Theory MLTT-like setting, include Formation, Introduction, Elimination, Composition, Computational, and
 Uniqueness rules, ensuring a lightweight, deterministic computational model with linear-time type checking (O(k + m + n),
@@ -19,13 +21,19 @@ type-theoretic foundation. Compared to opetopic sequent calculi and the Rzk prov
 simplicity with practical efficiency, targeting simplicial constructions over general ∞-categories,
 and achieves a fast, pure checker suitable for formal proofs and combinatorial reasoning.
 
+## Compile and Run
+
+```
+$ ocamlopt -o dan src/simplicity.ml && ./dan
+```
+
 ## Syntax
 
-Incorporating into CCHM/CHM HTS Anders core.
+Incorporating into CCHM/CHM/HTS Anders/Dan core.
 
-###  Definition
+### Definition
 
-General:
+New sequent contruction:
 
 ```
 def <name> : <type> := П (context), conditions ⊢ <n> (elements | constraints)
@@ -40,36 +48,36 @@ def group : Group := П (context), conditions ⊢ n (generators | relations)
 def cat : Category := П (context), conditions ⊢ n (objects | morphisms | coherence)
 ```
 
-### Formal BNF
+### BNF
 
 ```
 <program> ::= <definition> | <definition> <program>
 <definition> ::= "def" <id> ":" <type-name> ":=" <type-term>
-<type-name> ::= "Simplex" | "Group" | "Simplicial" | "Chain" | "Category" | "Monoid"
+<type-name> ::= "Simplex" | "Group" | "Simplicial" | "Chain" | "Cochain" | "Category" | "Monoid"
 <type-term> ::= "П" "(" <context> ")" "⊢" <n> "(" <elements> "|" <constraints> ")" 
 <digit> ::= "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9"
 <superscript> ::= "¹" | "²" | "³" | "⁴" | "⁵" | "⁶" | "⁷" | "⁸" | "⁹"
-<n> ::= <digit> | <digit> <n>
+<n> ::= <digit> | <digit> <n> | "∞"
 <context> ::= <hypothesis> | <hypothesis> "," <context>
-<hypothesis> ::= <id> ":" <type-term>              % Single declaration, e.g., a : Simplex
-               | "(" <id-list> ":" <type-term> ")" % Grouped declaration, e.g., (a b c : Simplex)
-               | <id> "=" <t> "<" <t>              % Map, e.g., ∂₁ = C₂ < C₃
-               | <id> "=" <t> "∘" <t>              % Equality, e.g., ac = ab ∘ bc
-<id-list> ::= <id> | <id> <id-list>                % e.g., a b c
-<elements> ::= <element-list> | ε
+<hypothesis> ::= <id> ":" <type-term>               % Single declaration, e.g., a : Simplex
+               | "(" <id-list> ":" <type-term> ")"  % Grouped declaration, e.g., (a b c : Simplex)
+               | <id> "=" <t> "<" <t>               % Map, e.g., ∂₁ = C₂ < C₃
+               | <id> "=" <t> "∘" <t>               % Equality, e.g., ac = ab ∘ bc
+<id-list> ::= <id> | <id> <id-list>                 % e.g., a b c
+<elements> ::= <element-list> | ε 
 <element-list> ::= <id> | <id> "," <element-list>
 <constraints> ::= <constraint-list> | ε
-<constraint-list> ::= <constraint> | <constraint> "," <constraint-list>
-<constraint> ::= <t> "=" <t>                      % Equality (e.g., a ∘ a = e)
-               | <id> "<" <id>                    % Map (e.g., ∂₁ < C₂)
-<t> ::= <id>                                      % e.g., a
-      | <t> "∘" <t>                               % e.g., a ∘ b
-      | <t> "^-1"                                 % e.g., a^-1
-      | <t> "^" <superscript>                     % e.g., a³
-      | "e"                                       % identity
+<constraint-list> ::= <constraint> | <constraint>  "," <constraint-list>
+<constraint> ::= <t> "=" <t>                        % Equality (e.g., a ∘ a = e)
+               | <id> "<" <id>                      % Map (e.g., ∂₁ < C₂)
+<t> ::= <id>                                        % e.g., a
+      | <t> "∘" <t>                                 % e.g., a ∘ b
+      | <t> "^-1"                                   % e.g., a^-1
+      | <t> "^" <superscript>                       % e.g., a³
+      | "e"                                         % identity
 ```
 
-Meaning of <n> Across Types:
+Meaning of `<n>` Across Types:
 
 * Simplex: Dimension of the simplex—e.g., n=2 for a triangle (2-simplex).
 * Group: Number of generators—e.g., n=1 for Z/3Z (one generator a).
@@ -82,110 +90,184 @@ Meaning of <n> Across Types:
 
 ### Chain
 
+1. Formation. Γ ⊢ Chain : Set
+2. Intro. Γ ⊢ n (S | R) : Chain  if  Γ = s₀₁, …, sₙₘₙ : Simplex, r₁, …, rₚ ∧ S₀, S₁, …, Sₙ = (s₀₁, …, s₀ₘ₀), …, (sₙ₁, …, sₙₘₙ) ∧ ∀ rⱼ = tⱼ = tⱼ', Γ ⊢ rⱼ : tⱼ = tⱼ' ∧ ∀ ∂ᵢⱼ < sₖₗ, Γ ⊢ ∂ᵢⱼ : sₖₗ → sₖ₋₁,ₘ
+3. Elim Face. Γ ⊢ ∂ᵢⱼ s : Simplex  if  Γ ⊢ n (S | R) : Chain ∧ r = ∂ᵢⱼ < s ∧ r ∈ R ∧ s ∈ S
+4. Comp Face. ∂ᵢⱼ (n (S | R)) → s'  if  r = ∂ᵢⱼ < s' ∧ r ∈ R ∧ s' ∈ S
+5. Uniq Face. Γ ⊢ ∂ᵢⱼ s ≡ ∂ᵢⱼ s'  if  Γ ⊢ n (S | R) : Chain ∧ n (S' | R') : Chain ∧ s ∈ S ∧ s' ∈ S' ∧ ∀ r = ∂ᵢⱼ < s ∈ R ∧ r' = ∂ᵢⱼ < s' ∈ R'
+
+### Cochain
+
+1. Formation. Γ ⊢ Cochain : Set
+2. Intro. Γ ⊢ n (S | R) : Cochain  if  Γ = s₀₁, …, sₙₘₙ : Simplex, r₁, …, rₚ ∧ S₀, S₁, …, Sₙ = (s₀₁, …, s₀ₘ₀), …, (sₙ₁, …, sₙₘₙ) ∧ ∀ rⱼ = tⱼ = tⱼ', Γ ⊢ rⱼ : tⱼ = tⱼ' ∧ ∀ σᵢⱼ < sₖₗ, Γ ⊢ σᵢⱼ : sₖₗ → sₖ₊₁,ₘ
+3. Elim Degeneracy. Γ ⊢ σᵢⱼ s : Simplex  if  Γ ⊢ n (S | R) : Cochain ∧ r = σᵢⱼ < s ∧ r ∈ R ∧ s ∈ S
+4. Comp Degeneracy. σᵢⱼ (n (S | R)) → s'  if  r = σᵢⱼ < s' ∧ r ∈ R ∧ s' ∈ S
+5. Uniq Degeneracy. Γ ⊢ σᵢⱼ s ≡ σᵢⱼ s'  if  Γ ⊢ n (S | R) : CoChain ∧ n (S' | R') : CoChain ∧ s ∈ S ∧ s' ∈ S' ∧ ∀ r = σᵢⱼ < s ∈ R ∧ r' = σᵢⱼ < s' ∈ R'
+
 ### Category
+
+1. Formation. Γ ⊢ Category : Set
+2. Intro. Γ ⊢ n (O | R) : Category  if  Γ = o₁, …, oₙ, m₁, …, mₖ : Simplex, r₁, …, rₚ ∧ O = (o₁, …, oₙ) ∧ ∀ rⱼ = tⱼ = tⱼ', Γ ⊢ rⱼ : tⱼ = tⱼ' ∧ ∀ tⱼ = mₐ ∘ mᵦ, mₐ, mᵦ ∈ Γ
+3. Elim Comp. Γ ⊢ c : Simplex  if  Γ ⊢ n (O | R) : Category ∧ r = c = m₁ ∘ m₂ ∧ r ∈ R ∧ m₁, m₂ ∈ Γ
+4. Comp Comp. (m₁ ∘ m₂) (n (O | R)) → c  if  r = c = m₁ ∘ m₂ ∧ r ∈ R ∧ m₁, m₂ ∈ Γ
+5. Uniq Comp. Γ ⊢ c ≡ c'  if  Γ ⊢ n (O | R) : Category ∧ n (O' | R') : Category ∧ r = c = m₁ ∘ m₂ ∈ R ∧ r' = c' = m₁' ∘ m₂' ∈ R' ∧ m₁, m₂ ∈ Γ ∧ m₁', m₂' ∈ Γ'
 
 ### Monoid
 
-### Simplicial
-
+1. Formation. Γ ⊢ Monoid : Set
+2. Intro. Γ ⊢ n (M | R) : Monoid  if  Γ = m₁, …, mₙ : Simplex, r₁, …, rₚ ∧ M = (m₁, …, mₙ) ∧ ∀ rⱼ = tⱼ = tⱼ', Γ ⊢ rⱼ : tⱼ = tⱼ' ∧ ∀ tⱼ = mₐ ∘ mᵦ, mₐ, mᵦ ∈ M
+3. Elim Comp. Γ ⊢ c : Simplex  if  Γ ⊢ n (M | R) : Monoid ∧ r = c = m₁ ∘ m₂ ∧ r ∈ R ∧ m₁, m₂ ∈ M
+4. Comp Comp. (m₁ ∘ m₂) (n (M | R)) → c  if  r = c = m₁ ∘ m₂ ∧ r ∈ R ∧ m₁, m₂ ∈ M
+5. Uniq Comp. Γ ⊢ c ≡ c'  if  Γ ⊢ n (M | R) : Monoid ∧ n (M' | R') : Monoid ∧ r = c = m₁ ∘ m₂ ∈ R ∧ r' = c' = m₁' ∘ m₂' ∈ R' ∧ m₁, m₂ ∈ M ∧ m₁', m₂' ∈ M'
+   
 ### Simplex
+
+1. Formation. Γ ⊢ Simplex : Set
+2. Intro. Γ ⊢ n (S | R) : Simplex  if  Γ = s₀, …, sₙ : Simplex, r₁, …, rₚ ∧ |S| = n + 1 ∧ ∀ rⱼ = tⱼ = tⱼ', Γ ⊢ rⱼ : tⱼ = tⱼ' ∧ ∀ ∂ᵢ < sₖ, Γ ⊢ ∂ᵢ : sₖ → sₖ₋₁ ∧ ∀ σᵢ < sₖ, Γ ⊢ σᵢ : sₖ → sₖ₊₁
+3. Elim Face. Γ ⊢ ∂ᵢ s : Simplex  if  Γ ⊢ n (S | R) : Simplex ∧ r = ∂ᵢ < s ∧ r ∈ R ∧ s ∈ S
+4. Elim Degeneracy. Γ ⊢ σᵢ s : Simplex  if  Γ ⊢ n (S | R) : Simplex ∧ r = σᵢ < s ∧ r ∈ R ∧ s ∈ S
+5. Comp Face. ∂ᵢ (n (S | R)) → s'  if  r = ∂ᵢ < s' ∧ r ∈ R ∧ s' ∈ S
+6. Comp Degeneracy. σᵢ (n (S | R)) → s'  if  r = σᵢ < s' ∧ r ∈ R ∧ s' ∈ S
+7. Uniq Face. Γ ⊢ ∂ᵢ s ≡ ∂ᵢ s'  if  Γ ⊢ n (S | R) : Simplex ∧ n (S' | R') : Simplex ∧ s ∈ S ∧ s' ∈ S' ∧ ∀ r = ∂ᵢ < s ∈ R ∧ r' = ∂ᵢ < s' ∈ R'
+8. Uniq Degeneracy. Γ ⊢ σᵢ s ≡ σᵢ s'  if  Γ ⊢ n (S | R) : Simplex ∧ n (S' | R') : Simplex ∧ s ∈ S ∧ s' ∈ S' ∧ ∀ r = σᵢ < s ∈ R ∧ r' = σᵢ < s' ∈ R'
+
+### Simplicial
 
 #### Formation
 
+The simplicial type is declared as a set within the context Γ without any premises.
+
 ```
-\frac{}{\Gamma \vdash \text{Simplex} : \text{Set}} \quad (\text{Simplex-Form})
+Γ ⊢ Simplicial : Set
 ```
 
 #### Introduction
 
-```
-\frac{
-  \Gamma = v_0 : \text{Simplex}, \dots, v_k : \text{Simplex}, e_1, \dots,
-   e_p, f_0 : \text{Simplex}, \dots, f_m : \text{Simplex}, r_1, \dots, r_n \\
-  \{ v_0, \dots, v_k \} = \text{vertices in } [v_0 \, \dots \, v_k] \text{ after applying equalities } e_i \\
-  \{ f_0, \dots, f_l \} = \{ f_0, \dots, f_m \} \cup \{ f_i \mid r_j = f_i = g \circ h \} \\
-  |\text{set } \{ f_0, \dots, f_l \}| = k + 1 \\
-  \text{for each } e_i = v_a = v_b, \, \Gamma \vdash v_a = v_b \\
-  \text{for each } r_j = f_i = g \circ h, \, \Gamma \vdash \partial_0 g = \partial_k h
-}{
-  \Gamma \vdash k [v_0 \, \dots \, v_k] \{ f_0, \dots, f_l \} : \text{Simplex}
-} \quad (\text{Simplex-Intro})
-```
-
-#### Elimination (Simplex-Face)
+A simplicial set of rank n with elements S and constraints R is formed from context Γ if simplices, equalities, face maps, and degeneracy maps are properly defined.
 
 ```
-\frac{ \Gamma \vdash k [v_0 \, \dots \, v_k] \{ f_0, \dots, f_l \} : \text{Simplex} \quad i : \text{Fin}(k+1)}
-     { \Gamma \vdash \partial_i \, (k [v_0 \, \dots \, v_k] \{ f_0, \dots, f_l \})
-       \Rightarrow f_i } \quad (\text{Simplex-Face})
+Γ ⊢ n (S | R) : Simplicial if
+Γ = s₀₁, …, sₙₘₙ : Simplex, r₁, …, rₚ ∧
+    S₀, S₁, …, Sₙ = (s₀₁, …, s₀ₘ₀), …, (sₙ₁, …, sₙₘₙ) ∧
+    rⱼ = tⱼ = tⱼ',
+Γ ⊢ rⱼ : tⱼ = tⱼ' ∧
+    ∂ᵢⱼ < sₖₗ,
+Γ ⊢ ∂ᵢⱼ : sₖₗ → sₖ₋₁,ₘ ∧
+    σᵢⱼ < sₖₗ,
+Γ ⊢ σᵢⱼ : sₖₗ → sₖ₊₁,ₘ
 ```
 
-#### Composition 
+#### Elim Face
+
+The face map ∂ᵢⱼ extracts a simplex from s in a simplicial set if the constraint r defines the face relation.
 
 ```
-\frac{\Gamma \vdash g : \text{Simplex} \quad \Gamma \vdash h : \text{Simplex} \\
-      \Gamma \vdash \partial_0 g = \partial_k h }
-     {\Gamma \vdash g \circ h : \text{Simplex}} \quad (\text{Composition})
+Γ ⊢ ∂ᵢⱼ s : Simplex if
+Γ ⊢ n (S | R) : Simplicial ∧
+    r = ∂ᵢⱼ < s ∧
+    r ∈ R ∧
+    s ∈ S                                  
 ```
 
-#### Computation
+#### Elim Composition
 
-Face Extraction:
-
-```
-\partial_i \, (k [v_0 \, \dots \, v_k] \{ f_0, f_1, \dots, f_l \}) \to f_i
-```
-
-Composition Reduction:
+The composition s₁ ∘ s₂ yields a simplex c in a simplicial set if the constraint r defines it and s1 and s2 are composable.
 
 ```
-f_i \to g \circ h \quad \text{if } \Gamma \text{ contains } f_i = g \circ h
+Γ ⊢ c : Simplex if
+Γ ⊢ n (S | R) : Simplicial ∧
+    r = c = s₁ ∘ s₂ ∧
+    r ∈ R ∧ s₁, s₂ ∈ S ∧
+Γ ⊢ ∂ᵢᵢ₋₁ s₁ = ∂ᵢ₀ s₂
 ```
 
-Degeneracy Reduction:
+#### Elim Degeneracy
+
+The degeneracy map σᵢⱼ lifts a simplex s to a higher simplex in a simplicial set if the constraint r defines the degeneracy relation.
 
 ```
-k [v_0 \, \dots \, v_i \, v_{i+1} \, \dots \, v_k] \{ f_0, \dots, f_l \} 
-\to (k-1) [v_0 \, \dots \, v_{i-1} \, v_{i+1} \, \dots \, v_k] 
-  \{ f_0', \dots, f_{l-1}' \} \quad \text{if } v_i = v_{i+1} \text{ in } \Gamma
+Γ ⊢ σᵢⱼ s : Simplex if
+Γ ⊢ n (S | R) : Simplicial ∧
+    r = σᵢⱼ < s,
+    r ∈ R,
+    s ∈ S
 ```
 
-Base Case:
+#### Face Computation
+
+The face map ∂ᵢⱼ applied to a simplicial set reduces to the simplex s′ specified by the constraint r in R.
 
 ```
-0 [v] \{ \} \to v
+∂ᵢⱼ (n (S | R)) → s' if
+    r = ∂ᵢⱼ < s' ∧
+    r ∈ R ∧
+    s' ∈ S
 ```
 
-#### Uniqueness
+### Composition Computation.
 
-Uniqueness of Face Extraction (Simplex-Uniqueness-Face):
-
-```
-\frac{ \Gamma \vdash s = k [v_0 \, \dots \, v_k] \{ f_0, \dots, f_l \} : \text{Simplex} \\
-       \Gamma \vdash t = k [v_0 \, \dots \, v_k] \{ f_0, \dots, f_l \} : \text{Simplex} \\
-       \Gamma \vdash \partial_i \, s = \partial_i \, t \quad (\text{for all } i) }
-     { \Gamma \vdash s = t} \quad (\text{Simplex-Uniqueness-Face})
-```
-
-Uniqueness of Composition (Composition-Uniqueness):
+The composition s₁ ∘ s₂ applied to a simplicial set reduces to the simplex c specified by the constraint r in R, given s1 and s2 are composable.
 
 ```
-\frac{ \Gamma \vdash f = g \circ h : \text{Simplex} \\
-       \Gamma \vdash f' = g' \circ h' : \text{Simplex} \\
-       \Gamma \vdash g = g' \quad \Gamma \vdash h = h' \\
-       \Gamma \vdash \partial_0 g = \partial_k h \quad \Gamma \vdash \partial_0 g' = \partial_k h'}
-     { \Gamma \vdash f = f' } \quad (\text{Composition-Uniqueness})
+(s₁ ∘ s₂) (n (S | R)) → c if
+    r = c = s₁ ∘ s₂ ∧
+    r ∈ R ∧
+    s₁, s₂ ∈ S ∧
+Γ ⊢ ∂ᵢᵢ₋₁ s₁ = ∂ᵢ₀ s₂
 ```
 
-Uniqueness of Degeneracy (Degeneracy-Uniqueness):
+### Degeneracy Computation.
+
+The degeneracy map σᵢⱼ applied to a simplicial set reduces to the simplex s′ specified by the constraint r in R.
 
 ```
-\frac{ \Gamma \vdash s = k [v_0 \, \dots \, v_i \, v_{i+1} \, \dots \, v_k] \{ f_0, \dots, f_l \} : \text{Simplex} \\
-       \Gamma \vdash t = (k-1) [v_0 \, \dots \, v_{i-1} \, v_{i+1} \, \dots \, v_k] \{ f_0', \dots, f_{l-1}' \}
-     : \text{Simplex} \\
-       \Gamma \vdash v_i = v_{i+1} \\
-       \Gamma \vdash \partial_j s = \partial_j t \quad (\text{for all } j, \text{ adjusted indices}) }
-     { \Gamma \vdash s = t } \quad (\text{Degeneracy-Uniqueness})
+σᵢⱼ (n (S | R)) → s' if
+    r = σᵢⱼ < s' ∧ 
+    r ∈ R ∧ 
+    s' ∈ S
+```
+
+#### Face Uniqueness
+
+Two face maps ∂ᵢⱼ s and ∂ᵢⱼ s′ are equal if they are defined by constraints r and r′ across two simplicial sets with matching elements.
+
+```
+Γ ⊢ ∂ᵢⱼ s ≡ ∂ᵢⱼ s'  if  
+Γ ⊢ n (S | R) : Simplicial ∧ 
+    n (S' | R') : Simplicial ∧ 
+    s ∈ S ∧ s' ∈ S' ∧ 
+    r = ∂ᵢⱼ < s ∈ R ∧ 
+    r' = ∂ᵢⱼ < s' ∈ R'
+```
+
+### Uniqueness of Composition.
+
+Two composed simplices c and c′ are equal if their constraints r and r′ define compositions of matching pairs s₁, s₂ and s₁′, s₂′ across two simplicial sets with composability conditions.
+
+```
+Γ ⊢ c ≡ c' if
+Γ ⊢ n (S | R) : Simplicial ∧
+    n (S' | R') : Simplicial ∧ 
+    r = c = s₁ ∘ s₂ ∈ R ∧
+    r' = c' = s₁' ∘ s₂' ∈ R' ∧
+    s₁, s₂ ∈ S ∧ 
+    s₁', s₂' ∈ S' ∧ 
+Γ ⊢ ∂ᵢᵢ₋₁ s₁ = ∂ᵢ₀ s₂ ∧ 
+Γ ⊢ ∂ᵢᵢ₋₁ s₁' = ∂ᵢ₀ s₂'
+```
+
+### Uniqueness of Degeneracy.
+
+Two degeneracy maps σᵢⱼ s and σᵢⱼ s′ are equal if they are defined by constraints r and r′ across two simplicial sets with matching elements.
+
+```
+Γ ⊢ σᵢⱼ s ≡ σᵢⱼ s' if
+Γ ⊢ n (S | R) : Simplicial ∧
+    n (S' | R') : Simplicial ∧
+    s ∈ S ∧
+    s' ∈ S' ∧
+    r = σᵢⱼ < s ∈ R ∧
+    r' = σᵢⱼ < s' ∈ R'
 ```
 
 ## Examples
@@ -313,8 +395,8 @@ Context:
 * Relations: ab = bc ∘ ac,  cd = ac ∘ bd  (twist via composition).
   
 Simplices:
-* [a b c] { bc, ac, ab }: First triangle.
-* [b c d] { bc, bd, cd }: Second triangle, sharing bc.
+* (a b c | bc, ac, ab ): First triangle.
+* (b c d | bc, bd, cd ): Second triangle, sharing bc.
   
 Checking:
 * Vertices: a, b, c, d ∈ Γ — O(4).
@@ -337,7 +419,7 @@ Context:
 * Relation: ab = bc ∘ ac.
 
 Simplex:
-* [a b c] { bc, ac, ab } — 3 faces, despite degeneracy.
+* (a b c | bc, ac, ab ) — 3 faces, despite degeneracy.
 
 Checking:
 * Vertices: a, b, c ∈ Γ, b = c — O(3).
@@ -360,7 +442,7 @@ Context:
 * Relations: qrs = qrs (degenerate identity), pqr = pqt ∘ qrs.
 
 Simplex: 
-* [p q r s] { qrs, prs, pqt, pqr } — 4 faces, one degenerate.
+* (p q r s | qrs, prs, pqt, pqr ) — 4 faces, one degenerate.
 
 Checking:
 * Vertices: p, q, r, s ∈ Γ (t unused, valid) — O(4).
@@ -405,33 +487,27 @@ let s1_infty = {
 }
 ```
 
+### ∞-Category with cube fillers
+
+```
+def cube_infty : Category := П (a b c : Simplex),
+       (f g h : Simplex), cube2 = g ∘ f, cube2 : Simplex,
+       cube3 = cube2 ∘ f, cube3 : Simplex
+       ⊢ ∞ (a b c | cube2 cube3)
+```
+
+## Bibliography
+
+* Daniel Kan. Abstract Homotopy I. 1955.
+* Daniel Kan. Abstract Homotopy II. 1956.
+* Daniel Kan. On c.s.s. Complexes. 1957.
+* Daniel Kan. A Combinatorial Definition of Homotopy Groups. 1958.
+
 ## Conclusion
 
-Rzk supports synthetic ∞-categories via simplicial Homotopy Type Theory (sHoTT), extending MLTT with:
-Shapes: Simplicial shapes (e.g., Δn) as types, representing n-simplices.
-Topes: Geometric constraints (e.g., i=j, i≤k) over the interval I, enforced by a tope solver.
-Higher Paths: Hom_A(x,y) as path types over shapes, supporting higher morphisms (e.g., 2-morphisms, 3-morphisms).
-Type Checking: Bidirectional with a tope solver — O(n + solver cost), where solver cost varies (e.g., O(n²) or worse for complex constraints).
-Expressiveness: Models ∞-categories (e.g., Kan complexes, ∞-groupoids) with infinite-dimensional coherences.
-Our DSL currently handles finite-dimensional simplices (e.g., k-simplices with k+1 faces) with explicit compositions—no shapes, topes, or higher paths.
-
-Adding ∞-category support akin to the Rzk prover to our Lean/Anders-like simplicial
-DSL in CCHM would significantly impact type checking speed, shifting it from our
-current lightweight, linear-time design (O(k + m + n)) to a more complex system
-with potentially higher computational costs. 
-
-Our CCHM DSL is a fast, pure simplicial checker—aligned with opetopic purity in its algebraic core,
-but distinct in its fixed-face simplicial structure and CCHM reductions. Compared to Rzk, it sacrifices
-generality for speed and simplicity, embedding a lean DSL in a type-theoretic framework. It’s a sweet
-spot—opetopic-inspired, MLTT-rigorous, and CCHM-efficient—ideal for compact, non-trivial simplicial constructions.
-
-A lightweight, fast type checker—O(k + m + n)—balancing opetopic purity (algebraic,
-no geometry) with CCHM’s computational power (reductions, uniqueness). It’s less
-expressive than Rzk (no ∞-categories) and less flexible than opetopes (fixed faces vs. trees),
-but excels at simplicial tasks. Ours is O(k + m + n)—faster than potential O(n log n) tree
-traversals in opetopic derivations, due to fixed structure and no recursion.
-
-Both avoid geometric filling—our DSL uses explicit face compositions (e.g., ab = bc ∘ ac),
-akin to opetopic grafting, while opetopes rely on tree-based pasting (e.g., Γ ⊢ o).
-We’re purer than traditional simplicial sets (no coh). Opetopes lack computational
-reductions—ours adds MLTT-like rules (∂_i → f_i), diverging from static syntax but enhancing usability in CCHM.
+Dan Kan Simplicity HoTT, hosted at groupoid/dan, is a lightweight, pure type checker
+built on Cubical Homotopy Type Theory (CCHM), named in tribute to Daniel Kan for
+his foundational work on simplicial sets. With a unified syntax — 
+`П (context) ⊢ n (elements | constraints)` — Dan supports a rich type
+system `Simplex`, `Group`, `Simplicial`, `Chain`, `Category`, `Monoid`, now extended with 
+∞-categories featuring cube fillers.

@@ -138,6 +138,11 @@ context default
     keyword : cyan
     keyword ; cyan
 
+    keyword {- brown
+    keyword -} brown
+
+context exclusive {- -} brown
+
 context exclusive \-\- \n brown
     spellcheck
 

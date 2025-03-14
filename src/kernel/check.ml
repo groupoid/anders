@@ -417,7 +417,8 @@ and inferGlueElem r u t =
 
 and inferJ v t =
   let x = freshName "x" in let y = freshName "y" in let pi = freshName "P" in let p = freshName "p" in
-  let k = extSet t in let t = VPi (v, (x, fun x -> VPi (v, (y, fun y -> implv (idv v x y) (VPre k))))) in
+  let k = extSet t in
+  let t = VPi (v, (x, fun x -> VPi (v, (y, fun y -> implv (idv v x y) (VPre k))))) in
 
   VPi (t, (pi, fun pi ->
     VPi (v, (x, fun x ->

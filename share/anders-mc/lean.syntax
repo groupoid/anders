@@ -1,0 +1,82 @@
+# Syntax highlighting for Lean 4 (.lean files)
+# Save as lean.syntax in ~/.local/share/mc/syntax/ or /usr/share/mc/syntax/
+
+context default gray
+
+    keyword whole \:\{ABCDEFGHIJKLMNOPQRSTUVWXYZ_\-abcdefghijklmnopqrstuvwxyz\}\[\?\-0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ_abcdefghijklmnopqrstuvwxyz\] brown
+
+    keyword whole def magenta
+    keyword whole theorem magenta
+    keyword whole axiom magenta
+    keyword whole lemma magenta
+    keyword whole example magenta
+    keyword whole import magenta
+    keyword whole namespace magenta
+    keyword whole end magenta
+    keyword whole open magenta
+    keyword whole variable magenta
+    keyword whole instance magenta
+    keyword whole class magenta
+    keyword whole structure magenta
+    keyword whole inductive magenta
+    keyword whole where magenta
+    keyword whole match magenta
+    keyword whole with magenta
+    keyword whole if magenta
+    keyword whole then magenta
+    keyword whole else magenta
+    keyword whole let magenta
+    keyword whole in magenta
+    keyword whole fun magenta
+    keyword whole do magenta
+    keyword whole return magenta
+    keyword whole Type magenta
+    keyword whole Prop magenta
+
+    # Tactic keywords
+    keyword whole by cyan
+    keyword whole intro cyan
+    keyword whole exact cyan
+    keyword whole apply cyan
+    keyword whole refine cyan
+    keyword whole rw cyan
+    keyword whole simp cyan
+    keyword whole dsimp cyan
+    keyword whole use cyan
+    keyword whole assumption cyan
+    keyword whole cases cyan
+    keyword whole split cyan
+    keyword whole have cyan
+    keyword whole show cyan
+    keyword whole ring cyan
+    keyword whole linarith cyan
+
+    # Operators
+    keyword := brightcyan
+    keyword = brightcyan
+    keyword < brightcyan
+    keyword > brightcyan
+    keyword \+ brightcyan
+    keyword - brightcyan
+    keyword \* brightcyan
+    keyword / brightcyan
+    keyword ^ brightcyan
+    keyword \. brightcyan
+    keyword \[ brightcyan
+    keyword \] brightcyan
+    keyword \( brightcyan
+    keyword \) brightcyan
+    keyword { brightcyan
+    keyword } brightcyan
+    keyword , brightcyan
+    keyword : brightcyan
+    keyword | brightcyan
+
+    # Numbers
+    keyword whole {0-9}+ green
+    keyword whole {0-9}+.{0-9}+ green
+
+context exclusive /- -/ yellow
+
+context exclusive \-\- \n yellow
+    spellcheck

@@ -691,22 +691,13 @@ and instantiation example:
 
 \begin{table}[ht]
 \tabstyle
-\begin{tabular}{rl}
+\begin{tabular}{l}
 
-\textbf{def} & $\Delta-$mobius : Simplex := \textbf{simplex} 2 [a b c] \{ \\
- &  \ \ \ \   \textbf{simplex} 1 [b c] \{ \textbf{simplex} 0 [c] \{ \}, \textbf{simplex} 0 [b] \{ \} | bc \}, \\
- &  \ \ \ \   \textbf{simplex} 1 [a c] \{ \textbf{simplex} 0 [c] \{ \}, \textbf{simplex} 0 [a] \{ \} | ac \}, \\
- &  \ \ \ \   \textbf{simplex} 1 [a b] \{ \textbf{simplex} 0 [b] \{ \}, \textbf{simplex} 0 [a] \{ \} | twist \} \\
- &  \ \ \ \ | coh \\
- & \} where \{ \\
- &  \ \ \ \  a : Simplex \\
- &  \ \ \ \  b : Simplex \\
- &  \ \ \ \  c : Simplex \\
- &  \ \ \ \  bc : PathP ($\lambda$ i $\rightarrow$ Simplex) b c \\
- &  \ \ \ \  ac : PathP ($\lambda$ i $\rightarrow$ Simplex) a c \\
- &  \ \ \ \  twist : PathP ($\lambda$ i $\rightarrow$ Simplex) a b \\
- &  \ \ \ \  coh : PathP ($\lambda$ i $\rightarrow$ PathP ($\lambda$ j $\rightarrow$ Simplex) (bc i) (ac i)) twist \\
- & \} 
+\textbf{def} s$_\infty$ : Simplicial \\
+\ := $\Pi$ (v e : Simplex), \\
+\ \ \ \ $\delta_{10}$ = v, $\delta_{11}$ = v, s$_0$ < v, \\
+\ \ \ \ $\delta_{20}$ = e $\circ$ e, s$_{10}$ < $\delta_{20}$ \\
+\ \ \ \ $\vdash$ $\infty$ (v, e, $\delta_{20}$ | $\delta_{10}$ $\delta_{11}$, s$_0$, $\delta_{20}$, s$_{10}$)
 \end{tabular}
 \end{table}
 
@@ -738,25 +729,16 @@ Initiality is implicit in the syntactic construction \cite{Awodey12}.
 
 \section{Conclusion}
 
-In Infinity topos where paths commute, \\
-cubes arise --- decomposable, mute.\\
-Faces align in fibrant constraint,\\
-homotopies traced with structure innate.\\
-
-Identity lifts through Kan’s domain,\\
-glued by fillers that witness the same.\\
-No law assumed, no axiom imposed ---\\
-only constructions, composition enclosed.\\
-
-Higher the paths, coherently bound,\\
-define the equivalence, the symmetry found.\\
-Contractible witness, a spaces of proofs,\\
-where judgment refines computational truth.\\
-
-Thus, in category where cubes unfold,\\
-types are the spaces, infinities hold ---\\
-not mere sets, but the forms which refined,\\
-landscape of a proof in your cubical mind!\\
+This paper presents Anders, a proof assistant that reimplements
+cubicaltt within a Modal Homotopy Type System framework, based
+on MLTT-80 and CCHM/CHM. It integrates HTS strict equality,
+infinitesimal modalities, and primitives like suspensions or quotients,
+with the extension adding simplicial types and Hopf fibrations.
+Anders offers an efficient, idiomatic system — compiling in under
+one second — using a syntax of Lean and semantics of cubicaltt and Cubical Agda.
+As a practical refinement of cubicaltt, Anders serves as an accessible
+tool for homotopy type theory, with potential for incremental
+enhancements like a tactic language.
 
 \newpage
 \bibliography{anders}

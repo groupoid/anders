@@ -1,0 +1,29 @@
+module lambda where
+
+import lib/foundations/mltt/either
+
+def Tag : U := 𝟓
+def VAR      : Tag := 0₅
+def UNIV     : Tag := 1₅
+def PI       : Tag := 2₅
+def LAM      : Tag := 3₅
+def APP      : Tag := 4₅
+
+def Shape : Tag → U
+ := ind₅ (λ (_: U), 𝟎)  -- VAR has 0 subterms
+         (λ (_: U), 𝟎)  -- UNIV has 0 subterms
+         (λ (_: U), 𝟐)  -- PI has 2 subterms: domain, codomain
+         (λ (_: U), 𝟐)  -- LAM has 2 subterms: type, body
+         (λ (_: U), 𝟐)  -- APP has 2 subterms: function, argument
+
+def term : U := W (t : Tag), Shape t
+def Term : U := Σ (t : term), Label (tag_of t)
+def tag_of (t : term) : Tag
+ := W-rec Tag Shape Tag (λ (t : Tag) (f : Shape t → term), t) t
+
+def Label : Tag → U
+ := ind₅ (λ (_: U), string) -- VAR
+         (λ (_: U), ℕ)      -- UNIV
+         (λ (_: U), string) -- PI
+         (λ (_: U), string) -- LAM
+         (λ (_: U), 𝟎)      -- APP

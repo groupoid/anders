@@ -1,0 +1,156 @@
+include ../../../header
+
+block title
+    title ADJOINT
+
+block content
+    nav
+        <a href='https://anders.groupoid.space/'>ANDERS</a>
+        <a href='https://anders.groupoid.space/lib/'>LIB</a>
+        <a href='#'>ADJOINT</a>
+    section
+        article.main.list
+            section
+                h1 ADJOINT
+                aside
+                    time Published: 16 OCT 2017
+
+                +tex.
+                    This article introduces the Adjoint Triple,
+                    a structure in category theory where three functors between three
+                    categories form a chain of two consecutive adjunctions. An adjunction
+                    triple consists of functors $ F: \mathcal{A} \to \mathcal{B} $,
+                    $ G: \mathcal{B} \to \mathcal{C} $, and $ H: \mathcal{C} \to \mathcal{B} $,
+                    where $ F \dashv H $ and $ H \dashv G $. This configuration arises in
+                    settings like monad-comonad interactions, algebraic geometry, and type theory.
+                +tex.
+                    Key applications include:
+                    1) Modeling reflective and coreflective subcategories in tandem;
+                    2) Constructing monads and comonads via composite adjunctions;
+                    3) Providing a framework for Kan extensions and limits.
+                    This article is a companion to studies of adjoint functors and monad theory, offering both geometric intuition and formal categorical constructions.
+
+            section
+                h1 Intuition
+            +tex.
+                Imagine three categories as spaces, with functors as bridges. An adjunction triple is like a triangular pathway where each bridge has a dual, allowing a "round-trip" with specific universal properties. The functor $ H $ plays a pivotal role, acting as both a left and right adjoint, creating a balanced structure.
+
+            section
+                h2 Definitions
+
+                +tex.
+                    $\mathbf{Definition}$ (Adjoint). An adjunction between
+                    categories $ \mathcal{A} $ and $ \mathcal{B} $ consists
+                    of functors $ F: \mathcal{A} \to \mathcal{B} $ and
+                    $ G: \mathcal{B} \to \mathcal{A} $, with a natural isomorphism:
+
+                +tex(true, false).
+                    $$
+                    \text{Hom}_{\mathcal{B}}(F(A), B) \cong \text{Hom}_{\mathcal{A}}(A, G(B)).
+                    $$
+                +tex.
+                    We write $ F \dashv G $, with $ F $ the left adjoint and $ G $ the right adjoint.
+
+                +tex.
+                    $\mathbf{Definition}$ (Adjoint Triple). An adjunction triple consists of three categories $ \mathcal{A}, \mathcal{B}, \mathcal{C} $, and functors $ F: \mathcal{A} \to \mathcal{B} $, $ H: \mathcal{C} \to \mathcal{B} $, $ G: \mathcal{B} \to \mathcal{C} $, such that:
+
+                +tex(true, false).
+                  $$
+                    F \dashv H \quad \text{and} \quad H \dashv G.
+                  $$
+
+                +tex.
+                  Equivalently, there are natural isomorphisms:
+
+                +tex(true, false).
+                  $$
+                  \begin{array}{c}
+                    \text{Hom}_{\mathcal{B}}(F(A), B) \cong \text{Hom}_{\mathcal{A}}(A, H(C)), \\
+                    \text{Hom}_{\mathcal{C}}(H(B), C) \cong \text{Hom}_{\mathcal{B}}(B, G(C)).
+                  \end{array}
+                  $$
+
+                +tex.
+                    The diagram for an adjunction triple can be visualized as:
+
+                +tex(true, false).
+
+                    $$
+                    \begin{array}{ccc}
+                      \mathcal{A} & \xrightarrow{F} & \mathcal{B} \\
+                      & \nwarrow H & \downarrow G \\
+                      & & \mathcal{C}
+                    \end{array}
+                    $$
+                +tex.
+                  where $ F \dashv H $ and $ H \dashv G $.
+      
+            section
+                h1 Properties
+                p.
+                    Adjoint triples yield rich structures, such as monads and comonads, and preserve certain categorical properties like limits and colimits.
+      
+            section
+                h2 Monad and Comonad
+                +tex.
+                   $\mathbf{Theorem}$ (Monad from Adjoint Triple). Given an adjunction
+                   triple $ F \dashv H \dashv G $, the composite functor $ T = H G: \mathcal{B} \to \mathcal{B} $
+                   forms a monad on $ \mathcal{B} $, with unit and multiplication derived from the
+                   adjunction counits and units.
+                +code.
+                  monad T: B -> B = H ∘ G
+                    unit: (b: B) -> T b
+                    multiply: (b: B) -> T (T b) -> T b
+      
+                +tex.
+                   <b>Theorem</b> (Comonad from Adjoint Triple). The composite functor $ S = H F: \mathcal{C} \to \mathcal{C} $ forms a comonad on $ \mathcal{C} $, with counit and comultiplication derived from the adjunction units and counits.
+                +code.
+                  comonad S: C -> C = H ∘ F
+                    counit: (c: C) -> S c -> c
+                    comultiply: (c: C) -> S c -> S (S c)
+      
+                h2 Reflective and Coreflective Subcategories
+                +tex.
+                    <b>Definition</b> (Reflective Subcategory). A subcategory $ \mathcal{B} \subseteq \mathcal{C} $ is reflective if the inclusion functor $ H: \mathcal{B} \to \mathcal{C} $ has a left adjoint $ G: \mathcal{C} \to \mathcal{B} $.
+                +tex.
+                    <b>Proposition</b>. In an adjunction triple $ F \dashv H \dashv G $, if $ H $ is fully faithful, then $ \mathcal{C} $ is a reflective subcategory of $ \mathcal{B} $, and if $ F $ is fully faithful, $ \mathcal{A} $ is a coreflective subcategory of $ \mathcal{B} $.
+        
+            section
+                h1 Examples
+            section
+                h2 Free-Forgetful Adjoint Triple
+                +tex.
+                   Consider the categories $ \mathbf{Set} $ (sets), $ \mathbf{Mon} $ (monoids), and $ \mathbf{Grp} $ (groups). Define:
+                   - $ F: \mathbf{Set} \to \mathbf{Mon} $, the free monoid functor;
+                   - $ H: \mathbf{Grp} \to \mathbf{Mon} $, the inclusion of groups into monoids;
+                   - $ G: \mathbf{Mon} \to \mathbf{Grp} $, the group completion functor.
+                   These form an adjunction triple $ F \dashv H \dashv G $, where $ H $ is the pivot, embedding groups as monoids with inverses.
+
+                +tex(true, false).
+
+                   $$
+                   \begin{array}{ccc}
+                     \mathbf{Set} & \xrightarrow{F} & \mathbf{Mon} \\
+                     & \nwarrow H & \downarrow G \\
+                     & & \mathbf{Grp}
+                   \end{array}
+                   $$
+     
+                h2 Kleisli Categories
+                +tex.
+                  Given a monad $ T $ on a category $ \mathcal{B} $, the Kleisli category $ \mathcal{B}_T $ and the Eilenberg-Moore category $ \mathcal{B}^T $ form an adjunction triple with $ \mathcal{B} $. The functors are:
+                  - $ F: \mathcal{B} \to \mathcal{B}_T $, mapping objects to free $ T $-algebras;
+                  - $ H: \mathcal{B}^T \to \mathcal{B}_T $, comparing algebras;
+                  - $ G: \mathcal{B}_T \to \mathcal{B}^T $, mapping Kleisli arrows to algebra homomorphisms.
+                +code.
+                  kleisli_adj: (B: Cat) (T: Monad B) -> Adjoint B (Kleisli T)
+                  em_adj: (B: Cat) (T: Monad B) -> Adjoint (Kleisli T) (EilenbergMoore T)
+      
+            section
+                h1 Literature
+            section
+                p
+                  | [1]. Saunders Mac Lane, 
+                  a(href='https://www.springer.com/gp/book/9780387984032') Categories for the Working Mathematician
+      
+include ../../../footer

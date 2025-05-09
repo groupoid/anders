@@ -16,8 +16,7 @@ def isMonoidal (C: precategory): U
       (tensor₁: C.C.ob)
       (left₁: Π (x: C.C.ob),  Path (C.C.ob) x (tensor.ob (tensor₁,x)))
       (right₁: Π (x: C.C.ob), Path (C.C.ob) x (tensor.ob (x,tensor₁)))
-      (associator: Π (x y z: C.C.ob),
-         Path (C.C.ob) (tensor.ob ((tensor.ob (x,y)),z)) (tensor.ob (x,(tensor.ob (y,z)))))
+      (associator: Π (x y z: C.C.ob), Path (C.C.ob) (tensor.ob ((tensor.ob (x,y)),z)) (tensor.ob (x,(tensor.ob (y,z)))))
       (triangle: Π (x y: C.C.ob), 𝟏)
       (pentagon: Π (x y z w: C.C.ob), 𝟏), 𝟏
 

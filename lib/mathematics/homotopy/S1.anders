@@ -10,7 +10,7 @@ def loop : Path S¹ base base := resp 𝟏 𝟏 (id 𝟏) (id 𝟏) ★
 -- [Sokhatsky] 2022
 
 def Loop₀ : U := PathP (<_>𝟐) false false
-def Rec : 𝟐 -> U := λ (x : 𝟐), 2-rec U 𝟎 Loop₀ x
+def Rec : 𝟐 -> U := 2-rec U 𝟎 Loop₀
 def WS¹ : U := W (x : 𝟐), Rec x
 def Wbase : WS¹ := sup 𝟐 Rec false (ind₀ WS¹)
 def Wloop (n : WS¹) : WS¹ := sup 𝟐 Rec true (λ (x : Loop₀), n)

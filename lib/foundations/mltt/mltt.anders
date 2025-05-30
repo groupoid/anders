@@ -1,12 +1,18 @@
-{- MLTT Reality Module Check: https://groupoid.space/articles/mltt/mltt.pdf
+{- MLTT Reality Check: https://groupoid.space/books/vol1/mltt.pdf
    — Pi;
    — Sigma;
    — Path.
 
-   Copyright (c) Groupoid Infinity, 2014-2023. -}
+   Copyright (c) Groupoid Infinity, 2014-2025. -}
 
 module mltt where
 option girard true
+
+-- Definition. Internalization is sigma record of MLTT-73 type formers instantiated with
+-- proof term such that during normalization covers all type checker cases producing output
+-- that should be sufficient for syntactical verification of type checker inference rules.
+
+-- built-ins
 
 def Path (A : U) (x y : A) : U := PathP (<_> A) x y
 def idp (A : U) (x : A) : Path A x x := <_> x
@@ -34,6 +40,8 @@ def subst (A : U) (P : A -> U) (a b : A) (p : Path A a b) (e : P a) : P b := tra
 def subst-comp (A: U) (P: A → U) (a: A) (e: P a): Path (P a) e (subst A P a a (idp A a) e) := trans_comp (P a) e
 def D (A : U) : U₁ := Π (x y : A), Path A x y → U
 
+-- constructive J-β
+
 def J (A: U) (x: A) (C: D A) (d: C x x (idp A x)) (y: A) (p: Path A x y): C x y p
  := subst (singl A x) (\ (z: singl A x), C x (z.1) (z.2)) (eta A x) (y, p) (contr A x y p) d
 def J-1 (O : 𝟏) (A : U) (x : A) (C: D A) (d: C x x (idp A x)) (y: A) (p: Path A x y): C x y p
@@ -41,7 +49,10 @@ def J-1 (O : 𝟏) (A : U) (x : A) (C: D A) (d: C x x (idp A x)) (y: A) (p: Path
 def J-β (O : 𝟏) (A : U) (a : A) (C : D A) (d: C a a (idp A a)) : Path (C a a (idp A a)) d (J A a C d a (idp A a))
  := subst-comp (singl A a) (\ (z: singl A a), C a (z.1) (z.2)) (eta A a) d
 
-def MLTT :=
+
+-- Remark. In MLTT signatures only particular combinations of built-ins/context formers can be used.
+
+def MLTT-73 :=
   Σ (Π-form  : Π (A : U) (B : A → U), U)
     (Π-ctor₁ : Π (A : U) (B : A → U), Pi ★ A B → Pi ★ A B)
     (Π-elim₁ : Π (A : U) (B : A → U), Pi ★ A B → Pi ★ A B)
@@ -59,10 +70,9 @@ def MLTT :=
     (=-elim₁ : Π (A : U) (a : A) (C: D A) (d: C a a (=-ctor₁ A a)) (y: A) (p: Path A a y), C a y p)
     (=-comp₁ : Π (A : U) (a : A) (C: D A) (d: C a a (=-ctor₁ A a)), Path (C a a (=-ctor₁ A a)) d (=-elim₁ A a C d a (=-ctor₁ A a))), 𝟏
 
---- Self-aware MLTT:
 --- Theorem. J-β-rule is derivable from generalized transport
 
-def internalizing : MLTT
+def internalizing : MLTT-73
  := ( Pi ★, Π-lambda ★, Π-apply ★, Π-β ★, Π-η ★,
       Sigma ★, pair ★, pr₁ ★, pr₂ ★, Σ-β₁ ★, Σ-β₂ ★, Σ-η ★,
       Path-1 ★, idp-1 ★, J-1 ★, J-β ★, ★

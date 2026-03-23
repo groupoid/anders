@@ -2,3 +2,5 @@ _build/*
 *.native
 node_modules/*
 .DS_Store
+main.css.map
+package-lock.json

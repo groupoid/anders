@@ -1,0 +1,121 @@
+{- Inductive Basis: https://anders.groupoid.space/foundations/mltt/inductive/
+   - 0, 1, 2, W types;
+
+   HoTT 1.8 The type of booleans
+   HoTT 2.8 Unit type
+   HoTT 5.1 Induction to inductive types
+   HoTT 5.3 W-Types
+   HoTT 5.4 Inductive types are initial algebras
+   HoTT 5.5 Homotopy-in
+
+   Copyright (c) Groupoid Infinity, 2014-2023. -}
+
+module inductive where
+import lib/foundations/univalent/path
+import lib/foundations/mltt/either
+option irrelevance true
+
+-- Steve Awodey, Nicola Gambino, Kristina Sojakova
+-- Inductive Types in Homotopy Type Theory
+-- https://arxiv.org/pdf/1201.3898.pdf
+
+-- Jasper Hugunin
+-- Why not W?
+-- https://jashug.github.io/papers/whynotw.pdf
+
+-- Fredrik Nordvall Forsberg and Anton Setzer
+-- A finite axiomatisation of inductive-inductive definitions
+-- https://personal.cis.strath.ac.uk/fredrik.nordvall-forsberg/papers/indind_finite.pdf
+
+-- Primitives: 0, 1, 2, W
+
+def 0-ind (C: 𝟎 → U) (z: 𝟎) : C z := ind₀ (C z) z
+
+def 1-rec (C: U) (x: C) : 𝟏 → C := ind₁ (\(_:𝟏), C) x
+def 1-ind (C: 𝟏 → U) (x: C ★) : П (z: 𝟏), C z := ind₁ C x
+def 1-β (C: U) (c: C): Path C (1-rec C c ★) c := idp C c
+def 1-η (z: 𝟏) : Path 𝟏 ★ z := idp 𝟏 ★ -- 𝟏-irrelevance enabled
+
+def 2-ind (C: 𝟐 → U) (x: C 0₂) (y: C 1₂) : П (z: 𝟐), C z := ind₂ C x y
+def 2-rec (C: U) (x y: C) : П (z: bool), C := ind₂ (\(_:𝟐), C) x y
+
+def 2-β₁ (C : 𝟐 → U) (f : Π (x : 𝟐), C 0₂) (g : Π (y : 𝟐), C 1₂)
+  : PathP (<_>C 0₂) (f 0₂) (ind₂ (λ (x : 𝟐), C x) (f 0₂) (g 1₂) 0₂)
+ := <_> f 0₂
+
+def 2-β₂ (C : 𝟐 → U) (f : Π (x : 𝟐), C 0₂) (g : Π (y : 𝟐), C 1₂)
+  : PathP (<_>C 1₂) (g 1₂) (ind₂ (λ (x : 𝟐), C x) (f 0₂) (g 1₂) 1₂)
+ := <_> g 1₂
+
+def 2-η (c : 𝟐) : + (PathP (<_> 𝟐) c 0₂) (PathP (<_> 𝟐) c 1₂)
+ := ind₂ (λ (c : 𝟐), + (PathP (<_> 𝟐) c 0₂) (PathP (<_> 𝟐) c 1₂))
+         (0₂, <_> 0₂) (1₂, <_> 1₂) c
+
+def W′ (A : U) (B : A → U) : U := W (x: A), B x
+def sup′ (A : U) (B : A → U) (x : A) (f : B x → W′ A B) : W′ A B := sup A B x f
+
+def W-ind (A : U) (B : A → U) (C : (W (x : A), B x) → U)
+    (g : Π (x : A) (f : B x → (W (x : A), B x)), (Π (b : B x), C (f b)) → C (sup A B x f))
+    (w : W (x : A), B x)
+  : C w := indᵂ A B C g w
+
+def W-rec (A : U) (B : A → U) (C : U)
+    (g : Π (x : A) (f : B x → (W (x : A), B x)), (B x → C) → C)
+    (w : W (x : A), B x)
+  : C := indᵂ A B (λ (_ : W (x : A), B x), C) g w
+
+def W-ind′ (A : U) (B : A → U) (C : (W (x : A), B x) → U)
+    (φ : Π (x : A) (f : B x → (W (x : A), B x)), C (sup A B x f))
+  : Π (w : W (x : A), B x), C w
+ := indᵂ A B C (λ (x : A) (f : B x → (W (x : A), B x)) (g : Π (b : B x), C (f b)), φ x f)
+
+def W-case (A : U) (B : A → U) (C : U) (g : Π (x : A) (f : B x → (W (x : A), B x)), C)
+  : (W (x : A), B x) → C
+ := W-ind′ A B (λ (_ : W (x : A), B x), C) g
+
+def indᵂ-β (A : U) (B : A → U) (C : (W (x : A), B x) → U)
+    (g : Π (x : A) (f : B x → (W (x : A), B x)), (Π (b : B x), C (f b)) → C (sup A B x f))
+    (a : A) (f : B a → (W (x : A), B x))
+  : PathP (<_> C (sup A B a f)) (indᵂ A B C g (sup A B a f)) (g a f (λ (b : B a), indᵂ A B C g (f b)))
+ := <_> g a f (λ (b : B a), indᵂ A B C g (f b))
+
+def W-proj₁ (A : U) (B : A → U) : (W (x : A), B x) → A
+ := W-case A B A (λ (x : A) (f : B x → (W (x : A), B x)), x)
+
+def W-proj₂ (A : U) (B : A → U) : Π (w : W (x : A), B x), B (W-proj₁ A B w) → (W (x : A), B x)
+ := W-ind′ A B (λ (w : W (x : A), B x), B (W-proj₁ A B w) → (W (x : A), B x))
+               (λ (x : A) (f : B x → (W (x : A), B x)), f)
+
+def W-η (A : U) (B : A → U)
+  : Π (w : W (x : A), B x), Path (W (x : A), B x) (sup A B (W-proj₁ A B w) (W-proj₂ A B w)) w
+ := W-ind′ A B (λ (w : W (x : A), B x), Path (W (x : A), B x) (sup A B (W-proj₁ A B w) (W-proj₂ A B w)) w)
+               (λ (x : A) (f : B x → (W (x : A), B x)), <_> sup A B x f)
+
+def trans-W (A : I → U) (B : Π (i : I), A i → U) (a : A 0) (f : B 0 a → (W (x : A 0), B 0 x)) : W (x : A 1), B 1 x
+ := sup (A 1) (B 1) (transp (<i> A i) 0 a) (transp (<i> B i (transFill (A 0) (A 1) (<j> A j) a @ i) → (W (x : A i), B i x)) 0 f)
+
+def trans-W′ (A : I → U) (B : Π (i : I), A i → U) (a : A 0) (f : B 0 a → (W (x : A 0), B 0 x)) : W (x : A 1), B 1 x
+ := transp (<i> W (x : A i), B i x) 0 (sup (A 0) (B 0) a f)
+
+def trans-W-is-correct (A : I → U) (B : Π (i : I), A i → U) (a : A 0) (f : B 0 a → (W (x : A 0), B 0 x))
+  : Path (W (x : A 1), B 1 x) (trans-W A B a f) (trans-W′ A B a f)
+ := <_> trans-W A B a f
+
+def hcomp-W (A : U) (B : A → U) (r : I) (a : I → Partial A r)
+    (f : Π (i : I), PartialP [(r = 1) → B (a i 1=1) → (W (x : A), B x)] r)
+    (a₀ : A[r ↦ a 0]) (f₀ : (B (ouc a₀) → (W (x : A), B x))[r ↦ f 0]) : W (x : A), B x
+ := sup A B (hcomp A r a (ouc a₀))
+            (hcomp (B (hcomp A r a (ouc a₀)) → (W (x : A), B x)) r
+                   (λ (i : I), [(r = 1) → λ (b : B (a 1 1=1)), (f i 1=1) (transp (<j> B (a (-j ∨ i) 1=1)) 0 b)])
+                   (λ (b : B (hcomp A r a (ouc a₀))), (ouc f₀) (transp (<j> B (hfill A r a a₀ -j)) 0 b)))
+
+def hcomp-W′ (A : U) (B : A → U) (r : I) (a : I → Partial A r)
+    (f : Π (i : I), PartialP [(r = 1) → B (a i 1=1) → (W (x : A), B x)] r)
+    (a₀ : A[r ↦ a 0]) (f₀ : (B (ouc a₀) → (W (x : A), B x))[r ↦ f 0]) : W (x : A), B x
+ := hcomp (W (x : A), B x) r (λ (i : I), [(r = 1) → sup A B (a i 1=1) (f i 1=1)]) (sup A B (ouc a₀) (ouc f₀))
+
+def hcomp-W-is-correct (A : U) (B : A → U) (r : I) (a : I → Partial A r)
+    (f : Π (i : I), PartialP [(r = 1) → B (a i 1=1) → (W (x : A), B x)] r)
+    (a₀ : A[r ↦ a 0]) (f₀ : (B (ouc a₀) → (W (x : A), B x))[r ↦ f 0]) :
+    Path (W (x : A), B x) (hcomp-W A B r a f a₀ f₀) (hcomp-W′ A B r a f a₀ f₀) :=
+<_> hcomp-W A B r a f a₀ f₀

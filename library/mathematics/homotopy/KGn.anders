@@ -1,0 +1,13 @@
+module KGn where
+import lib/foundations/mltt/inductive
+import lib/mathematics/algebra/algebra
+import lib/mathematics/homotopy/suspension
+import lib/mathematics/homotopy/truncation
+import lib/mathematics/homotopy/quotient
+
+def 𝚺ₓ (A: U) : ℕ → U := ℕ-iter U A 𝚺
+def discreteTopology (G : abgroup) : U := G.1.1
+def R-K1 (G : group) : 𝟏 → 𝟏 → U := λ (x y : 𝟏), G.1.1
+axiom Q-K1 (G : group) (x y : 𝟏) (u w : R¯ 𝟏 (R-K1 G) x y) : U
+def K1 (G : group) : U := ‖_‖₁ (2-quot 𝟏 (R-K1 G) (Q-K1 G))
+def K (G : abgroup) (n: ℕ) : U := ℕ-iter U (discreteTopology G) (λ (_: U), ‖_‖ (𝚺ₓ (K1 (G.X, G.2.g)) n) n) n

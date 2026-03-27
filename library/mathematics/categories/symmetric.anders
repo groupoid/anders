@@ -1,0 +1,30 @@
+module symmetric where
+import lib/mathematics/categories/category
+import lib/mathematics/categories/functor
+import lib/mathematics/categories/natural
+
+def catproduct (A B: precategory): precategory
+ := ((prod A.C.ob B.C.ob,(\(x y: prod A.C.ob B.C.ob), prod (A.C.hom x.1 y.1) (B.C.hom x.2 y.2)), star),
+    (?,?,?,?,?,?,star),
+    star)
+
+axiom flipBifunctor (X Y Z: precategory) (F: catfunctor (catproduct X Y) Z)
+    : catfunctor (catproduct Y X) Z
+
+def isMonoidal (C: precategory): U
+ := Σ (tensor: catfunctor (catproduct C C) C)
+      (tensor₁: C.C.ob)
+      (left₁: Π (x: C.C.ob),  Path (C.C.ob) x (tensor.ob (tensor₁,x)))
+      (right₁: Π (x: C.C.ob), Path (C.C.ob) x (tensor.ob (x,tensor₁)))
+      (associator: Π (x y z: C.C.ob), Path (C.C.ob) (tensor.ob ((tensor.ob (x,y)),z)) (tensor.ob (x,(tensor.ob (y,z)))))
+      (triangle: Π (x y: C.C.ob), 𝟏)
+      (pentagon: Π (x y z w: C.C.ob), 𝟏), 𝟏
+
+def isBraided (C: precategory) (m: isMonoidal C) : U
+ := Σ (braiding: natiso (catproduct C C) C m.tensor (flipBifunctor C C C m.tensor))
+      (hexagon₁: unit)
+      (hexagon₂: unit), 𝟏
+
+def isSymmetric (C: precategory) (m: isMonoidal C) (b: isBraided C m) : U
+ := Σ (commutative: unit)
+      (braidingCondition: unit), 𝟏

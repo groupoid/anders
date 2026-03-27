@@ -1,0 +1,129 @@
+{- Equivalence: https://anders.groupoid.space/foundations/univalent/equiv
+   — Fibers;
+   — Contractability of Fibers and Singletons;
+   — Equivalence;
+   — Surjective, Injective, Embedding;
+   — Half-adjoint equivalence;
+   — Bi-invertible;
+   — Univalence;
+   — Theorems, Gluing.
+
+   HoTT 2.10 Universes and univalence axiom
+   HoTT 4.2 Half-adjoint equivalence
+   HoTT 4.2.4 Fiber
+   HoTT 4.3 Bi-invertible maps
+   HoTT 4.4 Contractible Fibers
+   HoTT 4.6 Surjections and Embedding
+   HoTT 5.8.5 Equivalence Induction
+
+   Copyright (c) Groupoid Infinity, 2014-2023. -}
+
+module equiv where
+import lib/foundations/univalent/path
+option girard true
+
+--- [Pelayo, Warren] 2012
+
+def fiber (A : U) (B: U) (f: A → B) (y : B) : U := Σ (x : A), Path B y (f x)
+def isEquiv (A B : U) (f : A → B) : U := Π (y : B), isContr (fiber A B f y)
+def equiv (A B : U) : U := Σ (f : A → B), isEquiv A B f
+def contrSingl (A : U) (a b : A) (p : PathP (<_>A) a b) : PathP (<_>Σ (x : A), PathP (<_>A) a x) (a,<_>a) (b,p) := <i> (p @ i, <j> p @ i /\ j)
+def idIsEquiv (A : U) : isEquiv A A (id A) := λ (a : A), ((a, <_> a), λ (z : fiber A A (id A) a), contrSingl A a z.1 z.2)
+def idEquiv (A : U) : equiv A A := (id A, isContrSingl A)
+def isInjective (A B : U) (f : A → B) : U := Π (x y : A), Path B (f x) (f y) → Path A x y
+def isInjective' (A B : U) (f : A → B) : U := Π (b : B), isProp (fiber A B f b)
+def injective (A B : U) : U := Σ (f : A → B), isInjective A B f
+def isEmbedding (A B : U) (f : A → B) : U := Π (x y : A), isEquiv (Path A x y) (Path B (f x) (f y)) (cong A B f x y)
+def embedding (A B : U) : U := Σ (f : A → B), isEmbedding A B f
+def inv-equiv (A B : U) (w : equiv A B) : B → A := λ (y : B), (w.2 y).1.1
+def ret-equiv (A B : U) (w : equiv A B) (y : B) : Path B (w.1 (inv-equiv A B w y)) y := <i> (w.2 y).1.2 @ -i
+def sec-equiv (A B : U) (w : equiv A B) (x : A) : Path A (inv-equiv A B w (w.1 x)) x := <i> ((w.2 (w.1 x)).2 (x, <j> w.1 x) @ i).1
+
+--- Univalence Type (Equiv → Path) [Voevodsky] 2014
+
+def univ-formation (A B : U)
+ := equiv A B → PathP (<_> U) A B
+def univ-intro (A B : U) : univ-formation A B
+ := λ (e : equiv A B), <i> Glue B (∂ i) [(i = 0) → (A, e), (i = 1) → (B, idEquiv B)]
+def univ-elim (A B : U) (p : PathP (<_> U) A B) : equiv A B
+ := transp (<i> equiv A (p @ i)) 0 (idEquiv A)
+def univ-computation (A B : U) (p : PathP (<_> U) A B)
+  : PathP (<_> PathP (<_> U) A B) (univ-intro A B (univ-elim A B p)) p
+ := <j i> Glue B (j ∨ ∂ i) [(i = 0) → (A, univ-elim A B p), (i = 1) → (B, idEquiv B),
+                            (j = 1) → (p @ i, univ-elim (p @ i) B (<k> p @ (i ∨ k)))]
+
+--- Glue Primitive [CCHM] 2016
+
+def Glue' (A : U) (φ : I) (e : Partial (Σ (T : U), equiv T A) φ) : U := Glue A φ e
+def glue' (A : U) (φ : I) (u : Partial (Σ (T : U), equiv T A × T) φ)
+    (a : A[φ ↦ [(φ = 1) → (u 1=1).2.1.1 (u 1=1).2.2]]) := glue φ u (ouc a)
+def unglue' (A : U) (φ : I) (e : Partial (Σ (T : U), equiv T A) φ)
+    (a : Glue A φ e) : A := unglue φ e a
+def hcomp-Glue' (A : U) (φ : I)
+    (e : Partial (Σ (T : U), equiv T A) φ)
+    (ψ : I) (u : I → Partial (Glue A φ [(φ = 1) → e 1=1]) ψ)
+    (u₀ : (Glue A φ [(φ = 1) → e 1=1])[ψ ↦ u 0]) : Glue A φ [(φ = 1) → e 1=1]
+ := hcomp (Glue A φ [(φ = 1) → e 1=1]) ψ
+          (λ (i : I), [(ψ = 1) → u i 1=1]) (ouc u₀)
+--- def Glue-computation
+--- def Glue-uniqueness
+
+--- Equiv as [Right] Identity System [Escardó] 2014
+
+--- def singl (A: U) (a: A): U := Σ (x: A), Path A a x
+--- def isContr (A: U) : U := Σ (x: A), Π (y: A), Path A x y
+--- def contr (A : U) (a b : A) (p : Path A a b) : Path (singl A a) (eta A a) (b, p) := <i> (p @ i, <j> p @ i /\ j)
+--- def isContrSingl (A : U) (a : A) : isContr (singl A a) := ((a,idp A a),(\ (z:singl A a), contr A a z.1 z.2))
+
+def single (A : U) : U := Σ (B: U), equiv A B
+def single2 (A : U) : U := Σ (B: U), equiv B A
+axiom contrEquiv (A B : U) (p : equiv A B) : Path (single A) (A,idEquiv A) (B,p)
+-- := (<i> ((univ-intro A B p) @ i, <j> univ-intro A B p @ i /\ j))
+def EquivIsContr (A: U) : isContr (single A) := ((A, idEquiv A), \(z:single A), (contrEquiv A z.1 z.2))
+def isContr→isProp (A: U) (w: isContr A) (a b : A) : Path A a b
+ := <i> hcomp A (∂ i) (λ (j : I), [(i = 0) → a, (i = 1) → (w.2 b) @ j]) ((<i4> w.2 a @ -i) @ i)
+def contrSinglEquiv (A B : U) (p : equiv A B) : Path (single A) (A,idEquiv A) (B,p)
+ := isContr→isProp (single A) (EquivIsContr A) (A,idEquiv A) (B,p)
+def J-equiv (A B: U) (P: Π (A B: U), equiv A B → U) (r: P A A (idEquiv A)) : Π (e: equiv A B), P A B e
+ := λ (e: equiv A B), subst (single A) (\ (z: single A), P A z.1 z.2) (A,idEquiv A) (B,e) (contrSinglEquiv A B e) r
+
+--- [Pitts] 2016
+
+def ua  (A B : U) : equiv A B -> PathP (<_> U) A B := \ (p: equiv A B), univ-intro A B p
+def ua' (A B : U) : PathP (<_> U) A B -> equiv A B := \ (p: PathP (<_>U) A B), univ-elim A B p
+def ua-β (A B : U) (e : equiv A B) : Path (A → B) (trans A B ((ua A B) e)) e.1
+ := <i> λ (x : A), (idfun=idfun″ B @ -i) ((idfun=idfun″ B @ -i) ((idfun=idfun′ B @ -i) (e.1 x)))
+def ua'-IsEquiv (A B: U) := isEquiv (PathP (<_>U) A B) (equiv A B) (ua' A B)
+
+--- The Half-adjoint equivalence from Homotopy Theory
+--- as if f anf g are adjoint functors.
+
+def τ (A B : U) (f : A → B) (g : B → A)
+    (η: Path (idᵀ A) (∘ A B A g f) (id A))
+    (ε: Path (idᵀ B) (∘ B A B f g) (id B)) : U
+ := Π (x : A), Path B (f ((η @ 0) x)) ((ε @ 0) (f x))
+
+def ν (A B : U) (f : A → B) (g : B → A)
+    (η: Path (idᵀ A) (∘ A B A g f) (id A))
+    (ε: Path (idᵀ B) (∘ B A B f g) (id B)) : U
+ := Π (y : B), Path A (g ((ε @ 0) y)) ((η @ 0) (g y))
+
+def isHae (A B : U) (f : A → B): U :=
+  Σ (g : B → A)
+    (η: Path (idᵀ A) (∘ A B A g f) (id A))
+    (ε: Path (idᵀ B) (∘ B A B f g) (id B)), τ A B f g η ε
+
+def isHae' (A B : U) (f : A → B): U :=
+  Σ (g : B → A)
+    (η: Path (idᵀ A) (∘ A B A g f) (id A))
+    (ε: Path (idᵀ B) (∘ B A B f g) (id B)), ν A B f g η ε
+
+def isHae'' (A B : U) (f : A → B) : U :=
+  Σ (g : B → A)
+    (linv : Π (a : A), Path A a (g (f a)))
+    (rinv : Π (b : B), Path B b (f (g b))),
+  Π (a: A), Path B (cong A B f a (g (f a)) (linv a) @ 0) (rinv (f a) @ 0)
+
+def isHae=isHae' (A B : U) (f : A → B) : U := Path U (isHae A B f) (isHae' A B f)
+
+def hae (A B : U) : U := Σ (f : A → B), isHae A B f

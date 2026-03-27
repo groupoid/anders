@@ -1,0 +1,139 @@
+include ../header
+
+html
+    head
+        meta(property='og:title'       content='LIB')
+        meta(property='og:description' content='Homotopy Library')
+        meta(property='og:url'         content='https://anders.groupoid.space/library/')
+
+block title
+    title LIBRARY
+
+block content
+    nav
+        <a href='../index.html'>ANDERS</a>
+        <a href='#'>LIB</a>
+    article.main
+        .exe
+            section
+            h1 ОСНОВИ МАТЕМАТИКИ
+            aside Максим Сохацький
+            p.
+                Тут представлена базова бібліотека мови Anders для курсу «Теорія типів»,
+                яка сумісна з позначеннями, що використовуються в підручнику HoTT.
+                Серед принципів, які покладені в основу бібліотеки, головними є: лаконічность,
+                академічність, педагогічність. Кожна сторінка має на меті
+                повністю висвітлити компоненти типу, використовуючи тільки
+                ті типи, що були викладені попередньо, кожне визначення повинно містити
+                як математичну нотацію так і код верифікатора та бути вичерпним посібником
+                користувача мови програмування Anders та її базової бібліотеки.
+                Загалом передбачається, що бібліотека повинна відповідати підручнику HoTT,
+                та бути його практичним досліднидницьким артефактом.
+            p.
+                Короткий <a href="../intro/index.html">вступ</a>
+                в теорію типів розкриває систему спряжень у яку
+                вбудовуються фундаментальні типи, ідентифікаційні
+                системи та модальності.
+
+            h2 Основи
+            p.
+                Модальні унівалентні MLTT основи розділені на три частини.
+                Перша частина містить класичні типи MLTT системи описані Мартіном-Льофом.
+                Друга частина містить унівалентні ідентифікаційні системи.
+                Третя частина містить модальності, які використовуються в
+                диференціальній геометріїї та в теорії гомотопій. Основи пропонують
+                фундаментальний базис який використовується для формалізації
+                сучасної математики в таких системах доведення теорем як: Coq, Agda, Lean.
+
+            section
+                .macro
+                    .macro__col
+                        h3#mltt <b>Теорії типів</b>
+                        ol
+                            li: <a href='../foundations/mltt/pi/index.html'>Pi</a>,
+                                <a href='../foundations/mltt/sigma/index.html'>Sigma</a>,
+                                <a href='../foundations/mltt/id/index.html'>Id</a>
+                            li: <a href='../foundations/mltt/inductive/index.html'>𝟘, 𝟙, 𝟚, W</a>
+                            li: <a href='../foundations/mltt/either/index.html'>Either</a>,
+                                <a href='../foundations/mltt/maybe/index.html'>Maybe</a>
+                            li: <a href='../foundations/mltt/nat/index.html'>ℕ</a>,
+                                <a href='../foundations/mltt/list/index.html'>List</a>
+                            li: <a href='../foundations/mltt/fin/index.html'>Fin<sub>ℕ</sub></a>,
+                                <a href='../foundations/mltt/vec/index.html'>Vec<sub>ℕ</sub></a>
+                    .macro__col
+                        h3#univalent <b>Унівалентні</b>
+                        ol
+                            li: a(href='../foundations/univalent/path/index.html') Шляхи
+                            li: a(href='../foundations/univalent/glue/index.html') Склейки
+                            li: a(href='../foundations/univalent/equiv/index.html') Еквівалентності
+                            li: a(href='../foundations/univalent/funext/index.html') Гомотопії
+                            li: a(href='../foundations/univalent/iso/index.html') Ізоморфізми
+                    .macro__col
+                        h3#modal <b>Модальні</b>
+                        ol
+                            li: a(href='../foundations/modal/modality/index.html') Модальності
+                            li: a(href='../foundations/modal/infinitesimal/index.html') Інфінітезімальні
+                            li: a(href='../foundations/modal/localization/index.html') Локалізації
+                            <!-- li: a(href='../foundations/modal/process/index.html') Процеси -->
+
+            h2 Математики
+            p.
+                Друга частина базової бібліотеки містить формалізації математичних теорій
+                з різних галузей математики: аналіз, алгебра, геометрія, теорія гомотопій,
+                теорія категорій.
+
+            section
+                .macro
+                    .macro__col
+                        h3#categories <b>Аналіз</b>
+                        ol
+                            li: <a href='../mathematics/analysis/topology/index.html'>Топологія</a>
+                            li: <a href='../mathematics/analysis/set/index.html'>Множини</a>
+                            li: <a href='../mathematics/analysis/rational/index.html'>ℚ</a>,
+                                <a href='../mathematics/analysis/real/index.html'>ℝ</a>
+                            li: <a href='../mathematics/analysis/complex/index.html'>ℂ</a>,
+                                <a href='../mathematics/analysis/quatro/index.html'>ℍ</a>,
+                                <a href='../mathematics/analysis/octo/index.html'>𝕆</a>
+                    .macro__col
+                        h3#algebra <b>Алгебра</b>
+                        ol
+                            li: a(href='../mathematics/algebra/group/index.html') Групи
+                            li: a(href='../mathematics/algebra/algebra/index.html') Алгебра
+                            li: a(href='../mathematics/algebra/homology/index.html') Гомології
+                    .macro__col
+                        h3#geometry <b>Геометрія</b>
+                        ol
+                            li: a(href='../mathematics/geometry/etale/index.html') Етальні
+                            li: a(href='../mathematics/geometry/bundle/index.html') Пучки
+                            li: a(href='../mathematics/geometry/manifold/index.html') Многовиди
+                            li: a(href='../mathematics/geometry/derham/index.html') де Рам
+            section
+                .macro
+                    .macro__col
+                        h3#homotopy <b>Гомотопії</b>
+                        ol
+                            li: a(href='../mathematics/homotopy/limit/index.html') Ліміти
+                            li: a(href='../mathematics/homotopy/colimit/index.html') Коліміти
+                            li: a(href='../mathematics/homotopy/coeq/index.html') Коеквалайзери
+                            li: a(href='../mathematics/homotopy/cw/index.html') CW-комплекси
+                            li: a(href='../mathematics/homotopy/pullback/index.html') Пулбеки
+                            li: a(href='../mathematics/homotopy/pushout/index.html') Пушаути
+                            li: a(href='../mathematics/homotopy/hopf/index.html') Хопф
+                            li: a(href='../mathematics/homotopy/em/index.html') K(G,n)
+                    .macro__col
+                        h3#categories <b>Категорії</b>
+                        ol
+                            li: a(href='../mathematics/categories/category/index.html') Категорії
+                            li: a(href='../mathematics/categories/functor/index.html') Функтори
+                            li: a(href='../mathematics/categories/adjoint/index.html') Спряження
+                            li: a(href='../mathematics/categories/groupoid/index.html') Групоїди
+                            li: a(href='../mathematics/categories/presheaf/index.html') Паростки
+                            li: a(href='../mathematics/categories/topos/index.html') Топоси
+                            li: a(href='../mathematics/categories/abelian/index.html') Абелеві
+            br.
+            p.
+                 Базова бібліотека для мови cubicaltt знаходиться на іншій сторінці:
+                 <a href='https://groupoid.space/misc/library/'>Formal Mathematics:
+                 The Cubical Base Library</a><br>
+
+include ../footer

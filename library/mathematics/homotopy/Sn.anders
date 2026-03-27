@@ -1,0 +1,7 @@
+module Sn where
+import lib/foundations/mltt/nat
+import lib/mathematics/homotopy/suspension
+option girard true
+
+def sphere : ℕ → U := ℕ-iter U 𝟐 𝚺
+

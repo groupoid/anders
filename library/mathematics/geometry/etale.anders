@@ -1,0 +1,28 @@
+{- Étale Maps:
+   - Etale.
+
+   EGA4 4.1 Etale maps
+
+   Copyright (c) Groupoid Infinity, 2014-2022. -}
+
+module etale where
+import lib/foundations/modal/infinitesimal
+import lib/foundations/univalent/path
+import lib/mathematics/homotopy/pullback
+
+--       ι A
+--    A ――――→ ℑ A
+--    |        |
+--  f |        | ℑ f
+--    ↓        ↓
+--    B ―――――→ ℑ B
+--       ι B
+
+def isÉtaleMap (A B : U) (f : A → B) : U
+ := isPullbackSq A (ℑ A) B (ℑ B) (ℑ-app A B f) (ι B) (ι A) f (λ (a : A), <_> ℑ-unit (f a))
+
+def ÉtaleMap (A B: U): U
+ := Σ (f : A → B), isÉtaleMap A B f
+
+def isÉtale (A : U)
+ := isÉtaleMap A 𝟏 (λ (_ : A), ★)

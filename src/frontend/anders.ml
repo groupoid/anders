@@ -10,7 +10,7 @@ type cmdline =
   | Indices | Girard | Silent | Irrelevance
 
 let help =
-"\nhttps://homotopy.dev/lib/
+"\nhttps://homotopy.dev/library/
 
   invocation = anders | anders list
         list = [] | command list

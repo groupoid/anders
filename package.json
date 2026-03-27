@@ -4,7 +4,7 @@
   "description": "Groupoid Infinity Institute",
   "main": "",
   "scripts": {
-    "build": "sass ./styles:./ && pug -O ./framework.js ./foundations ./mathematics ./intro ./spec ./lib index.pug",
+    "build": "sass ./styles:./ && pug -O ./framework.js ./foundations ./mathematics ./intro ./spec ./library index.pug",
     "start": "npm run build",
     "test": "echo \"Error: no test specified\" && exit 1"
   },

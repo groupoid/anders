@@ -57,7 +57,7 @@ Features
 * Lean syntax for ΠΣW
 * Poor man's records as Σ with named accessors to telescope variables
 * 1D syntax with top-level declarations
-* Groupoid Infinity CCHM Homotopy Library: https://anders.groupoid.space/lib/
+* Groupoid Infinity CCHM Homotopy Library: https://anders.groupoid.space/library/
 * Best suited for academic papers and fast type checking
 
 Setup

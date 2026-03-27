@@ -5,7 +5,7 @@ Changelog
 
 * Microkernel Architecture: Kernel, Proof Shell, and Tactics Server with open binary protocols
 * NixOS package /applications/science/logic/anders/
-* Homotopy Library Manual: https://anders.groupoid.space/lib/
+* Homotopy Library Manual: https://anders.groupoid.space/library/
 * CNAME Alias HOMOTOPY.DEV
 
 27 JAN 2022 Version 1.1.1 Univalence:

@@ -1,35 +1,35 @@
 (env (dev (flags (:standard -warn-error -A))))
 
-(install (files lib/foundations/mltt/proto.anders
-                lib/foundations/mltt/bool.anders
-                lib/foundations/mltt/inductive.anders
-                lib/foundations/mltt/list.anders
-                lib/foundations/mltt/pi.anders
-                lib/foundations/mltt/sigma.anders
-                lib/foundations/univalent/path.anders
-                lib/foundations/univalent/equiv.anders
-                lib/foundations/univalent/iso.anders
-                lib/foundations/modal/infinitesimal.anders
-                lib/mathematics/algebra/algebra.anders
-                lib/mathematics/analysis/real.anders
-                lib/mathematics/analysis/topology.anders
-                lib/mathematics/categories/category.anders
-                lib/mathematics/categories/functor.anders
-                lib/mathematics/categories/abelian.anders
-                lib/mathematics/categories/groupoid.anders
-                lib/mathematics/categories/topos.anders
-                lib/mathematics/geometry/bundle.anders
-                lib/mathematics/geometry/etale.anders
-                lib/mathematics/geometry/formalDisc.anders
-                lib/mathematics/homotopy/coequalizer.anders
-                lib/mathematics/homotopy/constcubes.anders
-                lib/mathematics/homotopy/pullback.anders
-                lib/mathematics/homotopy/pushout.anders
-                lib/mathematics/homotopy/hubSpokes.anders
-                lib/mathematics/homotopy/quotient.anders
-                lib/mathematics/homotopy/truncation.anders
-                lib/mathematics/homotopy/suspension.anders
-                lib/mathematics/homotopy/S1.anders
-                lib/mathematics/homotopy/Sn.anders
-                lib/mathematics/homotopy/KGn.anders)
+(install (files library/foundations/mltt/proto.anders
+                library/foundations/mltt/bool.anders
+                library/foundations/mltt/inductive.anders
+                library/foundations/mltt/list.anders
+                library/foundations/mltt/pi.anders
+                library/foundations/mltt/sigma.anders
+                library/foundations/univalent/path.anders
+                library/foundations/univalent/equiv.anders
+                library/foundations/univalent/iso.anders
+                library/foundations/modal/infinitesimal.anders
+                library/mathematics/algebra/algebra.anders
+                library/mathematics/analysis/real.anders
+                library/mathematics/analysis/topology.anders
+                library/mathematics/categories/category.anders
+                library/mathematics/categories/functor.anders
+                library/mathematics/categories/abelian.anders
+                library/mathematics/categories/groupoid.anders
+                library/mathematics/categories/topos.anders
+                library/mathematics/geometry/bundle.anders
+                library/mathematics/geometry/etale.anders
+                library/mathematics/geometry/formalDisc.anders
+                library/mathematics/homotopy/coequalizer.anders
+                library/mathematics/homotopy/constcubes.anders
+                library/mathematics/homotopy/pullback.anders
+                library/mathematics/homotopy/pushout.anders
+                library/mathematics/homotopy/hubSpokes.anders
+                library/mathematics/homotopy/quotient.anders
+                library/mathematics/homotopy/truncation.anders
+                library/mathematics/homotopy/suspension.anders
+                library/mathematics/homotopy/S1.anders
+                library/mathematics/homotopy/Sn.anders
+                library/mathematics/homotopy/KGn.anders)
          (section share) (package anders))

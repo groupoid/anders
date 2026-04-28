@@ -8,8 +8,8 @@
    Copyright (c) Groupoid Infinity, 2014-2023. -}
 
 module iso where
-import lib/foundations/univalent/path
-import lib/foundations/univalent/equiv
+import library/foundations/univalent/path
+import library/foundations/univalent/equiv
 
 -- Post-Voevodsky CCHM/hcomp lemIso implementation
 

@@ -1,5 +1,5 @@
 module S1 where
-import lib/mathematics/homotopy/coequalizer
+import library/mathematics/homotopy/coequalizer
 
 -- [Shulman] 2015
 

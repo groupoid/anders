@@ -6,8 +6,8 @@
    Copyright (c) Groupoid Infinity, 2014-2022. -}
 
 module glivenko where
-import lib/foundations/mltt/proto
-import lib/foundations/mltt/either
+import library/foundations/mltt/proto
+import library/foundations/mltt/either
 
 def CL (A : U) := ¬ (¬ A)
 def IPC→CL (A : U) : A → CL A := λ (x : A) (φ : ¬ A), φ x

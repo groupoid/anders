@@ -1,6 +1,6 @@
 module cartesian where
-import lib/mathematics/categories/category
-import lib/mathematics/categories/functor
+import library/mathematics/categories/category
+import library/mathematics/categories/functor
 
 axiom sliceCat (C D: precategory)
       (a: (catᵒᵖ C).C.ob)

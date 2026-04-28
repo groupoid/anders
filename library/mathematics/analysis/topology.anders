@@ -1,6 +1,6 @@
 module topology where
-import lib/foundations/univalent/path
-import lib/foundations/mltt/bool
+import library/foundations/univalent/path
+import library/foundations/mltt/bool
 
 --- Kang Rongji, 2022-2023
 --- Classical Topology

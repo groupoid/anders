@@ -5,7 +5,7 @@
    Copyright (c) Groupoid Infinity, 2014-2025. -}
 
 module suspension where
-import lib/mathematics/homotopy/pushout
+import library/mathematics/homotopy/pushout
 
 -- [Caglayan] 2018
 

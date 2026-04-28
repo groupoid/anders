@@ -1,5 +1,5 @@
 module mipham where
-import lib/foundations/mltt/vec
+import library/foundations/mltt/vec
 option irrelevance true
 
 --- Формальна філософія

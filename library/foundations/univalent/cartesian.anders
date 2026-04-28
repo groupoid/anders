@@ -1,5 +1,5 @@
 module cartesian where
-import lib/foundations/univalent/path
+import library/foundations/univalent/path
 
 --- AFH, ABCFHL
 

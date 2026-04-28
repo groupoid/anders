@@ -5,8 +5,8 @@
    Copyright (c) Groupoid Infinity, 2014-2025. -}
 
 module pushout where
-import lib/foundations/mltt/either
-import lib/mathematics/homotopy/coequalizer
+import library/foundations/mltt/either
+import library/mathematics/homotopy/coequalizer
 
 -- [Caglayan] 2014
 

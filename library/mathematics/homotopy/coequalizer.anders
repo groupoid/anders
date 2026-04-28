@@ -13,8 +13,8 @@
    Copyright (c) Groupoid Infinity, 2014-2022. -}
 
 module coequalizer where
-import lib/foundations/univalent/equiv
-import lib/foundations/mltt/inductive
+import library/foundations/univalent/equiv
+import library/foundations/mltt/inductive
 
 -- [1]. Nicolai Kraus, Jakob von Raumer.
 -- Path spaces of higher inductive types in homotopy type theory.

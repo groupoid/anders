@@ -6,8 +6,8 @@
    Copyright (c) Groupoid Infinity, 2014-2023. -}
 
 module fin where
-import lib/foundations/mltt/either
-import lib/foundations/mltt/nat
+import library/foundations/mltt/either
+import library/foundations/mltt/nat
 
 def Fin : ℕ -> U := ℕ-iter U 𝟎 (+ 𝟏)
 def fzero (n : ℕ) : Fin (succ n) := (0₂, ★)

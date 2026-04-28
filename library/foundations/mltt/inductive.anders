@@ -11,8 +11,8 @@
    Copyright (c) Groupoid Infinity, 2014-2023. -}
 
 module inductive where
-import lib/foundations/univalent/path
-import lib/foundations/mltt/either
+import library/foundations/univalent/path
+import library/foundations/mltt/either
 option irrelevance true
 
 -- Steve Awodey, Nicola Gambino, Kristina Sojakova

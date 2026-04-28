@@ -6,8 +6,8 @@
    Copyright (c) Groupoid Infinity, 2014-2022. -}
 
 module list where
-import lib/foundations/mltt/maybe
-import lib/foundations/mltt/nat
+import library/foundations/mltt/maybe
+import library/foundations/mltt/nat
 option girard true
 
 -- def L-ctor (A : U)  : U := W (x : Maybe A), maybe-rec A U 𝟎 (λ (a : A), 𝟏) x

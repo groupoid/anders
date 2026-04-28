@@ -6,8 +6,8 @@
    Copyright (c) Groupoid Infinity, 2014-2025. -}
 
 module truncation where
-import lib/mathematics/homotopy/Sn
-import lib/mathematics/homotopy/hubSpokes
+import library/mathematics/homotopy/Sn
+import library/mathematics/homotopy/hubSpokes
 
 {- Generic ℕ-indexed Truncations -}
 

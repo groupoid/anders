@@ -1,7 +1,7 @@
 module bool where
-import lib/foundations/univalent/path
-import lib/foundations/mltt/either
-import lib/foundations/mltt/proto
+import library/foundations/univalent/path
+import library/foundations/mltt/either
+import library/foundations/mltt/proto
 
 --- data 𝟐 : U := 0₂ | 1₂
 def rec₂ (A : U) (a b : A) : 𝟐 → A := ind₂ (λ (_ : 𝟐), A) a b

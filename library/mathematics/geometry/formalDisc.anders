@@ -8,9 +8,9 @@
    Copyright (c) Groupoid Infinity, 2014-2022. -}
 
 module formalDisc where
-import lib/foundations/univalent/path
-import lib/foundations/univalent/iso
-import lib/foundations/modal/infinitesimal
+import library/foundations/univalent/path
+import library/foundations/univalent/iso
+import library/foundations/modal/infinitesimal
 
 def ~~ (X : U) (a x′ : X) : U := Path (ℑ X) (ι X a) (ι X x′)
 def 𝔻 (X : U) (a : X) : U := Σ (x′ : X), ~~ X a x′

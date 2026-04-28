@@ -6,8 +6,8 @@
    Copyright (c) Groupoid Infinity, 2014-2022. -}
 
 module hilbert where
-import lib/foundations/univalent/path
-import lib/foundations/mltt/proto
+import library/foundations/univalent/path
+import library/foundations/mltt/proto
 
 -- [Schönfinkel] Ukraine, Dnipro
 

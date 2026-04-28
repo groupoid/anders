@@ -10,7 +10,7 @@
    Copyright (c) Groupoid Infinity, 2014-2023. -}
 
 module functor where
-import lib/mathematics/categories/category
+import library/mathematics/categories/category
 
 def catfunctor (A B: precategory): U := Σ
     (ob: A.C.ob -> B.C.ob)

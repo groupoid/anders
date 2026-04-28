@@ -8,11 +8,11 @@
    Copyright (c) Groupoid Infinity, 2014-2022. -}
 
 module bundle where
-import lib/foundations/univalent/path
-import lib/foundations/mltt/sigma
-import lib/foundations/univalent/iso
-import lib/mathematics/homotopy/pullback
-import lib/mathematics/homotopy/truncation
+import library/foundations/univalent/path
+import library/foundations/mltt/sigma
+import library/foundations/univalent/iso
+import library/mathematics/homotopy/pullback
+import library/mathematics/homotopy/truncation
 option girard true
 
 def Family (B : U) : U₁ := B → U

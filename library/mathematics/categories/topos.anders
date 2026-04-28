@@ -3,6 +3,8 @@ import library/mathematics/categories/category
 import library/mathematics/categories/functor
 import library/mathematics/categories/cartesian
 import library/foundations/univalent/extensionality
+import library/foundations/univalent/prop
+import library/foundations/univalent/iso
 
 -- | Large Categories (Locally Small)
 
@@ -74,8 +76,31 @@ def subobjectClassifier1 (C: precategory1): U₁ := Σ
 
 -- | Detailed Components for the Set Topos.
 
-axiom SetSigma (A: U) (B: A -> U) (sA: isSet A) (sB: Π (x: A), isSet (B x)) : isSet (Sigma A B)
-axiom SetIsSet1 : isSet 𝟏
+def SetIsSet1 : isSet 𝟏 := propSet 𝟏 (isContrProp 𝟏 (★, 𝟏-contr))
+
+def pathSig (A: U) (B: A -> U) (t u: Sigma A B) :
+  Path U (Path (Sigma A B) t u) (Σ (p : Path A t.1 u.1), PathP (<i> B (p @ i)) t.2 u.2) :=
+  iso→Path (Path (Sigma A B) t u) (Σ (p : Path A t.1 u.1), PathP (<i> B (p @ i)) t.2 u.2)
+    (λ (q : Path (Sigma A B) t u), (<i> (q @ i).1, <i> (q @ i).2))
+    (λ (z : Σ (p : Path A t.1 u.1), PathP (<i> B (p @ i)) t.2 u.2), <i> (z.1 @ i, z.2 @ i))
+    (λ (z : Σ (p : Path A t.1 u.1), PathP (<i> B (p @ i)) t.2 u.2), <_> z)
+    (λ (q : Path (Sigma A B) t u), <_> q)
+
+def corSigSet (A: U) (B: A -> U) (sB: Π (x: A), isSet (B x)) (t u: Sigma A B) (p: Path A t.1 u.1)
+  : isProp (PathP (<i> B (p @ i)) t.2 u.2) :=
+  subst U isProp
+    (Path (B u.1) (hcomp (B u.1) 0 (λ (k : I), []) (transp (<i> B (p @ i)) 0 t.2)) u.2)
+    (PathP (<i> B (p @ i)) t.2 u.2)
+    (<i> (pathSig0 A B t u p) @ -i)
+    (sB u.1 (hcomp (B u.1) 0 (λ (k : I), []) (transp (<i> B (p @ i)) 0 t.2)) u.2)
+
+def SetSigma (A: U) (B: A -> U) (sA: isSet A) (sB: Π (x: A), isSet (B x)) : isSet (Sigma A B) :=
+  λ (t u : Sigma A B), subst U isProp
+    (Σ (p : Path A t.1 u.1), PathP (<i> B (p @ i)) t.2 u.2)
+    (Path (Sigma A B) t u)
+    (<i> (pathSig A B t u) @ -i)
+    (propSig (Path A t.1 u.1) (λ (p : Path A t.1 u.1), PathP (<i> B (p @ i)) t.2 u.2)
+      (sA t.1 u.1) (λ (p : Path A t.1 u.1), corSigSet A B sB t u p))
 
 def SetTerminal : terminal1 Set := 
   ((𝟏, SetIsSet1), λ (X: SET), (λ (x: X.1), ★, λ (f: X.1 -> 𝟏), <i> λ (a: X.1), 𝟏-contr (f a) @ i))
@@ -83,16 +108,25 @@ def SetTerminal : terminal1 Set :=
 def SetProd (A B: SET) : SET := (Sigma A.1 (λ (_: A.1), B.1), SetSigma A.1 (λ (_: A.1), B.1) A.2 (λ (_: A.1), B.2))
 def SetP1 (A B: SET) (p: (SetProd A B).1) : A.1 := p.1
 def SetP2 (A B: SET) (p: (SetProd A B).1) : B.1 := p.2
-axiom SetUniv (A B X: SET) (f: X.1 -> A.1) (g: X.1 -> B.1) : isContr (Sigma (X.1 -> (SetProd A B).1) (λ (h: X.1 -> (SetProd A B).1), (Path (X.1 -> A.1) (λ (x: X.1), SetP1 A B (h x)) f) × (Path (X.1 -> B.1) (λ (x: X.1), SetP2 A B (h x)) g)))
+def SetUniv (A B X: SET) (f: X.1 -> A.1) (g: X.1 -> B.1) : isContr (Sigma (X.1 -> (SetProd A B).1) (λ (h: X.1 -> (SetProd A B).1), (Path (X.1 -> A.1) (λ (x: X.1), SetP1 A B (h x)) f) × (Path (X.1 -> B.1) (λ (x: X.1), SetP2 A B (h x)) g))) :=
+  ( (λ (x: X.1), (f x, g x), (<_> f, <_> g)),
+    λ (z: Σ (h: X.1 -> (SetProd A B).1), (Path (X.1 -> A.1) (λ (x: X.1), (h x).1) f) × (Path (X.1 -> B.1) (λ (x: X.1), (h x).2) g)),
+      <i> ( (λ (x: X.1), ((z.2.1 @ -i) x, (z.2.2 @ -i) x)),
+            (<j> λ (x: X.1), (z.2.1 @ (-i \/ j)) x,
+             <j> λ (x: X.1), (z.2.2 @ (-i \/ j)) x) ) )
 
 def SetExp (A B: SET) : SET := (A.1 -> B.1, setFun A.1 B.1 B.2)
 def SetApply (A B: SET) (p: (SetProd (SetExp A B) A).1) : B.1 := p.1 p.2
-axiom SetCurry (A B X: SET) (f: (SetProd X A).1 -> B.1) : isContr (Sigma (X.1 -> (SetExp A B).1) (λ (g: X.1 -> (SetExp A B).1), Path ((SetProd X A).1 -> B.1) (λ (p: (SetProd X A).1), SetApply A B (g p.1, p.2)) f))
+def SetCurry (A B X: SET) (f: (SetProd X A).1 -> B.1) : isContr (Sigma (X.1 -> (SetExp A B).1) (λ (g: X.1 -> (SetExp A B).1), Path ((SetProd X A).1 -> B.1) (λ (p: (SetProd X A).1), SetApply A B (g p.1, p.2)) f)) :=
+  ( (λ (x: X.1) (a: A.1), f (x, a), <_> f),
+    λ (z: Σ (g: X.1 -> (SetExp A B).1), Path ((SetProd X A).1 -> B.1) (λ (p: (SetProd X A).1), SetApply A B (g p.1, p.2)) f),
+      <i> ( (λ (x: X.1) (a: A.1), (z.2 @ -i) (x, a)),
+            <j> λ (p: (SetProd X A).1), (z.2 @ (-i \/ j)) p ) )
 
 -- | Final Topos Definition for Set.
 
-axiom SetCCC : isCCC1 Set
--- SetCCC = (SetProd, SetP1, SetP2, SetUniv, SetExp, SetApply, SetCurry, SetTerminal)
+def SetCCC : isCCC1 Set
+ := (SetProd, SetP1, SetP2, SetUniv, SetExp, SetApply, SetCurry, SetTerminal)
 
 axiom SetOmega : SET
 axiom SetTrue : SetTerminal.1.1 -> SetOmega.1

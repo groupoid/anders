@@ -40,7 +40,20 @@ def terminal1 (C: precategory1) : U₁ := Σ (top: C.C.ob), Π (x: C.C.ob), isCo
 
 def cospanLarge (C: precategory1) : U₁ := Σ (X: C.C.ob) (f: Σ (Y: C.C.ob), C.C.hom Y X), (Σ (Y: C.C.ob), C.C.hom Y X)
 
-axiom hasPullbackLarge (C: precategory1) (D: cospanLarge C) : U₁
+def hasCospanConeLarge (C: precategory1) (D: cospanLarge C) (w: C.C.ob) : U₁ := Σ (f: C.C.hom w D.2.1.1) (g: C.C.hom w D.2.2.1),
+    Path (C.C.hom w D.1) (C.P.∘ w D.2.1.1 D.1 f D.2.1.2) (C.P.∘ w D.2.2.1 D.1 g D.2.2.2)
+
+def cospanConeLarge (C: precategory1) (D: cospanLarge C) : U₁ := Σ (w: C.C.ob), hasCospanConeLarge C D w
+
+def isCospanConeHomLarge (C: precategory1) (D: cospanLarge C) (E1 E2: cospanConeLarge C D) (h: C.C.hom E1.1 E2.1) : U₁ := Σ
+    (_ : Path (C.C.hom E1.1 D.2.1.1) (C.P.∘ E1.1 E2.1 D.2.1.1 h E2.2.1) E1.2.1),
+    Path (C.C.hom E1.1 D.2.2.1) (C.P.∘ E1.1 E2.1 D.2.2.1 h E2.2.2.1) E1.2.2.1
+
+def cospanConeHomLarge (C: precategory1) (D: cospanLarge C) (E1 E2: cospanConeLarge C D) : U₁ := Σ (h: C.C.hom E1.1 E2.1), isCospanConeHomLarge C D E1 E2 h
+
+def isPullbackLarge (C: precategory1) (D: cospanLarge C) (E: cospanConeLarge C D) : U₁ := Π (h: cospanConeLarge C D), isContr (cospanConeHomLarge C D h E)
+
+def hasPullbackLarge (C: precategory1) (D: cospanLarge C) : U₁ := Σ (E: cospanConeLarge C D), isPullbackLarge C D E
 
 def mono1 (C: precategory1) (Y Z: C.C.ob) (f: C.C.hom Y Z): U₁ := Π (X: C.C.ob) (g1 g2: C.C.hom X Y),
     Path (C.C.hom X Z) (C.P.∘ X Y Z g1 f) (C.P.∘ X Y Z g2 f) -> Path (C.C.hom X Y) g1 g2

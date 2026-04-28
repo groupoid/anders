@@ -18,9 +18,9 @@ def isCCC (C: precategory): U
       (exp: Π (A B: C.C.ob), C.C.ob)
       (apply: Π (A B: C.C.ob), C.C.hom (prod (exp A B) A) B)
       (curry: Π (A B X: C.C.ob) (f: C.C.hom (prod X A) B), 
-        isContr (Σ (g: C.C.hom X (exp A B)), Path (C.C.hom (prod X A) B) (C.P.∘ (prod X A) (prod (exp A B) A) B (tensorHom C (prod X A) (prod (exp A B) A) g (C.P.id A)) (apply A B)) f)),
+        isContr (Σ (g: C.C.hom X (exp A B)), 
+          Path (C.C.hom (prod X A) B) 
+               (C.P.∘ (prod X A) (prod (exp A B) A) B 
+                 ((univ (exp A B) A (prod X A) (C.P.∘ (prod X A) X (exp A B) (p1 X A) g) (p2 X A)).1.1) 
+                 (apply A B)) f)),
       terminal C
-
--- Helper for morphism product (should be moved to symmetric or similar)
-axiom tensorHom (C: precategory) (A B: C.C.ob) (A' B': C.C.ob) (f: C.C.hom A A') (g: C.C.hom B B') : C.C.hom (prod C A B) (prod C A' B')
--- Note: the above tensorHom is just a stub for CCC context.

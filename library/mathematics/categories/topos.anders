@@ -11,10 +11,6 @@ module topos where
 import library/mathematics/categories/category
 import library/mathematics/categories/functor
 import library/mathematics/categories/cartesian
-import library/foundations/mltt/pi
-
-def epi (P: precategory) (X Y: P.C.ob) (f: P.C.hom X Y): U := Π (Z: P.C.ob) (g1 g2: P.C.hom Y Z),
-    Path (P.C.hom X Z) (P.P.∘ X Y Z f g1) (P.P.∘ X Y Z f g2) -> Path (P.C.hom Y Z) g1 g2
 
 def mono (P: precategory) (Y Z: P.C.ob) (f: P.C.hom Y Z): U := Π (X: P.C.ob) (g1 g2: P.C.hom X Y),
     Path (P.C.hom X Z) (P.P.∘ X Y Z g1 f) (P.P.∘ X Y Z g2 f) -> Path (P.C.hom X Y) g1 g2
@@ -30,16 +26,48 @@ def subobjectClassifier (C: precategory): U := Σ
     (mono C Y X j) -> (hasPullback C (omega,(end.top,trueHom),(X,k))) ->
        (Path (C.C.hom X omega) (xi Y X j) k)
 
+-- | Axioms for the Category of Sets.
+
 axiom Set : precategory
 axiom cartesianClosed : isCCC Set
 axiom hasSubobject : subobjectClassifier Set
 
-def Topos (cat: precategory) : U := Σ (cartesianClosed: isCCC cat), subobjectClassifier cat
+-- | Topos definition.
+
+def Topos (cat: precategory) : U := Σ (ccc: isCCC cat), subobjectClassifier cat
 def internal : Topos Set := (cartesianClosed,hasSubobject)
-def presheaf (C: precategory): U := catfunctor (catᵒᵖ C) Set
+
+-- | Presheaves valued in h-sets (SET from path.anders).
+-- This uses the SET model (Σ (X : U), isSet X) to ensure all sections belong to h-sets.
+
+def presheaf (C: precategory) : U₁ := Σ
+    (ob: C.C.ob -> SET)
+    (mor: Π (x y: C.C.ob), C.C.hom x y -> (ob y).1 -> (ob x).1),
+    (Π (x: C.C.ob) (s: (ob x).1), Path (ob x).1 (mor x x (C.P.id x) s) s) ×
+    (Π (x y z: C.C.ob) (f: C.C.hom x y) (g: C.C.hom y z) (s: (ob z).1),
+       Path (ob x).1 (mor x z (C.P.∘ x y z f g) s) (mor x y f (mor y z g s)))
+
 def Co (C: precategory) (cod: C.C.ob) : U := Σ (dom: C.C.ob), C.C.hom dom cod
 def Delta (C: precategory) (d: C.C.ob) : U₁ := Σ (index: U), index -> Co C d
+
 def Coverage (C: precategory): U₁ := Σ (cod: C.C.ob) (fam: Delta C cod)
-    (coverings: C.C.ob -> Delta C cod -> U), coverings cod fam
-def site  (C: precategory): U₁ := Σ (C: precategory), Coverage C
-def sheaf (C: precategory): U₁ := Σ (S: site C), presheaf S.C
+    (coverings: Π (c: C.C.ob), Delta C c -> U), coverings cod fam
+
+def site (C: precategory): U₁ := Σ (J: Coverage C), unit
+
+-- | Matching family for SET-valued presheaves.
+
+def MatchingFamily (C: precategory) (P: presheaf C) (d: C.C.ob) (fam: Delta C d) : U :=
+  Σ (sections: Π (i: fam.1), (P.1 ((fam.2 i).1)).1),
+    Π (i j: fam.1), Π (X: C.C.ob), Π (g: C.C.hom X (fam.2 i).1), Π (k: C.C.hom X (fam.2 j).1),
+    (Path (C.C.hom X d) (C.P.∘ X (fam.2 i).1 d g (fam.2 i).2) (C.P.∘ X (fam.2 j).1 d k (fam.2 j).2)) ->
+    Path (P.1 X).1 (P.2.1 X (fam.2 i).1 g (sections i)) (P.2.1 X (fam.2 j).1 k (sections j))
+
+-- | Sheaf condition for SET-valued presheaves.
+
+def isSheaf (C: precategory) (J: Coverage C) (P: presheaf C) : U₁ := 
+  Π (d: C.C.ob), Π (fam: Delta C d), Π (isCover: J.coverings d fam),
+  Π (mf: MatchingFamily C P d fam),
+  isContr (Σ (s: (P.1 d).1), Π (i: fam.1), Path (P.1 (fam.2 i).1).1 (P.2.1 (fam.2 i).1 d (fam.2 i).2 s) (mf.1 i))
+
+def sheaf (C: precategory) (J: Coverage C): U₁ := Σ (P: presheaf C), isSheaf C J P

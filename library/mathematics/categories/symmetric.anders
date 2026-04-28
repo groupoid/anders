@@ -3,28 +3,52 @@ import library/mathematics/categories/category
 import library/mathematics/categories/functor
 import library/mathematics/categories/natural
 
-def catproduct (A B: precategory): precategory
- := ((prod A.C.ob B.C.ob,(\(x y: prod A.C.ob B.C.ob), prod (A.C.hom x.1 y.1) (B.C.hom x.2 y.2)), star),
-    (?,?,?,?,?,?,star),
-    star)
+-- | Product Category
 
-axiom flipBifunctor (X Y Z: precategory) (F: catfunctor (catproduct X Y) Z)
-    : catfunctor (catproduct Y X) Z
+def catproduct (A B: precategory): precategory
+ := ((prod A.C.ob B.C.ob, (\ (x y: prod A.C.ob B.C.ob), prod (A.C.hom x.1 y.1) (B.C.hom x.2 y.2)), star),
+     ((\ (x: prod A.C.ob B.C.ob), (A.P.id x.1, B.P.id x.2)),
+      (\ (x y z: prod A.C.ob B.C.ob) (f: prod (A.C.hom x.1 y.1) (B.C.hom x.2 y.2)) (g: prod (A.C.hom y.1 z.1) (B.C.hom y.2 z.2)),
+       (A.P.∘ x.1 y.1 z.1 f.1 g.1, B.P.∘ x.2 y.2 z.2 f.2 g.2)),
+      (\ (x y: prod A.C.ob B.C.ob) (f g: prod (A.C.hom x.1 y.1) (B.C.hom x.2 y.2)) (p q: Path (prod (A.C.hom x.1 y.1) (B.C.hom x.2 y.2)) f g),
+       <i j> (A.P.homSet x.1 y.1 f.1 g.1 (<k> (p @ k).1) (<k> (q @ k).1) @ i @ j,
+              B.P.homSet x.2 y.2 f.2 g.2 (<k> (p @ k).2) (<k> (q @ k).2) @ i @ j)),
+      (\ (x y: prod A.C.ob B.C.ob) (f: prod (A.C.hom x.1 y.1) (B.C.hom x.2 y.2)), <i> (A.P.∘-left x.1 y.1 f.1 @ i, B.P.∘-left x.2 y.2 f.2 @ i)),
+      (\ (x y: prod A.C.ob B.C.ob) (f: prod (A.C.hom x.1 y.1) (B.C.hom x.2 y.2)), <i> (A.P.∘-right x.1 y.1 f.1 @ i, B.P.∘-right x.2 y.2 f.2 @ i)),
+      (\ (x y z w: prod A.C.ob B.C.ob) (f: prod (A.C.hom x.1 y.1) (B.C.hom x.2 y.2)) (g: prod (A.C.hom y.1 z.1) (B.C.hom y.2 z.2)) (h: prod (A.C.hom z.1 w.1) (B.C.hom z.2 w.2)),
+       <i> (A.P.∘-assoc x.1 y.1 z.1 w.1 f.1 g.1 h.1 @ i, B.P.∘-assoc x.2 y.2 z.2 w.2 f.2 g.2 h.2 @ i)), star), star)
+
+-- | Flip Bifunctor
+
+def flipBifunctor (X Y Z: precategory) (F: catfunctor (catproduct X Y) Z) : catfunctor (catproduct Y X) Z :=
+  ((\(x: prod Y.C.ob X.C.ob), F.ob (x.2, x.1)),
+   (\(x y: prod Y.C.ob X.C.ob) (f: prod (Y.C.hom x.1 y.1) (X.C.hom x.2 y.2)), F.mor (x.2, x.1) (y.2, y.1) (f.2, f.1)),
+   (\(x: prod Y.C.ob X.C.ob), F.id (x.2, x.1)),
+   (\(x y z: prod Y.C.ob X.C.ob) (f: prod (Y.C.hom x.1 y.1) (X.C.hom x.2 y.2)) (g: prod (Y.C.hom y.1 z.1) (X.C.hom y.2 z.2)),
+    F.fcomp (x.2, x.1) (y.2, y.1) (z.2, z.1) (f.2, f.1) (g.2, g.1)), star)
+
+-- | Monoidal Category structure (Strict on objects for simplicity in this encoding)
 
 def isMonoidal (C: precategory): U
  := Σ (tensor: catfunctor (catproduct C C) C)
-      (tensor₁: C.C.ob)
-      (left₁: Π (x: C.C.ob),  Path (C.C.ob) x (tensor.ob (tensor₁,x)))
-      (right₁: Π (x: C.C.ob), Path (C.C.ob) x (tensor.ob (x,tensor₁)))
-      (associator: Π (x y z: C.C.ob), Path (C.C.ob) (tensor.ob ((tensor.ob (x,y)),z)) (tensor.ob (x,(tensor.ob (y,z)))))
-      (triangle: Π (x y: C.C.ob), 𝟏)
-      (pentagon: Π (x y z w: C.C.ob), 𝟏), 𝟏
+      (e: C.C.ob)
+      (left₁: Π (x: C.C.ob),  Path (C.C.ob) x (tensor.ob (e,x)))
+      (right₁: Π (x: C.C.ob), Path (C.C.ob) x (tensor.ob (x,e)))
+      (associator: Π (x y z: C.C.ob), Path (C.C.ob) (tensor.ob (tensor.ob (x,y), z)) (tensor.ob (x, tensor.ob (y,z))))
+      (triangle: Π (x y: C.C.ob), unit)
+      (pentagon: Π (x y z w: C.C.ob), unit), unit
+
+-- | Braided Monoidal Category
 
 def isBraided (C: precategory) (m: isMonoidal C) : U
  := Σ (braiding: natiso (catproduct C C) C m.tensor (flipBifunctor C C C m.tensor))
-      (hexagon₁: unit)
-      (hexagon₂: unit), 𝟏
+      (hexagon₁: Π (x y z: C.C.ob), unit)
+      (hexagon₂: Π (x y z: C.C.ob), unit), unit
+
+-- | Symmetric Monoidal Category
 
 def isSymmetric (C: precategory) (m: isMonoidal C) (b: isBraided C m) : U
- := Σ (commutative: unit)
-      (braidingCondition: unit), 𝟏
+ := Σ (symmetry: Π (x y: C.C.ob), Path (C.C.hom (m.tensor.ob (x,y)) (m.tensor.ob (x,y)))
+          (C.P.∘ (m.tensor.ob (x,y)) (m.tensor.ob (y,x)) (m.tensor.ob (x,y)) (b.braiding.η.η (x,y)) (b.braiding.η.η (y,x)))
+          (C.P.id (m.tensor.ob (x,y))))
+      (braidingCondition: unit), unit

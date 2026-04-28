@@ -28,6 +28,7 @@ def nattrans (C D: precategory) (F G: catfunctor C D): U
 
 -- Natural Transformation Isomorphism
 def natiso (C D: precategory) (F G: catfunctor C D) : U
- := Σ (left: nattrans C D F G)
-      (right: nattrans C D G F),
-      unit
+ := Σ (η: nattrans C D F G)
+      (inv: nattrans C D G F)
+      (idL: Π (x: C.C.ob), Path (D.C.hom (F.ob x) (F.ob x)) (D.P.∘ (F.ob x) (G.ob x) (F.ob x) (η.η x) (inv.η x)) (D.P.id (F.ob x)))
+      (idR: Π (x: C.C.ob), Path (D.C.hom (G.ob x) (G.ob x)) (D.P.∘ (G.ob x) (F.ob x) (G.ob x) (inv.η x) (η.η x)) (D.P.id (G.ob x))), unit

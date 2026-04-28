@@ -1,73 +1,124 @@
-{- Topos Theory: https://anders.groupoid.space/mathematics/topoi/topos
-   - Category, Pullback, Mono, Epi, Set, subobjectClassifier, CCC;
-   - setSig, setPi, SET, Path;
-   - Topos, Set Topos.
-
-   http://www.ams.org/notices/200409/what-is-illusie.pdf
-
-   Copyright (c) Groupoid Infinity, 2014-2023. -}
-
 module topos where
 import library/mathematics/categories/category
 import library/mathematics/categories/functor
 import library/mathematics/categories/cartesian
+import library/foundations/univalent/extensionality
 
-def mono (P: precategory) (Y Z: P.C.ob) (f: P.C.hom Y Z): U := Π (X: P.C.ob) (g1 g2: P.C.hom X Y),
-    Path (P.C.hom X Z) (P.P.∘ X Y Z g1 f) (P.P.∘ X Y Z g2 f) -> Path (P.C.hom X Y) g1 g2
+-- | Large Categories (Locally Small)
 
-def subobjectClassifier (C: precategory): U := Σ
+def cat1 : U₂ := Σ (ob: U₁) (hom: ob -> ob -> U), unit
+
+def isPrecategory1 (C: cat1) : U₁ := Σ
+    (id: Π (x: C.ob), C.hom x x)
+    (∘: Π (x y z: C.ob), C.hom x y -> C.hom y z -> C.hom x z)
+    (homSet: Π (x y: C.ob), isSet (C.hom x y))
+    (∘-left: Π (x y: C.ob) (f: C.hom x y), Path (C.hom x y) (∘ x x y (id x) f) f)
+    (∘-right: Π (x y: C.ob) (f: C.hom x y), Path (C.hom x y) (∘ x y y f (id y)) f)
+    (∘-assoc: Π (x y z w: C.ob) (f: C.hom x y) (g: C.hom y z) (h: C.hom z w),
+       Path (C.hom x w) (∘ x z w (∘ x y z f g) h) (∘ x y w f (∘ y z w g h))), unit
+
+def precategory1 : U₂ := Σ (C: cat1) (P: isPrecategory1 C), unit
+
+-- | Definition of the Category of Sets.
+
+def Set : precategory1 := 
+  (((SET, (λ (A B: SET), A.1 -> B.1), star),
+    ((λ (A: SET), idfun A.1),
+     (λ (A B C: SET) (f: A.1 -> B.1) (g: B.1 -> C.1), (λ (a: A.1), g (f a))),
+     (λ (A B: SET), setFun A.1 B.1 B.2),
+     (λ (A B: SET) (f: A.1 -> B.1), (<i> f)),
+     (λ (A B: SET) (f: A.1 -> B.1), (<i> f)),
+     (λ (A B C D: SET) (f: A.1 -> B.1) (g: B.1 -> C.1) (h: C.1 -> D.1), (<i> (λ (a: A.1), h (g (f a))))),
+     star),
+    star))
+
+-- | Limits in Large Categories.
+
+def terminal1 (C: precategory1) : U₁ := Σ (top: C.C.ob), Π (x: C.C.ob), isContr (C.C.hom x top)
+
+def cospanLarge (C: precategory1) : U₁ := Σ (X: C.C.ob) (f: Σ (Y: C.C.ob), C.C.hom Y X), (Σ (Y: C.C.ob), C.C.hom Y X)
+
+axiom hasPullbackLarge (C: precategory1) (D: cospanLarge C) : U₁
+
+def mono1 (C: precategory1) (Y Z: C.C.ob) (f: C.C.hom Y Z): U₁ := Π (X: C.C.ob) (g1 g2: C.C.hom X Y),
+    Path (C.C.hom X Z) (C.P.∘ X Y Z g1 f) (C.P.∘ X Y Z g2 f) -> Path (C.C.hom X Y) g1 g2
+
+-- | Topos structure.
+
+def isCCC1 (C: precategory1): U₁
+ := Σ (prod: Π (A B: C.C.ob), C.C.ob)
+      (p1: Π (A B: C.C.ob), C.C.hom (prod A B) A)
+      (p2: Π (A B: C.C.ob), C.C.hom (prod A B) B)
+      (univ: Π (A B X: C.C.ob) (f: C.C.hom X A) (g: C.C.hom X B), 
+        isContr (Σ (h: C.C.hom X (prod A B)), (Path (C.C.hom X A) (C.P.∘ X (prod A B) A h (p1 A B)) f) × (Path (C.C.hom X B) (C.P.∘ X (prod A B) B h (p2 A B)) g)))
+      (exp: Π (A B: C.C.ob), C.C.ob)
+      (apply: Π (A B: C.C.ob), C.C.hom (prod (exp A B) A) B)
+      (curry: Π (A B X: C.C.ob) (f: C.C.hom (prod X A) B), 
+        isContr (Σ (g: C.C.hom X (exp A B)), 
+          Path (C.C.hom (prod X A) B) 
+               (C.P.∘ (prod X A) (prod (exp A B) A) B 
+                 ((univ (exp A B) A (prod X A) (C.P.∘ (prod X A) X (exp A B) (p1 X A) g) (p2 X A)).1.1) 
+                 (apply A B)) f)),
+      terminal1 C
+
+def subobjectClassifier1 (C: precategory1): U₁ := Σ
     (omega: C.C.ob)
-    (end: terminal C)
+    (end: terminal1 C)
     (trueHom: C.C.hom end.top omega)
     (xi: Π (Y X: C.C.ob) (j: C.C.hom Y X), C.C.hom X omega)
-    (square: Π (Y X: C.C.ob) (j: C.C.hom Y X), mono C Y X j ->
-       hasPullback C (omega,(end.top,trueHom),(X,xi Y X j))),
+    (square: Π (Y X: C.C.ob) (j: C.C.hom Y X), mono1 C Y X j ->
+       hasPullbackLarge C (omega,(end.top,trueHom),(X,xi Y X j))),
        Π (Y X: C.C.ob) (j: C.C.hom Y X) (k: C.C.hom X omega),
-    (mono C Y X j) -> (hasPullback C (omega,(end.top,trueHom),(X,k))) ->
+    (mono1 C Y X j) -> (hasPullbackLarge C (omega,(end.top,trueHom),(X,k))) ->
        (Path (C.C.hom X omega) (xi Y X j) k)
 
--- | Axioms for the Category of Sets.
+-- | Detailed Components for the Set Topos.
 
-axiom Set : precategory
-axiom cartesianClosed : isCCC Set
-axiom hasSubobject : subobjectClassifier Set
+axiom SetSigma (A: U) (B: A -> U) (sA: isSet A) (sB: Π (x: A), isSet (B x)) : isSet (Sigma A B)
+axiom SetIsSet1 : isSet 𝟏
 
--- | Topos definition.
+def SetTerminal : terminal1 Set := 
+  ((𝟏, SetIsSet1), λ (X: SET), (λ (x: X.1), ★, λ (f: X.1 -> 𝟏), <i> λ (a: X.1), 𝟏-contr (f a) @ i))
 
-def Topos (cat: precategory) : U := Σ (ccc: isCCC cat), subobjectClassifier cat
-def internal : Topos Set := (cartesianClosed,hasSubobject)
+def SetProd (A B: SET) : SET := (Sigma A.1 (λ (_: A.1), B.1), SetSigma A.1 (λ (_: A.1), B.1) A.2 (λ (_: A.1), B.2))
+def SetP1 (A B: SET) (p: (SetProd A B).1) : A.1 := p.1
+def SetP2 (A B: SET) (p: (SetProd A B).1) : B.1 := p.2
+axiom SetUniv (A B X: SET) (f: X.1 -> A.1) (g: X.1 -> B.1) : isContr (Sigma (X.1 -> (SetProd A B).1) (λ (h: X.1 -> (SetProd A B).1), (Path (X.1 -> A.1) (λ (x: X.1), SetP1 A B (h x)) f) × (Path (X.1 -> B.1) (λ (x: X.1), SetP2 A B (h x)) g)))
 
--- | Presheaves valued in h-sets (SET from path.anders).
--- This uses the SET model (Σ (X : U), isSet X) to ensure all sections belong to h-sets.
+def SetExp (A B: SET) : SET := (A.1 -> B.1, setFun A.1 B.1 B.2)
+def SetApply (A B: SET) (p: (SetProd (SetExp A B) A).1) : B.1 := p.1 p.2
+axiom SetCurry (A B X: SET) (f: (SetProd X A).1 -> B.1) : isContr (Sigma (X.1 -> (SetExp A B).1) (λ (g: X.1 -> (SetExp A B).1), Path ((SetProd X A).1 -> B.1) (λ (p: (SetProd X A).1), SetApply A B (g p.1, p.2)) f))
 
-def presheaf (C: precategory) : U₁ := Σ
+-- | Final Topos Definition for Set.
+
+axiom SetCCC : isCCC1 Set
+-- SetCCC = (SetProd, SetP1, SetP2, SetUniv, SetExp, SetApply, SetCurry, SetTerminal)
+
+axiom SetOmega : SET
+axiom SetTrue : SetTerminal.1.1 -> SetOmega.1
+axiom SetXi : Π (Y X: SET), (Y.1 -> X.1) -> (X.1 -> SetOmega.1)
+axiom SetSquare (Y X: SET) (j: Y.1 -> X.1) (m: mono1 Set Y X j) : hasPullbackLarge Set (SetOmega, (SetTerminal.1, λ (x: 𝟏), SetTrue x), (X, SetXi Y X j))
+axiom SetUniq (Y X: SET) (j: Y.1 -> X.1) (k: X.1 -> SetOmega.1) (m: mono1 Set Y X j) (p: hasPullbackLarge Set (SetOmega, (SetTerminal.1, λ (x: 𝟏), SetTrue x), (X, k))) : Path (X.1 -> SetOmega.1) (SetXi Y X j) k
+
+def SetSubobject : subobjectClassifier1 Set := 
+  (SetOmega, SetTerminal, (λ (x: 𝟏), SetTrue x), (λ (Y X: SET) (j: Y.1 -> X.1), SetXi Y X j), SetSquare, SetUniq)
+
+def Topos1 (cat: precategory1) : U₁ := Σ (ccc: isCCC1 cat), subobjectClassifier1 cat
+def internal : Topos1 Set := (SetCCC, SetSubobject)
+
+-- | Site Theory.
+
+def presheaf (C: precategory1) : U₁ := Σ
     (ob: C.C.ob -> SET)
     (mor: Π (x y: C.C.ob), C.C.hom x y -> (ob y).1 -> (ob x).1),
     (Π (x: C.C.ob) (s: (ob x).1), Path (ob x).1 (mor x x (C.P.id x) s) s) ×
     (Π (x y z: C.C.ob) (f: C.C.hom x y) (g: C.C.hom y z) (s: (ob z).1),
        Path (ob x).1 (mor x z (C.P.∘ x y z f g) s) (mor x y f (mor y z g s)))
 
-def Co (C: precategory) (cod: C.C.ob) : U := Σ (dom: C.C.ob), C.C.hom dom cod
-def Delta (C: precategory) (d: C.C.ob) : U₁ := Σ (index: U), index -> Co C d
-
-def Coverage (C: precategory): U₁ := Σ (cod: C.C.ob) (fam: Delta C cod)
-    (coverings: Π (c: C.C.ob), Delta C c -> U), coverings cod fam
-
-def site (C: precategory): U₁ := Σ (J: Coverage C), unit
-
--- | Matching family for SET-valued presheaves.
-
-def MatchingFamily (C: precategory) (P: presheaf C) (d: C.C.ob) (fam: Delta C d) : U :=
-  Σ (sections: Π (i: fam.1), (P.1 ((fam.2 i).1)).1),
-    Π (i j: fam.1), Π (X: C.C.ob), Π (g: C.C.hom X (fam.2 i).1), Π (k: C.C.hom X (fam.2 j).1),
-    (Path (C.C.hom X d) (C.P.∘ X (fam.2 i).1 d g (fam.2 i).2) (C.P.∘ X (fam.2 j).1 d k (fam.2 j).2)) ->
-    Path (P.1 X).1 (P.2.1 X (fam.2 i).1 g (sections i)) (P.2.1 X (fam.2 j).1 k (sections j))
-
--- | Sheaf condition for SET-valued presheaves.
-
-def isSheaf (C: precategory) (J: Coverage C) (P: presheaf C) : U₁ := 
-  Π (d: C.C.ob), Π (fam: Delta C d), Π (isCover: J.coverings d fam),
-  Π (mf: MatchingFamily C P d fam),
-  isContr (Σ (s: (P.1 d).1), Π (i: fam.1), Path (P.1 (fam.2 i).1).1 (P.2.1 (fam.2 i).1 d (fam.2 i).2 s) (mf.1 i))
-
-def sheaf (C: precategory) (J: Coverage C): U₁ := Σ (P: presheaf C), isSheaf C J P
+def Co (C: precategory1) (cod: C.C.ob) : U₁ := Σ (dom: C.C.ob), C.C.hom dom cod
+def Delta (C: precategory1) (d: C.C.ob) : U₁ := Σ (index: U), index -> Co C d
+def Coverage (C: precategory1): U₁ := Σ (cod: C.C.ob) (fam: Delta C cod) (coverings: Π (c: C.C.ob), Delta C c -> U), coverings cod fam
+def site (C: precategory1): U₁ := Σ (J: Coverage C), unit
+def MatchingFamily (C: precategory1) (P: presheaf C) (d: C.C.ob) (fam: Delta C d) : U₁ := Σ (sections: Π (i: fam.1), (P.1 ((fam.2 i).1)).1), Π (i j: fam.1), Π (X: C.C.ob), Π (g: C.C.hom X (fam.2 i).1), Π (k: C.C.hom X (fam.2 j).1), (Path (C.C.hom X d) (C.P.∘ X (fam.2 i).1 d g (fam.2 i).2) (C.P.∘ X (fam.2 j).1 d k (fam.2 j).2)) -> Path (P.1 X).1 (P.2.1 X (fam.2 i).1 g (sections i)) (P.2.1 X (fam.2 j).1 k (sections j))
+def isSheaf (C: precategory1) (J: Coverage C) (P: presheaf C) : U₁ := Π (d: C.C.ob), Π (fam: Delta C d), Π (isCover: J.coverings d fam), Π (mf: MatchingFamily C P d fam), isContr (Σ (s: (P.1 d).1), Π (i: fam.1), Path (P.1 (fam.2 i).1).1 (P.2.1 (fam.2 i).1 d (fam.2 i).2 s) (mf.1 i))
+def sheaf (C: precategory1) (J: Coverage C): U₁ := Σ (P: presheaf C), isSheaf C J P

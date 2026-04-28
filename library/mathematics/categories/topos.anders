@@ -128,14 +128,32 @@ def SetCurry (A B X: SET) (f: (SetProd X A).1 -> B.1) : isContr (Sigma (X.1 -> (
 def SetCCC : isCCC1 Set
  := (SetProd, SetP1, SetP2, SetUniv, SetExp, SetApply, SetCurry, SetTerminal)
 
-axiom SetOmega : SET
-axiom SetTrue : SetTerminal.1.1 -> SetOmega.1
-axiom SetXi : Π (Y X: SET), (Y.1 -> X.1) -> (X.1 -> SetOmega.1)
+-- | Subobject Classifier for the Set Topos.
+
+axiom SetOmegaSet : isSet (Sigma U (λ (A: U), isProp A))
+def SetOmega : SET := (Sigma U (λ (A: U), isProp A), SetOmegaSet)
+
+def SetTrue : SetTerminal.1.1 -> SetOmega.1 := λ (x: SetTerminal.1.1), (𝟏, isContrProp 𝟏 (★, 𝟏-contr))
+
+def SetXi (Y X: SET) (j: Y.1 -> X.1) : X.1 -> SetOmega.1 :=
+  λ (x: X.1), (Π (P: U), isProp P -> (fiber Y.1 X.1 j x -> P) -> P,
+               propPi U (λ (P: U), isProp P -> (fiber Y.1 X.1 j x -> P) -> P) 
+                 (λ (P: U), propPi (isProp P) (λ (_: isProp P), (fiber Y.1 X.1 j x -> P) -> P) 
+                   (λ (hP: isProp P), propPi (fiber Y.1 X.1 j x -> P) (λ (_: fiber Y.1 X.1 j x -> P), P) 
+                     (λ (hF: fiber Y.1 X.1 j x -> P), hP))))
+
+def mono-to-prop (Y X: SET) (j: Y.1 -> X.1) (m: mono1 Set Y X j) (x: X.1) : isProp (fiber Y.1 X.1 j x) :=
+  λ (f1 f2: fiber Y.1 X.1 j x),
+    <i> ( (m (𝟏, SetIsSet1) (λ (z: 𝟏), f1.1) (λ (z: 𝟏), f2.1) (<i> λ (z: 𝟏), comp-Path X.1 (j f1.1) x (j f2.1) (inv X.1 x (j f1.1) f1.2) f2.2 @ i) @ i) ★,
+          lemPropF Y.1 (λ (y: Y.1), Path X.1 x (j y)) (λ (y: Y.1), X.2 x (j y)) f1.1 f2.1 
+            (<i> (m (𝟏, SetIsSet1) (λ (z: 𝟏), f1.1) (λ (z: 𝟏), f2.1) (<i> λ (z: 𝟏), comp-Path X.1 (j f1.1) x (j f2.1) (inv X.1 x (j f1.1) f1.2) f2.2 @ i) @ i) ★)
+            f1.2 f2.2 @ i )
+
 axiom SetSquare (Y X: SET) (j: Y.1 -> X.1) (m: mono1 Set Y X j) : hasPullbackLarge Set (SetOmega, (SetTerminal.1, λ (x: 𝟏), SetTrue x), (X, SetXi Y X j))
 axiom SetUniq (Y X: SET) (j: Y.1 -> X.1) (k: X.1 -> SetOmega.1) (m: mono1 Set Y X j) (p: hasPullbackLarge Set (SetOmega, (SetTerminal.1, λ (x: 𝟏), SetTrue x), (X, k))) : Path (X.1 -> SetOmega.1) (SetXi Y X j) k
 
 def SetSubobject : subobjectClassifier1 Set := 
-  (SetOmega, SetTerminal, (λ (x: 𝟏), SetTrue x), (λ (Y X: SET) (j: Y.1 -> X.1), SetXi Y X j), SetSquare, SetUniq)
+  (SetOmega, SetTerminal, (λ (x: 𝟏), SetTrue x), SetXi, SetSquare, SetUniq)
 
 def Topos1 (cat: precategory1) : U₁ := Σ (ccc: isCCC1 cat), subobjectClassifier1 cat
 def internal : Topos1 Set := (SetCCC, SetSubobject)

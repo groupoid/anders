@@ -17,6 +17,7 @@ import library/foundations/univalent/iso
 import library/foundations/modal/infinitesimal
 import library/mathematics/algebra/algebra
 import library/mathematics/analysis/real
+import library/mathematics/analysis/borel
 import library/mathematics/analysis/topology
 import library/mathematics/geometry/bundle
 import library/mathematics/geometry/etale

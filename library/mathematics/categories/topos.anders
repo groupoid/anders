@@ -130,7 +130,14 @@ def SetCCC : isCCC1 Set
 
 -- | Subobject Classifier for the Set Topos.
 
-axiom SetOmegaSet : isSet (Sigma U (λ (A: U), isProp A))
+def propIsEquiv (A B : U) (f : A -> B) (pB : isProp B) : isProp (isEquiv A B f) :=
+  propPi B (λ (y : B), isContr (fiber A B f y)) (λ (y : B), propIsContr (fiber A B f y))
+
+def propEquiv (A B : U) (pA : isProp A) (pB : isProp B) : isProp (equiv A B) :=
+  propSig (A -> B) (isEquiv A B) (propPi A (λ (x: A), B) (λ (x: A), pB)) (λ (f: A -> B), propIsEquiv A B f pB)
+
+axiom SetOmegaSet (P Q : Sigma U (λ (A : U), isProp A)) : isProp (Path (Sigma U (λ (A : U), isProp A)) P Q)
+
 def SetOmega : SET := (Sigma U (λ (A: U), isProp A), SetOmegaSet)
 
 def SetTrue : SetTerminal.1.1 -> SetOmega.1 := λ (x: SetTerminal.1.1), (𝟏, isContrProp 𝟏 (★, 𝟏-contr))

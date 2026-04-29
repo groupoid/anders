@@ -42,11 +42,8 @@ with 0, 1, 2, W types; CCHM \cite{CCHM} in CHM \cite{CHM} flavour as cubical typ
 hcomp/transp operations; HTS \cite{HTS} strict equality on pretypes;
 infinitisemal \cite{deRham} modality primitives for differential geometry purposes.
 We tend not to touch general recursive higher inductive schemes,
-instead we will try to express as much HIT as possible through Suspensions, Truncations,
-Quotients primitives built into type checker core.
-Anders also aims to support simplicial types Simplex along with Hopf Fibrations
-built into core for sphere homotopy groups processing. This modification is called \textbf{Dan}.
-Full stack of Groupoid Infinity languages is given at AXIO/1\footnote{\url{https://axio.groupoid.space}} homepage.
+instead we will try to express as much HIT as possible through Hub Spoke Disc, Coequalizer, and W
+primitives built into type checker core.
 
 The HTS language proposed by Voevodsky exposes two different presheaf models of type theory:
 the inner one is homotopy type system presheaf that models HoTT and the outer one is
@@ -672,7 +669,7 @@ to express other HITs. Also there are other foundations to consider motivated by
 
 \begin{itemize}
 \item Coequalizer, Path Coequalizer and Colimit (van der Weide)
-\item Suspension, Truncation, Quotient (Groupoid Infinity)
+\item Coequalizer, Hub Spoke Disc, and W, 0, 1, 2 types (Groupoid Infinity)
 \item General Schemes of Higher Inductive Types (Cubical Agda)
 \end{itemize}
 
@@ -742,6 +739,101 @@ tool for homotopy type theory, with potential for incremental
 enhancements like a tactic language.
 
 \newpage
-\bibliography{anders}
+\begin{thebibliography}{20}
+
+\bibitem{deRham}
+Felix Cherubini.
+\newblock Cartan Geometry in Modal Homotopy Type Theory.
+\newblock \url{https://arxiv.org/pdf/1806.05966.pdf}, 2019.
+
+\bibitem{CHM}
+Thierry Coquand, Simon Huber, and Anders Mörtberg.
+\newblock On Higher Inductive Types in Cubical Type Theory.
+\newblock \url{https://staff.math.su.se/anders.mortberg/papers/cubicalhits.pdf}, 2017.
+
+\bibitem{Huber}
+Simon Huber.
+\newblock On Higher Inductive Types in Cubical Type Theory.
+\newblock \url{http://www.cse.chalmers.se/~simonhu/misc/hcomp.pdf}, 2017.
+
+\bibitem{MLTT72}
+Martin-Löf.
+\newblock An Intuitionistic Theory of Types, 1972.
+
+\bibitem{MLTT75}
+Martin-Löf.
+\newblock An Intuitionistic Theory of Types: Predicative Part, 1975.
+
+\bibitem{MLTT80}
+Martin-Löf.
+\newblock Intuitionistic Type Theory.
+\newblock \url{https://raw.githubusercontent.com/michaelt/martin-lof/master/pdfs/Bibliopolis-Book-retypeset-1984.pdf}, 1980.
+
+\bibitem{CIC}
+Christine Paulin-Mohring.
+\newblock Introduction to the Calculus of Inductive Constructions.
+\newblock \url{https://hal.inria.fr/hal-01094195/document}, 2015.
+
+\bibitem{HTS}
+Vladimir Voevodsky.
+\newblock A simple type system with two identity types.
+\newblock \url{https://www.math.ias.edu/vladimir/sites/math.ias.edu.vladimir/files/HTS.pdf}, 2013.
+
+\bibitem{2LTT}
+Danil Annenkov, Paolo Capriotti, Nicolai Kraus, and Christian Sattler.
+\newblock Two-Level Type Theory and Applications.
+\newblock \url{https://arxiv.org/pdf/1705.03307.pdf}, 2019.
+
+\bibitem{CubicalAgda}
+Andrea Vezzosi, Anders Mörtberg, and Andreas Abel.
+\newblock Cubical Agda: A Dependently Typed Programming Language with Univalence and Higher Inductive Types.
+\newblock \url{https://staff.math.su.se/anders.mortberg/papers/cubicalagda.pdf}, 2019.
+
+\bibitem{CCHM}
+Cyril Cohen, Thierry Coquand, Simon Huber, and Anders Mörtberg.
+\newblock Cubical Type Theory: A Constructive Interpretation of the Univalence Axiom.
+\newblock \url{https://staff.math.su.se/anders.mortberg/papers/cubicalagda.pdf}, 2018.
+
+\bibitem{Awodey12}
+Steve Awodey.
+\newblock Type Theory and Homotopy.
+\newblock In \emph{Epistemology versus Ontology: Essays on the Philosophy and Foundations of Mathematics in Honour of Per Martin-Löf}, pages 183--201. Springer, 2012.
+
+\bibitem{Coquand18}
+Thierry Coquand.
+\newblock A Survey of Constructive Models of Univalence.
+\newblock Preprint or Lecture Notes, 2018.
+
+\bibitem{Huber17}
+Simon Huber.
+\newblock Canonicity for Cubical Type Theory.
+\newblock \emph{Journal of Automated Reasoning}, 61(1-4):173--205, 2017.
+
+\bibitem{Streicher91}
+Thomas Streicher.
+\newblock \emph{Semantics of Type Theory: Correctness, Completeness and Independence Results}.
+\newblock Birkhäuser, Basel, 1991.
+
+\bibitem{Bezem14}
+Marc Bezem, Thierry Coquand, and Simon Huber.
+\newblock A Model of Type Theory in Cubical Sets.
+\newblock Preprint, arXiv:1406.1731, 2014.
+
+\bibitem{Shulman15}
+Michael Shulman.
+\newblock Univalence for Inverse Diagrams and Homotopy Canonicity.
+\newblock \emph{Mathematical Structures in Computer Science}, 25(5):1203--1277, 2015.
+
+\bibitem{Hofmann97}
+Martin Hofmann.
+\newblock Syntax and Semantics of Dependent Types.
+\newblock In \emph{Semantics and Logics of Computation}, pages 79--130. Cambridge University Press, 1997.
+
+\bibitem{Hofmann97}
+Andrej Bauer and Niels van der Weide.
+\newblock The Three-HITs Theorem.
+\newblock DOI:10.4230/LIPIcs.CVIT.2016.23, \url{https://5ht.co/three.pdf}.
+
+\end{thebibliography}
 
 \end{document}

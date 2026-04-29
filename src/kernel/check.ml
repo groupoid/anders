@@ -612,16 +612,14 @@ and conv v1 v2 : bool = traceConv v1 v2;
     | VResp (a1, b1, f1, g1, c1), VResp (a2, b2, f2, g2, c2) -> conv a1 a2 && conv b1 b2 && conv f1 f2 && conv g1 g2 && conv c1 c2
     | VIndCoequ (a1, b1, f1, g1, x1, i1, p1), VIndCoequ (a2, b2, f2, g2, x2, i2, p2) -> conv a1 a2 && conv b1 b2 && conv f1 f2 && conv g1 g2 && conv x1 x2 && conv i1 i2 && conv p1 p2
     | VDisc _, _ | _, VDisc _ -> true
-    | VDisc u, VDisc v -> conv u v
-
+(*    | VDisc u, VDisc v -> conv u v *)
     | VBase u, VBase v -> conv u v
     | VHub u, VHub v -> conv u v
     | VAppFormula (VSpoke _, _), _ | _, VAppFormula (VSpoke _, _) -> true
     | VSpoke u, VSpoke v -> conv u v
-
     | VKan _, _ | _, VKan _ -> true
     | VIndDisc _, _ | _, VIndDisc _ -> true
-    | VIndDisc u, VIndDisc v -> conv u v
+(*  | VIndDisc u, VIndDisc v -> conv u v *)
     | _, _ -> false
 
 

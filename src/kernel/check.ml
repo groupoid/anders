@@ -7,6 +7,7 @@ open Term
 open Gen
 open Rbv
 
+
 (* Evaluator *)
 let rec eval ctx e0 = traceEval e0; match e0 with
   | EPre u               -> VPre u
@@ -147,7 +148,7 @@ and transport i p phi u0 = match p, phi, u0 with
       comp (fun k -> appFormula (act0 i k p) j) r k
         (VSystem (unionSystem (border (solve phi One) uj)
                  (unionSystem (border (solve j Zero) (swap i k v))
-                              (border (solve j One)  (swap i k w))))) uj)))
+                               (border (solve j One)  (swap i k w))))) uj)))
   | VApp (VApp (VGlue a, _), VSystem u), _, _ ->
     let u' = System.map eta (forall i u) in let psi' = getFormulaV u' in
 
@@ -250,6 +251,7 @@ and homcom t r i u u0 = match t, r, u, u0 with
     let a1 = homcom a (evalOr r phi) i (VSystem (unionSystem
       (System.map (fun (_, w, x) -> app (vfst w, x (dim i))) ts)
       (System.map (unglue phi (VSystem t)) u))) (unglue phi (VSystem t) u0) in
+
     glue phi (VSystem t1) a1
   (* hcomp (W (x : A), B x) r (λ (i : I), [(r = 1) → sup A B (a i 1=1) (f i 1=1)]) (sup A B (ouc a₀) (ouc f₀)) ~>
      sup A B (hcomp A r a (ouc a₀))
@@ -668,7 +670,9 @@ and check ctx (e0 : exp) (t0 : value) =
     let v0 = eval (upLocal ctx i VI vzero) e in
     let v1 = eval (upLocal ctx i VI vone) e in
     check ctx' e (appFormula p v); eqNf v0 u0; eqNf v1 u1
+
   | e, VPre u -> begin
+
     match infer ctx e with
     | VKan v | VPre v -> if ieq u v then () else raise (Internal (Ineq (EPre u, EPre v)))
     | t -> raise (Internal (Ineq (EPre u, rbV t)))

@@ -78,10 +78,10 @@ def ua-β (A B : U) (e : equiv A B) : Path (A → B) (trans A B ((ua A B) e)) e.
  := <i> λ (x : A), (idfun=idfun″ B @ -i) ((idfun=idfun″ B @ -i) ((idfun=idfun′ B @ -i) (e.1 x)))
 def ua'-IsEquiv (A B: U) := isEquiv (PathP (<_>U) A B) (equiv A B) (ua' A B)
 
-def fwd (A : U) (x : singl U A) : single A := (x.1, ua' A x.1 x.2)
+axiom contrEquiv (A B : U) (p : equiv A B) : Path (single A) (A,idEquiv A) (B,p)
 
-def contrEquiv (A B : U) (p : equiv A B) : Path (single A) (A,idEquiv A) (B,p)
- := cong (singl U A) (single A) (fwd A) (A,idp U A) (B,ua A B p) (contr U A B (ua A B p))
+
+
 
 
 

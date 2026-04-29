@@ -1,0 +1,26 @@
+module colimit where
+import library/foundations/mltt/nat
+import library/foundations/mltt/w
+import library/mathematics/homotopy/coequalizer
+import library/mathematics/homotopy/disc
+
+def Diagram (X : U) (D : X → U) : U := Σ (w : W X (λ _ → X)), Π (x : X), D x
+def W-Colim (A : U) (B : A → U) (D : W A B → U) (α : Π (a : A) (f : B a → W A B),  Π (x : B a), D (sup a f) → D (f x)) : U := ?
+def Colim (Shape : W A B) (D : Shape → U) (glue' : Π (a : A) (f : B a → Shape), (Π (x : B a), D (f x)) → D (sup a f)) : U
+ := W-ind A B (λ _ → U)
+       (λ a f rec, ?)
+       (λ a f rec, ?)
+       Shape
+
+def FreeColimStep (a : A) (f : B a → ColimPrev) (prev : ColimPrev) : U
+  := coeq (Σ (x : B a), prev (f x)) prev
+         (λ p, p.2)
+         (λ p, glue-map a f (p.1) (p.2))
+
+def HomotopyColim (A : U) (B : A → U) 
+                  (D : W A B → U)
+                  (action : Π a f, (Π x, D (f x)) → D (sup a f)) : U
+  := W-ind A B (λ w, U)
+       (λ a f rec, ?)
+       (λ a f rec coh, ?)
+       w

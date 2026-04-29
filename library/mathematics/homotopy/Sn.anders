@@ -1,7 +1,44 @@
 module Sn where
 import library/foundations/mltt/nat
+import library/foundations/univalent/extensionality
 import library/mathematics/homotopy/suspension
 option girard true
 
+-- 1) Formation Rule
 def sphere : ℕ → U := ℕ-iter U 𝟐 𝚺
+def Sn (n : ℕ) : U := sphere n
+
+-- 2) Introduction Rules
+def north_n (n : ℕ) : sphere (succ n) := 𝜎₁ (sphere n)
+def south_n (n : ℕ) : sphere (succ n) := 𝜎₂ (sphere n)
+def merid_n (n : ℕ) (x : sphere n) : Path (sphere (succ n)) (north_n n) (south_n n) := 𝜎₃ (sphere n) x
+
+-- 3) Dependent Elimination Rule
+def Sn-ind (n : ℕ) (P : sphere (succ n) → U)
+      (nNorth : P (north_n n))
+      (nSouth : P (south_n n))
+      (nMerid : Π (x : sphere n), PathP (<i> P (merid_n n x @ i)) nNorth nSouth)
+      (x : sphere (succ n)) : P x
+ := 𝚺-ind (sphere n) P nNorth nSouth nMerid x
+
+-- 4) Computational Rules
+def Sn-β₁ (n : ℕ) (P : sphere (succ n) → U)
+      (nNorth : P (north_n n))
+      (nSouth : P (south_n n))
+      (nMerid : Π (x : sphere n), PathP (<i> P (merid_n n x @ i)) nNorth nSouth)
+  : Path (P (north_n n)) (Sn-ind n P nNorth nSouth nMerid (north_n n)) nNorth
+ := 𝚺-β₁ (sphere n) P nNorth nSouth nMerid
+
+def Sn-β₂ (n : ℕ) (P : sphere (succ n) → U)
+      (nNorth : P (north_n n))
+      (nSouth : P (south_n n))
+      (nMerid : Π (x : sphere n), PathP (<i> P (merid_n n x @ i)) nNorth nSouth)
+  : Path (P (south_n n)) (Sn-ind n P nNorth nSouth nMerid (south_n n)) nSouth
+ := 𝚺-β₂ (sphere n) P nNorth nSouth nMerid
+
+-- 5) Uniqueness Rule
+def Sn-η (n : ℕ) (P : sphere (succ n) → U) (h : Π (z : sphere (succ n)), P z)
+  : Path (Π (z : sphere (succ n)), P z) h (Sn-ind n P (h (north_n n)) (h (south_n n)) (λ (x : sphere n), <i> h (merid_n n x @ i)))
+ := 𝚺-η (sphere n) P h
+
 

@@ -26,7 +26,7 @@ import library/mathematics/homotopy/coequalizer
 import library/mathematics/homotopy/constcubes
 import library/mathematics/homotopy/pullback
 import library/mathematics/homotopy/pushout
-import library/mathematics/homotopy/hubSpokes
+import library/mathematics/homotopy/hs
 import library/mathematics/homotopy/quotient
 import library/mathematics/homotopy/truncation
 import library/mathematics/homotopy/suspension

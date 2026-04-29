@@ -532,11 +532,13 @@ and conv v1 v2 : bool = traceConv v1 v2;
     | VPair (_, a, b), v | v, VPair (_, a, b) -> conv (vfst v) a && conv (vsnd v) b
     | VPi  (a, (p, f)), VPi  (b, (_, g))
     | VSig (a, (p, f)), VSig (b, (_, g))
-    | VLam (a, (p, f)), VLam (b, (_, g))
     | W    (a, (p, f)), W    (b, (_, g)) ->
       let x = Var (p, a) in conv a b && conv (f x) (g x)
+    | VLam (a, (p, f)), VLam (b, (_, g)) ->
+      conv a b && (conv a VEmpty || let x = Var (p, a) in conv (f x) (g x))
     | VLam (a, (p, f)), b | b, VLam (a, (p, f)) ->
-      let x = Var (p, a) in conv (app (b, x)) (f x)
+      conv a VEmpty || let x = Var (p, a) in conv (app (b, x)) (f x)
+
     | VPre u, VPre v -> ieq u v
     | VPLam f, VPLam g -> conv f g
     | VPLam f, v | v, VPLam f -> let (_, _, i) = freshDim () in conv (appFormula v i) (app (f, i))

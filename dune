@@ -25,8 +25,10 @@
                 library/mathematics/homotopy/constcubes.anders
                 library/mathematics/homotopy/pullback.anders
                 library/mathematics/homotopy/pushout.anders
-                library/mathematics/homotopy/hubSpokes.anders
+                library/mathematics/homotopy/axiohs.anders
+                library/mathematics/homotopy/hs.anders
                 library/mathematics/homotopy/quotient.anders
+                library/mathematics/homotopy/axiotruncation.anders
                 library/mathematics/homotopy/truncation.anders
                 library/mathematics/homotopy/suspension.anders
                 library/mathematics/homotopy/S1.anders

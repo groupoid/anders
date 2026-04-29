@@ -1,33 +1,42 @@
 name: opam
 
 on:
-  - pull_request
-  - push
+  pull_request:
+  push:
+    branches: [ main ]   # optional: limit push events
 
 jobs:
   build:
     strategy:
-      fail-fast: false
+      fail-fast: true
       matrix:
         os:
-          - ubuntu-22.04
+          - ubuntu-24.04          # ← Updated from 22.04
         ocaml-version:
-          - 4.14.0
+          - "5.6"                 # ← Strongly recommended bump
 
     runs-on: ${{ matrix.os }}
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4     # ← Updated from v2
 
       - name: Use OCaml ${{ matrix.ocaml-version }}
-        uses: avsm/setup-ocaml@v1
+        uses: ocaml/setup-ocaml@v3    # ← Updated action (official & maintained)
         with:
-          ocaml-version: ${{ matrix.ocaml-version }}
+          ocaml-compiler: ${{ matrix.ocaml-version }}
 
-      - run: opam depext anders --yes
-      - run: opam install . --deps-only
-      - run: opam exec -- dune build
-      - run: opam install .
-      - run: opam exec -- dune exec anders silent check library/book.anders
+      - name: Install system dependencies
+        run: opam depext anders --yes
 
+      - name: Install dependencies
+        run: opam install . --deps-only
+
+      - name: Build
+        run: opam exec -- dune build
+
+      - name: Install package
+        run: opam install .
+
+      - name: Run tests / checks
+        run: opam exec -- dune exec anders silent check library/book.anders

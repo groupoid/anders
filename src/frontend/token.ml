@@ -32,3 +32,9 @@ let tokenToString : token -> string = function
   | PLUGIN     -> "PLUGIN"      | IM         -> "IM"
   | INF        -> "INF"         | INDIM      -> "INDIM"
   | JOIN       -> "JOIN"
+  | COEQU      -> "COEQU"       | IOTA2      -> "IOTA2"
+  | RESP       -> "RESP"        | INDCOEQU   -> "INDCOEQU"
+  | DISC       -> "DISC"        | BASE       -> "BASE"
+  | HUB        -> "HUB"         | SPOKE      -> "SPOKE"
+  | INDDISC    -> "INDDISC"
+

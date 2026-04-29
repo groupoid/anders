@@ -90,6 +90,12 @@ struct
     | EIota2 (a, b, f, g, c) -> W.put '\x55'; exp5 a b f g c
     | EResp (a, b, f, g, c) -> W.put '\x56'; exp5 a b f g c
     | EIndCoequ (a, b, f, g, x, i, rho) -> W.put '\x57'; exp7 a b f g x i rho
+    | EDisc e -> W.put '\x58'; exp e
+    | EBase e -> W.put '\x59'; exp e
+    | EHub e -> W.put '\x5A'; exp e
+    | ESpoke e -> W.put '\x5B'; exp e
+    | EIndDisc e -> W.put '\x5C'; exp e
+
 
   and exp2 a b = exp a; exp b
   and exp3 a b c = exp a; exp b; exp c

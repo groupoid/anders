@@ -54,6 +54,9 @@ let extPathP = function
   | VApp (VApp (VPathP v, u0), u1) -> (v, u0, u1)
   | v                              -> raise (Internal (ExpectedPath (rbV v)))
 
+
+
+
 let extGlue = function
   | VApp (VApp (VGlue t, r), u) -> (t, r, u)
   | v -> raise (Internal (ExpectedGlue (rbV v)))
@@ -167,7 +170,13 @@ let rec salt (ns : ident Env.t) : exp -> exp = function
   | EIota2 (a, b, f, g, c) -> EIota2 (salt ns a, salt ns b, salt ns f, salt ns g, salt ns c)
   | EResp (a, b, f, g, c) -> EResp (salt ns a, salt ns b, salt ns f, salt ns g, salt ns c)
   | EIndCoequ (a, b, f, g, x, i, rho) -> EIndCoequ (salt ns a, salt ns b, salt ns f, salt ns g, salt ns x, salt ns i, salt ns rho)
+  | EDisc e -> EDisc (salt ns e)
+  | EBase e -> EBase (salt ns e)
+  | EHub e -> EHub (salt ns e)
+  | ESpoke e -> ESpoke (salt ns e)
+  | EIndDisc e -> EIndDisc (salt ns e)
   | EJoin e              -> EJoin (salt ns e)
+
 
 and saltTele ctor ns p a b =
   let x = fresh p in ctor x (salt ns a) (salt (Env.add p x ns) b)
@@ -229,7 +238,13 @@ let rec swap i j = function
   | VIota2 (a, b, f, g, c) -> VIota2 (swap i j a, swap i j b, swap i j f, swap i j g, swap i j c)
   | VResp (a, b, f, g, c) -> VResp (swap i j a, swap i j b, swap i j f, swap i j g, swap i j c)
   | VIndCoequ (a, b, f, g, x, k, rho) -> VIndCoequ (swap i j a, swap i j b, swap i j f, swap i j g, swap i j x, swap i j k, swap i j rho)
+  | VDisc v              -> VDisc (swap i j v)
+  | VBase v              -> VBase (swap i j v)
+  | VHub v               -> VHub (swap i j v)
+  | VSpoke v             -> VSpoke (swap i j v)
+  | VIndDisc v           -> VIndDisc (swap i j v)
   | VJoin v              -> VJoin (swap i j v)
+
 
 and swapVar i j k = if i = k then j else k
 
@@ -242,7 +257,9 @@ let rec mem y = function
   | VStar | VBool | VFalse | VTrue | VDir _ -> false
   | VPLam a | VFst a | VSnd a | VPathP a | VId a | VRef a
   | VJ a | VNeg a | VOuc a | VGlue a | VIndEmpty a
-  | VIndUnit a | VIndBool a | VIm a | VInf a | VJoin a -> mem y a
+  | VIndUnit a | VIndBool a | VIm a | VInf a | VJoin a
+  | VDisc a | VBase a | VHub a | VSpoke a | VIndDisc a -> mem y a
+
   | VApp (a, b) | VPartialP (a, b) | VAppFormula (a, b)
   | VTransp (a, b) | VAnd (a, b) | VOr (a, b) | VInc (a, b)
   | VSup (a, b) | VIndIm (a, b) | VPair (_, a, b) -> mem y a || mem y b

@@ -7,60 +7,35 @@ import library/mathematics/homotopy/hs
 {- Generic ℕ-indexed Truncations -}
 
 def trunc (A : U) (n : ℕ) : U := hs (sphere n) A
-
-def trunc₁ (A : U) (n : ℕ) (x : A) : trunc A n
- := center (sphere n) A x
-
-def trunc₂ (A : U) (n : ℕ) (f : sphere n → W_hs (sphere n) A) : trunc A n
- := hub (sphere n) A f
-
-def trunc₃ (A : U) (n : ℕ) (f : sphere n → W_hs (sphere n) A) (s : sphere n)
-  : Path (trunc A n) (trunc₂ A n f) (ι₂ (Rel_hs (sphere n) A) (W_hs (sphere n) A) (Rel_lhs (sphere n) A) (Rel_rhs (sphere n) A) (f s))
- := spoke (sphere n) A f s
-
-{- Truncation Instances for ₋₁,₀,₁ truncation levels -}
+def trunc₁ (A : U) (n : ℕ) (x : A) := hs-center (sphere n) A x
+def trunc₂ (A : U) (n : ℕ) (f : sphere n → hs (sphere n) A) := hs-hub (sphere n) A f
+def trunc₃ (A : U) (n : ℕ) (f : sphere n → hs (sphere n) A) (s : sphere n) := hs-spoke (sphere n) A f s
 
 def ‖_‖₋₁ (A : U) : U := trunc A zero
 def ‖_‖₀ (A : U) : U := trunc A one
 def ‖_‖₁ (A : U) : U := trunc A two
 def ‖_‖ (A : U) : ℕ → U := trunc A
 
-def isSurjective (A B : U) (f : A → B) : U := summa (b : B), ‖_‖₋₁ (fiber A B f b)
-def surjective (A B: U): U := summa (f: A -> B), isSurjective A B f
+def isSurjective (A B : U) (f : A → B) : U := Σ (b : B), ‖_‖₋₁ (fiber A B f b)
+def surjective (A B: U): U := Σ (f: A -> B), isSurjective A B f
 
--- 3) Dependent Elimination Rule
 def trunc-ind (A : U) (n : ℕ) (P : trunc A n → U)
       (nCenter : Π (a : A), P (trunc₁ A n a))
-      (nHub : Π (f : sphere n → W_hs (sphere n) A) (nF : Π (s : sphere n), P (ι₂ (Rel_hs (sphere n) A) (W_hs (sphere n) A) (Rel_lhs (sphere n) A) (Rel_rhs (sphere n) A) (f s))), P (trunc₂ A n f))
-      (nSpoke : Π (f : sphere n → W_hs (sphere n) A) (nF : Π (s : sphere n), P (ι₂ (Rel_hs (sphere n) A) (W_hs (sphere n) A) (Rel_lhs (sphere n) A) (Rel_rhs (sphere n) A) (f s))) (s : sphere n), 
-                 PathP (<i> P (trunc₃ A n f s @ i)) (nHub f nF) (nF s))
-      (x : trunc A n) : P x
- := hs-ind (sphere n) A P nCenter nHub nSpoke x
+      (nHub : Π (f : sphere n → hs (sphere n) A) (nF : Π (s : sphere n), P (f s)), P (trunc₂ A n f))
+      (nSpoke : Π (f : sphere n → hs (sphere n) A) (nF : Π (s : sphere n), P (f s)) (s : sphere n), PathP (<i> P (trunc₃ A n f s @ i)) (nHub f nF) (nF s))
+      (x : trunc A n) := hs-ind (sphere n) A P nCenter nHub nSpoke x
 
--- 4) Computational Rules
 def trunc-β₁ (A : U) (n : ℕ) (P : trunc A n → U)
       (nCenter : Π (a : A), P (trunc₁ A n a))
-      (nHub : Π (f : sphere n → W_hs (sphere n) A) (nF : Π (s : sphere n), P (ι₂ (Rel_hs (sphere n) A) (W_hs (sphere n) A) (Rel_lhs (sphere n) A) (Rel_rhs (sphere n) A) (f s))), P (trunc₂ A n f))
-      (nSpoke : Π (f : sphere n → W_hs (sphere n) A) (nF : Π (s : sphere n), P (ι₂ (Rel_hs (sphere n) A) (W_hs (sphere n) A) (Rel_lhs (sphere n) A) (Rel_rhs (sphere n) A) (f s))) (s : sphere n), 
-                 PathP (<i> P (trunc₃ A n f s @ i)) (nHub f nF) (nF s)) (a : A)
-  : Path (P (trunc₁ A n a)) (trunc-ind A n P nCenter nHub nSpoke (trunc₁ A n a)) (nCenter a)
- := hs-β₁ (sphere n) A P nCenter nHub nSpoke a
+      (nHub : Π (f : sphere n → hs (sphere n) A) (nF : Π (s : sphere n), P (f s)), P (trunc₂ A n f))
+      (nSpoke : Π (f : sphere n → hs (sphere n) A) (nF : Π (s : sphere n), P (f s)) (s : sphere n), PathP (<i> P (trunc₃ A n f s @ i)) (nHub f nF) (nF s)) (a : A)
+    := idp (P (trunc₁ A n a)) (nCenter a)
 
 def trunc-β₂ (A : U) (n : ℕ) (P : trunc A n → U)
       (nCenter : Π (a : A), P (trunc₁ A n a))
-      (nHub : Π (f : sphere n → W_hs (sphere n) A) (nF : Π (s : sphere n), P (ι₂ (Rel_hs (sphere n) A) (W_hs (sphere n) A) (Rel_lhs (sphere n) A) (Rel_rhs (sphere n) A) (f s))), P (trunc₂ A n f))
-      (nSpoke : Π (f : sphere n → W_hs (sphere n) A) (nF : Π (s : sphere n), P (ι₂ (Rel_hs (sphere n) A) (W_hs (sphere n) A) (Rel_lhs (sphere n) A) (Rel_rhs (sphere n) A) (f s))) (s : sphere n), 
-                 PathP (<i> P (trunc₃ A n f s @ i)) (nHub f nF) (nF s)) (f : sphere n → W_hs (sphere n) A)
-  : Path (P (trunc₂ A n f)) (trunc-ind A n P nCenter nHub nSpoke (trunc₂ A n f)) (nHub f (λ (s : sphere n), trunc-ind A n P nCenter nHub nSpoke (ι₂ (Rel_hs (sphere n) A) (W_hs (sphere n) A) (Rel_lhs (sphere n) A) (Rel_rhs (sphere n) A) (f s))))
- := hs-β₂ (sphere n) A P nCenter nHub nSpoke f
+      (nHub : Π (f : sphere n → hs (sphere n) A) (nF : Π (s : sphere n), P (f s)), P (trunc₂ A n f))
+      (nSpoke : Π (f : sphere n → hs (sphere n) A) (nF : Π (s : sphere n), P (f s)) (s : sphere n), PathP (<i> P (trunc₃ A n f s @ i)) (nHub f nF) (nF s)) (f : sphere n → hs (sphere n) A)
+    := idp (P (trunc₂ A n f)) (nHub f (λ (s : sphere n), trunc-ind A n P nCenter nHub nSpoke (f s)))
 
-
--- 5) Uniqueness Rule
 def trunc-η (A : U) (n : ℕ) (P : trunc A n → U) (h : Π (z : trunc A n), P z)
-  : Path (Π (z : trunc A n), P z) h
-         (λ (z : trunc A n), coequ-ind (Rel_hs (sphere n) A) (W_hs (sphere n) A) (Rel_lhs (sphere n) A) (Rel_rhs (sphere n) A) P
-                                       (λ (w : W_hs (sphere n) A), h (ι₂ (Rel_hs (sphere n) A) (W_hs (sphere n) A) (Rel_lhs (sphere n) A) (Rel_rhs (sphere n) A) w))
-                                       (λ (r : Rel_hs (sphere n) A), <i> h (spoke (sphere n) A r.1 r.2 @ i)) z)
- := hs-η (sphere n) A P h
-
-
+  := idp (Π (z : trunc A n), P z) h

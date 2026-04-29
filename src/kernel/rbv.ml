@@ -50,6 +50,12 @@ let rec rbV v = (*traceRbV v;*) match v with
   | VIota2 (a, b, f, g, c) -> EIota2 (rbV a, rbV b, rbV f, rbV g, rbV c)
   | VResp (a, b, f, g, c) -> EResp (rbV a, rbV b, rbV f, rbV g, rbV c)
   | VIndCoequ (a, b, f, g, x, i, rho) -> EIndCoequ (rbV a, rbV b, rbV f, rbV g, rbV x, rbV i, rbV rho)
+  | VDisc e -> EDisc (rbV e)
+  | VBase e -> EBase (rbV e)
+  | VHub e -> EHub (rbV e)
+  | VSpoke e -> ESpoke (rbV e)
+  | VIndDisc e -> EIndDisc (rbV e)
+
   | VIndW (a, b, c)      -> EIndW (rbV a, rbV b, rbV c)
   | VIm t                -> EIm (rbV t)
   | VInf v               -> EInf (rbV v)

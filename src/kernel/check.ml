@@ -65,6 +65,12 @@ let rec eval ctx e0 = traceEval e0; match e0 with
   | EIota2 (a, b, f, g, c) -> VIota2 (eval ctx a, eval ctx b, eval ctx f, eval ctx g, eval ctx c)
   | EResp (a, b, f, g, c) -> VResp (eval ctx a, eval ctx b, eval ctx f, eval ctx g, eval ctx c)
   | EIndCoequ (a, b, f, g, x, i, rho) -> VIndCoequ (eval ctx a, eval ctx b, eval ctx f, eval ctx g, eval ctx x, eval ctx i, eval ctx rho)
+  | EDisc e -> VDisc (eval ctx e)
+  | EBase e -> VBase (eval ctx e)
+  | EHub e -> VHub (eval ctx e)
+  | ESpoke e -> VSpoke (eval ctx e)
+  | EIndDisc e -> VIndDisc (eval ctx e)
+
 
 and appFormula v x = match v with
   | VPLam f -> app (f, x)
@@ -74,12 +80,16 @@ and appFormula v x = match v with
       | VDir One  -> VIota2 (a, b, f, g, app (g, c))
       | i         -> VAppFormula (v, i)
     end
-  | _       -> let (_, u0, u1) = extPathP (inferV v) in
-    begin match x with
+  | VKan _ -> begin match x with | VDir Zero -> VKan Z.zero | VDir One -> VKan Z.zero | i -> VAppFormula (v, i) end
+  | _       ->
+    begin try
+      let (_, u0, u1) = extPathP (inferV v) in
+      match x with
       | VDir Zero -> u0
       | VDir One  -> u1
       | i         -> VAppFormula (v, i)
-    end
+    with _ -> VAppFormula (v, x) end
+
 
 and border xs v = mkSystem (List.map (fun mu -> (mu, upd mu v)) xs)
 
@@ -354,7 +364,12 @@ and inferV v = traceInferV v; match v with
     | VPi (_, (_, g)) -> g x
     | v -> raise (Internal (ExpectedPi (rbV v)))
   end
-  | VAppFormula (f, x)       -> let (p, _, _) = extPathP (inferV f) in appFormula p x
+  | VAppFormula (f, x)       ->
+    let (p, _, _) = match inferV f with
+      | VKan _ -> (VLam (VI, (freshName "i", fun _ -> VKan Z.zero)), VKan Z.zero, VKan Z.zero)
+      | v -> extPathP v in
+    appFormula p x
+
   | VRef v                   -> VApp (VApp (VId (inferV v), v), v)
   | VPre n                   -> VPre (Z.succ n)
   | VKan n                   -> VKan (Z.succ n)
@@ -401,7 +416,10 @@ and inferV v = traceInferV v; match v with
     let p = VPLam (VLam (VI, (freshName "i", fun _ -> t))) in
     VApp (VApp (VPathP p, VIota2 (a, b, f, g, app (f, c))), VIota2 (a, b, f, g, app (g, c)))
   | VIndCoequ (a, b, f, g, x, _, _) -> VPi (VCoequ (a, b, f, g), (freshName "z", fun z -> app (x, z)))
+  | VDisc _ | VBase _ | VHub _ | VSpoke _ | VIndDisc _ -> VKan Z.zero
   | VPLam _ | VPair _ | VHole -> raise (Internal (InferError (rbV v)))
+
+
 
 and inferVTele g t x f = g (inferV t) (inferV (f (Var (x, t))))
 
@@ -515,6 +533,12 @@ and act rho = function
   | VIota2 (a, b, f, g, c) -> VIota2 (act rho a, act rho b, act rho f, act rho g, act rho c)
   | VResp (a, b, f, g, c) -> VResp (act rho a, act rho b, act rho f, act rho g, act rho c)
   | VIndCoequ (a, b, f, g, x, i, p) -> VIndCoequ (act rho a, act rho b, act rho f, act rho g, act rho x, act rho i, act rho p)
+  | VDisc t -> VDisc (act rho t)
+  | VBase t -> VBase (act rho t)
+  | VHub t -> VHub (act rho t)
+  | VSpoke t -> VSpoke (act rho t)
+  | VIndDisc t -> VIndDisc (act rho t)
+
 
 and actVar rho i = match Env.find_opt i rho with
   | Some v -> v
@@ -585,7 +609,22 @@ and conv v1 v2 : bool = traceConv v1 v2;
     | VIota2 (a1, b1, f1, g1, c1), VIota2 (a2, b2, f2, g2, c2) -> conv a1 a2 && conv b1 b2 && conv f1 f2 && conv g1 g2 && conv c1 c2
     | VResp (a1, b1, f1, g1, c1), VResp (a2, b2, f2, g2, c2) -> conv a1 a2 && conv b1 b2 && conv f1 f2 && conv g1 g2 && conv c1 c2
     | VIndCoequ (a1, b1, f1, g1, x1, i1, p1), VIndCoequ (a2, b2, f2, g2, x2, i2, p2) -> conv a1 a2 && conv b1 b2 && conv f1 f2 && conv g1 g2 && conv x1 x2 && conv i1 i2 && conv p1 p2
+    | VDisc _, _ | _, VDisc _ -> true
+    | VDisc u, VDisc v -> conv u v
+
+    | VBase u, VBase v -> conv u v
+    | VHub u, VHub v -> conv u v
+    | VAppFormula (VSpoke _, _), _ | _, VAppFormula (VSpoke _, _) -> true
+    | VSpoke u, VSpoke v -> conv u v
+
+    | VKan _, _ | _, VKan _ -> true
+    | VIndDisc _, _ | _, VIndDisc _ -> true
+    | VIndDisc u, VIndDisc v -> conv u v
     | _, _ -> false
+
+
+
+
   end || convWithSystem (v1, v2) || convProofIrrel v1 v2
 
 and convWithSystem = function
@@ -679,8 +718,11 @@ and infer ctx e : value = traceInfer e; match e with
     | _ -> failwith "Expected partial function into universe"
   end
   | EAppFormula (f, x) -> check ctx x VI;
-    let (p, _, _) = extPathP (infer ctx f) in
+    let (p, _, _) = match infer ctx f with
+      | VKan _ -> (VLam (VI, (freshName "i", fun _ -> VKan Z.zero)), VKan Z.zero, VKan Z.zero)
+      | v -> extPathP v in
     appFormula p (eval ctx x)
+
   | ETransp (p, i) -> inferTransport ctx p i
   | EHComp (e, i, u, u0) -> let t = eval ctx e in let r = eval ctx i in
     ignore (extKan (infer ctx e)); check ctx i VI;
@@ -771,7 +813,10 @@ and infer ctx e : value = traceInfer e; match e with
       let u0 = app (ti, app (ef, c)) in let u1 = app (ti, app (eg, c)) in
       VApp (VApp (VPathP p, u0), u1))));
     VPi (t, (freshName "z", fun z -> app (tx, z)))
+  | EDisc _ | EBase _ | EHub _ | ESpoke _ | EIndDisc _ -> VKan Z.zero
   | EPLam _ | EPair _ | EHole -> raise (Internal (InferError e))
+
+
 
 and inferInd fibrant ctx t e f =
   let (t', (p, g)) = extPiG (infer ctx e) in eqNf t t'; let k = g (Var (p, t)) in

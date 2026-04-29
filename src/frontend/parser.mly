@@ -60,7 +60,10 @@
 %token INDEMPTY INDUNIT INDBOOL
 %token W INDW SUP
 %token IM INF INDIM JOIN
-%token COEQU IOTA2 RESP INDCOEQU
+%token COEQU IOTA2 RESP INDCOEQU DISC BASE HUB SPOKE INDDISC
+
+
+
 
 %left APPFORMULA
 %left OR
@@ -134,7 +137,15 @@ exp4 :
   | IOTA2 exp6 exp6 exp6 exp6 exp6 { EIota2 ($2, $3, $4, $5, $6) }
   | RESP exp6 exp6 exp6 exp6 exp6 { EResp ($2, $3, $4, $5, $6) }
   | INDCOEQU exp6 exp6 exp6 exp6 exp6 exp6 exp6 { EIndCoequ ($2, $3, $4, $5, $6, $7, $8) }
+  | DISC exp6 { EDisc $2 }
+  | BASE exp6 { EBase $2 }
+  | HUB exp6 { EHub $2 }
+  | SPOKE exp6 { ESpoke $2 }
+  | INDDISC exp6 { EIndDisc $2 }
   | exp5 { $1 }
+
+
+
 
 exp5:
   | exp6 LSQ exp2 MAP exp2 RSQ { ESub ($1, $3, $5) }

@@ -5,8 +5,9 @@ import library/foundations/mltt/bool
 -- [Shulman] 2015
 
 def S¹ : U := coequ 𝟏 𝟏 (id 𝟏) (id 𝟏)
-def base : S¹ := ι₂ 𝟏 𝟏 (id 𝟏) (id 𝟏) ★
-def loop : Path S¹ base base := resp 𝟏 𝟏 (id 𝟏) (id 𝟏) ★
+def baseS1 : S¹ := ι₂ 𝟏 𝟏 (id 𝟏) (id 𝟏) ★
+def loop : Path S¹ baseS1 baseS1 := resp 𝟏 𝟏 (id 𝟏) (id 𝟏) ★
+
 
 -- [Sokhatsky] 2022
 

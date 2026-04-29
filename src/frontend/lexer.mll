@@ -96,7 +96,13 @@ rule main = parse
   | "W"          -> W        | "sup"             -> SUP
   | "coequ"      -> COEQU    | "\xCE\xB9\xE2\x82\x82" -> IOTA2
   | "resp"       -> RESP     | "coequ-ind"       -> INDCOEQU
+  | "disc"       -> DISC     | "base"            -> BASE
+  | "hub"        -> HUB      | "spoke"           -> SPOKE
+  | "disc-ind"   -> INDDISC
   | "definition"             | "def"
+
+
+
   | "theorem"                | "lemma"
   | "corollary"              | "proposition"     -> DEF
   | "axiom"                  | "postulate"       -> AXIOM

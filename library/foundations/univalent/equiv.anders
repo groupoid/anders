@@ -29,7 +29,8 @@ def isEquiv (A B : U) (f : A → B) : U := Π (y : B), isContr (fiber A B f y)
 def equiv (A B : U) : U := Σ (f : A → B), isEquiv A B f
 def contrSingl (A : U) (a b : A) (p : PathP (<_>A) a b) : PathP (<_>Σ (x : A), PathP (<_>A) a x) (a,<_>a) (b,p) := <i> (p @ i, <j> p @ i /\ j)
 def idIsEquiv (A : U) : isEquiv A A (id A) := λ (a : A), ((a, <_> a), λ (z : fiber A A (id A) a), contrSingl A a z.1 z.2)
-def idEquiv (A : U) : equiv A A := (id A, isContrSingl A)
+def idEquiv (A : U) : equiv A A := (id A, idIsEquiv A)
+
 def isInjective (A B : U) (f : A → B) : U := Π (x y : A), Path B (f x) (f y) → Path A x y
 def isInjective' (A B : U) (f : A → B) : U := Π (b : B), isProp (fiber A B f b)
 def injective (A B : U) : U := Σ (f : A → B), isInjective A B f
@@ -68,6 +69,27 @@ def hcomp-Glue' (A : U) (φ : I)
 --- def Glue-computation
 --- def Glue-uniqueness
 
+--- [Pitts] 2016
+
+def single (A : U) : U := Σ (B: U), equiv A B
+def ua  (A B : U) : equiv A B -> PathP (<_> U) A B := \ (p: equiv A B), univ-intro A B p
+def ua' (A B : U) : PathP (<_> U) A B -> equiv A B := \ (p: PathP (<_>U) A B), univ-elim A B p
+def ua-β (A B : U) (e : equiv A B) : Path (A → B) (trans A B ((ua A B) e)) e.1
+ := <i> λ (x : A), (idfun=idfun″ B @ -i) ((idfun=idfun″ B @ -i) ((idfun=idfun′ B @ -i) (e.1 x)))
+def ua'-IsEquiv (A B: U) := isEquiv (PathP (<_>U) A B) (equiv A B) (ua' A B)
+
+def fwd (A : U) (x : singl U A) : single A := (x.1, ua' A x.1 x.2)
+
+def contrEquiv (A B : U) (p : equiv A B) : Path (single A) (A,idEquiv A) (B,p)
+ := cong (singl U A) (single A) (fwd A) (A,idp U A) (B,ua A B p) (contr U A B (ua A B p))
+
+
+
+
+
+
+
+
 --- Equiv as [Right] Identity System [Escardó] 2014
 
 --- def singl (A: U) (a: A): U := Σ (x: A), Path A a x
@@ -75,10 +97,7 @@ def hcomp-Glue' (A : U) (φ : I)
 --- def contr (A : U) (a b : A) (p : Path A a b) : Path (singl A a) (eta A a) (b, p) := <i> (p @ i, <j> p @ i /\ j)
 --- def isContrSingl (A : U) (a : A) : isContr (singl A a) := ((a,idp A a),(\ (z:singl A a), contr A a z.1 z.2))
 
-def single (A : U) : U := Σ (B: U), equiv A B
 def single2 (A : U) : U := Σ (B: U), equiv B A
-axiom contrEquiv (A B : U) (p : equiv A B) : Path (single A) (A,idEquiv A) (B,p)
-
 
 def EquivIsContr (A: U) : isContr (single A) := ((A, idEquiv A), \(z:single A), (contrEquiv A z.1 z.2))
 def isContr→isProp (A: U) (w: isContr A) (a b : A) : Path A a b
@@ -88,13 +107,6 @@ def contrSinglEquiv (A B : U) (p : equiv A B) : Path (single A) (A,idEquiv A) (B
 def J-equiv (A B: U) (P: Π (A B: U), equiv A B → U) (r: P A A (idEquiv A)) : Π (e: equiv A B), P A B e
  := λ (e: equiv A B), subst (single A) (\ (z: single A), P A z.1 z.2) (A,idEquiv A) (B,e) (contrSinglEquiv A B e) r
 
---- [Pitts] 2016
-
-def ua  (A B : U) : equiv A B -> PathP (<_> U) A B := \ (p: equiv A B), univ-intro A B p
-def ua' (A B : U) : PathP (<_> U) A B -> equiv A B := \ (p: PathP (<_>U) A B), univ-elim A B p
-def ua-β (A B : U) (e : equiv A B) : Path (A → B) (trans A B ((ua A B) e)) e.1
- := <i> λ (x : A), (idfun=idfun″ B @ -i) ((idfun=idfun″ B @ -i) ((idfun=idfun′ B @ -i) (e.1 x)))
-def ua'-IsEquiv (A B: U) := isEquiv (PathP (<_>U) A B) (equiv A B) (ua' A B)
 
 --- The Half-adjoint equivalence from Homotopy Theory
 --- as if f anf g are adjoint functors.

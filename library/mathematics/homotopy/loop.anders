@@ -4,7 +4,7 @@
    HoTT 8.1 0-Truncations Loop Space of Circle
    HoTT 8.4 Fiber Sequence and long exact sequence
 
-   Copyright (c) Groupoid Infinity, 2014-2025. -}
+   Copyright (c) Groupoid Infinity, 2014-2026. -}
 
 module loop where
 import library/foundations/univalent/path

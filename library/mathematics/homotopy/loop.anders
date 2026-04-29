@@ -13,11 +13,16 @@ def Ω (A : U) (a₀ : A) : U := Path A a₀ a₀
 
 def Ω-refl (A : U) (a₀ : A) : Ω A a₀ := idp A a₀
 
-def Ω-ind (A : U) (a₀ : A) (P : Π (γ : Ω A a₀), U) (base : P (Ω-refl A a₀)) (γ : Ω A a₀) : P γ := ?
+def Ω-ind (A : U) (a₀ : A) (P : Π (x : A) (γ : Path A a₀ x), U) (base : P a₀ (Ω-refl A a₀)) (x : A) (γ : Path A a₀ x) : P x γ :=
+  subst (singl A a₀) (λ (z : singl A a₀), P z.1 z.2) (eta A a₀) (x, γ) (contr A a₀ x γ) base
 
-def Ω-comp (A : U) (a₀ : A) (P : Π (γ : Ω A a₀), U) (base : P (Ω-refl A a₀))
-  : PathP (<_> P (Ω-refl A a₀)) (Ω-ind A a₀ P base (Ω-refl A a₀)) base := ?
+def Ω-comp (A : U) (a₀ : A) (P : Π (x : A) (γ : Path A a₀ x), U) (base : P a₀ (Ω-refl A a₀))
+  : PathP (<_> P a₀ (Ω-refl A a₀)) (Ω-ind A a₀ P base a₀ (Ω-refl A a₀)) base :=
+  <i> subst-comp (singl A a₀) (λ (z : singl A a₀), P z.1 z.2) (eta A a₀) base @ -i
 
-def Ω-uniq (A : U) (a₀ : A) (P : Π (γ : Ω A a₀), U) (f : Π (γ : Ω A a₀), P γ)
-    (h-comp :  Π (γ : Ω A a₀), PathP (<_> P (Ω-refl A a₀)) (f (Ω-refl A a₀)) (Ω-ind A a₀ P (f (Ω-refl A a₀)) (Ω-refl A a₀)))
-  : PathP (<_> Π (γ : Ω A a₀), P γ) f (Ω-ind A a₀ P (f (Ω-refl A a₀))) := ?
+def Ω-uniq (A : U) (a₀ : A) (P : Π (x : A) (γ : Path A a₀ x), U) (f : Π (x : A) (γ : Path A a₀ x), P x γ)
+    (h-comp : PathP (<_> P a₀ (Ω-refl A a₀)) (f a₀ (Ω-refl A a₀)) (Ω-ind A a₀ P (f a₀ (Ω-refl A a₀)) a₀ (Ω-refl A a₀)))
+  : PathP (<_> Π (x : A) (γ : Path A a₀ x), P x γ) f (Ω-ind A a₀ P (f a₀ (Ω-refl A a₀)))
+ := <i> λ (x : A) (γ : Path A a₀ x), subst (singl A a₀)
+          (λ (z : singl A a₀), PathP (<_> P z.1 z.2) (f z.1 z.2) (Ω-ind A a₀ P (f a₀ (Ω-refl A a₀)) z.1 z.2))
+          (eta A a₀) (x, γ) (contr A a₀ x γ) h-comp @ i

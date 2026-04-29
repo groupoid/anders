@@ -12,7 +12,7 @@ import library/mathematics/homotopy/coequalizer
 def W_hs_B (S A : U) : U := + A 𝟏 -- Points container: B = A + 1
 def W_hs_C (S A : U) : W_hs_B S A → U := +-rec A 𝟏 U (λ (_ : A), 𝟎) (λ (_ : 𝟏), S) -- Subtrees: C (inl a) = 0, C (inr *) = S
 def W_hs (S A : U) : U := W (x : W_hs_B S A), W_hs_C S A x -- Raw constructors via W-types
-def W_center (S A : U) (a : A) : W_hs S a := sup (+ A 𝟏) (W_hs_C S A) (inl A 𝟏 a) (λ (z : 𝟎), ind₀ (W_hs S A) z)
+def W_center (S A : U) (a : A) : W_hs S A := sup (+ A 𝟏) (W_hs_C S A) (inl A 𝟏 a) (λ (z : 𝟎), ind₀ (W_hs S A) z)
 def W_hub (S A : U) (f : S → W_hs S A) : W_hs S A := sup (+ A 𝟏) (W_hs_C S A) (inr A 𝟏 ★) f
 
 def Rel_hs (S A : U) : U := Σ (f : S → W_hs S A), S
@@ -20,24 +20,24 @@ def Rel_lhs (S A : U) (r : Rel_hs S A) : W_hs S A := W_hub S A r.1
 def Rel_rhs (S A : U) (r : Rel_hs S A) : W_hs S A := r.1 r.2
 
 -- 1) Formation Rule
-def hs (S A : U) : U
+def hs' (S A : U) : U
  := coequ (Rel_hs S A) (W_hs S A) (Rel_lhs S A) (Rel_rhs S A)
 
 -- 2) Introduction Rules
-def center (S A : U) (a : A) : hs S A
+def center (S A : U) (a : A) : hs' S A
  := ι₂ (Rel_hs S A) (W_hs S A) (Rel_lhs S A) (Rel_rhs S A) (W_center S A a)
 
-def hub (S A : U) (f : S → W_hs S A) : hs S A
+def hub' (S A : U) (f : S → W_hs S A) : hs' S A
  := ι₂ (Rel_hs S A) (W_hs S A) (Rel_lhs S A) (Rel_rhs S A) (W_hub S A f)
 
-def spoke (S A : U) (f : S → W_hs S A) (s : S)
-  : Path (hs S A) (hub S A f) (ι₂ (Rel_hs S A) (W_hs S A) (Rel_lhs S A) (Rel_rhs S A) (f s))
+def spoke' (S A : U) (f : S → W_hs S A) (s : S)
+  : Path (hs S A) (hub' S A f) (ι₂ (Rel_hs S A) (W_hs S A) (Rel_lhs S A) (Rel_rhs S A) (f s))
  := resp (Rel_hs S A) (W_hs S A) (Rel_lhs S A) (Rel_rhs S A) (f, s)
 
 -- The algebra map for the W-type induction
-def hs-algebra-map (S A : U) (X : hs S A → U)
+def hs-algebra-map (S A : U) (X : hs' S A → U)
       (nCenter : Π (a : A), X (center S A a))
-      (nHub : Π (f : S → W_hs S A) (nF : Π (s : S), X (ι₂ (Rel_hs S A) (W_hs S A) (Rel_lhs S A) (Rel_rhs S A) (f s))), X (hub S A f))
+      (nHub : Π (f : S → W_hs S A) (nF : Π (s : S), X (ι₂ (Rel_hs S A) (W_hs S A) (Rel_lhs S A) (Rel_rhs S A) (f s))), X (hub' S A f))
     : Π (w : W_hs S A), X (ι₂ (Rel_hs S A) (W_hs S A) (Rel_lhs S A) (Rel_rhs S A) w)
  := W-ind (+ A 𝟏) (W_hs_C S A) (λ (w : W_hs S A), X (ι₂ (Rel_hs S A) (W_hs S A) (Rel_lhs S A) (Rel_rhs S A) w))
       (+-ind A 𝟏 (λ (b : + A 𝟏), Π (f : W_hs_C S A b → W_hs S A), (Π (c : W_hs_C S A b), X (ι₂ (Rel_hs S A) (W_hs S A) (Rel_lhs S A) (Rel_rhs S A) (f c))) → X (ι₂ (Rel_hs S A) (W_hs S A) (Rel_lhs S A) (Rel_rhs S A) (sup (+ A 𝟏) (W_hs_C S A) b f)))
@@ -45,37 +45,37 @@ def hs-algebra-map (S A : U) (X : hs S A → U)
         (λ (b : 𝟏) (f : S → W_hs S A) (nF : Π (c : S), X (ι₂ (Rel_hs S A) (W_hs S A) (Rel_lhs S A) (Rel_rhs S A) (f c))), nHub f nF))
 
 -- 3) Dependent Elimination Rule
-def hs-ind (S A : U) (X : hs S A → U)
+def hs-ind' (S A : U) (X : hs' S A → U)
       (nCenter : Π (a : A), X (center S A a))
-      (nHub : Π (f : S → W_hs S A) (nF : Π (s : S), X (ι₂ (Rel_hs S A) (W_hs S A) (Rel_lhs S A) (Rel_rhs S A) (f s))), X (hub S A f))
+      (nHub : Π (f : S → W_hs S A) (nF : Π (s : S), X (ι₂ (Rel_hs S A) (W_hs S A) (Rel_lhs S A) (Rel_rhs S A) (f s))), X (hub' S A f))
       (nSpoke : Π (f : S → W_hs S A) (nF : Π (s : S), X (ι₂ (Rel_hs S A) (W_hs S A) (Rel_lhs S A) (Rel_rhs S A) (f s))) (s : S),
-                 PathP (<i> X (spoke S A f s @ i)) (nHub f nF) (nF s))
-      (z : hs S A) : X z
+                 PathP (<i> X (spoke' S A f s @ i)) (nHub f nF) (nF s))
+      (z : hs' S A) : X z
  := coequ-ind (Rel_hs S A) (W_hs S A) (Rel_lhs S A) (Rel_rhs S A) X
       (hs-algebra-map S A X nCenter nHub)
       (λ (r : Rel_hs S A), nSpoke r.1 (λ (s : S), hs-algebra-map S A X nCenter nHub (r.1 s)) r.2) z
 
 -- 4) Computational Rules
-def hs-β₁ (S A : U) (X : hs S A → U)
+def hs-β₁' (S A : U) (X : hs' S A → U)
       (nCenter : Π (a : A), X (center S A a))
-      (nHub : Π (f : S → W_hs S A) (nF : Π (s : S), X (ι₂ (Rel_hs S A) (W_hs S A) (Rel_lhs S A) (Rel_rhs S A) (f s))), X (hub S A f))
+      (nHub : Π (f : S → W_hs S A) (nF : Π (s : S), X (ι₂ (Rel_hs S A) (W_hs S A) (Rel_lhs S A) (Rel_rhs S A) (f s))), X (hub' S A f))
       (nSpoke : Π (f : S → W_hs S A) (nF : Π (s : S), X (ι₂ (Rel_hs S A) (W_hs S A) (Rel_lhs S A) (Rel_rhs S A) (f s))) (s : S),
-                 PathP (<i> X (spoke S A f s @ i)) (nHub f nF) (nF s)) (a : A)
-    : Path (X (center S A a)) (hs-ind S A X nCenter nHub nSpoke (center S A a)) (nCenter a)
+                 PathP (<i> X (spoke' S A f s @ i)) (nHub f nF) (nF s)) (a : A)
+    : Path (X (center S A a)) (hs-ind' S A X nCenter nHub nSpoke (center S A a)) (nCenter a)
  := idp (X (center S A a)) (nCenter a)
 
-def hs-β₂ (S A : U) (X : hs S A → U)
+def hs-β₂' (S A : U) (X : hs' S A → U)
       (nCenter : Π (a : A), X (center S A a))
-      (nHub : Π (f : S → W_hs S A) (nF : Π (s : S), X (ι₂ (Rel_hs S A) (W_hs S A) (Rel_lhs S A) (Rel_rhs S A) (f s))), X (hub S A f))
+      (nHub : Π (f : S → W_hs S A) (nF : Π (s : S), X (ι₂ (Rel_hs S A) (W_hs S A) (Rel_lhs S A) (Rel_rhs S A) (f s))), X (hub' S A f))
       (nSpoke : Π (f : S → W_hs S A) (nF : Π (s : S), X (ι₂ (Rel_hs S A) (W_hs S A) (Rel_lhs S A) (Rel_rhs S A) (f s))) (s : S),
-                 PathP (<i> X (spoke S A f s @ i)) (nHub f nF) (nF s)) (f : S → W_hs S A)
-    : Path (X (hub S A f)) (hs-ind S A X nCenter nHub nSpoke (hub S A f)) (nHub f (λ (s : S), hs-algebra-map S A X nCenter nHub (f s)))
- := idp (X (hub S A f)) (nHub f (λ (s : S), hs-algebra-map S A X nCenter nHub (f s)))
+                 PathP (<i> X (spoke' S A f s @ i)) (nHub f nF) (nF s)) (f : S → W_hs S A)
+    : Path (X (hub' S A f)) (hs-ind' S A X nCenter nHub nSpoke (hub' S A f)) (nHub f (λ (s : S), hs-algebra-map S A X nCenter nHub (f s)))
+ := idp (X (hub' S A f)) (nHub f (λ (s : S), hs-algebra-map S A X nCenter nHub (f s)))
 
 -- 5) Uniqueness Rule
-def hs-η (S A : U) (X : hs S A → U) (h : Π (z : hs S A), X z)
-  : Path (Π (z : hs S A), X z) h 
-         (λ (z : hs S A), coequ-ind (Rel_hs S A) (W_hs S A) (Rel_lhs S A) (Rel_rhs S A) X
+def hs-η' (S A : U) (X : hs' S A → U) (h : Π (z : hs' S A), X z)
+  : Path (Π (z : hs' S A), X z) h
+         (λ (z : hs' S A), coequ-ind (Rel_hs S A) (W_hs S A) (Rel_lhs S A) (Rel_rhs S A) X
                                    (λ (w : W_hs S A), h (ι₂ (Rel_hs S A) (W_hs S A) (Rel_lhs S A) (Rel_rhs S A) w))
-                                   (λ (r : Rel_hs S A), <i> h (spoke S A r.1 r.2 @ i)) z)
+                                   (λ (r : Rel_hs S A), <i> h (spoke' S A r.1 r.2 @ i)) z)
  := coequ-η (Rel_hs S A) (W_hs S A) (Rel_lhs S A) (Rel_rhs S A) X h

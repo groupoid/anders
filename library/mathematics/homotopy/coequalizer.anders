@@ -25,7 +25,7 @@ import library/foundations/univalent/extensionality
 -- The HoTT Library: A formalization of homotopy type theory in Coq
 -- https://arxiv.org/pdf/1610.04591.pdf
 
--- [3]. Andrej Bauer, Niels van der Weide 
+-- [3]. Andrej Bauer, Niels van der Weide
 -- The Three-HITs Theorem
 -- https://github.com/nmvdw/Three-HITs
 

@@ -1,0 +1,150 @@
+include ../../../header
+
+html
+    head
+        meta(property='og:title'       content='TOPOLOGY')
+        meta(property='og:description' content='Topology and Borel Sets')
+        meta(property='og:url'         content='https://anders.groupoid.space/foundations/mathematics/topology/')
+
+block title
+    title TOPOLOGY
+
+block content
+    nav
+        <a href='https://anders.groupoid.space/'>ANDERS</a>
+        <a href='https://anders.groupoid.space/library/'>LIB</a>
+        <a href='#'>TOPOLOGY</a>
+    article.main.list
+        .exe
+            section
+                h1 TOPOLOGY
+                aside
+                    time Published: 29 APR 2026
+                +tex.
+                    This page presents basic notions from classical topology and measure theory formalized in Cubical Homotopy Type Theory,
+                    including propositional predicates, power sets, and the Borel $\sigma$-algebra constructed via W-types.
+
+            section
+                h2 Propositional Predicates and Power Sets
+
+                +tex.
+                    We work in universe $U_1$ and define propositional predicates and power sets.
+                +code.
+                    def Path₁ (A : U₁) (x y : A) := PathP (<_> A) x y
+                    def isProp₁ (A : U₁) := Π (a b : A), Path₁ A a b
+                    def isSet₁ (A : U₁) := Π (a b : A) (x y : Path₁ A a b), Path₁ (Path₁ A a b) x y
+
+                +tex.
+                    The power set $\mathbb{P}(X)$ is defined as the function space $X \to Prop$, where $Prop := U \to 𝟐$.
+                +code.
+                    def Prop := U → 𝟐
+                    def ℙ (X: U₁) := X → Prop
+
+                h2 Basic Operations on Subsets
+                +code.
+                    def ∅ (X: U₁) : ℙ X := λ (_: X) (_: U), false
+                    def total (X: U₁) : ℙ X := λ (_: X) (_: U), true
+
+                    def ∈ (X: U₁) (el: X) (set: ℙ X) : U₁
+                     := Path₁ (U → 𝟐) (set el) (λ (_: U), true)
+
+                    def ∉ (X: U₁) (el: X) (set: ℙ X) : U₁
+                     := Path₁ (U → 𝟐) (set el) (λ (_: U), false)
+
+                    def ⊆ (X: U₁) (A B: ℙ X) := Π (x: X), (∈ X x A) × (∈ X x B)
+
+                    def ∁ (X: U₁) : ℙ X → ℙ X
+                     := λ (h : ℙ X), λ (x: X) (Y: U), not (h x Y)
+
+                    def ∪ (X: U₁) : ℙ X → ℙ X → ℙ X
+                     := λ (h1 h2 : ℙ X), λ (x: X) (Y: U), or (h1 x Y) (h2 x Y)
+
+                    def ∩ (X: U₁) : ℙ X → ℙ X → ℙ X
+                     := λ (h1 h2 : ℙ X), λ (x: X) (Y: U), and (h1 x Y) (h2 x Y)
+
+                h2 Properties
+                +code.
+                    def isSet-ℙ (X: U₁) : isSet₁ (ℙ X)
+                     := isSetPi₁ X (λ (_: X), Prop)
+                          (λ (_: X), isSetPi₁' U (λ (_: U), 𝟐) (λ (_: U), boolset))
+
+            section
+                h2 Borel σ-Algebra
+
+                +tex.
+                    The Borel $\sigma$-algebra on a type $A$ is constructed as the smallest $\sigma$-algebra containing a given collection of generators (open sets).
+                    We encode Borel sets using W-types (well-founded trees) with four kinds of constructors: base generators, empty set, complement, and countable union.
+
+                h2 Borel codes as W-type
+                +code.
+                    axiom Generator (A : U) : U
+                    axiom isOpen (A : U) (g : Generator A) (a : A) : U
+
+                    def Borel-Shape (A : U) : U := + (Generator A) 𝟑
+
+                    def Borel-Pos (A : U) (s : Borel-Shape A) : U
+                     := +-ind₁ (Generator A) 𝟑 (λ (_ : Borel-Shape A), U)
+                          (λ (_ : Generator A), 𝟎)
+                          (ind₃₁ (λ (_ : 𝟑), U)
+                             𝟎          -- empty
+                             𝟏          -- complement
+                             ℕ          -- countable union
+                          ) s
+
+                    def Borel (A : U) : U := W (s : Borel-Shape A), Borel-Pos A s
+
+                h2 Constructors
+                +code.
+                    def base' (A : U) (g : Generator A) : Borel A
+                     := sup (Borel-Shape A) (Borel-Pos A) (inl (Generator A) 𝟑 g) (ind₀ (Borel A))
+
+                    def empty-code (A : U) : Borel A
+                     := sup (Borel-Shape A) (Borel-Pos A) (inr (Generator A) 𝟑 0₃) (ind₀ (Borel A))
+
+                    def complement-code (A : U) (b : Borel A) : Borel A
+                     := sup (Borel-Shape A) (Borel-Pos A) (inr (Generator A) 𝟑 1₃) (λ (_ : 𝟏), b)
+
+                    def union-code (A : U) (f : ℕ → Borel A) : Borel A
+                     := sup (Borel-Shape A) (Borel-Pos A) (inr (Generator A) 𝟑 2₃) f
+
+                h2 Interpretation
+                +tex.
+                    The interpretation function turns a Borel code into an actual predicate on $A$.
+                +code.
+                    def isBorel (A : U) (b : Borel A) : A → U
+                     := W-ind₁ (Borel-Shape A) (Borel-Pos A) (λ (_ : Borel A), A → U)
+                          (λ (s : Borel-Shape A),
+                            +-ind₁ (Generator A) 𝟑 (λ (_ : Borel-Shape A),
+                              Π (f : Borel-Pos A s → Borel A),
+                                (Π (p : Borel-Pos A s), A → U) → A → U)
+                              (λ (g : Generator A) (_ : 𝟎 → Borel A) (_ : 𝟎 → A → U), isOpen A g)
+                              (ind₃₁ (λ (t : 𝟑),
+                                Π (f : Borel-Pos A (inr (Generator A) 𝟑 t) → Borel A),
+                                  (Π (p : Borel-Pos A (inr (Generator A) 𝟑 t)), A → U) → A → U)
+                                (λ (_ : 𝟎 → Borel A) (_ : 𝟎 → A → U) (_ : A), 𝟎)                    -- empty
+                                (λ (f : 𝟏 → Borel A) (h : 𝟏 → A → U) (a : A), (h ★ a) → 𝟎)          -- complement
+                                (λ (f : ℕ → Borel A) (h : ℕ → A → U) (a : A), Σ (n : ℕ), h n a)     -- union
+                              ) s)
+                          ) b
+
+                h2 Borel Sets and σ-Algebra Structure
+                +code.
+                    def BorelSets (A : U) (P : A → U) : U₁
+                     := Σ (b : Borel A), Path₁ (A → U) P (isBorel A b)
+
+                    def is-sigma-algebra (A : U) (S : (A → U) → U₁) : U₁
+                     := Σ (empty : S (λ (_ : A), 𝟎)),
+                        Σ (compl : Π (P : A → U), S P → S (λ (a : A), (P a) → 𝟎)),
+                          (Π (f : ℕ → (A → U)), (Π (n : ℕ), S (f n)) → S (λ (a : A), Σ (n : ℕ), f n a))
+
+                    def borel-is-sigma-algebra (A : U) : is-sigma-algebra A (BorelSets A)
+                     := ( (empty-code A, &lt;_> (λ (_ : A), 𝟎))
+                        , ( λ (P : A → U) (H : BorelSets A P),
+                              (complement-code A H.1, &lt;i> λ (a : A), ((H.2 @ i) a) → 𝟎)
+                          , λ (f : ℕ → (A → U)) (H : Π (n : ℕ), BorelSets A (f n)),
+                              (union-code A (λ (n : ℕ), (H n).1),
+                               &lt;i> λ (a : A), Σ (n : ℕ), ((H n).2 @ i) a )
+                          )
+                        )
+
+include ../../../footer

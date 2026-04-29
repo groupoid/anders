@@ -20,9 +20,30 @@ def hs-rec (S A X : U)
       (nC : A → X) (x : hs S A) : X
  := hs-ind S A (λ (_ : hs S A), X) (λ (x : hs S A), nX) nC x
 
+{- 
+  In the Lumsdaine $S$-null formulation,
+  the eliminator hs-ind uses an abstraction:
+  instead of taking explicit cases for hub and spoke,
+  it takes a witness that the family $B$ is
+  $S$-null (nB : Π (x : hs S A), isNull S (B x)).
+
+  Because being $S$-null means that any map $S \to B x$ uniquely
+  extends to a hub and its spokes, the nB constraint implicitly
+  handles both the hub and spoke constructors.
+
+  If we were to instead treat hs as a standard HIT without the $S$-null abstraction,
+  the eliminator would require an explicit path case:
+
+-}
+
 axiom hs-β₁ (S A : U) (B : hs S A → U)
       (nB : Π (x : hs S A), isNull S (B x))
       (nC : Π (a : A), B (center S A a)) (a : A)
     : Path (B (center S A a)) (hs-ind S A B nB nC (center S A a)) (nC a)
+
+axiom hs-η (S A : U) (B : hs S A → U) (h : Π (z : hs S A), B z)
+      (nB : Π (x : hs S A), isNull S (B x)) :
+  Path (Π (z : hs S A), B z) h
+       (λ (z : hs S A), hs-ind S A B nB (λ (a : A), h (center S A a)) z)
 
 

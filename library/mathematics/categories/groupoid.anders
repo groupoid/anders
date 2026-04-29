@@ -6,8 +6,8 @@
    Copyright (c) Groupoid Infinity, 2014-2023. -}
 
 module groupoid where
-import lib/foundations/univalent/path
-import lib/mathematics/categories/category
+import library/foundations/univalent/path
+import library/mathematics/categories/category
 option irrelevance true
 
 def PathCat (X: U): cat := (X, \ (x y : X), PathP (<_>X) x y, star)

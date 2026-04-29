@@ -1,9 +1,9 @@
 module KGn where
-import lib/foundations/mltt/inductive
-import lib/mathematics/algebra/algebra
-import lib/mathematics/homotopy/suspension
-import lib/mathematics/homotopy/truncation
-import lib/mathematics/homotopy/quotient
+import library/foundations/mltt/inductive
+import library/mathematics/algebra/algebra
+import library/mathematics/homotopy/suspension
+import library/mathematics/homotopy/truncation
+import library/mathematics/homotopy/quotient
 
 def 𝚺ₓ (A: U) : ℕ → U := ℕ-iter U A 𝚺
 def discreteTopology (G : abgroup) : U := G.1.1

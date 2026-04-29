@@ -1,0 +1,92 @@
+module borel where
+
+import library/foundations/mltt/nat
+import library/mathematics/analysis/topology
+
+-- | Borel sets and Sigma Algebras
+-- | Canonical encoding using W-types
+
+axiom Generator (A : U) : U
+axiom isOpen (A : U) (g : Generator A) (a : A) : U
+
+-- Helper for induction over sums landing in U1
+def +-ind₁ (A B : U) (C : + A B → U₁)
+    (f : Π (x : A), C (inl A B x))
+    (g : Π (y : B), C (inr A B y)) (w : + A B)
+  : C w
+ := ind₂ (λ (x : 𝟐), Π (u : ind₂ (λ (y : 𝟐), U) A B x), C (x, u)) f g w.1 w.2
+
+-- Helper for induction over 3 landing in U1
+def ind₃₁ (C : 𝟑 → U₁) (c₀ : C 0₃) (c₁ : C 1₃) (c₂ : C 2₃) : Π (x : 𝟑), C x
+ := +-ind₁ 𝟏 𝟐 C (ind₁ (λ (x : 𝟏), C (0₂, x)) c₀) (ind₂ (λ (x : 𝟐), C (1₂, x)) c₁ c₂)
+
+-- Helper for induction over W-types landing in U1
+def W-ind₁ (A : U) (B : A → U) (C : (W (x : A), B x) → U₁)
+    (g : Π (x : A) (f : B x → (W (x : A), B x)), (Π (b : B x), C (f b)) → C (sup A B x f))
+    (w : W (x : A), B x)
+  : C w := indᵂ A B C g w
+
+-- Borel codes as a W-type
+-- Borel-Shape represents the constructors: base, empty, complement, union.
+
+def Borel-Shape (A : U) : U := + (Generator A) 𝟑
+
+def Borel-Pos (A : U) (s : Borel-Shape A) : U :=
+  +-ind₁ (Generator A) 𝟑 (λ (t : Borel-Shape A), U)
+    (λ (g : Generator A), 𝟎)
+    (ind₃₁ (λ (t : 𝟑), U)
+       𝟎                     -- empty: zero children
+       𝟏                     -- complement: one recursive child
+       ℕ                     -- union: Nat-indexed recursive children
+    ) s
+
+def Borel (A : U) : U := W (s : Borel-Shape A), Borel-Pos A s
+
+-- Borel Constructors
+
+def base' (A : U) (g : Generator A) : Borel A :=
+  sup (Borel-Shape A) (Borel-Pos A) (inl (Generator A) 𝟑 g) (ind₀ (Borel A))
+
+def empty-code (A : U) : Borel A :=
+  sup (Borel-Shape A) (Borel-Pos A) (inr (Generator A) 𝟑 0₃) (ind₀ (Borel A))
+
+def complement-code (A : U) (b : Borel A) : Borel A :=
+  sup (Borel-Shape A) (Borel-Pos A) (inr (Generator A) 𝟑 1₃) (λ (x : 𝟏), b)
+
+def union-code (A : U) (f : ℕ → Borel A) : Borel A :=
+  sup (Borel-Shape A) (Borel-Pos A) (inr (Generator A) 𝟑 2₃) f
+
+-- Interpretation of Borel codes as properties on A
+
+def isBorel (A : U) (b : Borel A) : A → U :=
+  W-ind₁ (Borel-Shape A) (Borel-Pos A) (λ (c : Borel A), A → U)
+    (λ (s : Borel-Shape A), +-ind₁ (Generator A) 𝟑 (λ (t : Borel-Shape A), Π (f : Borel-Pos A t → Borel A), (Π (p : Borel-Pos A t), A → U) → A → U)
+      (λ (g : Generator A) (f : 𝟎 → Borel A) (h : 𝟎 → A → U), isOpen A g)
+      (ind₃₁ (λ (t : 𝟑), Π (f : Borel-Pos A (inr (Generator A) 𝟑 t) → Borel A), (Π (p : Borel-Pos A (inr (Generator A) 𝟑 t)), A → U) → A → U)
+        (λ (f : 𝟎 → Borel A) (h : 𝟎 → A → U) (a : A), 𝟎)
+        (λ (f : 𝟏 → Borel A) (h : 𝟏 → A → U) (a : A), (h ★ a) → 𝟎)
+        (λ (f : ℕ → Borel A) (h : ℕ → A → U) (a : A), Σ (n : ℕ), h n a)
+      ) s) b
+
+-- Sigma Algebra structure
+
+def is-sigma-algebra (A : U) (S : (A → U) → U₁) : U₁ :=
+  Σ (empty : S (λ (a : A), 𝟎)),
+  Σ (compl : Π (P : A → U), S P → S (λ (a : A), (P a) → 𝟎)),
+    (Π (f : ℕ → (A → U)), (Π (n : ℕ), S (f n)) → S (λ (a : A), Σ (n : ℕ), f n a))
+
+-- BorelSets on A form a collection of properties
+
+def BorelSets (A : U) (P : A → U) : U₁ :=
+  Σ (b : Borel A), Path₁ (A → U) P (isBorel A b)
+
+-- Proof: BorelSets form a sigma-algebra
+
+def borel-is-sigma-algebra (A : U) : is-sigma-algebra A (BorelSets A) :=
+  ( (empty-code A, <_> (λ (a : A), 𝟎))
+  , ( λ (P : A → U) (H : BorelSets A P),
+        (complement-code A H.1, <i> λ (a : A), ((H.2 @ i) a) → 𝟎)
+    , λ (f : ℕ → (A → U)) (H : Π (n : ℕ), BorelSets A (f n)),
+        (union-code A (λ (n : ℕ), (H n).1), <i> λ (a : A), Σ (n : ℕ), ((H n).2 @ i) a)
+    )
+  )

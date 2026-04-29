@@ -1,6 +1,6 @@
 module lambda where
 
-import lib/foundations/mltt/either
+import library/foundations/mltt/either
 
 def Tag : U := 𝟓
 def VAR      : Tag := 0₅

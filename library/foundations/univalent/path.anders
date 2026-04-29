@@ -19,7 +19,7 @@
    Copyright (c) Groupoid Infinity, 2014-2023. -}
 
 module path where
-import lib/foundations/mltt/proto
+import library/foundations/mltt/proto
 
 --- Path Space
 

@@ -19,7 +19,7 @@
    Copyright (c) Groupoid Infinity, 2014-2023. -}
 
 module equiv where
-import lib/foundations/univalent/path
+import library/foundations/univalent/path
 option girard true
 
 --- [Pelayo, Warren] 2012

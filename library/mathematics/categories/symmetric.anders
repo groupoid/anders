@@ -1,30 +1,95 @@
 module symmetric where
-import lib/mathematics/categories/category
-import lib/mathematics/categories/functor
-import lib/mathematics/categories/natural
+import library/mathematics/categories/category
+import library/mathematics/categories/functor
+import library/mathematics/categories/natural
+
+-- | Product Category
 
 def catproduct (A B: precategory): precategory
- := ((prod A.C.ob B.C.ob,(\(x y: prod A.C.ob B.C.ob), prod (A.C.hom x.1 y.1) (B.C.hom x.2 y.2)), star),
-    (?,?,?,?,?,?,star),
-    star)
+ := ((prod A.C.ob B.C.ob, (\ (x y: prod A.C.ob B.C.ob), prod (A.C.hom x.1 y.1) (B.C.hom x.2 y.2)), star),
+     ((\ (x: prod A.C.ob B.C.ob), (A.P.id x.1, B.P.id x.2)),
+      (\ (x y z: prod A.C.ob B.C.ob) (f: prod (A.C.hom x.1 y.1) (B.C.hom x.2 y.2)) (g: prod (A.C.hom y.1 z.1) (B.C.hom y.2 z.2)),
+       (A.P.∘ x.1 y.1 z.1 f.1 g.1, B.P.∘ x.2 y.2 z.2 f.2 g.2)),
+      (\ (x y: prod A.C.ob B.C.ob) (f g: prod (A.C.hom x.1 y.1) (B.C.hom x.2 y.2)) (p q: Path (prod (A.C.hom x.1 y.1) (B.C.hom x.2 y.2)) f g),
+       <i j> (A.P.homSet x.1 y.1 f.1 g.1 (<k> (p @ k).1) (<k> (q @ k).1) @ i @ j,
+              B.P.homSet x.2 y.2 f.2 g.2 (<k> (p @ k).2) (<k> (q @ k).2) @ i @ j)),
+      (\ (x y: prod A.C.ob B.C.ob) (f: prod (A.C.hom x.1 y.1) (B.C.hom x.2 y.2)), <i> (A.P.∘-left x.1 y.1 f.1 @ i, B.P.∘-left x.2 y.2 f.2 @ i)),
+      (\ (x y: prod A.C.ob B.C.ob) (f: prod (A.C.hom x.1 y.1) (B.C.hom x.2 y.2)), <i> (A.P.∘-right x.1 y.1 f.1 @ i, B.P.∘-right x.2 y.2 f.2 @ i)),
+      (\ (x y z w: prod A.C.ob B.C.ob) (f: prod (A.C.hom x.1 y.1) (B.C.hom x.2 y.2)) (g: prod (A.C.hom y.1 z.1) (B.C.hom y.2 z.2)) (h: prod (A.C.hom z.1 w.1) (B.C.hom z.2 w.2)),
+       <i> (A.P.∘-assoc x.1 y.1 z.1 w.1 f.1 g.1 h.1 @ i, B.P.∘-assoc x.2 y.2 z.2 w.2 f.2 g.2 h.2 @ i)), star), star)
 
-axiom flipBifunctor (X Y Z: precategory) (F: catfunctor (catproduct X Y) Z)
-    : catfunctor (catproduct Y X) Z
+-- | Flip Bifunctor
+
+def flipBifunctor (X Y Z: precategory) (F: catfunctor (catproduct X Y) Z) : catfunctor (catproduct Y X) Z :=
+  ((\(x: prod Y.C.ob X.C.ob), F.ob (x.2, x.1)),
+   (\(x y: prod Y.C.ob X.C.ob) (f: prod (Y.C.hom x.1 y.1) (X.C.hom x.2 y.2)), F.mor (x.2, x.1) (y.2, y.1) (f.2, f.1)),
+   (\(x: prod Y.C.ob X.C.ob), F.id (x.2, x.1)),
+   (\(x y z: prod Y.C.ob X.C.ob) (f: prod (Y.C.hom x.1 y.1) (X.C.hom x.2 y.2)) (g: prod (Y.C.hom y.1 z.1) (X.C.hom y.2 z.2)),
+    F.fcomp (x.2, x.1) (y.2, y.1) (z.2, z.1) (f.2, f.1) (g.2, g.1)), star)
+
+-- | Monoidal Category structure
 
 def isMonoidal (C: precategory): U
  := Σ (tensor: catfunctor (catproduct C C) C)
-      (tensor₁: C.C.ob)
-      (left₁: Π (x: C.C.ob),  Path (C.C.ob) x (tensor.ob (tensor₁,x)))
-      (right₁: Π (x: C.C.ob), Path (C.C.ob) x (tensor.ob (x,tensor₁)))
-      (associator: Π (x y z: C.C.ob), Path (C.C.ob) (tensor.ob ((tensor.ob (x,y)),z)) (tensor.ob (x,(tensor.ob (y,z)))))
-      (triangle: Π (x y: C.C.ob), 𝟏)
-      (pentagon: Π (x y z w: C.C.ob), 𝟏), 𝟏
+      (e: C.C.ob)
+      (α: Π (x y z: C.C.ob), isoCat C (tensor.ob (tensor.ob (x, y), z)) (tensor.ob (x, tensor.ob (y, z))))
+      (λ₁: Π (x: C.C.ob), isoCat C (tensor.ob (e, x)) x)
+      (ρ₁: Π (x: C.C.ob), isoCat C (tensor.ob (x, e)) x)
+      (pentagon: Π (x y z w: C.C.ob), 
+        Path (C.C.hom (tensor.ob (tensor.ob (tensor.ob (x, y), z), w)) (tensor.ob (x, tensor.ob (y, tensor.ob (z, w)))))
+             (C.P.∘ (tensor.ob (tensor.ob (tensor.ob (x, y), z), w)) (tensor.ob (x, tensor.ob (tensor.ob (y, z), w))) (tensor.ob (x, tensor.ob (y, tensor.ob (z, w))))
+                (C.P.∘ (tensor.ob (tensor.ob (tensor.ob (x, y), z), w)) (tensor.ob (tensor.ob (x, tensor.ob (y, z)), w)) (tensor.ob (x, tensor.ob (tensor.ob (y, z), w)))
+                   (tensor.mor (tensor.ob (tensor.ob (x, y), z), w) (tensor.ob (x, tensor.ob (y, z)), w) ((α x y z).1, C.P.id w))
+                   ((α x (tensor.ob (y, z)) w).1))
+                (tensor.mor (x, tensor.ob (tensor.ob (y, z), w)) (x, tensor.ob (y, tensor.ob (z, w))) (C.P.id x, (α y z w).1)))
+             (C.P.∘ (tensor.ob (tensor.ob (tensor.ob (x, y), z), w)) (tensor.ob (tensor.ob (x, y), tensor.ob (z, w))) (tensor.ob (x, tensor.ob (y, tensor.ob (z, w))))
+                ((α (tensor.ob (x, y)) z w).1)
+                ((α x y (tensor.ob (z, w))).1)))
+      (triangle: Π (x y: C.C.ob), 
+        Path (C.C.hom (tensor.ob (tensor.ob (x, e), y)) (tensor.ob (x, y)))
+             (C.P.∘ (tensor.ob (tensor.ob (x, e), y)) (tensor.ob (x, tensor.ob (e, y))) (tensor.ob (x, y))
+                ((α x e y).1)
+                (tensor.mor (x, tensor.ob (e, y)) (x, y) (C.P.id x, (λ₁ y).1)))
+             (tensor.mor (tensor.ob (x, e), y) (x, y) ((ρ₁ x).1, C.P.id y))), unit
+
+-- | Braided Monoidal Category
 
 def isBraided (C: precategory) (m: isMonoidal C) : U
  := Σ (braiding: natiso (catproduct C C) C m.tensor (flipBifunctor C C C m.tensor))
-      (hexagon₁: unit)
-      (hexagon₂: unit), 𝟏
+      (hexagon₁: Π (x y z: C.C.ob), 
+        Path (C.C.hom (m.tensor.ob (x, m.tensor.ob (y, z))) (m.tensor.ob (m.tensor.ob (y, z), x)))
+             (braiding.η.η (x, m.tensor.ob (y, z)))
+             (C.P.∘ (m.tensor.ob (x, m.tensor.ob (y, z))) (m.tensor.ob (y, m.tensor.ob (x, z))) (m.tensor.ob (m.tensor.ob (y, z), x))
+                (C.P.∘ (m.tensor.ob (x, m.tensor.ob (y, z))) (m.tensor.ob (m.tensor.ob (y, x), z)) (m.tensor.ob (y, m.tensor.ob (x, z)))
+                   (C.P.∘ (m.tensor.ob (x, m.tensor.ob (y, z))) (m.tensor.ob (m.tensor.ob (x, y), z)) (m.tensor.ob (m.tensor.ob (y, x), z))
+                      ((m.α x y z).2.1)
+                      (m.tensor.mor (m.tensor.ob (x, y), z) (m.tensor.ob (y, x), z) (braiding.η.η (x, y), C.P.id z)))
+                   ((m.α y x z).1))
+                (C.P.∘ (m.tensor.ob (y, m.tensor.ob (x, z))) (m.tensor.ob (y, m.tensor.ob (z, x))) (m.tensor.ob (m.tensor.ob (y, z), x))
+                   (m.tensor.mor (y, m.tensor.ob (x, z)) (y, m.tensor.ob (z, x)) (C.P.id y, braiding.η.η (x, z)))
+                   ((m.α y z x).2.1))))
+      (hexagon₂: Π (x y z: C.C.ob), 
+        Path (C.C.hom (m.tensor.ob (m.tensor.ob (x, y), z)) (m.tensor.ob (z, m.tensor.ob (x, y))))
+             (braiding.η.η (m.tensor.ob (x, y), z))
+             (C.P.∘ (m.tensor.ob (m.tensor.ob (x, y), z)) (m.tensor.ob (x, m.tensor.ob (z, y))) (m.tensor.ob (z, m.tensor.ob (x, y)))
+                (C.P.∘ (m.tensor.ob (m.tensor.ob (x, y), z)) (m.tensor.ob (x, m.tensor.ob (y, z))) (m.tensor.ob (x, m.tensor.ob (z, y)))
+                   ((m.α x y z).1)
+                   (m.tensor.mor (x, m.tensor.ob (y, z)) (x, m.tensor.ob (z, y)) (C.P.id x, braiding.η.η (y, z))))
+                (C.P.∘ (m.tensor.ob (x, m.tensor.ob (z, y))) (m.tensor.ob (m.tensor.ob (x, z), y)) (m.tensor.ob (z, m.tensor.ob (x, y)))
+                   ((m.α x z y).2.1)
+                   (C.P.∘ (m.tensor.ob (m.tensor.ob (x, z), y)) (m.tensor.ob (m.tensor.ob (z, x), y)) (m.tensor.ob (z, m.tensor.ob (x, y)))
+                      (m.tensor.mor (m.tensor.ob (x, z), y) (m.tensor.ob (z, x), y) (braiding.η.η (x, z), C.P.id y))
+                      ((m.α z x y).1))))), unit
+
+-- | Symmetric Monoidal Category
 
 def isSymmetric (C: precategory) (m: isMonoidal C) (b: isBraided C m) : U
- := Σ (commutative: unit)
-      (braidingCondition: unit), 𝟏
+ := Σ (symmetry: Π (x y: C.C.ob), Path (C.C.hom (m.tensor.ob (x,y)) (m.tensor.ob (x,y)))
+          (C.P.∘ (m.tensor.ob (x,y)) (m.tensor.ob (y,x)) (m.tensor.ob (x,y)) (b.braiding.η.η (x,y)) (b.braiding.η.η (y,x)))
+          (C.P.id (m.tensor.ob (x,y))))
+      (braidingCondition: Π (x: C.C.ob), 
+        Path (C.C.hom (m.tensor.ob (x, m.e)) (m.tensor.ob (m.e, x)))
+             (b.braiding.η.η (x, m.e))
+             (C.P.∘ (m.tensor.ob (x, m.e)) x (m.tensor.ob (m.e, x))
+                ((m.ρ₁ x).1)
+                ((m.λ₁ x).2.1))), unit

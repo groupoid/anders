@@ -8,8 +8,8 @@
    Copyright (c) Groupoid Infinity, 2014-2023. -}
 
 module nat where
-import lib/foundations/mltt/inductive
-import lib/foundations/univalent/path
+import library/foundations/mltt/inductive
+import library/foundations/univalent/path
 
 def ℕ-ctor := ind₂ (λ (f : 𝟐), U) 𝟎 𝟏
 def ℕ := W (x : 𝟐), ℕ-ctor x

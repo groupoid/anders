@@ -1,6 +1,6 @@
 module abelian where
-import lib/mathematics/categories/category
-import lib/mathematics/homotopy/truncation
+import library/mathematics/categories/category
+import library/mathematics/homotopy/truncation
 
 -- David Elinder Master Thesis
 -- Investigating Abelian categories in univalent type theory

@@ -10,8 +10,8 @@
    Copyright (c) Groupoid Infinity, 2014-2023. -}
 
 module extensionality where
-import lib/foundations/univalent/path
-import lib/foundations/mltt/pi
+import library/foundations/univalent/path
+import library/foundations/mltt/pi
 
 --- FunExt as Isomorphism
 

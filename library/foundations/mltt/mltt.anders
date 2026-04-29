@@ -14,39 +14,39 @@ option girard true
 
 -- built-ins
 
-def Path (A : U) (x y : A) : U := PathP (<_> A) x y
-def idp (A : U) (x : A) : Path A x x := <_> x
+def Path' (A : U) (x y : A) : U := PathP (<_> A) x y
+def idp (A : U) (x : A) : Path' A x x := <_> x
 def Pi (O : 𝟏) (A : U) (B : A → U) : U := Π (x : A), B x
 def Π-lambda (O : 𝟏) (A: U) (B: A → U) (b: Pi ★ A B) : Pi ★ A B := λ (x : A), b x
 def Π-apply (O : 𝟏) (A: U) (B: A → U) (f: Pi ★ A B) (a: A) : B a := f a
-def Π-β (O : 𝟏) (A : U) (B : A → U) (a : A) (f : Pi ★ A B) : Path (B a) (Π-apply ★ A B (Π-lambda ★ A B f) a) (f a) := idp (B a) (f a)
-def Π-η (O : 𝟏) (A : U) (B : A → U) (a : A) (f : Pi ★ A B) : Path (Pi ★ A B) f (λ (x : A), f x) := idp (Pi ★ A B) f
+def Π-β (O : 𝟏) (A : U) (B : A → U) (a : A) (f : Pi ★ A B) : Path' (B a) (Π-apply ★ A B (Π-lambda ★ A B f) a) (f a) := idp (B a) (f a)
+def Π-η (O : 𝟏) (A : U) (B : A → U) (a : A) (f : Pi ★ A B) : Path' (Pi ★ A B) f (λ (x : A), f x) := idp (Pi ★ A B) f
 def Sigma (O : 𝟏) (A : U) (B : A → U) : U := summa (x: A), B x
 def pair (O : 𝟏) (A: U) (B: A → U) (a: A) (b: B a) : Sigma ★ A B := (a, b)
 def pr₁ (O : 𝟏) (A: U) (B: A → U) (x: Sigma ★ A B) : A := x.1
 def pr₂ (O : 𝟏) (A: U) (B: A → U) (x: Sigma ★ A B) : B (pr₁ ★ A B x) := x.2
-def Σ-β₁ (O : 𝟏) (A : U) (B : A → U) (a : A) (b : B a) : Path A a (pr₁ ★ A B (a ,b)) := idp A a
-def Σ-β₂ (O : 𝟏) (A : U) (B : A → U) (a : A) (b : B a) : Path (B a) b (pr₂ ★ A B (a, b)) := idp (B a) b
-def Σ-η (O : 𝟏) (A : U) (B : A → U) (p : Sigma ★ A B) : Path (Sigma ★ A B) p (pr₁ ★ A B p, pr₂ ★ A B p) := idp (Sigma ★ A B) p
+def Σ-β₁ (O : 𝟏) (A : U) (B : A → U) (a : A) (b : B a) : Path' A a (pr₁ ★ A B (a ,b)) := idp A a
+def Σ-β₂ (O : 𝟏) (A : U) (B : A → U) (a : A) (b : B a) : Path' (B a) b (pr₂ ★ A B (a, b)) := idp (B a) b
+def Σ-η (O : 𝟏) (A : U) (B : A → U) (p : Sigma ★ A B) : Path' (Sigma ★ A B) p (pr₁ ★ A B p, pr₂ ★ A B p) := idp (Sigma ★ A B) p
 
-def Path-1 (O : 𝟏) (A : U) (x y : A) : U := PathP (<_> A) x y
-def idp-1 (O : 𝟏) (A : U) (x : A) : Path A x x := <_> x
+def Path'-1 (O : 𝟏) (A : U) (x y : A) : U := PathP (<_> A) x y
+def idp-1 (O : 𝟏) (A : U) (x : A) : Path' A x x := <_> x
 def transport (A B: U) (p : PathP (<_> U) A B) (a: A): B := transp p 0 a
-def singl (A: U) (a: A): U := Σ (x: A), Path A a x
+def singl (A: U) (a: A): U := Σ (x: A), Path' A a x
 def eta (A: U) (a: A): singl A a := (a, idp A a)
-def contr (A : U) (a b : A) (p : Path A a b) : Path (singl A a) (eta A a) (b, p) := <i> (p @ i, <j> p @ i /\ j)
-def trans_comp (A : U) (a : A) : Path A a (transport A A (<i> A) a) := <j> transp (<_> A) -j a
-def subst (A : U) (P : A -> U) (a b : A) (p : Path A a b) (e : P a) : P b := transp (<i> P (p @ i)) 0 e
-def subst-comp (A: U) (P: A → U) (a: A) (e: P a): Path (P a) e (subst A P a a (idp A a) e) := trans_comp (P a) e
-def D (A : U) : U₁ := Π (x y : A), Path A x y → U
+def contr (A : U) (a b : A) (p : Path' A a b) : Path' (singl A a) (eta A a) (b, p) := <i> (p @ i, <j> p @ i /\ j)
+def trans_comp (A : U) (a : A) : Path' A a (transport A A (<i> A) a) := <j> transp (<_> A) -j a
+def subst (A : U) (P : A -> U) (a b : A) (p : Path' A a b) (e : P a) : P b := transp (<i> P (p @ i)) 0 e
+def subst-comp (A: U) (P: A → U) (a: A) (e: P a): Path' (P a) e (subst A P a a (idp A a) e) := trans_comp (P a) e
+def D (A : U) : U₁ := Π (x y : A), Path' A x y → U
 
 -- constructive J-β
 
-def J (A: U) (x: A) (C: D A) (d: C x x (idp A x)) (y: A) (p: Path A x y): C x y p
+def J (A: U) (x: A) (C: D A) (d: C x x (idp A x)) (y: A) (p: Path' A x y): C x y p
  := subst (singl A x) (\ (z: singl A x), C x (z.1) (z.2)) (eta A x) (y, p) (contr A x y p) d
-def J-1 (O : 𝟏) (A : U) (x : A) (C: D A) (d: C x x (idp A x)) (y: A) (p: Path A x y): C x y p
+def J-1 (O : 𝟏) (A : U) (x : A) (C: D A) (d: C x x (idp A x)) (y: A) (p: Path' A x y): C x y p
  := subst (singl A x) (\ (z: singl A x), C x (z.1) (z.2)) (eta A x) (y, p) (contr A x y p) d
-def J-β (O : 𝟏) (A : U) (a : A) (C : D A) (d: C a a (idp A a)) : Path (C a a (idp A a)) d (J A a C d a (idp A a))
+def J-β (O : 𝟏) (A : U) (a : A) (C : D A) (d: C a a (idp A a)) : Path' (C a a (idp A a)) d (J A a C d a (idp A a))
  := subst-comp (singl A a) (\ (z: singl A a), C a (z.1) (z.2)) (eta A a) d
 
 
@@ -56,24 +56,24 @@ def MLTT-73 :=
   Σ (Π-form  : Π (A : U) (B : A → U), U)
     (Π-ctor₁ : Π (A : U) (B : A → U), Pi ★ A B → Pi ★ A B)
     (Π-elim₁ : Π (A : U) (B : A → U), Pi ★ A B → Pi ★ A B)
-    (Π-comp₁ : Π (A : U) (B : A → U) (a : A) (f : Pi ★ A B), Path (B a) (Π-elim₁ A B (Π-ctor₁ A B f) a) (f a))
-    (Π-comp₂ : Π (A : U) (B : A → U) (a : A) (f : Pi ★ A B), Path (Pi ★ A B) f (λ (x : A), f x))
+    (Π-comp₁ : Π (A : U) (B : A → U) (a : A) (f : Pi ★ A B), Path' (B a) (Π-elim₁ A B (Π-ctor₁ A B f) a) (f a))
+    (Π-comp₂ : Π (A : U) (B : A → U) (a : A) (f : Pi ★ A B), Path' (Pi ★ A B) f (λ (x : A), f x))
     (Σ-form  : Π (A : U) (B : A → U), U)
     (Σ-ctor₁ : Π (A : U) (B : A → U) (a : A) (b : B a) , Sigma ★ A B)
     (Σ-elim₁ : Π (A : U) (B : A → U) (p : Sigma ★ A B), A)
     (Σ-elim₂ : Π (A : U) (B : A → U) (p : Sigma ★ A B), B (pr₁ ★ A B p))
-    (Σ-comp₁ : Π (A : U) (B : A → U) (a : A) (b: B a), Path A a (Σ-elim₁ A B (Σ-ctor₁ A B a b)))
-    (Σ-comp₂ : Π (A : U) (B : A → U) (a : A) (b: B a), Path (B a) b (Σ-elim₂ A B (a, b)))
-    (Σ-comp₃ : Π (A : U) (B : A → U) (p : Sigma ★ A B), Path (Sigma ★ A B) p (pr₁ ★ A B p, pr₂ ★ A B p))
+    (Σ-comp₁ : Π (A : U) (B : A → U) (a : A) (b: B a), Path' A a (Σ-elim₁ A B (Σ-ctor₁ A B a b)))
+    (Σ-comp₂ : Π (A : U) (B : A → U) (a : A) (b: B a), Path' (B a) b (Σ-elim₂ A B (a, b)))
+    (Σ-comp₃ : Π (A : U) (B : A → U) (p : Sigma ★ A B), Path' (Sigma ★ A B) p (pr₁ ★ A B p, pr₂ ★ A B p))
     (=-form  : Π (A : U) (a : A), A → U)
-    (=-ctor₁ : Π (A : U) (a : A), Path A a a)
-    (=-elim₁ : Π (A : U) (a : A) (C: D A) (d: C a a (=-ctor₁ A a)) (y: A) (p: Path A a y), C a y p)
-    (=-comp₁ : Π (A : U) (a : A) (C: D A) (d: C a a (=-ctor₁ A a)), Path (C a a (=-ctor₁ A a)) d (=-elim₁ A a C d a (=-ctor₁ A a))), 𝟏
+    (=-ctor₁ : Π (A : U) (a : A), Path' A a a)
+    (=-elim₁ : Π (A : U) (a : A) (C: D A) (d: C a a (=-ctor₁ A a)) (y: A) (p: Path' A a y), C a y p)
+    (=-comp₁ : Π (A : U) (a : A) (C: D A) (d: C a a (=-ctor₁ A a)), Path' (C a a (=-ctor₁ A a)) d (=-elim₁ A a C d a (=-ctor₁ A a))), 𝟏
 
 --- Theorem. J-β-rule is derivable from generalized transport
 
 def internalizing : MLTT-73
  := ( Pi ★, Π-lambda ★, Π-apply ★, Π-β ★, Π-η ★,
       Sigma ★, pair ★, pr₁ ★, pr₂ ★, Σ-β₁ ★, Σ-β₂ ★, Σ-η ★,
-      Path-1 ★, idp-1 ★, J-1 ★, J-β ★, ★
+      Path'-1 ★, idp-1 ★, J-1 ★, J-β ★, ★
     )

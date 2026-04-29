@@ -8,8 +8,8 @@
    Copyright (c) Groupoid Infinity, 2014-2023. -}
 
 module category where
-import lib/foundations/mltt/sigma
-import lib/foundations/univalent/path
+import library/foundations/mltt/sigma
+import library/foundations/univalent/path
 option irrelevance true
 
 def cat : U₁ := Σ (ob: U) (hom: ob -> ob -> U), unit

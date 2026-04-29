@@ -6,8 +6,8 @@
    Copyright (c) Groupoid Infinity, 2014-2023. -}
 
 module vec where
-import lib/foundations/mltt/nat
-import lib/foundations/mltt/sigma
+import library/foundations/mltt/nat
+import library/foundations/mltt/sigma
 option girard true
 
 def Vec (A : U₁) : ℕ → U := ℕ-iter U 𝟏 (λ (X : U), A × X)

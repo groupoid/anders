@@ -1,5 +1,5 @@
 module maybe where
-import lib/foundations/mltt/either
+import library/foundations/mltt/either
 
 def Maybe (A : U) : U := + 𝟏 A
 def nothing (A : U) : Maybe A := (0₂, ★)

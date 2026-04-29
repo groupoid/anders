@@ -1,6 +1,17 @@
 Changelog
 =========
 
+30 APR 2026 Version 5.0.0 Complete Kernel:
+
+* Disk and Hub Spokes kernel primitives
+* Hub Spokes Disc in W
+* Lambda in W
+* Borel sets
+* Basic Topology
+* Locally Small Categories
+* Symmetric Monoidal Categories
+* OCaml 5.0
+
 14 APR 2022 Version 1.4.0 Microkernel Pipeline:
 
 * Microkernel Architecture: Kernel, Proof Shell, and Tactics Server with open binary protocols

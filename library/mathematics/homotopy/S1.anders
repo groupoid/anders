@@ -1,5 +1,6 @@
 module S1 where
 import library/mathematics/homotopy/coequalizer
+import library/foundations/mltt/bool
 
 -- [Shulman] 2015
 
@@ -15,3 +16,16 @@ def WS¹ : U := W (x : 𝟐), Rec x
 def Wbase : WS¹ := sup 𝟐 Rec false (ind₀ WS¹)
 def Wloop (n : WS¹) : WS¹ := sup 𝟐 Rec true (λ (x : Loop₀), n)
 
+def 𝟎⟶WS¹ (C : WS¹ → U) (f : 𝟎 → WS¹) : C Wbase → C (sup 𝟐 Rec false f)
+ := transp (<i> C (sup 𝟐 Rec false (λ (x : 𝟎), ind₀ (PathP (<_> WS¹) (ind₀ WS¹ x) (f x)) x @ i))) 0
+
+def Loop₀⟶WS¹ (C : WS¹ → U) (f : Loop₀ → WS¹) : C (Wloop (f (<_> false))) → C (sup 𝟐 Rec true f)
+ := transp (<i> C (sup 𝟐 Rec true (λ (x : Loop₀), f (boolset false false (<_> false) x @ i)))) 0
+
+def WS¹-ind (C : WS¹ → U) (b : C Wbase) (l : Π (w : WS¹), C w → C (Wloop w)) : Π (w : WS¹), C w
+ := indᵂ 𝟐 Rec C
+    (ind₂ (λ (x : 𝟐), Π (f : Rec x → WS¹), (Π (p : Rec x), C (f p)) → C (sup 𝟐 Rec x f))
+          (λ (f : 𝟎 → WS¹) (g : Π (x : 𝟎), C (f x)), 𝟎⟶WS¹ C f b)
+          (λ (f : Loop₀ → WS¹) (g : Π (x : Loop₀), C (f x)), Loop₀⟶WS¹ C f (l (f (<_> false)) (g (<_> false)))))
+
+def WS¹-rec (C : U) (b : C) (l : WS¹ → C → C) : WS¹ → C := WS¹-ind (λ (_ : WS¹), C) b l

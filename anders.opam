@@ -5,7 +5,7 @@ maintainer: "Namdak Tonpa <maxim@synrc.com>"
 authors: [ "Groupoid Infinity" ]
 homepage: "https://anders.groupoid.space/"
 bug-reports: "https://github.com/groupoid/anders/issues"
-dev-repo: "https://github.com/groupoid/anders"
+dev-repo: "git+https://github.com/groupoid/anders"
 synopsis: "Modal Homotopy Type System"
 license: "ISC"
 depends: [

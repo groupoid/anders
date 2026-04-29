@@ -14,8 +14,39 @@ def 𝜎₁ (A: U): 𝚺 A := po₁ 𝟏 𝟏 A (const₁ A) (const₁ A) ★
 def 𝜎₂ (A: U): 𝚺 A := po₂ 𝟏 𝟏 A (const₁ A) (const₁ A) ★
 def 𝜎₃ (A: U) (a: A) : Path (𝚺 A) (𝜎₁ A) (𝜎₂ A) := po₃ 𝟏 𝟏 A (const₁ A) (const₁ A) a
 
-axiom 𝚺-ind (X : U) (P : 𝚺 X → U)
+import library/foundations/univalent/extensionality
+import library/foundations/mltt/pi
+
+def 𝚺-ind (X : U) (P : 𝚺 X → U)
     (north : P (𝜎₁ X))
     (south : P (𝜎₂ X))
     (merid : Π (x: X), PathP (<i> P (𝜎₃ X x @ i)) (north) (south)) (y: 𝚺 X) : P y
+ := pushout-ind 𝟏 𝟏 X (const₁ X) (const₁ X) P
+      (λ (_ : 𝟏), north) (λ (_ : 𝟏), south) merid y
+
+def 𝚺-rec (A X : U) (north south : X) (merid : A → Path X north south) (y : 𝚺 A) : X
+ := 𝚺-ind A (λ (_ : 𝚺 A), X) north south (λ (a : A), merid a) y
+
+def 𝚺-β₁ (A : U) (P : 𝚺 A → U) (north : P (𝜎₁ A)) (south : P (𝜎₂ A))
+    (merid : Π (x: A), PathP (<i> P (𝜎₃ A x @ i)) (north) (south))
+  : Path (P (𝜎₁ A)) (𝚺-ind A P north south merid (𝜎₁ A)) north
+ := idp (P (𝜎₁ A)) north
+
+def 𝚺-β₂ (A : U) (P : 𝚺 A → U) (north : P (𝜎₁ A)) (south : P (𝜎₂ A))
+    (merid : Π (x: A), PathP (<i> P (𝜎₃ A x @ i)) (north) (south))
+  : Path (P (𝜎₂ A)) (𝚺-ind A P north south merid (𝜎₂ A)) south
+ := idp (P (𝜎₂ A)) south
+
+def 𝚺-η-pointwise (A : U) (P : 𝚺 A → U) (h : Π (z : 𝚺 A), P z) (z : 𝚺 A) :
+  Path (P z) (h z) (𝚺-ind A P (h (𝜎₁ A)) (h (𝜎₂ A)) (λ (x : A), <i> h (𝜎₃ A x @ i)) z)
+ := 𝚺-ind A (λ (z : 𝚺 A), Path (P z) (h z) (𝚺-ind A P (h (𝜎₁ A)) (h (𝜎₂ A)) (λ (x : A), <i> h (𝜎₃ A x @ i)) z))
+      (idp (P (𝜎₁ A)) (h (𝜎₁ A)))
+      (idp (P (𝜎₂ A)) (h (𝜎₂ A)))
+      (λ (x : A), <k> idp (P (𝜎₃ A x @ k)) (h (𝜎₃ A x @ k))) z
+
+def 𝚺-η (A : U) (P : 𝚺 A → U) (h : Π (z : 𝚺 A), P z) :
+  Path (Π (z : 𝚺 A), P z) h (𝚺-ind A P (h (𝜎₁ A)) (h (𝜎₂ A)) (λ (x : A), <i> h (𝜎₃ A x @ i)))
+ := piext (𝚺 A) P h (𝚺-ind A P (h (𝜎₁ A)) (h (𝜎₂ A)) (λ (x : A), <i> h (𝜎₃ A x @ i)))
+          (𝚺-η-pointwise A P h)
+
 

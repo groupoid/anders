@@ -163,6 +163,10 @@ let rec salt (ns : ident Env.t) : exp -> exp = function
   | EIm e                -> EIm (salt ns e)
   | EInf e               -> EInf (salt ns e)
   | EIndIm (a, b)        -> EIndIm (salt ns a, salt ns b)
+  | ECoequ (a, b, f, g)  -> ECoequ (salt ns a, salt ns b, salt ns f, salt ns g)
+  | EIota2 (a, b, f, g, c) -> EIota2 (salt ns a, salt ns b, salt ns f, salt ns g, salt ns c)
+  | EResp (a, b, f, g, c) -> EResp (salt ns a, salt ns b, salt ns f, salt ns g, salt ns c)
+  | EIndCoequ (a, b, f, g, x, i, rho) -> EIndCoequ (salt ns a, salt ns b, salt ns f, salt ns g, salt ns x, salt ns i, salt ns rho)
   | EJoin e              -> EJoin (salt ns e)
 
 and saltTele ctor ns p a b =
@@ -221,6 +225,10 @@ let rec swap i j = function
   | VIm v                -> VIm (swap i j v)
   | VInf v               -> VInf (swap i j v)
   | VIndIm (a, b)        -> VIndIm (swap i j a, swap i j b)
+  | VCoequ (a, b, f, g)  -> VCoequ (swap i j a, swap i j b, swap i j f, swap i j g)
+  | VIota2 (a, b, f, g, c) -> VIota2 (swap i j a, swap i j b, swap i j f, swap i j g, swap i j c)
+  | VResp (a, b, f, g, c) -> VResp (swap i j a, swap i j b, swap i j f, swap i j g, swap i j c)
+  | VIndCoequ (a, b, f, g, x, k, rho) -> VIndCoequ (swap i j a, swap i j b, swap i j f, swap i j g, swap i j x, swap i j k, swap i j rho)
   | VJoin v              -> VJoin (swap i j v)
 
 and swapVar i j k = if i = k then j else k
@@ -240,7 +248,9 @@ let rec mem y = function
   | VSup (a, b) | VIndIm (a, b) | VPair (_, a, b) -> mem y a || mem y b
   | VSub (a, b, c) | VGlueElem (a, b, c) | VUnglue (a, b, c)
   | VIndW (a, b, c) -> mem y a || mem y b || mem y c
-  | VHComp (a, b, c, d) -> mem y a || mem y b || mem y c || mem y d
+  | VHComp (a, b, c, d) | VCoequ (a, b, c, d) -> mem y a || mem y b || mem y c || mem y d
+  | VIota2 (a, b, f, g, c) | VResp (a, b, f, g, c) -> mem y a || mem y b || mem y f || mem y g || mem y c
+  | VIndCoequ (a, b, f, g, x, k, rho) -> mem y a || mem y b || mem y f || mem y g || mem y x || mem y k || mem y rho
 
 and memClos y t x g = if x = y then false else mem y (g (Var (x, t)))
 

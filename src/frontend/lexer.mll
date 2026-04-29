@@ -56,6 +56,8 @@ let inf   = im "-unit" (* ℑ-unit *)
 let join  = im "-join" (* ℑ-join *)
 let indim = "ind-" im (* ind-ℑ *)
 
+let iota2 = "\xCE\xB9\xE2\x82\x82" (* ι₂ *)
+
 rule main = parse
 | nl            { nextLine lexbuf; main lexbuf }
 | inlineComment { nextLine lexbuf; main lexbuf }
@@ -92,6 +94,8 @@ rule main = parse
   | "hcomp"      -> HCOMP    | "Glue"            -> GLUE
   | "glue"       -> GLUEELEM | "unglue"          -> UNGLUE
   | "W"          -> W        | "sup"             -> SUP
+  | "coequ"      -> COEQU    | "\xCE\xB9\xE2\x82\x82" -> IOTA2
+  | "resp"       -> RESP     | "coequ-ind"       -> INDCOEQU
   | "definition"             | "def"
   | "theorem"                | "lemma"
   | "corollary"              | "proposition"     -> DEF

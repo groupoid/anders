@@ -20,6 +20,8 @@ type value =
   | VUnit | VStar | VIndUnit of value
   | VBool | VFalse | VTrue | VIndBool of value
   | W of value * clos | VSup of value * value | VIndW of value * value * value
+  | VCoequ of value * value * value * value | VIota2 of value * value * value * value * value
+  | VResp of value * value * value * value * value | VIndCoequ of value * value * value * value * value * value * value
   | VIm of value | VInf of value | VIndIm of value * value | VJoin of value
 
 and clos = ident * (value -> value)

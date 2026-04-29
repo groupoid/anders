@@ -61,9 +61,19 @@ let rec eval ctx e0 = traceEval e0; match e0 with
   | EInf e               -> inf (eval ctx e)
   | EJoin e              -> join (eval ctx e)
   | EIndIm (a, b)        -> VIndIm (eval ctx a, eval ctx b)
+  | ECoequ (a, b, f, g)  -> VCoequ (eval ctx a, eval ctx b, eval ctx f, eval ctx g)
+  | EIota2 (a, b, f, g, c) -> VIota2 (eval ctx a, eval ctx b, eval ctx f, eval ctx g, eval ctx c)
+  | EResp (a, b, f, g, c) -> VResp (eval ctx a, eval ctx b, eval ctx f, eval ctx g, eval ctx c)
+  | EIndCoequ (a, b, f, g, x, i, rho) -> VIndCoequ (eval ctx a, eval ctx b, eval ctx f, eval ctx g, eval ctx x, eval ctx i, eval ctx rho)
 
 and appFormula v x = match v with
   | VPLam f -> app (f, x)
+  | VResp (a, b, f, g, c) ->
+    begin match x with
+      | VDir Zero -> VIota2 (a, b, f, g, app (f, c))
+      | VDir One  -> VIota2 (a, b, f, g, app (g, c))
+      | i         -> VAppFormula (v, i)
+    end
   | _       -> let (_, u0, u1) = extPathP (inferV v) in
     begin match x with
       | VDir Zero -> u0
@@ -311,6 +321,11 @@ and app : value * value -> value = function
   (* ind-ℑ A B (λ _, b) x ~> b *)
   | VApp (VIndIm (a, b), VLam (t, (x, g))), v -> let u = g (Var (x, t)) in
     if mem x u then VApp (VApp (VIndIm (a, b), VLam (t, (x, g))), v) else u
+  (* coequ-ind A B f g X i rho (ι₂ b) ~> i b *)
+  | VIndCoequ (_, _, _, _, _, i, _), VIota2 (_, _, _, _, b) -> app (i, b)
+  (* coequ-ind A B f g X i rho (resp a @ r) ~> rho a @ r *)
+  | VIndCoequ (_, _, _, _, _, _, rho), VAppFormula (VResp (_, _, _, _, a), r) ->
+    appFormula (app (rho, a)) r
   | f, x -> VApp (f, x)
 
 and evalSystem ctx = bimap (getRho ctx) (fun mu t -> eval (faceEnv mu ctx) t)
@@ -379,6 +394,13 @@ and inferV v = traceInferV v; match v with
   | VInf v -> VIm (inferV v)
   | VJoin v -> extIm (inferV v)
   | VIndIm (a, b) -> inferIndIm a b
+  | VCoequ (a, _, _, _) -> VKan (extSet (inferV a))
+  | VIota2 (a, b, f, g, _) -> VCoequ (a, b, f, g)
+  | VResp (a, b, f, g, c) ->
+    let t = VCoequ (a, b, f, g) in
+    let p = VPLam (VLam (VI, (freshName "i", fun _ -> t))) in
+    VApp (VApp (VPathP p, VIota2 (a, b, f, g, app (f, c))), VIota2 (a, b, f, g, app (g, c)))
+  | VIndCoequ (a, b, f, g, x, _, _) -> VPi (VCoequ (a, b, f, g), (freshName "z", fun z -> app (x, z)))
   | VPLam _ | VPair _ | VHole -> raise (Internal (InferError (rbV v)))
 
 and inferVTele g t x f = g (inferV t) (inferV (f (Var (x, t))))
@@ -489,6 +511,10 @@ and act rho = function
   | VInf v               -> inf (act rho v)
   | VJoin v              -> join (act rho v)
   | VIndIm (a, b)        -> VIndIm (act rho a, act rho b)
+  | VCoequ (a, b, f, g)  -> VCoequ (act rho a, act rho b, act rho f, act rho g)
+  | VIota2 (a, b, f, g, c) -> VIota2 (act rho a, act rho b, act rho f, act rho g, act rho c)
+  | VResp (a, b, f, g, c) -> VResp (act rho a, act rho b, act rho f, act rho g, act rho c)
+  | VIndCoequ (a, b, f, g, x, i, p) -> VIndCoequ (act rho a, act rho b, act rho f, act rho g, act rho x, act rho i, act rho p)
 
 and actVar rho i = match Env.find_opt i rho with
   | Some v -> v
@@ -553,6 +579,10 @@ and conv v1 v2 : bool = traceConv v1 v2;
     | VInf u, VInf v -> conv u v
     | VJoin u, VJoin v -> conv u v
     | VIndIm (a1, b1), VIndIm (a2, b2) -> conv a1 a2 && conv b1 b2
+    | VCoequ (a1, b1, f1, g1), VCoequ (a2, b2, f2, g2) -> conv a1 a2 && conv b1 b2 && conv f1 f2 && conv g1 g2
+    | VIota2 (a1, b1, f1, g1, c1), VIota2 (a2, b2, f2, g2, c2) -> conv a1 a2 && conv b1 b2 && conv f1 f2 && conv g1 g2 && conv c1 c2
+    | VResp (a1, b1, f1, g1, c1), VResp (a2, b2, f2, g2, c2) -> conv a1 a2 && conv b1 b2 && conv f1 f2 && conv g1 g2 && conv c1 c2
+    | VIndCoequ (a1, b1, f1, g1, x1, i1, p1), VIndCoequ (a2, b2, f2, g2, x2, i2, p2) -> conv a1 a2 && conv b1 b2 && conv f1 f2 && conv g1 g2 && conv x1 x2 && conv i1 i2 && conv p1 p2
     | _, _ -> false
   end || convWithSystem (v1, v2) || convProofIrrel v1 v2
 
@@ -704,6 +734,41 @@ and infer ctx e : value = traceInfer e; match e with
   | EIndIm (a, b) -> ignore (extSet (infer ctx a)); let t = eval ctx a in
     let (c, (x, g)) = extPiG (infer ctx b) in eqNf (VIm t) c;
     ignore (extSet (g (Var (x, c)))); inferIndIm t (eval ctx b)
+  | ECoequ (a, b, f, g) ->
+    let ta = eval ctx a in ignore (extSet (infer ctx a));
+    let tb = eval ctx b in ignore (extSet (infer ctx b));
+    check ctx f (implv ta tb); check ctx g (implv ta tb);
+    VKan (extSet (infer ctx a))
+  | EIota2 (a, b, f, g, c) ->
+    let ta = eval ctx a in ignore (extSet (infer ctx a));
+    let tb = eval ctx b in ignore (extSet (infer ctx b));
+    check ctx f (implv ta tb); check ctx g (implv ta tb);
+    check ctx c tb; VCoequ (ta, tb, eval ctx f, eval ctx g)
+  | EResp (a, b, f, g, c) ->
+    let ta = eval ctx a in ignore (extSet (infer ctx a));
+    let tb = eval ctx b in ignore (extSet (infer ctx b));
+    check ctx f (implv ta tb); check ctx g (implv ta tb);
+    check ctx c ta;
+    let ef = eval ctx f in let eg = eval ctx g in
+    let ec = eval ctx c in let t = VCoequ (ta, tb, ef, eg) in
+    let p = VPLam (VLam (VI, (freshName "i", fun _ -> t))) in
+    VApp (VApp (VPathP p, VIota2 (ta, tb, ef, eg, app (ef, ec))), VIota2 (ta, tb, ef, eg, app (eg, ec)))
+  | EIndCoequ (a, b, f, g, x, i, rho) ->
+    let ta = eval ctx a in ignore (extSet (infer ctx a));
+    let tb = eval ctx b in ignore (extSet (infer ctx b));
+    check ctx f (implv ta tb); check ctx g (implv ta tb);
+    let ef = eval ctx f in let eg = eval ctx g in
+    let t = VCoequ (ta, tb, ef, eg) in
+    let tx = eval ctx x in
+    check ctx x (implv t (VKan Z.zero));
+    check ctx i (VPi (tb, (freshName "b", fun c -> app (tx, VIota2 (ta, tb, ef, eg, c)))));
+    let ti = eval ctx i in
+    check ctx rho (VPi (ta, (freshName "a", fun c ->
+      let p = VPLam (VLam (VI, (freshName "k", fun k ->
+        app (tx, appFormula (VResp (ta, tb, ef, eg, c)) k)))) in
+      let u0 = app (ti, app (ef, c)) in let u1 = app (ti, app (eg, c)) in
+      VApp (VApp (VPathP p, u0), u1))));
+    VPi (t, (freshName "z", fun z -> app (tx, z)))
   | EPLam _ | EPair _ | EHole -> raise (Internal (InferError e))
 
 and inferInd fibrant ctx t e f =

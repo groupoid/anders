@@ -35,8 +35,32 @@ def isPullbackSq (Z A B C : U) (f : A → C) (g : B → C) (z₁ : Z → A) (z�
  := isEquiv Z (pullback A B C f g) (induced Z A B C f g z₁ z₂ h)
 
 -- Exercise 2.11. Prove that the pullback P :≡ A x_C B defined in (2.15.11) is the corner of a pullback square.
-axiom completePullback (A B C : U) (f : A → C) (g : B → C) : pullbackSq (pullback A B C f g) A B C f g (pb₁ A B C f g) (pb₂ A B C f g)
+def completePullback (A B C : U) (f : A → C) (g : B → C) : pullbackSq (pullback A B C f g) A B C f g (pb₁ A B C f g) (pb₂ A B C f g)
+ := (pb₃ A B C f g, idIsEquiv (pullback A B C f g))
 
 def fiberPullback (A B : U) (f : A → B) (y : B)
   : pullbackSq (hofiber A B f y) A 𝟏 B f (λ (x : 𝟏), y) (pb₁ A 𝟏 B f (λ (x : 𝟏), y)) (pb₂ A 𝟏 B f (λ (x : 𝟏), y))
  := completePullback A 𝟏 B f (λ (x : 𝟏), y)
+
+def pullback-ind (A B C : U) (f : A → C) (g : B → C)
+  (P : pullback A B C f g → U)
+  (p : Π (a : A) (b : B) (eq : Path C (f a) (g b)), P (a, b, eq))
+  : Π (x : pullback A B C f g), P x
+ := λ (x : pullback A B C f g), p x.1 x.2.1 x.2.2
+
+def pullback-β (A B C : U) (f : A → C) (g : B → C)
+  (P : pullback A B C f g → U)
+  (p : Π (a : A) (b : B) (eq : Path C (f a) (g b)), P (a, b, eq))
+  (a : A) (b : B) (eq : Path C (f a) (g b))
+  : Path (P (a, b, eq)) (pullback-ind A B C f g P p (a, b, eq)) (p a b eq)
+ := idp (P (a, b, eq)) (p a b eq)
+
+def pullback-rec (A B C : U) (f : A → C) (g : B → C)
+  (X : U)
+  (p : Π (a : A) (b : B) (eq : Path C (f a) (g b)), X)
+  : pullback A B C f g → X
+ := pullback-ind A B C f g (λ (_ : pullback A B C f g), X) p
+
+def pullback-η (A B C : U) (f : A → C) (g : B → C) (x : pullback A B C f g)
+  : Path (pullback A B C f g) x (x.1, x.2.1, x.2.2)
+ := idp (pullback A B C f g) x

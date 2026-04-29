@@ -46,6 +46,10 @@ let rec rbV v = (*traceRbV v;*) match v with
   | VIndBool v           -> EIndBool (rbV v)
   | W (t, g)             -> rbVTele eW t g
   | VSup (a, b)          -> ESup (rbV a, rbV b)
+  | VCoequ (a, b, f, g)  -> ECoequ (rbV a, rbV b, rbV f, rbV g)
+  | VIota2 (a, b, f, g, c) -> EIota2 (rbV a, rbV b, rbV f, rbV g, rbV c)
+  | VResp (a, b, f, g, c) -> EResp (rbV a, rbV b, rbV f, rbV g, rbV c)
+  | VIndCoequ (a, b, f, g, x, i, rho) -> EIndCoequ (rbV a, rbV b, rbV f, rbV g, rbV x, rbV i, rbV rho)
   | VIndW (a, b, c)      -> EIndW (rbV a, rbV b, rbV c)
   | VIm t                -> EIm (rbV t)
   | VInf v               -> EInf (rbV v)

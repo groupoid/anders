@@ -86,10 +86,16 @@ struct
     | EInf e               -> W.put '\x51'; exp e
     | EIndIm (t, f)        -> W.put '\x52'; exp2 t f
     | EJoin e              -> W.put '\x53'; exp e
+    | ECoequ (a, b, f, g)  -> W.put '\x54'; exp4 a b f g
+    | EIota2 (a, b, f, g, c) -> W.put '\x55'; exp5 a b f g c
+    | EResp (a, b, f, g, c) -> W.put '\x56'; exp5 a b f g c
+    | EIndCoequ (a, b, f, g, x, i, rho) -> W.put '\x57'; exp7 a b f g x i rho
 
   and exp2 a b = exp a; exp b
   and exp3 a b c = exp a; exp b; exp c
   and exp4 a b c d = exp a; exp b; exp c; exp d
+  and exp5 a b c d e = exp a; exp b; exp c; exp d; exp e
+  and exp7 a b c d e f g = exp a; exp b; exp c; exp d; exp e; exp f; exp g
 
   and clos idx a p b = W.put idx; exp a; ident p; exp b
 

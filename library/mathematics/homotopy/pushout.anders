@@ -16,3 +16,39 @@ def po₂ (A B C: U) (f: C → A) (g: C → B) (b: B) : pushout A B C f g := ι�
 def po₃ (A B C: U) (f: C → A) (g: C → B) (c: C) : Path (pushout A B C f g) (po₁ A B C f g (f c)) (po₂ A B C f g (g c))
  := resp C (+ A B) (∘ C A (+ A B) (inl A B) f) (∘ C B (+ A B) (inr A B) g) c
 
+def pushout-ind (A B C : U) (f : C → A) (g : C → B)
+  (X : pushout A B C f g → U)
+  (i₁ : Π (a : A), X (po₁ A B C f g a))
+  (i₂ : Π (b : B), X (po₂ A B C f g b))
+  (ρ : Π (c : C), PathP (<i> X (po₃ A B C f g c @ i)) (i₁ (f c)) (i₂ (g c)))
+  : Π (z : pushout A B C f g), X z
+ := coequ-ind C (+ A B) (∘ C A (+ A B) (inl A B) f) (∘ C B (+ A B) (inr A B) g) X
+      (+-ind A B (λ (w : + A B), X (ι₂ C (+ A B) (∘ C A (+ A B) (inl A B) f) (∘ C B (+ A B) (inr A B) g) w)) i₁ i₂)
+      ρ
+
+def pushout-β₁ (A B C : U) (f : C → A) (g : C → B)
+  (X : pushout A B C f g → U)
+  (i₁ : Π (a : A), X (po₁ A B C f g a))
+  (i₂ : Π (b : B), X (po₂ A B C f g b))
+  (ρ : Π (c : C), PathP (<i> X (po₃ A B C f g c @ i)) (i₁ (f c)) (i₂ (g c)))
+  (a : A)
+  : Path (X (po₁ A B C f g a)) (pushout-ind A B C f g X i₁ i₂ ρ (po₁ A B C f g a)) (i₁ a)
+ := coequ-ind-β₁ C (+ A B) (∘ C A (+ A B) (inl A B) f) (∘ C B (+ A B) (inr A B) g) X
+      (+-ind A B (λ (w : + A B), X (ι₂ C (+ A B) (∘ C A (+ A B) (inl A B) f) (∘ C B (+ A B) (inr A B) g) w)) i₁ i₂)
+      ρ (inl A B a)
+
+def pushout-β₂ (A B C : U) (f : C → A) (g : C → B)
+  (X : pushout A B C f g → U)
+  (i₁ : Π (a : A), X (po₁ A B C f g a))
+  (i₂ : Π (b : B), X (po₂ A B C f g b))
+  (ρ : Π (c : C), PathP (<i> X (po₃ A B C f g c @ i)) (i₁ (f c)) (i₂ (g c)))
+  (b : B)
+  : Path (X (po₂ A B C f g b)) (pushout-ind A B C f g X i₁ i₂ ρ (po₂ A B C f g b)) (i₂ b)
+ := coequ-ind-β₁ C (+ A B) (∘ C A (+ A B) (inl A B) f) (∘ C B (+ A B) (inr A B) g) X
+      (+-ind A B (λ (w : + A B), X (ι₂ C (+ A B) (∘ C A (+ A B) (inl A B) f) (∘ C B (+ A B) (inr A B) g) w)) i₁ i₂)
+      ρ (inr A B b)
+
+def pushout-rec (A B C X : U) (f : C → A) (g : C → B)
+  (i₁ : A → X) (i₂ : B → X) (ρ : Π (c : C), Path X (i₁ (f c)) (i₂ (g c)))
+  : pushout A B C f g → X
+ := pushout-ind A B C f g (λ (_ : pushout A B C f g), X) i₁ i₂ ρ

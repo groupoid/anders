@@ -90,11 +90,17 @@ struct
     | '\x51' -> EInf (exp ())
     | '\x52' -> let (t, f) = exp2 () in EIndIm (t, f)
     | '\x53' -> EJoin (exp ())
+    | '\x54' -> let (a, b, c, d) = exp4 () in ECoequ (a, b, c, d)
+    | '\x55' -> let (a, b, c, d, e) = exp5 () in EIota2 (a, b, c, d, e)
+    | '\x56' -> let (a, b, c, d, e) = exp5 () in EResp (a, b, c, d, e)
+    | '\x57' -> let (a, b, c, d, e, f, g) = exp7 () in EIndCoequ (a, b, c, d, e, f, g)
     | _      -> failwith "Term?"
 
   and exp2 () = let a = exp () in let b = exp () in (a, b)
   and exp3 () = let a = exp () in let b = exp () in let c = exp () in (a, b, c)
   and exp4 () = let a = exp () in let b = exp () in let c = exp () in let d = exp () in (a, b, c, d)
+  and exp5 () = let a = exp () in let b = exp () in let c = exp () in let d = exp () in let e = exp () in (a, b, c, d, e)
+  and exp7 () = let a = exp () in let b = exp () in let c = exp () in let d = exp () in let e = exp () in let f = exp () in let g = exp () in (a, b, c, d, e, f, g)
 
   and clos () = let a = exp () in let p = ident () in let b = exp () in (a, p, b)
 

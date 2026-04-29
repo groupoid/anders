@@ -5,13 +5,31 @@ import library/foundations/mltt/inductive
 import library/foundations/mltt/either
 import library/mathematics/homotopy/coequalizer
 
-{- Hub and Spoke HIT Encoded via W-types and Coequalizers.
-   This formalization avoids high-level HIT and core Disc primitive, instead implementing
-   the MLTT rules via an underlying inductive-algebra framework. -}
+{-
+   Hub and Spoke HIT Encoded via W-types and Coequalizers.
+   This formalization avoids high-level HIT and core Disc primitive,
+   instead implementing the MLTT rules via an underlying inductive-algebra framework.
 
-def W_hs_B (S A : U) : U := + A 𝟏 -- Points container: B = A + 1
-def W_hs_C (S A : U) : W_hs_B S A → U := +-rec A 𝟏 U (λ (_ : A), 𝟎) (λ (_ : 𝟏), S) -- Subtrees: C (inl a) = 0, C (inr *) = S
-def W_hs (S A : U) : U := W (x : W_hs_B S A), W_hs_C S A x -- Raw constructors via W-types
+   Implementing the Hub and Spoke Higher Inductive Type (HIT) algebraically
+   via $W$-types and general Coequalizers reveals significant computational
+   and type-theoretic boundary constraints compared to providing a dedicated
+   primitive inside the kernel.
+
+   Blocked Homotopy Computations. When trying to construct higher dimensional
+   structures (e.g. proving contractibility), standard operations like transp
+   and hcomp over Coequalizers result in unreduced dependent closures.
+   The system cannot reduce the endpoints efficiently because the
+   $W$-type constructor trees are structurally massive. 
+
+   High-level HIT implementations without judgmental shortcuts
+   easily break computational univalence criteria (comp over Glue types).
+   Hardcoding constraints allows safe execution of complex theorems without
+   structural failure. See hs.anders for a built-in Disc primitive implementation.
+-}
+
+def W_hs_B (S A : U) : U := + A 𝟏 
+def W_hs_C (S A : U) : W_hs_B S A → U := +-rec A 𝟏 U (λ (_ : A), 𝟎) (λ (_ : 𝟏), S)
+def W_hs (S A : U) : U := W (x : W_hs_B S A), W_hs_C S A x
 def W_center (S A : U) (a : A) : W_hs S A := sup (+ A 𝟏) (W_hs_C S A) (inl A 𝟏 a) (λ (z : 𝟎), ind₀ (W_hs S A) z)
 def W_hub (S A : U) (f : S → W_hs S A) : W_hs S A := sup (+ A 𝟏) (W_hs_C S A) (inr A 𝟏 ★) f
 

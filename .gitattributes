@@ -1,5 +1,6 @@
 Makefile linguist-detectable=false
 *.mll linguist-language=OCaml
+*.anders linguist-language=Lean
 *.mly linguist-language=OCaml
 *.ml linguist-language=OCaml
 *.js linguist-detectable=false

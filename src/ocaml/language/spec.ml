@@ -66,12 +66,6 @@ type exp =
   | EDisc of exp | EBase of exp | EHub of exp | ESpoke of exp | EIndDisc of exp          (* Disc *)
   | EIm of exp | EInf of exp | EIndIm of exp * exp | EJoin of exp      (* Infinitesimal Modality *)
 
-
-
-
-type extension =
-  | EDisc of exp | EBase of exp | EHub of exp | ESpoke of exp | EIndDisc of exp          (* Disc *)
-
 type tele = ident * exp
 
 let eLam p a b = ELam (a, (p, b))

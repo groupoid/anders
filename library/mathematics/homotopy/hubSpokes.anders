@@ -14,3 +14,15 @@ axiom isNull (S A : U) : U
 axiom hs-ind (S A : U) (B : hs S A → U)
       (nB : Π (x : hs S A), isNull S (B x))
       (nC : Π (a : A), B (center S A a)) (x : hs S A) : B x
+
+def hs-rec (S A X : U)
+      (nX : isNull S X)
+      (nC : A → X) (x : hs S A) : X
+ := hs-ind S A (λ (_ : hs S A), X) (λ (x : hs S A), nX) nC x
+
+axiom hs-β₁ (S A : U) (B : hs S A → U)
+      (nB : Π (x : hs S A), isNull S (B x))
+      (nC : Π (a : A), B (center S A a)) (a : A)
+    : Path (B (center S A a)) (hs-ind S A B nB nC (center S A a)) (nC a)
+
+

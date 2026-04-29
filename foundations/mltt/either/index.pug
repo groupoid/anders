@@ -3,7 +3,7 @@ include ../../../header
 html
     head
         meta(property='og:title'       content='EITHER')
-        meta(property='og:description' content='Either type (disjunction, union)')
+        meta(property='og:description' content='Disjoint Union / Sum Type')
         meta(property='og:url'         content='https://anders.groupoid.space/foundations/mltt/either/')
 
 block title
@@ -15,15 +15,93 @@ block content
         <a href='https://anders.groupoid.space/library/'>LIB</a>
         <a href='#'>EITHER</a>
     article.main.list
-        section
-            h1 EITHER
-            aside
-                time Published: 16 OCT 2017
-            +tex.
-                $+$-type is a representation disjunction.
+        .exe
+            section
+                h1 DISJOINT UNION
+                aside
+                    time Published: 29 APR 2026
+                +tex.
+                    The disjoint union (sum type) $A + B$ is the type of values that are either from $A$ (tagged left) 
+                    or from $B$ (tagged right). It is the coproduct in the category of types.
+                +tex(true).
+                    $$
+                      A + B = \sum_{x:𝟐} \mathrm{ind}_2(\lambda\_,U)\, A\, B\, x
+                    $$
 
-            h2 Constructors
-            h2 Eliminators
-            h2 Induction Principle
+            section
+                h2 Formation
+                +code.
+                    def + (A B: U) : U := Σ (x : 𝟐), ind₂ (λ (_ : 𝟐), U) A B x
+
+                h2 Constructors
+                +code.
+                    def inl (A B : U) (a : A) : + A B := (0₂, a)
+                    def inr (A B : U) (b : B) : + A B := (1₂, b)
+
+                h2 Eliminators
+                +tex.
+                    The induction principle $+$-ind allows case analysis on a value of the sum type.
+                +code.
+                    def +-ind (A B : U) (C : + A B → U)
+                        (f : Π (x : A), C (inl A B x))
+                        (g : Π (y : B), C (inr A B y)) (w : + A B)
+                      : C w
+                     := ind₂ (λ (x : 𝟐), Π (u : ind₂ (λ (_ : 𝟐), U) A B x), C (x, u)) 
+                             f g w.1 w.2
+
+                p.
+                    Non-dependent recursion:
+                +code.
+                    def +-rec (A B C : U) (f : A → C) (g : B → C)
+                      : (+ A B) → C
+                     := +-ind A B (λ (_ : + A B), C) f g
+
+                h2 Computation Rules
+                +tex.
+                    The $\beta$-rules for the disjoint union state how the eliminator computes on the constructors.
+                +code.
+                    def +-β₁ (A B : U) (C : + A B → U) (a: A)
+                        (f : Π (x : A), C (inl A B x)) (g : Π (y : B), C (inr A B y))
+                      : PathP (<_>C (inl A B a)) (f a) (+-ind A B C f g (inl A B a))
+                     := <_> f a
+
+                    def +-β₂ (A B : U) (C : + A B → U) (b: B)
+                        (f : Π (x : A), C (inl A B x)) (g : Π (y : B), C (inr A B y))
+                      : PathP (<_>C (inr A B b)) (g b) (+-ind A B C f g (inr A B b))
+                     := <_> g b
+
+                h2 Uniqueness
+                +code.
+                    def +-η (A B : U) (c : + A B)
+                      : + (Σ (x : A), PathP (<_> + A B) c (inl A B x))
+                          (Σ (y : B), PathP (<_> + A B) c (inr A B y))
+                     := +-ind A B (λ (c : + A B),
+                        + (Σ (x : A), PathP (<_> + A B) c (inl A B x))
+                          (Σ (y : B), PathP (<_> + A B) c (inr A B y)))
+                          (λ (x : A), (0₂, (x, <_> (0₂, x))))
+                          (λ (y : B), (1₂, (y, <_> (1₂, y)))) c
+
+            section
+                h2 Finite Coproducts
+                +tex.
+                    Using $+$, we can define small finite sum types such as $𝟑$, $𝟒$, $𝟓$, etc., with their corresponding eliminators.
+                +code.
+                    def 𝟑 : U := + 𝟏 𝟐
+                    def 0₃ : 𝟑 := inl 𝟏 𝟐 ★
+                    def 1₃ : 𝟑 := inr 𝟏 𝟐 0₂
+                    def 2₃ : 𝟑 := inr 𝟏 𝟐 1₂
+
+                    def ind₃ (C : 𝟑 → U) (c₀ : C 0₃) (c₁ : C 1₃) (c₂ : C 2₃) 
+                      : Π (x : 𝟑), C x
+                     := +-ind 𝟏 𝟐 C (ind₁ (λ (_ : 𝟏), C 0₃) c₀) 
+                                    (ind₂ (λ (_ : 𝟐), C (1₂, _)) c₁ c₂)
+
+                p.
+                    Similar definitions exist for $𝟒$, $𝟓$, $𝟔$, $𝟕$ (see source module for full list).
+
+            section
+                h2 Theorems
+                +tex.
+                    The disjoint union satisfies standard properties expected from a coproduct in type theory.
 
 include ../../../footer

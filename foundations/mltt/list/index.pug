@@ -56,7 +56,7 @@ block content
                 def List-ind (A: U) (C: List A -> U)
                     (z: C (nil A)) (s: Π (x: A) (xs: List A), C xs -> C (cons A x xs))
                   : Π (n: List A), C n
-
+            br.
             +code.
                 def List-rec  (A: U) (C : U) (z : C) (s : A → List A → C → C) : List A → C
                 def List-iter (A: U) (C : U) (z : C) (s : A → C → C) : List A → C

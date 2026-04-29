@@ -3,7 +3,7 @@ include ../../../header
 html
     head
         meta(property='og:title'       content='MAYBE')
-        meta(property='og:description' content='Maybe')
+        meta(property='og:description' content='Maybe / Option Type')
         meta(property='og:url'         content='https://anders.groupoid.space/foundations/mltt/maybe/')
 
 block title
@@ -15,17 +15,51 @@ block content
         <a href='https://anders.groupoid.space/library/'>LIB</a>
         <a href='#'>MAYBE</a>
     article.main.list
-        section
-            h1 MAYBE
-            aside
-                time Published: 4 NOV 2017
-            +tex.
-                Maybe has representing functor $M_A(X) = 1 + A$.
-                It is used for wrapping values with optional nothing constructor.
+        .exe
+            section
+                h1 MAYBE TYPE
+                aside
+                    time Published: 29 APR 2026
+                +tex.
+                    The $Maybe$ type (also called $Option$) is the disjoint union of the unit type $𝟏$ and a given type $A$.
+                    It represents computations that may fail or return no value ($nothing$) or succeed with a value ($just$).
+                +tex(true).
+                    $$
+                      Maybe(A) = 𝟏 + A
+                    $$
 
-            h2 Introduction
-            h2 Elimination
-            h2 Computation
-            h2 Uniqueness
+            section
+                h2 Formation
+                +code.
+                    def Maybe (A : U) : U := + 𝟏 A
+
+                h2 Constructors
+                +tex.
+                    $Maybe$ has two constructors: $nothing$ (the failure case) and $just$ (the success case).
+                +code.
+                    def nothing (A : U) : Maybe A := inl 𝟏 A ★
+                    def just (A : U) (a : A) : Maybe A := inr 𝟏 A a
+
+                h2 Eliminators
+                +tex.
+                    The induction principle for $Maybe$ is derived from the induction principle of the disjoint union $+$.
+                +code.
+                    def maybe-ind (A : U) (P: Maybe A → U)
+                        (n: P (nothing A)) (j: Π (x: A), P (just A x))
+                      : Π (a: Maybe A), P a
+                     := +-ind 𝟏 A P (ind₁ (λ (_ : 𝟏), P (nothing A)) n) j
+
+                p.
+                    Non-dependent versions:
+                +code.
+                    def maybe-rec (A P: U) (n: P) (j: A → P) : Maybe A → P
+                     := maybe-ind A (λ (_ : Maybe A), P) n j
+
+            section
+                h2 Theorems
+                +tex.
+                    Standard computational rules follow from the corresponding rules of $+$.
+                p.
+                    (See $+$-β rules in the Either section for the computational behavior.)
 
 include ../../../footer

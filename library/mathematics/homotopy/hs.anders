@@ -6,30 +6,35 @@ import library/foundations/univalent/equiv
 def hs (S A : U) : U := disc A
 
 -- 2) Introduction Rules
-def hs-center (S A : U) (a : A) := base a
-def hs-hub (S A : U) (f : S → hs S A) := hub f
-def hs-spoke (S A : U) (f : S → hs S A) (s : S) := spoke s
+def center (S A : U) (a : A) : hs S A := base a
+def hub' (S A : U) (f : S → hs S A) : hs S A := hub f
+def spoke' (S A : U) (f : S → hs S A) (s : S) : PathP (<i> hs S A) (hub' S A f) (f s) := spoke s
 
 -- 3) Elimination Rule
 def hs-ind (S A : U) (X : hs S A → U)
-      (nCenter : Π (a : A), X (hs-center S A a))
-      (nHub : Π (f : S → hs S A) (nF : Π (s : S), X (f s)), X (hs-hub S A f))
-      (nSpoke : Π (f : S → hs S A) (nF : Π (s : S), X (f s)) (s : S), PathP (<i> X (hs-spoke S A f s @ i)) (nHub f nF) (nF s))
-      (z : hs S A) := disc-ind z
+      (nCenter : Π (a : A), X (center S A a))
+      (nHub : Π (f : S → hs S A) (nF : Π (s : S), X (f s)), X (hub' S A f))
+      (nSpoke : Π (f : S → hs S A) (nF : Π (s : S), X (f s)) (s : S), PathP (<i> X (spoke' S A f s @ i)) (nHub f nF) (nF s))
+      (z : hs S A) : X z := disc-ind z
 
 -- 4) Computational Rules
 def hs-β₁ (S A : U) (X : hs S A → U)
-      (nCenter : Π (a : A), X (hs-center S A a))
-      (nHub : Π (f : S → hs S A) (nF : Π (s : S), X (f s)), X (hs-hub S A f))
-      (nSpoke : Π (f : S → hs S A) (nF : Π (s : S), X (f s)) (s : S), PathP (<i> X (hs-spoke S A f s @ i)) (nHub f nF) (nF s)) (a : A)
-    := idp (X (hs-center S A a)) (nCenter a)
+      (nCenter : Π (a : A), X (center S A a))
+      (nHub : Π (f : S → hs S A) (nF : Π (s : S), X (f s)), X (hub' S A f))
+      (nSpoke : Π (f : S → hs S A) (nF : Π (s : S), X (f s)) (s : S), PathP (<i> X (spoke' S A f s @ i)) (nHub f nF) (nF s)) (a : A)
+    : Path (X (center S A a)) (hs-ind S A X nCenter nHub nSpoke (center S A a)) (nCenter a)
+    := idp (X (center S A a)) (nCenter a)
 
 def hs-β₂ (S A : U) (X : hs S A → U)
-      (nCenter : Π (a : A), X (hs-center S A a))
-      (nHub : Π (f : S → hs S A) (nF : Π (s : S), X (f s)), X (hs-hub S A f))
-      (nSpoke : Π (f : S → hs S A) (nF : Π (s : S), X (f s)) (s : S), PathP (<i> X (hs-spoke S A f s @ i)) (nHub f nF) (nF s)) (f : S → hs S A)
-    := idp (X (hs-hub S A f)) (nHub f (λ (s : S), hs-ind S A X nCenter nHub nSpoke (f s)))
+      (nCenter : Π (a : A), X (center S A a))
+      (nHub : Π (f : S → hs S A) (nF : Π (s : S), X (f s)), X (hub' S A f))
+      (nSpoke : Π (f : S → hs S A) (nF : Π (s : S), X (f s)) (s : S), PathP (<i> X (spoke' S A f s @ i)) (nHub f nF) (nF s)) (f : S → hs S A)
+    : Path (X (hub' S A f)) (hs-ind S A X nCenter nHub nSpoke (hub' S A f)) (nHub f (λ (s : S), hs-ind S A X nCenter nHub nSpoke (f s)))
+    := idp (X (hub' S A f)) (nHub f (λ (s : S), hs-ind S A X nCenter nHub nSpoke (f s)))
 
 -- 5) Uniqueness Rule
 def hs-η (S A : U) (X : hs S A → U) (h : Π (z : hs S A), X z)
       (hs-map : Π (z : hs S A), X z) := idp (Π (z : hs S A), X z) h
+
+
+

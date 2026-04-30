@@ -7,9 +7,9 @@ import library/mathematics/homotopy/hs
 {- Generic ℕ-indexed Truncations -}
 
 def trunc (A : U) (n : ℕ) : U := hs (sphere n) A
-def trunc₁ (A : U) (n : ℕ) (x : A) := hs-center (sphere n) A x
-def trunc₂ (A : U) (n : ℕ) (f : sphere n → hs (sphere n) A) := hs-hub (sphere n) A f
-def trunc₃ (A : U) (n : ℕ) (f : sphere n → hs (sphere n) A) (s : sphere n) := hs-spoke (sphere n) A f s
+def trunc₁ (A : U) (n : ℕ) (x : A) := center (sphere n) A x
+def trunc₂ (A : U) (n : ℕ) (f : sphere n → hs (sphere n) A) := hub' (sphere n) A f
+def trunc₃ (A : U) (n : ℕ) (f : sphere n → hs (sphere n) A) (s : sphere n) := spoke' (sphere n) A f s
 
 def ‖_‖₋₁ (A : U) : U := trunc A zero
 def ‖_‖₀ (A : U) : U := trunc A one

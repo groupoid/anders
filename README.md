@@ -31,7 +31,7 @@ type exp =
 
 Anders is a HoTT proof assistant based on: classical MLTT-80 with 0, 1, 2, W types;
 CCHM in CHM flavour as cubical type system with hcomp/trans Kan operations;
-HTS sctrict equality on pretypes; de Rham stack modality; Disk and Coequalizer primitives.
+HTS sctrict equality on pretypes; de Rham stack modality; Disc and Coequalizer primitives.
 We tend not to touch general recursive higher inductive schemes yet,
 instead we will try to express as much HIT as possible through W,
 Coequlizer and HubSpokes Disc in the style of HoTT/Coq homotopy library and Three-HIT theorem.

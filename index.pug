@@ -20,12 +20,12 @@ block content
             aside
                 time Published: 4 JUL 2021
                 +tex.
-                    $\mathbf{Anders}$ is a Modal HoTT proof assistant based on: classical <a href="https://raw.githubusercontent.com/michaelt/martin-lof/master/pdfs/Bibliopolis-Book-retypeset-1984.pdf">MLTT-80</a> [14] with 0, 1, 2, W types;
+                    $\mathbf{Anders}$ is a Modal HoTT proof assistant based on: classical <a href="https://5ht.co/mltt-80.pdf">MLTT-80</a> [14] with 0, 1, 2, W types;
                     <a href="https://arxiv.org/pdf/1611.02108.pdf">CCHM</a> [4] in CHM flavour as cubical type system with hcomp/transp Kan operations;
-                    HTS strict equality on pretypes; <a href="https://arxiv.org/pdf/1806.05966.pdf">de Rham</a> [19]  stack modality primitives.
+                    HTS strict equality on pretypes; <a href="https://arxiv.org/pdf/1806.05966.pdf">de Rham</a> [19] stack modality; Disc and Coequ primitives.
                     We tend not to touch general recursive higher inductive schemes yet,
                     instead we will try to express as much HIT as possible through W, Coequlizer
-                    and HubSpokes Disc in the style of HoTT/Coq homotopy library and Three-HIT theorem.
+                    and Hub Spokes Disc in the style of HoTT/Coq homotopy library and Three-HIT theorem [22].
 
             section
                 .macro
@@ -56,6 +56,8 @@ block content
                             li: a(href='#path') PATH
                             li: a(href='#glue') GLUE
                             li: a(href='#induction') 0,1,2,W
+                            li: a(href='#disc') DISC
+                            li: a(href='#coeqг') COEQU
                 br
                 p.
                     The <a href="https://www.math.ias.edu/vladimir/sites/math.ias.edu.vladimir/files/HTS.pdf">HTS</a> [1]
@@ -620,6 +622,7 @@ block content
                     19) <a href="https://arxiv.org/pdf/1806.05966.pdf">Cartan Geometry in Modal Homotopy Type Theory</a> [Cherubini].
                     20) <a href="https://hott-uf.github.io/2017/abstracts/cohesivett.pdf">Differential Cohesive Type Theory</a> [Gross, Licata, New, Paykin, Riley, Shulman, Cherubini].
                     21) <a href="https://arxiv.org/abs/1509.07584">Brouwer’s fixed-point theorem in real-cohesive homotopy type theory</a> [Shulman].
+                    22) <a href="https://5ht.co/three.pdf"></a> [Andrej Bauer, Niels van der Weide].
 
                 center.
                     <br>🧊 <br><br><br>

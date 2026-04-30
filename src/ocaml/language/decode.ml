@@ -94,11 +94,11 @@ struct
     | '\x55' -> let (a, b, c, d, e) = exp5 () in EIota2 (a, b, c, d, e)
     | '\x56' -> let (a, b, c, d, e) = exp5 () in EResp (a, b, c, d, e)
     | '\x57' -> let (a, b, c, d, e, f, g) = exp7 () in EIndCoequ (a, b, c, d, e, f, g)
-    | '\x58' -> EDisc (exp ())
-    | '\x59' -> EBase (exp ())
-    | '\x5A' -> EHub (exp ())
-    | '\x5B' -> ESpoke (exp ())
-    | '\x5C' -> EIndDisc (exp ())
+    | '\x58' -> let s = exp () in let a = exp () in EDisc (s, a)
+    | '\x59' -> let s = exp () in let a = exp () in let x = exp () in EBase (s, a, x)
+    | '\x5A' -> let s = exp () in let a = exp () in let f = exp () in EHub (s, a, f)
+    | '\x5B' -> let s = exp () in let a = exp () in let f = exp () in let x = exp () in ESpoke (s, a, f, x)
+    | '\x5C' -> let s = exp () in let a = exp () in let x = exp () in let nc = exp () in let nh = exp () in let ns' = exp () in let z = exp () in EIndDisc (s, a, x, nc, nh, ns', z)
 
     | _      -> failwith "Term?"
 

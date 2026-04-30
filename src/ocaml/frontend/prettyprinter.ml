@@ -75,11 +75,11 @@ let rec ppExp paren e = let x = match e with
   | EIota2 (a, b, f, g, c) -> Printf.sprintf "ι₂ %s %s %s %s %s" (ppExp true a) (ppExp true b) (ppExp true f) (ppExp true g) (ppExp true c)
   | EResp (a, b, f, g, c) -> Printf.sprintf "resp %s %s %s %s %s" (ppExp true a) (ppExp true b) (ppExp true f) (ppExp true g) (ppExp true c)
   | EIndCoequ (a, b, f, g, x, i, rho) -> Printf.sprintf "coequ-ind %s %s %s %s %s %s %s" (ppExp true a) (ppExp true b) (ppExp true f) (ppExp true g) (ppExp true x) (ppExp true i) (ppExp true rho)
-  | EDisc e -> Printf.sprintf "disc %s" (ppExp true e)
-  | EBase e -> Printf.sprintf "base %s" (ppExp true e)
-  | EHub e -> Printf.sprintf "hub %s" (ppExp true e)
-  | ESpoke e -> Printf.sprintf "spoke %s" (ppExp true e)
-  | EIndDisc e -> Printf.sprintf "disc-ind %s" (ppExp true e)
+  | EDisc (s, a) -> Printf.sprintf "disc %s %s" (ppExp true s) (ppExp true a)
+  | EBase (s, a, x) -> Printf.sprintf "base %s %s %s" (ppExp true s) (ppExp true a) (ppExp true x)
+  | EHub (s, a, f) -> Printf.sprintf "hub %s %s %s" (ppExp true s) (ppExp true a) (ppExp true f)
+  | ESpoke (s, a, f, x) -> Printf.sprintf "spoke %s %s %s %s" (ppExp true s) (ppExp true a) (ppExp true f) (ppExp true x)
+  | EIndDisc (s, a, x, nc, nh, ns', z) -> Printf.sprintf "disc-ind %s %s %s %s %s %s %s" (ppExp true s) (ppExp true a) (ppExp true x) (ppExp true nc) (ppExp true nh) (ppExp true ns') (ppExp true z)
 
   in match e with
   | EVar _ | EFst _ | ESnd _ | EI | EPre _ | ESystem _

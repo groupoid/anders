@@ -137,11 +137,11 @@ exp4 :
   | IOTA2 exp6 exp6 exp6 exp6 exp6 { EIota2 ($2, $3, $4, $5, $6) }
   | RESP exp6 exp6 exp6 exp6 exp6 { EResp ($2, $3, $4, $5, $6) }
   | INDCOEQU exp6 exp6 exp6 exp6 exp6 exp6 exp6 { EIndCoequ ($2, $3, $4, $5, $6, $7, $8) }
-  | DISC exp6 { EDisc $2 }
-  | BASE exp6 { EBase $2 }
-  | HUB exp6 { EHub $2 }
-  | SPOKE exp6 { ESpoke $2 }
-  | INDDISC exp6 { EIndDisc $2 }
+  | DISC exp6 exp6 { EDisc ($2, $3) }
+  | BASE exp6 exp6 exp6 { EBase ($2, $3, $4) }
+  | HUB exp6 exp6 exp6 { EHub ($2, $3, $4) }
+  | SPOKE exp6 exp6 exp6 exp6 { ESpoke ($2, $3, $4, $5) }
+  | INDDISC exp6 exp6 exp6 exp6 exp6 exp6 exp6 { EIndDisc ($2, $3, $4, $5, $6, $7, $8) }
   | exp5 { $1 }
 
 

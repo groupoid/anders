@@ -63,7 +63,8 @@ type exp =
   | EW of exp * (ident * exp) | ESup of exp * exp | EIndW of exp * exp * exp                (* W *)
   | ECoequ of exp * exp * exp * exp | EIota2 of exp * exp * exp * exp * exp       (* Coequalizer *)
   | EResp of exp * exp * exp * exp * exp | EIndCoequ of exp * exp * exp * exp * exp * exp * exp
-  | EDisc of exp | EBase of exp | EHub of exp | ESpoke of exp | EIndDisc of exp          (* Disc *)
+  | EDisc of exp * exp | EBase of exp * exp * exp | EHub of exp * exp * exp              (* Disc *)
+  | ESpoke of exp * exp * exp * exp | EIndDisc of exp * exp * exp * exp * exp * exp * exp  
   | EIm of exp | EInf of exp | EIndIm of exp * exp | EJoin of exp      (* Infinitesimal Modality *)
 
 type tele = ident * exp

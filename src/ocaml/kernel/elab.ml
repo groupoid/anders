@@ -170,11 +170,11 @@ let rec salt (ns : ident Env.t) : exp -> exp = function
   | EIota2 (a, b, f, g, c) -> EIota2 (salt ns a, salt ns b, salt ns f, salt ns g, salt ns c)
   | EResp (a, b, f, g, c) -> EResp (salt ns a, salt ns b, salt ns f, salt ns g, salt ns c)
   | EIndCoequ (a, b, f, g, x, i, rho) -> EIndCoequ (salt ns a, salt ns b, salt ns f, salt ns g, salt ns x, salt ns i, salt ns rho)
-  | EDisc e -> EDisc (salt ns e)
-  | EBase e -> EBase (salt ns e)
-  | EHub e -> EHub (salt ns e)
-  | ESpoke e -> ESpoke (salt ns e)
-  | EIndDisc e -> EIndDisc (salt ns e)
+  | EDisc (s, a) -> EDisc (salt ns s, salt ns a)
+  | EBase (s, a, x) -> EBase (salt ns s, salt ns a, salt ns x)
+  | EHub (s, a, f) -> EHub (salt ns s, salt ns a, salt ns f)
+  | ESpoke (s, a, f, x) -> ESpoke (salt ns s, salt ns a, salt ns f, salt ns x)
+  | EIndDisc (s, a, x, nc, nh, ns', z) -> EIndDisc (salt ns s, salt ns a, salt ns x, salt ns nc, salt ns nh, salt ns ns', salt ns z)
   | EJoin e              -> EJoin (salt ns e)
 
 
@@ -238,11 +238,11 @@ let rec swap i j = function
   | VIota2 (a, b, f, g, c) -> VIota2 (swap i j a, swap i j b, swap i j f, swap i j g, swap i j c)
   | VResp (a, b, f, g, c) -> VResp (swap i j a, swap i j b, swap i j f, swap i j g, swap i j c)
   | VIndCoequ (a, b, f, g, x, k, rho) -> VIndCoequ (swap i j a, swap i j b, swap i j f, swap i j g, swap i j x, swap i j k, swap i j rho)
-  | VDisc v              -> VDisc (swap i j v)
-  | VBase v              -> VBase (swap i j v)
-  | VHub v               -> VHub (swap i j v)
-  | VSpoke v             -> VSpoke (swap i j v)
-  | VIndDisc v           -> VIndDisc (swap i j v)
+  | VDisc (s, a) -> VDisc (swap i j s, swap i j a)
+  | VBase (s, a, x) -> VBase (swap i j s, swap i j a, swap i j x)
+  | VHub (s, a, f) -> VHub (swap i j s, swap i j a, swap i j f)
+  | VSpoke (s, a, f, x) -> VSpoke (swap i j s, swap i j a, swap i j f, swap i j x)
+  | VIndDisc (s, a, x, nc, nh, ns', z) -> VIndDisc (swap i j s, swap i j a, swap i j x, swap i j nc, swap i j nh, swap i j ns', swap i j z)
   | VJoin v              -> VJoin (swap i j v)
 
 
@@ -257,8 +257,12 @@ let rec mem y = function
   | VStar | VBool | VFalse | VTrue | VDir _ -> false
   | VPLam a | VFst a | VSnd a | VPathP a | VId a | VRef a
   | VJ a | VNeg a | VOuc a | VGlue a | VIndEmpty a
-  | VIndUnit a | VIndBool a | VIm a | VInf a | VJoin a
-  | VDisc a | VBase a | VHub a | VSpoke a | VIndDisc a -> mem y a
+  | VIndUnit a | VIndBool a | VIm a | VInf a | VJoin a -> mem y a
+  | VDisc (s, a) -> mem y s || mem y a
+  | VBase (s, a, x) -> mem y s || mem y a || mem y x
+  | VHub (s, a, f) -> mem y s || mem y a || mem y f
+  | VSpoke (s, a, f, x) -> mem y s || mem y a || mem y f || mem y x
+  | VIndDisc (s, a, x, nc, nh, ns', z) -> mem y s || mem y a || mem y x || mem y nc || mem y nh || mem y ns' || mem y z
 
   | VApp (a, b) | VPartialP (a, b) | VAppFormula (a, b)
   | VTransp (a, b) | VAnd (a, b) | VOr (a, b) | VInc (a, b)

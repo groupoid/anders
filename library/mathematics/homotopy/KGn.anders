@@ -8,6 +8,10 @@ import library/mathematics/homotopy/quotient
 def 𝚺ₓ (A: U) : ℕ → U := ℕ-iter U A 𝚺
 def discreteTopology (G : abgroup) : U := G.1.1
 def R-K1 (G : group) : 𝟏 → 𝟏 → U := λ (x y : 𝟏), G.1.1
-def Q-K1 (G : group) (x y : 𝟏) (u w : R¯ 𝟏 (R-K1 G) x y) : U := 𝟎
+def loop-K1 (G : group) (g : G.1.1) : R¯ 𝟏 (R-K1 G) ★ ★ := quot₂ 𝟏 (R-K1 G) ★ ★ g
+
+def Q-K1 (G : group) (x y : 𝟏) (r1 r2 : R¯ 𝟏 (R-K1 G) x y) : U
+ := + (Σ (g h : G.1.1), prod (Path (R¯ 𝟏 (R-K1 G) x y) r1 (−·− 𝟏 (R-K1 G) ★ ★ ★ (loop-K1 G g) (loop-K1 G h))) (Path (R¯ 𝟏 (R-K1 G) x y) r2 (loop-K1 G (G.2.1.1 g h))))
+      (prod (Path (R¯ 𝟏 (R-K1 G) x y) r1 (loop-K1 G G.2.1.2.2.1)) (Path (R¯ 𝟏 (R-K1 G) x y) r2 (idp (quot 𝟏 (R-K1 G)) (quot₁ 𝟏 (R-K1 G) ★))))
 def K1 (G : group) : U := ‖_‖₁ (2-quot 𝟏 (R-K1 G) (Q-K1 G))
 def K (G : abgroup) (n: ℕ) : U := ℕ-iter U (discreteTopology G) (λ (_: U), ‖_‖ (𝚺ₓ (K1 (G.X, G.2.g)) n) n) n

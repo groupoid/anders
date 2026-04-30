@@ -1,3 +1,10 @@
+{- Homotopy Type Theory:
+   - Coequalizer and Hubs/Spokes as primitives.
+
+   HoTT 6.7 Hub and Spoke Disc
+
+   Copyright (c) Groupoid Infinity, 2016-2026. -}
+
 module hs where
 import library/foundations/univalent/path
 import library/foundations/univalent/equiv

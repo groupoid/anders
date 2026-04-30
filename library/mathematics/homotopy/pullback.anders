@@ -2,7 +2,7 @@
 
    HoTT 2.15
 
-   Copyright (c) Groupoid Infinity, 2014-2022. -}
+   Copyright (c) Groupoid Infinity, 2016-2026. -}
 
 module pullback where
 import library/foundations/univalent/path

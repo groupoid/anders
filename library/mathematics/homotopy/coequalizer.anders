@@ -1,16 +1,8 @@
-{- Homotopy Type Theory:
-   - Coequalizer and Hubs/Spokes as primitives.
-   - S¹ sphere and 𝑛-sphere.
-   - Pushout.
-   - Suspension.
-   - 𝑛-Truncation.
+{- Coequalizer: https://anders.groupoid.space/mathematics/homotopy/coequalizer/
 
-   HoTT 6.8 Pushouts
-   HoTT 6.10 Quotients
-   HoTT 6.7 Hub and Spoke Disc
-   HoTT 6.9 Truncations
+   HoTT 6.12 The flattening lemma
 
-   Copyright (c) Groupoid Infinity, 2014-2022. -}
+   Copyright (c) Groupoid Infinity, 2016-2026. -}
 
 module coequalizer where
 import library/foundations/univalent/equiv

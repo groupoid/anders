@@ -1,3 +1,10 @@
+{- Truncation: https://anders.groupoid.space/mathematics/homotopy/truncation/
+
+   HoTT 6.9
+   HoTT 7.3
+
+   Copyright (c) Groupoid Infinity, 2016-2026. -}
+
 module truncation where
 import library/foundations/mltt/inductive
 import library/foundations/mltt/either

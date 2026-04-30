@@ -1,3 +1,10 @@
+{- S^1: https://anders.groupoid.space/mathematics/homotopy/s1/
+   - S^1 Sphere (Circle).
+
+   HoTT 6.4 Circles and Spheres
+
+   Copyright (c) Groupoid Infinity, 2016-2026. -}
+
 module S1 where
 import library/mathematics/homotopy/coequalizer
 import library/foundations/mltt/bool

@@ -1,3 +1,9 @@
+{- Quotient: https://anders.groupoid.space/mathematics/homotopy/quotient/
+
+   HoTT 6.10
+
+   Copyright (c) Groupoid Infinity, 2016-2026. -}
+
 module quotient where
 import library/foundations/univalent/path
 import library/mathematics/homotopy/coequalizer

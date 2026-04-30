@@ -1,3 +1,9 @@
+{- K(G,n): https://anders.groupoid.space/mathematics/homotopy/KGn/
+
+   - Eilenberg-MacLane spaces K(G,n).
+
+   Copyright (c) Groupoid Infinity, 2016-2026. -}
+
 module KGn where
 import library/foundations/mltt/inductive
 import library/mathematics/algebra/algebra
@@ -44,7 +50,7 @@ def K1-ind (G : group) (P : K1 G → U)
               (2-quot-ind 𝟏 (R-K1 G) (Q-K1 G) (λ (x : 2-quot 𝟏 (R-K1 G) (Q-K1 G)), P (trunc₁ (2-quot 𝟏 (R-K1 G) (Q-K1 G)) two x))
                           (λ (_ : 𝟏), pPoint)
                           (λ (_ _ : 𝟏) (g : G.1.1), pPath g)
-                          (λ (x y : 𝟏) (r1 r2 : R¯ 𝟏 (R-K1 G) x y) (q : Q-K1 G x y r1 r2), 
+                          (λ (x y : 𝟏) (r1 r2 : R¯ 𝟏 (R-K1 G) x y) (q : Q-K1 G x y r1 r2),
                               <i> PathP (<j> P (trunc₁ (2-quot 𝟏 (R-K1 G) (Q-K1 G)) two (2-quot₃ 𝟏 (R-K1 G) (Q-K1 G) x y r1 r2 q @ i @ j)))
                                         (pPath G.2.1.2.2.1 @ i) (pPath G.2.1.2.2.1 @ i)))
               nHub nSpoke z

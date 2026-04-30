@@ -1,3 +1,9 @@
+{- n-Sphere: https://anders.groupoid.space/mathematics/homotopy/nsphere/
+
+   HoTT 6.4 Circles and Spheres
+
+   Copyright (c) Groupoid Infinity, 2016-2026. -}
+
 module Sn where
 import library/foundations/mltt/nat
 import library/foundations/univalent/extensionality

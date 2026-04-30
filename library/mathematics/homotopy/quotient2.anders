@@ -11,6 +11,25 @@ import library/foundations/mltt/either
 import library/mathematics/homotopy/S1
 import library/mathematics/homotopy/quotient
 
+{-
+   Coherence of the 2-Quotient via Two-Stage Hub & Spoke Reduction:
+
+   By Floris van Doorn (2016), a 2-Quotient HIT enforces constraints
+   between *paths* rather than points. Standard Coequalizers only
+   equate points. To map 2-cell constraints into standard 1-HITs:
+
+   Stage 1 (Pre-HIT):
+   Points are extended to encompass base terms A alongside a disjoint
+   Hub index space for every 2-path requirement. Relations bind A
+   points uniformly.
+
+   Stage 2 (Final 2-Quotient):
+   Implements boundary loops mapped via the Circle (S1). Coequalizers
+   equate Hub targets with spoke-sweeping trajectories.
+
+   Sokhatsky
+-}
+
 -- 2-Quotient Construction
 
 def R¯ (A : U) (R : A → A → U) (x y : A) : U := Path (quot A R) (quot₁ A R x) (quot₁ A R y)

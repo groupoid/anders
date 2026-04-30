@@ -19,15 +19,17 @@ import library/mathematics/homotopy/coequalizer
    structures (e.g. proving contractibility), standard operations like transp
    and hcomp over Coequalizers result in unreduced dependent closures.
    The system cannot reduce the endpoints efficiently because the
-   $W$-type constructor trees are structurally massive. 
+   $W$-type constructor trees are structurally massive.
 
    High-level HIT implementations without judgmental shortcuts
    easily break computational univalence criteria (comp over Glue types).
    Hardcoding constraints allows safe execution of complex theorems without
    structural failure. See hs.anders for a built-in Disc primitive implementation.
+
+   Sokhatsky
 -}
 
-def W_hs_B (S A : U) : U := + A 𝟏 
+def W_hs_B (S A : U) : U := + A 𝟏
 def W_hs_C (S A : U) : W_hs_B S A → U := +-rec A 𝟏 U (λ (_ : A), 𝟎) (λ (_ : 𝟏), S)
 def W_hs (S A : U) : U := W (x : W_hs_B S A), W_hs_C S A x
 def W_center (S A : U) (a : A) : W_hs S A := sup (+ A 𝟏) (W_hs_C S A) (inl A 𝟏 a) (λ (z : 𝟎), ind₀ (W_hs S A) z)

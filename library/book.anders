@@ -34,6 +34,7 @@ import library/mathematics/homotopy/loop
 import library/mathematics/homotopy/S1
 import library/mathematics/homotopy/Sn
 import library/mathematics/homotopy/KGn
+import library/mathematics/homotopy/hopf
 import library/mathematics/categories/category
 import library/mathematics/categories/cartesian
 import library/mathematics/categories/functor

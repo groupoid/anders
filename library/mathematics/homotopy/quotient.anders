@@ -1,143 +1,50 @@
-{- Quotient: https://anders.groupoid.space/mathematics/homotopy/quotient/
-
-   HoTT 6.10
+{- Quotients: https://anders.groupoid.space/mathematics/homotopy/quotient/
+   - Higher-Inductive Type of Quotients.
 
    Copyright (c) Groupoid Infinity, 2016-2026. -}
 
 module quotient where
 import library/foundations/univalent/path
 import library/mathematics/homotopy/coequalizer
-import library/foundations/mltt/either
-import library/mathematics/homotopy/S1
 
-{-
-   Coherence of the 2-Quotient via Two-Stage Hub & Spoke Reduction:
-
-   By Floris van Doorn (2016), a 2-Quotient HIT enforces constraints
-   between *paths* rather than points. Standard Coequalizers only
-   equate points. To map 2-cell constraints into standard 1-HITs:
-
-   Stage 1 (Pre-HIT):
-   Points are extended to encompass base terms A alongside a disjoint
-   Hub index space for every 2-path requirement. Relations bind A
-   points uniformly.
-
-   Stage 2 (Final 2-Quotient):
-   Implements boundary loops mapped via the Circle (S1). Coequalizers
-   equate Hub targets with spoke-sweeping trajectories.
-
-   Sokhatsky
--}
+-- 1-Quotient (Coequalizer)
 
 def quot (A : U) (R : A → A → U) : U
- := coeq (Σ (x y : A), R x y) A (λ (p : Σ (x y : A), R x y), p.1) (λ (p : Σ (x y : A), R x y), p.2.1)
+  := coequ (Σ (x : A), Σ (y : A), R x y) A (λ (p : Σ (x : A), Σ (y : A), R x y), p.1) (λ (p : Σ (x : A), Σ (y : A), R x y), p.2.1)
 
-def quot₁ (A : U) (R : A → A → U) (a : A)
- := iota (Σ (x y : A), R x y) A (λ (p : Σ (x y : A), R x y), p.1) (λ (p : Σ (x y : A), R x y), p.2.1) a
+def quot₁ (A : U) (R : A → A → U) (a : A) : quot A R
+  := ι₂ (Σ (x : A), Σ (y : A), R x y) A (λ (p : Σ (x : A), Σ (y : A), R x y), p.1) (λ (p : Σ (x : A), Σ (y : A), R x y), p.2.1) a
 
-def quot₂ (A : U) (R : A → A → U) (x y : A) (r : R x y)
- := <i> resp′ (Σ (x y : A), R x y) A (λ (p : Σ (x y : A), R x y), p.1) (λ (p : Σ (x y : A), R x y), p.2.1) (x, (y, r)) @ i
+def quot₂ (A : U) (R : A → A → U) (x : A) (y : A) (r : R x y)
+  : Path (quot A R) (quot₁ A R x) (quot₁ A R y)
+  := <i> resp (Σ (x : A), Σ (y : A), R x y) A (λ (p : Σ (x : A), Σ (y : A), R x y), p.1) (λ (p : Σ (x : A), Σ (y : A), R x y), p.2.1) (x, (y, r)) @ i
 
-def quot-ind (A : U) (R : A → A → U) (X : quot A R → U) (nPoint : Π (a : A), X (quot₁ A R a))
-    (nPath : Π (x y : A) (r : R x y), PathP (<i> X (quot₂ A R x y r @ i)) (nPoint x) (nPoint y)) (z : quot A R)
- := coequ-ind (Σ (x y : A), R x y) A (λ (p : Σ (x y : A), R x y), p.1) (λ (p : Σ (x y : A), R x y), p.2.1) X nPoint
-    (λ (p : Σ (x y : A), R x y), nPath p.1 p.2.1 p.2.2) z
+-- MLTT Rules for 1-Quotient
 
-def quot-β₁ (A : U) (R : A → A → U) (X : quot A R → U) (nPoint : Π (a : A), X (quot₁ A R a))
-    (nPath : Π (x y : A) (r : R x y), PathP (<i> X (quot₂ A R x y r @ i)) (nPoint x) (nPoint y)) (a : A)
- := idp (X (quot₁ A R a)) (nPoint a)
+def quot-ind (A : U) (R : A → A → U) (X : quot A R → U)
+    (nPoint : Π (a : A), X (quot₁ A R a))
+    (nPath : Π (x : A), Π (y : A), Π (r : R x y), PathP (<i> X (quot₂ A R x y r @ i)) (nPoint x) (nPoint y))
+    (z : quot A R) : X z
+  := coequ-ind (Σ (x : A), Σ (y : A), R x y) A (λ (p : Σ (x : A), Σ (y : A), R x y), p.1) (λ (p : Σ (x : A), Σ (y : A), R x y), p.2.1) X nPoint
+       (λ (p : Σ (x : A), Σ (y : A), R x y), nPath p.1 p.2.1 p.2.2) z
+
+def quot-rec (A : U) (R : A → A → U) (X : U)
+    (nPoint : A → X)
+    (nPath : Π (x : A), Π (y : A), R x y → Path X (nPoint x) (nPoint y))
+    (z : quot A R) : X
+  := quot-ind A R (λ (_ : quot A R), X) nPoint nPath z
+
+def quot-β₁ (A : U) (R : A → A → U) (X : quot A R → U)
+    (nPoint : Π (a : A), X (quot₁ A R a))
+    (nPath : Π (x : A), Π (y : A), Π (r : R x y), PathP (<i> X (quot₂ A R x y r @ i)) (nPoint x) (nPoint y)) (a : A)
+  : Path (X (quot₁ A R a)) (quot-ind A R X nPoint nPath (quot₁ A R a)) (nPoint a)
+  := <_> nPoint a
 
 def quot-β₂ (A : U) (R : A → A → U) (X : quot A R → U)
-      (nPoint : Π (a : A), X (quot₁ A R a))
-      (nPath : Π (x y : A) (r : R x y), PathP (<i> X (quot₂ A R x y r @ i)) (nPoint x) (nPoint y)) (x y : A) (r : R x y)
- := idp (PathP (<i> X (quot₂ A R x y r @ i)) (nPoint x) (nPoint y)) (nPath x y r)
+    (nPoint : Π (a : A), X (quot₁ A R a))
+    (nPath : Π (x : A), Π (y : A), Π (r : R x y), PathP (<i> X (quot₂ A R x y r @ i)) (nPoint x) (nPoint y))
+    (x : A) (y : A) (r : R x y)
+  : Path (PathP (<i> X (quot₂ A R x y r @ i)) (nPoint x) (nPoint y)) (<i> quot-ind A R X nPoint nPath (quot₂ A R x y r @ i)) (nPath x y r)
+  := <_> nPath x y r
 
-def quot-η (A : U) (R : A → A → U) (X : quot A R → U) (h : Π (z : quot A R), X z)
- := idp (Π (z : quot A R), X z) h
-
-def R¯ (A : U) (R : A → A → U) (x y : A) : U := Path (quot A R) (quot₁ A R x) (quot₁ A R y)
-def |-| (A : U) (R : A → A → U) (x y : A) (r : R x y) : R¯ A R x y := quot₂ A R x y r
-
-def ro (A : U) (R : A → A → U) (x y : A) (p : Path A x y) : R¯ A R x y := <i> quot₁ A R (p @ i)
-def −¹ (A : U) (R : A → A → U) (x y : A) (r : R¯ A R x y) : R¯ A R y x := <i> r @ -i
-def −·− (A : U) (R : A → A → U) (x y z : A) (r : R¯ A R x y) (r' : R¯ A R y z ) : R¯ A R x z
- := comp-Path (quot A R) (quot₁ A R x) (quot₁ A R y) (quot₁ A R z) r r'
-
-def TotalQ (A : U) (R : A → A → U) (Q : Π (x y : A), R¯ A R x y → R¯ A R x y → U) : U
- := Σ (x : A), Σ (y : A), Σ (r1 : R¯ A R x y), Σ (r2 : R¯ A R x y), Q x y r1 r2
-
-def PreHIT_Points (A : U) (R : A → A → U) (Q : Π (x y : A), R¯ A R x y → R¯ A R x y → U) : U
- := + A (TotalQ A R Q)
-
-def PreHIT_Rel (A : U) (R : A → A → U) : U
- := Σ (x y : A), R x y
-
-def PreHIT_f (A : U) (R : A → A → U) (Q : Π (x y : A), R¯ A R x y → R¯ A R x y → U) (p : PreHIT_Rel A R) : PreHIT_Points A R Q
- := inl A (TotalQ A R Q) p.1
-
-def PreHIT_g (A : U) (R : A → A → U) (Q : Π (x y : A), R¯ A R x y → R¯ A R x y → U) (p : PreHIT_Rel A R) : PreHIT_Points A R Q
- := inl A (TotalQ A R Q) p.2.1
-
-def PreHIT (A : U) (R : A → A → U) (Q : Π (x y : A), R¯ A R x y → R¯ A R x y → U) : U
- := coequ (PreHIT_Rel A R) (PreHIT_Points A R Q) (PreHIT_f A R Q) (PreHIT_g A R Q)
-
-def i_pre (A : U) (R : A → A → U) (Q : Π (x y : A), R¯ A R x y → R¯ A R x y → U) (p : PreHIT_Points A R Q) : PreHIT A R Q
- := ι₂ (PreHIT_Rel A R) (PreHIT_Points A R Q) (PreHIT_f A R Q) (PreHIT_g A R Q) p
-
-def r_pre (A : U) (R : A → A → U) (Q : Π (x y : A), R¯ A R x y → R¯ A R x y → U) (x y : A) (r : R x y) : Path (PreHIT A R Q) (i_pre A R Q (inl A (TotalQ A R Q) x)) (i_pre A R Q (inl A (TotalQ A R Q) y))
- := <i> resp′ (PreHIT_Rel A R) (PreHIT_Points A R Q) (PreHIT_f A R Q) (PreHIT_g A R Q) (x, (y, r)) @ i
-
-def map_quot_PreHIT (A : U) (R : A → A → U) (Q : Π (x y : A), R¯ A R x y → R¯ A R x y → U) (z : quot A R) : PreHIT A R Q
- := quot-ind A R (λ (_: quot A R), PreHIT A R Q) (λ (a : A), i_pre A R Q (inl A (TotalQ A R Q) a)) (λ (x y : A) (r : R x y), r_pre A R Q x y r) z
-
-def TotalSpokes (A : U) (R : A → A → U) (Q : Π (x y : A), R¯ A R x y → R¯ A R x y → U) : U
- := Σ (q : TotalQ A R Q), S¹
-
-def loop_q (A : U) (R : A → A → U) (Q : Π (x y : A), R¯ A R x y → R¯ A R x y → U) (q : TotalQ A R Q) : Path (PreHIT A R Q) (i_pre A R Q (inl A (TotalQ A R Q) q.1)) (i_pre A R Q (inl A (TotalQ A R Q) q.1))
- := <i> map_quot_PreHIT A R Q (comp-Path (quot A R) (quot₁ A R q.1) (quot₁ A R q.2.1) (quot₁ A R q.1) q.2.2.1 (<i> q.2.2.2.1 @ -i) @ i)
-
-def f_q (A : U) (R : A → A → U) (Q : Π (x y : A), R¯ A R x y → R¯ A R x y → U) (q : TotalQ A R Q) (z : S¹) : PreHIT A R Q
- := S1-ind (λ (_ : S¹), PreHIT A R Q) (i_pre A R Q (inl A (TotalQ A R Q) q.1)) (loop_q A R Q q) z
-
-def h_q (A : U) (R : A → A → U) (Q : Π (x y : A), R¯ A R x y → R¯ A R x y → U) (q : TotalQ A R Q) : PreHIT A R Q
- := i_pre A R Q (inr A (TotalQ A R Q) q)
-
-def LHS_Stage2 (A : U) (R : A → A → U) (Q : Π (x y : A), R¯ A R x y → R¯ A R x y → U) (p : TotalSpokes A R Q) : PreHIT A R Q
- := f_q A R Q p.1 p.2
-
-def RHS_Stage2 (A : U) (R : A → A → U) (Q : Π (x y : A), R¯ A R x y → R¯ A R x y → U) (p : TotalSpokes A R Q) : PreHIT A R Q
- := h_q A R Q p.1
-
-def 2-quot (A : U) (R : A → A → U) (Q : Π (x y : A), R¯ A R x y → R¯ A R x y → U) : U
- := coequ (TotalSpokes A R Q) (PreHIT A R Q) (LHS_Stage2 A R Q) (RHS_Stage2 A R Q)
-
-def 2-quot₁ (A : U) (R : A → A → U) (Q : Π (x y : A), R¯ A R x y → R¯ A R x y → U) (a: A) : 2-quot A R Q
- := ι₂ (TotalSpokes A R Q) (PreHIT A R Q) (LHS_Stage2 A R Q) (RHS_Stage2 A R Q) (i_pre A R Q (inl A (TotalQ A R Q) a))
-
-def 2-quot₂ (A : U) (R : A → A → U) (Q : Π (x y : A), R¯ A R x y → R¯ A R x y → U) (x y : A) (r : R x y)
-  : Path (2-quot A R Q) (2-quot₁ A R Q x) (2-quot₁ A R Q y)
- := <i> ι₂ (TotalSpokes A R Q) (PreHIT A R Q) (LHS_Stage2 A R Q) (RHS_Stage2 A R Q) (r_pre A R Q x y r @ i)
-
-axiom 2-quot₃ (A : U) (R : A → A → U) (Q : Π (x y : A), R¯ A R x y → R¯ A R x y → U) (x y : A) (r1 r2 : R¯ A R x y) (q : Q x y r1 r2)
-  : PathP (<i> Path (2-quot A R Q) (2-quot₁ A R Q x) (2-quot₁ A R Q y))
-          (<i> ι₂ (TotalSpokes A R Q) (PreHIT A R Q) (LHS_Stage2 A R Q) (RHS_Stage2 A R Q) (map_quot_PreHIT A R Q (r1 @ i)))
-          (<i> ι₂ (TotalSpokes A R Q) (PreHIT A R Q) (LHS_Stage2 A R Q) (RHS_Stage2 A R Q) (map_quot_PreHIT A R Q (r2 @ i)))
-
-axiom 2-quot-lift (A : U) (R : A → A → U) (Q : Π (x y : A), R¯ A R x y → R¯ A R x y → U)
-    (X : 2-quot A R Q → U)
-    (nPoint : Π (a : A), X (2-quot₁ A R Q a))
-    (nPath : Π (x y : A) (r : R x y), PathP (<i> X (2-quot₂ A R Q x y r @ i)) (nPoint x) (nPoint y))
-    (x y : A) (r : R¯ A R x y)
-  : PathP (<i> X (ι₂ (TotalSpokes A R Q) (PreHIT A R Q) (LHS_Stage2 A R Q) (RHS_Stage2 A R Q) (map_quot_PreHIT A R Q (r @ i))))
-          (nPoint x) (nPoint y)
-
-axiom 2-quot-ind (A : U) (R : A → A → U) (Q : Π (x y : A), R¯ A R x y → R¯ A R x y → U)
-    (X : 2-quot A R Q → U)
-    (nPoint : Π (a : A), X (2-quot₁ A R Q a))
-    (nPath : Π (x y : A) (r : R x y), PathP (<i> X (2-quot₂ A R Q x y r @ i)) (nPoint x) (nPoint y))
-    (nQ : Π (x y : A) (r1 r2 : R¯ A R x y) (q : Q x y r1 r2),
-        PathP (<i> PathP (<j> X (2-quot₃ A R Q x y r1 r2 q @ i @ j))
-                  (nPoint x) (nPoint y))
-              (2-quot-lift A R Q X nPoint nPath x y r1)
-              (2-quot-lift A R Q X nPoint nPath x y r2))
-    (z : 2-quot A R Q) : X z
+def R¯ (A : U) (R : A → A → U) (x : A) (y : A) : U := Path (quot A R) (quot₁ A R x) (quot₁ A R y)

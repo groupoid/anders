@@ -22,8 +22,8 @@ def Q-K1 (G : group) (x y : 𝟏) (r1 r2 : R¯ 𝟏 (R-K1 G) x y) : U
       (prod (Path (R¯ 𝟏 (R-K1 G) x y) r1 (loop-K1 G G.2.1.2.2.1))
       (Path (R¯ 𝟏 (R-K1 G) x y) r2 (idp (quot 𝟏 (R-K1 G)) (quot₁ 𝟏 (R-K1 G) ★))))
 def K1 (G : group) : U := ‖_‖₁ (2-quot 𝟏 (R-K1 G) (Q-K1 G))
-def K1-point' (G : group) : K1 G := trunc₁ (2-quot 𝟏 (R-K1 G) (Q-K1 G)) two (2-quot₁ 𝟏 (R-K1 G) (Q-K1 G) ★)
-def K1-loop'  (G : group) (g : G.1.1) : Path (K1 G) (K1-point' G) (K1-point' G)
+def K1-point (G : group) : K1 G := trunc₁ (2-quot 𝟏 (R-K1 G) (Q-K1 G)) two (2-quot₁ 𝟏 (R-K1 G) (Q-K1 G) ★)
+def K1-loop  (G : group) (g : G.1.1) : Path (K1 G) (K1-point G) (K1-point G)
  := <i> trunc₁ (2-quot 𝟏 (R-K1 G) (Q-K1 G)) two (2-quot₂ 𝟏 (R-K1 G) (Q-K1 G) ★ ★ g @ i)
 
 def K (G : abgroup) (n: ℕ) : U
@@ -34,37 +34,35 @@ def K-point (G : abgroup) : Π (n : ℕ), K G n
           G.2.g.1.2.2.1
           (λ (k : ℕ) (_ : K G k), trunc₁ (𝚺ₓ (K1 (G.X, G.2.g)) (succ k)) (succ k) (𝜎₁ (𝚺ₓ (K1 (G.X, G.2.g)) k)))
 
-
-{-
-
 def K1-ind (G : group) (P : K1 G → U)
-      (pPoint : P (K1-point' G))
-      (pPath  : Π (g : G.1.1), PathP (<i> P (K1-loop' G g @ i)) pPoint pPoint)
-      (nHub   : Π (f : sphere two → hs (sphere two) (2-quot 𝟏 (R-K1 G) (Q-K1 G)))
-                  (nF : Π (s : sphere two), P (f s)), P (trunc₂ (2-quot 𝟏 (R-K1 G) (Q-K1 G)) two f))
-      (nSpoke : Π (f : sphere two → hs (sphere two) (2-quot 𝟏 (R-K1 G) (Q-K1 G)))
-                  (nF : Π (s : sphere two), P (f s)) (s : sphere two),
+      (pPoint : P (K1-point G))
+      (pPath  : Π (g : G.1.1), PathP (<i> P (K1-loop G g @ i)) pPoint pPoint)
+      (pCoher : Π (x y : 𝟏) (r1 r2 : R¯ 𝟏 (R-K1 G) x y) (q : Q-K1 G x y r1 r2),
+                PathP (<i> PathP (<j> P (trunc₁ (2-quot 𝟏 (R-K1 G) (Q-K1 G)) two (2-quot₃ 𝟏 (R-K1 G) (Q-K1 G) x y r1 r2 q @ i @ j)))
+                          pPoint pPoint)
+                      (2-quot-lift 𝟏 (R-K1 G) (Q-K1 G) (λ (z : 2-quot 𝟏 (R-K1 G) (Q-K1 G)), P (trunc₁ (2-quot 𝟏 (R-K1 G) (Q-K1 G)) two z)) (λ (_:𝟏), pPoint) (λ (_ _ : 𝟏) (g:G.1.1), pPath g) x y r1)
+                      (2-quot-lift 𝟏 (R-K1 G) (Q-K1 G) (λ (z : 2-quot 𝟏 (R-K1 G) (Q-K1 G)), P (trunc₁ (2-quot 𝟏 (R-K1 G) (Q-K1 G)) two z)) (λ (_:𝟏), pPoint) (λ (_ _ : 𝟏) (g:G.1.1), pPath g) x y r2))
+      (nHub   : Π (f : sphere two → K1 G) (nF : Π (s : sphere two), P (f s)), P (trunc₂ (2-quot 𝟏 (R-K1 G) (Q-K1 G)) two f))
+      (nSpoke : Π (f : sphere two → K1 G) (nF : Π (s : sphere two), P (f s)) (s : sphere two),
                   PathP (<i> P (trunc₃ (2-quot 𝟏 (R-K1 G) (Q-K1 G)) two f s @ i)) (nHub f nF) (nF s))
       (z : K1 G) : P z
  := trunc-ind (2-quot 𝟏 (R-K1 G) (Q-K1 G)) two P
               (2-quot-ind 𝟏 (R-K1 G) (Q-K1 G) (λ (x : 2-quot 𝟏 (R-K1 G) (Q-K1 G)), P (trunc₁ (2-quot 𝟏 (R-K1 G) (Q-K1 G)) two x))
                           (λ (_ : 𝟏), pPoint)
                           (λ (_ _ : 𝟏) (g : G.1.1), pPath g)
-                          (λ (x y : 𝟏) (r1 r2 : R¯ 𝟏 (R-K1 G) x y) (q : Q-K1 G x y r1 r2),
-                              <i> PathP (<j> P (trunc₁ (2-quot 𝟏 (R-K1 G) (Q-K1 G)) two (2-quot₃ 𝟏 (R-K1 G) (Q-K1 G) x y r1 r2 q @ i @ j)))
-                                        (pPath G.2.1.2.2.1 @ i) (pPath G.2.1.2.2.1 @ i)))
+                          (λ (x y : 𝟏) (r1 r2 : R¯ 𝟏 (R-K1 G) x y) (q : Q-K1 G x y r1 r2), pCoher x y r1 r2 q))
               nHub nSpoke z
 
 def K1-β₁ (G : group) (P : K1 G → U)
       (pPoint : P (K1-point G))
       (pPath  : Π (g : G.1.1), PathP (<i> P (K1-loop G g @ i)) pPoint pPoint)
-      (nHub   : Π (f : sphere two → hs (sphere two) (2-quot 𝟏 (R-K1 G) (Q-K1 G)))
-                  (nF : Π (s : sphere two), P (f s)), P (trunc₂ (2-quot 𝟏 (R-K1 G) (Q-K1 G)) two f))
-      (nSpoke : Π (f : sphere two → hs (sphere two) (2-quot 𝟏 (R-K1 G) (Q-K1 G)))
-                  (nF : Π (s : sphere two), P (f s)) (s : sphere two),
+      (pCoher : Π (x y : 𝟏) (r1 r2 : R¯ 𝟏 (R-K1 G) x y) (q : Q-K1 G x y r1 r2),
+                PathP (<i> PathP (<j> P (trunc₁ (2-quot 𝟏 (R-K1 G) (Q-K1 G)) two (2-quot₃ 𝟏 (R-K1 G) (Q-K1 G) x y r1 r2 q @ i @ j)))
+                          pPoint pPoint)
+                      (2-quot-lift 𝟏 (R-K1 G) (Q-K1 G) (λ (z : 2-quot 𝟏 (R-K1 G) (Q-K1 G)), P (trunc₁ (2-quot 𝟏 (R-K1 G) (Q-K1 G)) two z)) (λ (_:𝟏), pPoint) (λ (_ _ : 𝟏) (g:G.1.1), pPath g) x y r1)
+                      (2-quot-lift 𝟏 (R-K1 G) (Q-K1 G) (λ (z : 2-quot 𝟏 (R-K1 G) (Q-K1 G)), P (trunc₁ (2-quot 𝟏 (R-K1 G) (Q-K1 G)) two z)) (λ (_:𝟏), pPoint) (λ (_ _ : 𝟏) (g:G.1.1), pPath g) x y r2))
+      (nHub   : Π (f : sphere two → K1 G) (nF : Π (s : sphere two), P (f s)), P (trunc₂ (2-quot 𝟏 (R-K1 G) (Q-K1 G)) two f))
+      (nSpoke : Π (f : sphere two → K1 G) (nF : Π (s : sphere two), P (f s)) (s : sphere two),
                   PathP (<i> P (trunc₃ (2-quot 𝟏 (R-K1 G) (Q-K1 G)) two f s @ i)) (nHub f nF) (nF s))
-    : Path (P (K1-point G)) (K1-ind G P pPoint pPath nHub nSpoke (K1-point G)) pPoint
+    : Path (P (K1-point G)) (K1-ind G P pPoint pPath pCoher nHub nSpoke (K1-point G)) pPoint
    := idp (P (K1-point G)) pPoint
-
--}
-

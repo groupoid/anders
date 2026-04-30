@@ -10,27 +10,12 @@ import library/foundations/univalent/prop
 import library/foundations/mltt/bool
 import library/mathematics/homotopy/S1
 import library/mathematics/homotopy/suspension
-
-def Square (A : U) (a₀ a₁ b₀ b₁ : A) (u  : Path A a₀ a₁) (v : Path A b₀ b₁) (r₀ : Path A a₀ b₀) (r₁ : Path A a₁ b₁) : U
- := PathP (<i> (Path A (r₀ @ i) (r₁ @ i))) u v
-
-def sb (A : U) (a : A) (p : Path A a a) : Square A a a a a p (<_> a) p (<_> a) := <j i> p @ i \/ j
-def s₀ (A : U) (a : A) (p : Path A a a) : Square A a a a a p p (<_> a) (<_> a) := <_> p
-def s₁ (A : U) (a : A) (p : Path A a a) : Square A a a a a (<_> a) p (<_> a) p := <j i> p @ i /\ j
-
-def cs (A : U) (a : A) (p : Path A a a)
-  : Square A a a a a p p p p
- := <j i> hcomp A (∂ i ∨ ∂ j)
-        (λ (k : I), [ (i = 0) -> s₀ A a p @ k @ j,
-                      (i = 1) -> s₁ A a p @ k @ j,
-                      (j = 0) -> s₀ A a p @ k @ i,
-                      (j = 1) -> s₁ A a p @ k @ i ])
-        (sb A a p @ i @ j)
+import library/mathematics/homotopy/constcubes
 
 -- 1. Prerequisites (Prop Is Equiv and Equiv Path)
 
 def propIsEquiv (A B : U) (f : A → B) : isProp (isEquiv A B f)
- := λ (u0 u1 : isEquiv A B f), <i> λ (y : B), propIsContr (fiber A B f y) (u0 y) (u1 y) @ i
+ := propPi B (λ (y : B), isContr (fiber A B f y)) (λ (y : B), propIsContr (fiber A B f y))
 
 def equivPath (A B : U) (v w : equiv A B) (p : Path (A → B) v.1 w.1) : Path (equiv A B) v w
  := lemSig (A → B) (isEquiv A B) (propIsEquiv A B) v w p
@@ -57,4 +42,3 @@ def H1 : Π (x : 𝚺 S¹), U := 𝚺-ind S¹ (λ (_ : 𝚺 S¹), U) S¹ S¹ (λ
 
 -- Total Space of Hopf Fibration
 def TH1 : U := Σ (c : 𝚺 S¹), H1 c
-

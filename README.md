@@ -10,38 +10,41 @@ Modal Homotopy Type System.
 
 ```OCaml
 type exp =
-| EPre of Z.t | EKan of Z.t | EVar of name | EHole                             (* cosmos *)
+| EPre of Z.t | EKan of Z.t | EVar of name | EHole                             (* Cosmos *)
+| ENat | EZero | ESucc of exp | EIndNat of exp * exp * exp  (* Canonical Natural Numbers *)
 | EPi of exp * (name * exp) | ELam of exp * (name * exp) | EApp of exp * exp        (* Π *)
 | ESig of exp * (name * exp) | EPair of tag * exp * exp | EFst of exp | ESnd of exp (* Σ *)
-| EId of exp | ERef of exp | EJ of exp | EField of exp * string       (* strict equality *)
-| EPathP of exp | EPLam of exp | EAppFormula of exp * exp               (* path equality *)
-| EI | EDir of dir | EAnd of exp * exp | EOr of exp * exp | ENeg of exp (* CCHM interval *)
-| ETransp of exp * exp | EHComp of exp * exp * exp * exp               (* Kan operations *)
-| EPartial of exp | EPartialP of exp * exp | ESystem of exp System.t     (* partial funs *)
-| ESub of exp * exp * exp | EInc of exp * exp | EOuc of exp          (* cubical subtypes *)
-| EGlue of exp | EGlueElem of exp * exp * exp | EUnglue of exp                (* glueing *)
+| EId of exp | ERef of exp | EJ of exp | EField of exp * string       (* Strict Equality *)
 | EEmpty | EIndEmpty of exp                                                         (* 𝟎 *)
 | EUnit | EStar | EIndUnit of exp                                                   (* 𝟏 *)
 | EBool | EFalse | ETrue | EIndBool of exp                                          (* 𝟐 *)
 | EW of exp * (name * exp) | ESup of exp * exp | EIndW of exp * exp * exp           (* W *)
-| ENat | EZero | ESucc of exp | EIndNat of exp * exp * exp                        (* Nat *)
-| EIm of exp | EInf of exp | EIndIm of exp * exp | EJoin of exp        (* infinitesimals *)
+| EPathP of exp | EPLam of exp | EAppFormula of exp * exp               (* Path Equality *)
+| EI | EDir of dir | EAnd of exp * exp | EOr of exp * exp | ENeg of exp (* CCHM Interval *)
+| ETransp of exp * exp | EHComp of exp * exp * exp * exp               (* Kan Operations *)
+| EPartial of exp | EPartialP of exp * exp | ESystem of exp System.t     (* Partial Funs *)
+| ESub of exp * exp * exp | EInc of exp * exp | EOuc of exp          (* Cubical Subtypes *)
+| EGlue of exp | EGlueElem of exp * exp * exp | EUnglue of exp                (* Glueing *)
+| EIm of exp | EInf of exp | EIndIm of exp * exp | EJoin of exp        (* Infinitesimals *)
 | ECoeq of exp | EIota of exp | EResp of exp | EIndCoeq of exp            (* Coequalizer *)
 | EDisc of exp | EBase of exp | EHub of exp | ESpoke of exp | EIndDisc of exp    (* Disc *)
 ```
 
-Anders is a HoTT proof assistant based on: classical MLTT-80 with 0, 1, 2, W types;
-CCHM in CHM flavour as cubical type system with hcomp/trans Kan operations;
-HTS sctrict equality on pretypes; de Rham stack modality; Disc and Coequalizer primitives.
+Anders is a HoTT proof assistant based on:
+  classical MLTT-80 with N, 0, 1, 2, W types;
+  CCHM in CHM flavour as cubical type system with hcomp/trans Kan operations;
+  HTS sctrict equality on pretypes;
+  de Rham stack modality;
+  Disc and Coequalizer primitives.
 We tend not to touch general recursive higher inductive schemes yet,
-instead we will try to express as much HIT as possible through W,
-Coequlizer and HubSpokes Disc in the style of HoTT/Coq homotopy library and Three-HIT theorem.
+instead we will try to express as much HIT as possible through W, Coequlizer and HubSpokes Disc
+in the style of HoTT/Coq homotopy library and Three-HIT theorem.
 
 Features
 --------
 
 * Homepage: https://anders.groupoid.space/
-* Fibrant MLTT-style N-=-0-1-2-Π-Σ-W primitives with Uₙ hierarchy in 500 LOC
+* Fibrant MLTT-style N-0-1-2-Π-Σ-W primitives with Uₙ hierarchy in 500 LOC
 * Cofibrant CHM-style I (PathP) primitives with pretypes hierarchy Vₙ in 500 LOC
 * Generalized Transport and Homogeneous Composition core Kan operations
 * Partial Elements
@@ -50,7 +53,7 @@ Features
 * Strict Equality on pretypes
 * Coequalizer
 * Hub Spokes Disc
-* Nat (in Kernel) for spectral goodness under higher homotopies
+* Nat in Kernel for spectral goodness under higher homotopies
 * Infinitesimal Shape Modality (de Rham Stack)
 * Parser in 80 LOC
 * Lexer in 80 LOC
@@ -60,7 +63,7 @@ Features
 * Poor man's records as Σ with named accessors to telescope variables
 * 1D syntax with top-level declarations
 * Groupoid Infinity CCHM Homotopy Library: https://anders.groupoid.space/library/
-* Best suited for academic papers and fast type checking
+* Pure basis best suited for academic papers on W-types and verifiable type checking
 
 Setup
 -------------

@@ -50,7 +50,7 @@ Features
 * Strict Equality on pretypes
 * Coequalizer
 * Hub Spokes Disc
-* Nat (in Kernel) for computational K(G,n)
+* Nat (in Kernel) for spectral goodness under higher homotopies
 * Infinitesimal Shape Modality (de Rham Stack)
 * Parser in 80 LOC
 * Lexer in 80 LOC

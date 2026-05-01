@@ -42,7 +42,7 @@ def K (G : abgroup) (n : nat) : U := (K-Pointed G n).1
 def K-point (G : abgroup) (n : nat) : K G n := (K-Pointed G n).2
 
 -- K(G, n) Rules
--- Elimination (Induction): 
+-- Elimination (Induction):
 -- P must be a family over the whole tower to allow induction on n.
 def K-ind (G : abgroup) (n : nat) (P : Π (k : nat), K G k → U)
     (pBase : Π (g : G.1.1), P zero g)

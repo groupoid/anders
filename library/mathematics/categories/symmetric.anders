@@ -35,7 +35,7 @@ def isMonoidal (C: precategory): U
       (α: Π (x y z: C.C.ob), isoCat C (tensor.ob (tensor.ob (x, y), z)) (tensor.ob (x, tensor.ob (y, z))))
       (λ₁: Π (x: C.C.ob), isoCat C (tensor.ob (e, x)) x)
       (ρ₁: Π (x: C.C.ob), isoCat C (tensor.ob (x, e)) x)
-      (pentagon: Π (x y z w: C.C.ob), 
+      (pentagon: Π (x y z w: C.C.ob),
         Path (C.C.hom (tensor.ob (tensor.ob (tensor.ob (x, y), z), w)) (tensor.ob (x, tensor.ob (y, tensor.ob (z, w)))))
              (C.P.∘ (tensor.ob (tensor.ob (tensor.ob (x, y), z), w)) (tensor.ob (x, tensor.ob (tensor.ob (y, z), w))) (tensor.ob (x, tensor.ob (y, tensor.ob (z, w))))
                 (C.P.∘ (tensor.ob (tensor.ob (tensor.ob (x, y), z), w)) (tensor.ob (tensor.ob (x, tensor.ob (y, z)), w)) (tensor.ob (x, tensor.ob (tensor.ob (y, z), w)))
@@ -45,7 +45,7 @@ def isMonoidal (C: precategory): U
              (C.P.∘ (tensor.ob (tensor.ob (tensor.ob (x, y), z), w)) (tensor.ob (tensor.ob (x, y), tensor.ob (z, w))) (tensor.ob (x, tensor.ob (y, tensor.ob (z, w))))
                 ((α (tensor.ob (x, y)) z w).1)
                 ((α x y (tensor.ob (z, w))).1)))
-      (triangle: Π (x y: C.C.ob), 
+      (triangle: Π (x y: C.C.ob),
         Path (C.C.hom (tensor.ob (tensor.ob (x, e), y)) (tensor.ob (x, y)))
              (C.P.∘ (tensor.ob (tensor.ob (x, e), y)) (tensor.ob (x, tensor.ob (e, y))) (tensor.ob (x, y))
                 ((α x e y).1)
@@ -56,7 +56,7 @@ def isMonoidal (C: precategory): U
 
 def isBraided (C: precategory) (m: isMonoidal C) : U
  := Σ (braiding: natiso (catproduct C C) C m.tensor (flipBifunctor C C C m.tensor))
-      (hexagon₁: Π (x y z: C.C.ob), 
+      (hexagon₁: Π (x y z: C.C.ob),
         Path (C.C.hom (m.tensor.ob (x, m.tensor.ob (y, z))) (m.tensor.ob (m.tensor.ob (y, z), x)))
              (braiding.η.η (x, m.tensor.ob (y, z)))
              (C.P.∘ (m.tensor.ob (x, m.tensor.ob (y, z))) (m.tensor.ob (y, m.tensor.ob (x, z))) (m.tensor.ob (m.tensor.ob (y, z), x))
@@ -68,7 +68,7 @@ def isBraided (C: precategory) (m: isMonoidal C) : U
                 (C.P.∘ (m.tensor.ob (y, m.tensor.ob (x, z))) (m.tensor.ob (y, m.tensor.ob (z, x))) (m.tensor.ob (m.tensor.ob (y, z), x))
                    (m.tensor.mor (y, m.tensor.ob (x, z)) (y, m.tensor.ob (z, x)) (C.P.id y, braiding.η.η (x, z)))
                    ((m.α y z x).2.1))))
-      (hexagon₂: Π (x y z: C.C.ob), 
+      (hexagon₂: Π (x y z: C.C.ob),
         Path (C.C.hom (m.tensor.ob (m.tensor.ob (x, y), z)) (m.tensor.ob (z, m.tensor.ob (x, y))))
              (braiding.η.η (m.tensor.ob (x, y), z))
              (C.P.∘ (m.tensor.ob (m.tensor.ob (x, y), z)) (m.tensor.ob (x, m.tensor.ob (z, y))) (m.tensor.ob (z, m.tensor.ob (x, y)))
@@ -87,7 +87,7 @@ def isSymmetric (C: precategory) (m: isMonoidal C) (b: isBraided C m) : U
  := Σ (symmetry: Π (x y: C.C.ob), Path (C.C.hom (m.tensor.ob (x,y)) (m.tensor.ob (x,y)))
           (C.P.∘ (m.tensor.ob (x,y)) (m.tensor.ob (y,x)) (m.tensor.ob (x,y)) (b.braiding.η.η (x,y)) (b.braiding.η.η (y,x)))
           (C.P.id (m.tensor.ob (x,y))))
-      (braidingCondition: Π (x: C.C.ob), 
+      (braidingCondition: Π (x: C.C.ob),
         Path (C.C.hom (m.tensor.ob (x, m.e)) (m.tensor.ob (m.e, x)))
              (b.braiding.η.η (x, m.e))
              (C.P.∘ (m.tensor.ob (x, m.e)) x (m.tensor.ob (m.e, x))

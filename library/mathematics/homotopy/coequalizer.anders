@@ -17,43 +17,28 @@ def resp′ (A B : U) (f g : A → B) (x : A)
  := <i> resp A B f g x @ i
 
 def coequ-ind-β₁ (A B : U) (f g : A → B) (X : coeq A B f g → U) (i : Π (b : B), X (iota A B f g b))
-      (ρ : Π (x : A), PathP (<i> X (resp′ A B f g x @ i)) (i (f x)) (i (g x))) (b : B)
-    : Path (X (iota A B f g b)) (coequ-ind A B f g X i ρ (iota A B f g b)) (i b)
-    := idp (X (iota A B f g b)) (i b)
+    (ρ : Π (x : A), PathP (<i> X (resp′ A B f g x @ i)) (i (f x)) (i (g x))) (b : B)
+  : Path (X (iota A B f g b)) (coequ-ind A B f g X i ρ (iota A B f g b)) (i b)
+ := idp (X (iota A B f g b)) (i b)
 
 def coequ-ind-β₂ (A B : U) (f g : A → B) (X : coeq A B f g → U) (i : Π (b : B), X (iota A B f g b))
-  (ρ : Π (x : A), PathP (<k> X (resp′ A B f g x @ k)) (i (f x)) (i (g x))) (x : A) :
-  Path (PathP (<j> X (resp′ A B f g x @ j)) (i (f x)) (i (g x)))
-              (<j> coequ-ind A B f g X i ρ (resp′ A B f g x @ j)) (ρ x)
-  := idp (PathP (<j> X (resp′ A B f g x @ j)) (i (f x)) (i (g x))) (ρ x)
+    (ρ : Π (x : A), PathP (<k> X (resp′ A B f g x @ k)) (i (f x)) (i (g x))) (x : A)
+  : Path (PathP (<j> X (resp′ A B f g x @ j)) (i (f x)) (i (g x))) (<j> coequ-ind A B f g X i ρ (resp′ A B f g x @ j)) (ρ x)
+ := idp (PathP (<j> X (resp′ A B f g x @ j)) (i (f x)) (i (g x))) (ρ x)
 
-def coequ-ind′ (A B : U) (f g : A → B) (X : coeq A B f g → U)
-  (i : Π (b : B), X (iota A B f g b))
-  (ρ : Π (x : A), PathP (<i> X (resp′ A B f g x @ i)) (i (f x)) (i (g x)))
-  (z : coeq A B f g) : X z
+def coequ-ind′ (A B : U) (f g : A → B) (X : coeq A B f g → U) (i : Π (b : B), X (iota A B f g b))
+    (ρ : Π (x : A), PathP (<i> X (resp′ A B f g x @ i)) (i (f x)) (i (g x))) (z : coeq A B f g) : X z
  := coequ-ind A B f g X i ρ z
 
-def coequ-rec (A B X : U) (f g : A → B)
-  (i : B → X)
-  (ρ : Π (x : A), Path X (i (f x)) (i (g x)))
-  (z : coeq A B f g) : X
+def coequ-rec (A B X : U) (f g : A → B) (i : B → X) (ρ : Π (x : A), Path X (i (f x)) (i (g x))) (z : coeq A B f g) : X
  := coequ-ind A B f g (λ (_ : coeq A B f g), X) i (λ (x : A), ρ x) z
 
-def coequ-η-pointwise (A B : U) (f g : A → B) (X : coeq A B f g → U)
-  (h : Π (z : coeq A B f g), X z) (z : coeq A B f g) :
-  Path (X z) (h z) (coequ-ind A B f g X (λ (b : B), h (iota A B f g b)) (λ (x : A), <i> h (resp′ A B f g x @ i)) z)
+def coequ-η-pointwise (A B : U) (f g : A → B) (X : coeq A B f g → U) (h : Π (z : coeq A B f g), X z) (z : coeq A B f g)
+  : Path (X z) (h z) (coequ-ind A B f g X (λ (b : B), h (iota A B f g b)) (λ (x : A), <i> h (resp′ A B f g x @ i)) z)
  := coequ-ind A B f g (λ (z : coeq A B f g), Path (X z) (h z) (coequ-ind A B f g X (λ (b : B), h (iota A B f g b)) (λ (x : A), <i> h (resp′ A B f g x @ i)) z))
-      (λ (b : B), idp (X (iota A B f g b)) (h (iota A B f g b)))
-      (λ (x : A), <k> idp (X (resp′ A B f g x @ k)) (h (resp′ A B f g x @ k))) z
+    (λ (b : B), idp (X (iota A B f g b)) (h (iota A B f g b))) (λ (x : A), <k> idp (X (resp′ A B f g x @ k)) (h (resp′ A B f g x @ k))) z
 
-def coequ-η (A B : U) (f g : A → B) (X : coeq A B f g → U)
-  (h : Π (z : coeq A B f g), X z) :
-  Path (Π (z : coeq A B f g), X z) h
-       (λ (z : coeq A B f g),
-          coequ-ind A B f g X (λ (b : B), h (iota A B f g b))
-             (λ (x : A), <i> h (resp′ A B f g x @ i)) z)
- := piext (coeq A B f g) X h
-          (λ (z : coeq A B f g),
-             coequ-ind A B f g X (λ (b : B), h (iota A B f g b))
-                (λ (x : A), <i> h (resp′ A B f g x @ i)) z)
+def coequ-η (A B : U) (f g : A → B) (X : coeq A B f g → U) (h : Π (z : coeq A B f g), X z)
+  : Path (Π (z : coeq A B f g), X z) h (λ (z : coeq A B f g), coequ-ind A B f g X (λ (b : B), h (iota A B f g b)) (λ (x : A), <i> h (resp′ A B f g x @ i)) z)
+ := piext (coeq A B f g) X h (λ (z : coeq A B f g), coequ-ind A B f g X (λ (b : B), h (iota A B f g b)) (λ (x : A), <i> h (resp′ A B f g x @ i)) z)
           (coequ-η-pointwise A B f g X h)

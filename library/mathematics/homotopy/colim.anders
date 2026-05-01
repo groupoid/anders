@@ -2,31 +2,80 @@
 
    HoTT 7.4 Colimits of n-types
 
+   This module implements sequential colimits and general homotopy colimits
+   of diagram in the style of Cubical Agda and CCHM.
+
    Copyright (c) Groupoid Infinity, 2016-2026. -}
 
-module colimit where
+module colim where
+
 import library/foundations/mltt/nat
-import library/foundations/mltt/w
 import library/mathematics/homotopy/coequalizer
-import library/mathematics/homotopy/disc
 
-def Diagram (X : U) (D : X → U) : U := Σ (w : W X (λ _ → X)), Π (x : X), D x
-def W-Colim (A : U) (B : A → U) (D : W A B → U) (α : Π (a : A) (f : B a → W A B),  Π (x : B a), D (sup a f) → D (f x)) : U := ?
-def Colim (Shape : W A B) (D : Shape → U) (glue' : Π (a : A) (f : B a → Shape), (Π (x : B a), D (f x)) → D (sup a f)) : U
- := W-ind A B (λ _ → U)
-       (λ a f rec, ?)
-       (λ a f rec, ?)
-       Shape
+-- Sequential Colimits
 
-def FreeColimStep (a : A) (f : B a → ColimPrev) (prev : ColimPrev) : U
-  := coeq (Σ (x : B a), prev (f x)) prev
-         (λ p, p.2)
-         (λ p, glue-map a f (p.1) (p.2))
+-- 1) Formation Rule. Colim A f is the sequential colimit of A₀ → A₁ → A₂ → ...
 
-def HomotopyColim (A : U) (B : A → U) 
-                  (D : W A B → U)
-                  (action : Π a f, (Π x, D (f x)) → D (sup a f)) : U
-  := W-ind A B (λ w, U)
-       (λ a f rec, ?)
-       (λ a f rec coh, ?)
-       w
+def Colim (A : ℕ → U) (f : Π (n : ℕ), A n → A (succ n)) : U
+ := coeq (Σ (n : ℕ), A n) (Σ (n : ℕ), A n) (λ (x : Σ (n : ℕ), A n), x) (λ (x : Σ (n : ℕ), A n), (succ x.1, f x.1 x.2))
+
+-- 2) Introduction Rules
+
+def colim-inc (A : ℕ → U) (f : Π (n : ℕ), A n → A (succ n)) (n : ℕ) (a : A n) : Colim A f
+ := iota (Σ (n : ℕ), A n) (Σ (n : ℕ), A n) (λ (x : Σ (n : ℕ), A n), x) (λ (x : Σ (n : ℕ), A n), (succ x.1, f x.1 x.2)) (n, a)
+
+def colim-glue (A : ℕ → U) (f : Π (n : ℕ), A n → A (succ n)) (n : ℕ) (a : A n)
+  : Path (Colim A f) (colim-inc A f n a) (colim-inc A f (succ n) (f n a))
+ := resp (Σ (n : ℕ), A n) (Σ (n : ℕ), A n) (λ (x : Σ (n : ℕ), A n), x) (λ (x : Σ (n : ℕ), A n), (succ x.1, f x.1 x.2)) (n, a)
+
+-- 3) Elimination Rule (Induction)
+
+def Colim-ind (A : ℕ → U) (f : Π (n : ℕ), A n → A (succ n)) (C : Colim A f → U)
+    (base-case : Π (n : ℕ) (a : A n), C (colim-inc A f n a))
+    (path-case : Π (n : ℕ) (a : A n), PathP (<i> C (colim-glue A f n a @ i)) (base-case n a) (base-case (succ n) (f n a))) (x : Colim A f) : C x
+ := coequ-ind (Σ (n : ℕ), A n) (Σ (n : ℕ), A n) (λ (z : Σ (n : ℕ), A n), z) (λ (z : Σ (n : ℕ), A n), (succ z.1, f z.1 z.2))
+            C (λ (z : Σ (n : ℕ), A n), base-case z.1 z.2) (λ (z : Σ (n : ℕ), A n), path-case z.1 z.2) x
+
+-- 4) Recursion Rule
+
+def Colim-rec (A : ℕ → U) (f : Π (n : ℕ), A n → A (succ n)) (C : U) (base-case : Π (n : ℕ) (a : A n), C)
+    (path-case : Π (n : ℕ) (a : A n), Path C (base-case n a) (base-case (succ n) (f n a))) (x : Colim A f) : C
+ := Colim-ind A f (λ (z : Colim A f), C) base-case (λ (n : ℕ) (a : A n), path-case n a) x
+
+-- 5) Computation Rules
+
+def Colim-βinc (A : ℕ → U) (f : Π (n : ℕ), A n → A (succ n)) (C : Colim A f → U)
+    (base-case : Π (n : ℕ) (a : A n), C (colim-inc A f n a))
+    (path-case : Π (n : ℕ) (a : A n), PathP (<i> C (colim-glue A f n a @ i)) (base-case n a) (base-case (succ n) (f n a))) (n : ℕ) (a : A n)
+  : Path (C (colim-inc A f n a)) (Colim-ind A f C base-case path-case (colim-inc A f n a)) (base-case n a)
+ := idp (C (colim-inc A f n a)) (base-case n a)
+
+def Colim-βglue (A : ℕ → U) (f : Π (n : ℕ), A n → A (succ n)) (C : Colim A f → U)
+    (base-case : Π (n : ℕ) (a : A n), C (colim-inc A f n a))
+    (path-case : Π (n : ℕ) (a : A n), PathP (<i> C (colim-glue A f n a @ i)) (base-case n a) (base-case (succ n) (f n a))) (n : ℕ) (a : A n)
+  : Path (PathP (<i> C (colim-glue A f n a @ i)) (base-case n a) (base-case (succ n) (f n a)))
+         (<i> Colim-ind A f C base-case path-case (colim-glue A f n a @ i)) (path-case n a)
+ := idp (PathP (<i> C (colim-glue A f n a @ i)) (base-case n a) (base-case (succ n) (f n a))) (path-case n a)
+
+-- General Homotopy Colimit of a Graph
+
+-- A graph diagram is (Vtx, Edge, s, t, D, action)
+
+def GraphColim (Vtx Edge : U) (s t : Edge → Vtx) (D : Vtx → U) (act : Π (e : Edge), D (s e) → D (t e)) : U
+ := coeq (Σ (e : Edge), D (s e)) (Σ (v : Vtx), D v)
+         (λ (x : Σ (e : Edge), D (s e)), (s x.1, x.2))
+         (λ (x : Σ (e : Edge), D (s e)), (t x.1, act x.1 x.2))
+
+-- Introduction for graph colimits
+
+def graph-inc (Vtx Edge : U) (s t : Edge → Vtx) (D : Vtx → U) (act : Π (e : Edge), D (s e) → D (t e)) (v : Vtx) (d : D v)
+  : GraphColim Vtx Edge s t D act
+ := iota (Σ (e : Edge), D (s e)) (Σ (v : Vtx), D v)
+         (λ (x : Σ (e : Edge), D (s e)), (s x.1, x.2))
+         (λ (x : Σ (e : Edge), D (s e)), (t x.1, act x.1 x.2)) (v, d)
+
+def graph-glue (Vtx Edge : U) (s t : Edge → Vtx) (D : Vtx → U) (act : Π (e : Edge), D (s e) → D (t e)) (e : Edge) (d : D (s e))
+  : Path (GraphColim Vtx Edge s t D act) (graph-inc Vtx Edge s t D act (s e) d) (graph-inc Vtx Edge s t D act (t e) (act e d))
+  := resp (Σ (e : Edge), D (s e)) (Σ (v : Vtx), D v)
+          (λ (x : Σ (e : Edge), D (s e)), (s x.1, x.2))
+          (λ (x : Σ (e : Edge), D (s e)), (t x.1, act x.1 x.2)) (e, d)

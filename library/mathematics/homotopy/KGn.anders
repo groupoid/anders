@@ -1,5 +1,5 @@
 {- Eilenberg-MacLane Spaces: https://anders.groupoid.space/mathematics/homotopy/KGn/
-   
+
    Implemented using direct W-induction to avoid library transports.
    This version uses the most primitive recursion pattern for susp-Ω
    to ensure judgmental reduction across the loop space tower.

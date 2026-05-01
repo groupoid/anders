@@ -9,20 +9,6 @@ import library/foundations/univalent/equiv
 import library/foundations/mltt/inductive
 import library/foundations/univalent/extensionality
 
--- [1]. Nicolai Kraus, Jakob von Raumer.
--- Path spaces of higher inductive types in homotopy type theory.
--- http://pure-oai.bham.ac.uk/ws/files/84880431/Path_Spaces.pdf
-
--- [2]. Bauer, Gross, Lumsdaine, Shulman, Sozeau, Spitters [HoTT/Coq]
--- The HoTT Library: A formalization of homotopy type theory in Coq
--- https://arxiv.org/pdf/1610.04591.pdf
-
--- [3]. Andrej Bauer, Niels van der Weide
--- The Three-HITs Theorem
--- https://github.com/nmvdw/Three-HITs
-
-{- Coequalizer Primitive -}
-
 def coeq (A B : U) (f g : A → B) : U := coequ A B f g
 def iota (A B : U) (f g : A → B) (x : B) : coequ A B f g := ι₂ A B f g x
 

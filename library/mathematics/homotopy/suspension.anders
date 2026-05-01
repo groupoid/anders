@@ -21,7 +21,10 @@ def 𝚺-ind (X : U) (P : 𝚺 X → U)
     (north : P (𝜎₁ X))
     (south : P (𝜎₂ X))
     (merid : Π (x: X), PathP (<i> P (𝜎₃ X x @ i)) (north) (south)) (y: 𝚺 X) : P y
- := pushout-ind 𝟏 𝟏 X (const₁ X) (const₁ X) P (λ (_ : 𝟏), north) (λ (_ : 𝟏), south) merid y
+ := pushout-ind 𝟏 𝟏 X (const₁ X) (const₁ X) P
+      (1-ind (λ (u : 𝟏), P (po₁ 𝟏 𝟏 X (const₁ X) (const₁ X) u)) north)
+      (1-ind (λ (u : 𝟏), P (po₂ 𝟏 𝟏 X (const₁ X) (const₁ X) u)) south)
+      merid y
 
 def 𝚺-rec (A X : U) (north south : X) (merid : A → Path X north south) (y : 𝚺 A) : X
  := 𝚺-ind A (λ (_ : 𝚺 A), X) north south (λ (a : A), merid a) y

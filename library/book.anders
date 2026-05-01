@@ -30,7 +30,6 @@ import library/mathematics/homotopy/pushout
 import library/mathematics/homotopy/hs
 import library/mathematics/homotopy/quotient
 import library/mathematics/homotopy/quotient2
-import library/mathematics/homotopy/KG1
 import library/mathematics/homotopy/truncation
 import library/mathematics/homotopy/suspension
 import library/mathematics/homotopy/loop

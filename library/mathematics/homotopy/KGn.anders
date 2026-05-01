@@ -16,6 +16,7 @@ import library/mathematics/homotopy/truncationw
 import library/mathematics/homotopy/Snw
 import library/mathematics/homotopy/loop
 
+
 -- Pointed type helper
 def Pointed : U := summa (Ak : U), Ak
 
@@ -31,8 +32,8 @@ def K-next (G : abgroup) (k : natw) : U
  := nat-iter U (K1 (G.1, G.2.1)) (λ (pm : U), truncw (𝚺 pm) (succw (succw zerow))) k
 
 -- Note: We use a simplified K-point-next that maintains judgmental stability
-def K-point-next (G : abgroup) (k : natw) : K-next G k
- := nat-iter (K-next G k) (K1-point (G.1, G.2.1)) (λ (pm : K-next G k), trunc₁w (𝚺 (K-next G k)) (succw (succw zerow)) (𝜎₁ (K-next G k))) k
+def K-point-next (G : abgroup) : Π (k : natw), K-next G k
+ := nat-ind (λ (k : natw), K-next G k) (K1-point (G.1, G.2.1)) (λ (k : natw) (pk : K-next G k), trunc₁w (𝚺 (K-next G k)) (succw (succw zerow)) (𝜎₁ (K-next G k)))
 
 -- K(G, n) definition
 def Kn (G : abgroup) : natw → U
@@ -44,33 +45,33 @@ def K (G : abgroup) (n : natw) : U := Kn G n
 def K-point (G : abgroup) (n : natw) : K G n
  := nat-ind (K G) (G.2.1.1.2.2.1) (λ (k : natw) (pk : K G k), K-point-next G k) n
 
--- Functorial Loop Suspension to increase dimension
--- With nat-iter, the recursive step boundaries unify judgmentally.
-def susp-Ω (A : U) (a : A) (n : natw) (p : Ωⁿ A a n) : Ωⁿ (𝚺 A) (𝜎₁ A) (succw n)
- := nat-ind (λ (k : natw), Ωⁿ A a k → Ωⁿ (𝚺 A) (𝜎₁ A) (succw k))
-    (λ (x : A), <i> hcomp (𝚺 A) (∂ i) (λ (k : I), [ (i = 0) -> 𝜎₁ A, (i = 1) -> 𝜎₁ A ])
-                (comp-Path (𝚺 A) (𝜎₁ A) (𝜎₂ A) (𝜎₁ A) (𝜎₃ A x) (<j> 𝜎₃ A a @ -j) @ i))
-    (λ (k : natw) (prev : Ωⁿ A a k → Ωⁿ (𝚺 A) (𝜎₁ A) (succw k)) (pk : Ωⁿ A a (succw k)),
-      <j> prev (pk @ j))
-    n p
-
--- Final K-loop definition
-def K-loop (G : abgroup) (n : natw) (g : G.1.1) : Ωⁿ (K G n) (K-point G n) n
- := nat-ind (λ (k : natw), Ωⁿ (K G k) (K-point G k) k)
-    (g)
-    (λ (k : natw) (prev : Ωⁿ (K G k) (K-point G k) k),
-      <i> trunc₁w (𝚺 (K G k)) (succw (succw zerow)) (susp-Ω (K G k) (K-point G k) k prev @ i))
-    n
-
--- Induction Principle
-def K-ind-succ (G : abgroup) (n : natw) (P : K G (succw n) → U)
-    (nNorth : P (K-point G (succw n)))
-    (nSouth : P (trunc₁w (𝚺 (K G n)) (succw (succw zerow)) (𝜎₂ (K G n))))
-    (nMerid : Π (x : K G n), PathP (<i> P (trunc₁w (𝚺 (K G n)) (succw (succw zerow)) (𝜎₃ (K G n) x @ i))) nNorth nSouth)
-    (nHub   : Π (f : spherew (succw (succw zerow)) → K G (succw n)) (nF : Π (s : spherew (succw (succw zerow))), P (f s)), P (trunc₂w (K G (succw n)) (succw (succw zerow)) f))
-    (nSpoke : Π (f : spherew (succw (succw zerow)) → K G (succw n)) (nF : Π (s : spherew (succw (succw zerow))), P (f s)) (s : spherew (succw (succw zerow))), 
-               PathP (<i> P (trunc₃w (K G (succw n)) (succw (succw zerow)) f s @ i)) (nHub f nF) (nF s))
-    (z : K G (succw n)) : P z
-  := trunc-indw (𝚺 (K G n)) (succw (succw zerow)) P
-     (𝚺-ind (K G n) (λ (s : 𝚺 (K G n)), P (trunc₁w (𝚺 (K G n)) (succw (succw zerow)) s)) nNorth nSouth nMerid)
-     nHub nSpoke z
+-- -- Functorial Loop Suspension to increase dimension
+-- -- With nat-iter, the recursive step boundaries unify judgmentally.
+-- def susp-Ω (A : U) (a : A) (n : natw) (p : Ωⁿ A a n) : Ωⁿ (𝚺 A) (𝜎₁ A) (succw n)
+--  := nat-ind (λ (k : natw), Ωⁿ A a k → Ωⁿ (𝚺 A) (𝜎₁ A) (succw k))
+--     (λ (x : A), <i> hcomp (𝚺 A) (∂ i) (λ (k : I), [ (i = 0) -> 𝜎₁ A, (i = 1) -> 𝜎₁ A ])
+--                 (comp-Path (𝚺 A) (𝜎₁ A) (𝜎₂ A) (𝜎₁ A) (𝜎₃ A x) (<j> 𝜎₃ A a @ -j) @ i))
+--     (λ (k : natw) (prev : Ωⁿ A a k → Ωⁿ (𝚺 A) (𝜎₁ A) (succw k)) (pk : Ωⁿ A a (succw k)),
+--       <j> prev (pk @ j))
+--     n p
+-- 
+-- -- Final K-loop definition
+-- def K-loop (G : abgroup) (n : natw) (g : G.1.1) : Ωⁿ (K G n) (K-point G n) n
+--  := nat-ind (λ (k : natw), Ωⁿ (K G k) (K-point G k) k)
+--     (g)
+--     (λ (k : natw) (prev : Ωⁿ (K G k) (K-point G k) k),
+--       <i> trunc₁w (𝚺 (K G k)) (succw (succw zerow)) (susp-Ω (K G k) (K-point G k) k prev @ i))
+--     n
+-- 
+-- -- Induction Principle
+-- def K-ind-succ (G : abgroup) (n : natw) (P : K G (succw n) → U)
+--     (nNorth : P (K-point G (succw n)))
+--     (nSouth : P (trunc₁w (𝚺 (K G n)) (succw (succw zerow)) (𝜎₂ (K G n))))
+--     (nMerid : Π (x : K G n), PathP (<i> P (trunc₁w (𝚺 (K G n)) (succw (succw zerow)) (𝜎₃ (K G n) x @ i))) nNorth nSouth)
+--     (nHub   : Π (f : spherew (succw (succw zerow)) → K G (succw n)) (nF : Π (s : spherew (succw (succw zerow))), P (f s)), P (trunc₂w (K G (succw n)) (succw (succw zerow)) f))
+--     (nSpoke : Π (f : spherew (succw (succw zerow)) → K G (succw n)) (nF : Π (s : spherew (succw (succw zerow))), P (f s)) (s : spherew (succw (succw zerow))), 
+--                PathP (<i> P (trunc₃w (K G (succw n)) (succw (succw zerow)) f s @ i)) (nHub f nF) (nF s))
+--     (z : K G (succw n)) : P z
+--   := trunc-indw (𝚺 (K G n)) (succw (succw zerow)) P
+--      (𝚺-ind (K G n) (λ (s : 𝚺 (K G n)), P (trunc₁w (𝚺 (K G n)) (succw (succw zerow)) s)) nNorth nSouth nMerid)
+--      nHub nSpoke z

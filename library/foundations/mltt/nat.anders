@@ -20,10 +20,6 @@ def succ (n : ℕ) : ℕ := __succ n
 def ind-nat (C : ℕ → U) (z : C zero) (s : Π (n : ℕ), C n → C (succ n)) (n : ℕ) : C n
  := __ind_nat C z s n
 
--- 4) Backward compatibility and MLTT aliases
-def 𝟎 : ℕ := zero
-def 𝟏 : ℕ := succ zero
-
 def ℕ-ind (C : ℕ → U) (z : C zero) (s : Π (n : ℕ), C n → C (succ n)) (n : ℕ) : C n
  := ind-nat C z s n
 

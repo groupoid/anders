@@ -20,25 +20,20 @@ def propIsEquiv (A B : U) (f : A → B) : isProp (isEquiv A B f)
 def equivPath (A B : U) (v w : equiv A B) (p : Path (A → B) v.1 w.1) : Path (equiv A B) v w
  := lemSig (A → B) (isEquiv A B) (propIsEquiv A B) v w p
 
--- 2. Moebius Bundle over S1
+-- 2. Moebius Bundle over S1 (Real Fibration)
 
 def notK : Π (b : 𝟐), Path 𝟐 (not (not b)) b := ind₂ (λ (b : 𝟐), Path 𝟐 (not (not b)) b) (idp 𝟐 0₂) (idp 𝟐 1₂)
 def notEquiv : equiv 𝟐 𝟐 := (not, isoToEquiv 𝟐 𝟐 not not notK notK)
 def moebius : S¹ → U := S1-ind (λ (_ : S¹), U) 𝟐 (ua 𝟐 𝟐 notEquiv)
 
--- 3. Hopf Fibration over S2
+-- 3. Hopf Fibration over S2 (Complex Fibration)
 
--- rot: (x : S1) -> Path S1 x x
 def rot : Π (x : S¹), Path S¹ x x := S1-ind (λ (x : S¹), Path S¹ x x) loop (cs S¹ baseS1 loop)
-
--- mu : S1 -> equiv S1 S1
 def mu : Π (x : S¹), equiv S¹ S¹
  := S1-ind (λ (x : S¹), equiv S¹ S¹ ) (idEquiv S¹)
            (equivPath S¹ S¹ (idEquiv S¹) (idEquiv S¹)
            (piext S¹ (λ (_ : S¹), S¹) (id S¹) (id S¹) (λ (y : S¹), rot y)))
 
--- Hopf Fibration H1
 def H1 : Π (x : 𝚺 S¹), U := 𝚺-ind S¹ (λ (_ : 𝚺 S¹), U) S¹ S¹ (λ (x : S¹), ua S¹ S¹ (mu x))
-
--- Total Space of Hopf Fibration
 def TH1 : U := Σ (c : 𝚺 S¹), H1 c
+

@@ -1,6 +1,6 @@
-{- K(G,n): https://anders.groupoid.space/mathematics/homotopy/KGn/
+{- K(G,1): https://anders.groupoid.space/mathematics/homotopy/KG1/
 
-    - Eilenberg-MacLane spaces K(G,n).
+    - Eilenberg-MacLane spaces K(G,1) via 2-quotient.
 
     Copyright (c) Groupoid Infinity, 2016-2026. -}
 
@@ -27,12 +27,6 @@ def K1 (G : group) : U := ‖_‖₁ (2-quot 𝟏 (R-K1 G) (Q-K1 G))
 def K1-point (G : group) : K1 G := trunc₁ (2-quot 𝟏 (R-K1 G) (Q-K1 G)) two (2-quot₁ 𝟏 (R-K1 G) (Q-K1 G) ★)
 def K1-loop  (G : group) (g : G.1.1) : Path (K1 G) (K1-point G) (K1-point G)
  := <i> trunc₁ (2-quot 𝟏 (R-K1 G) (Q-K1 G)) two (2-quot₂ 𝟏 (R-K1 G) (Q-K1 G) ★ ★ g @ i)
-
-def K (G : abgroup) (n: ℕ) : U
- := ℕ-iter U (discreteTopology G) (λ (_: U), ‖_‖ (𝚺ₓ (K1 (G.X, G.2.g)) n) n) n
-
-def K-point (G : abgroup) : Π (n : ℕ), K G n
- := ℕ-ind (K G) G.2.g.1.2.2.1 (λ (k : ℕ) (_ : K G k), trunc₁ (𝚺ₓ (K1 (G.X, G.2.g)) (succ k)) (succ k) (𝜎₁ (𝚺ₓ (K1 (G.X, G.2.g)) k)))
 
 def K1-ind (G : group) (P : K1 G → U)
     (pPoint : P (K1-point G))

@@ -12,11 +12,19 @@ import library/mathematics/homotopy/suspension
 import library/mathematics/homotopy/truncation
 import library/mathematics/homotopy/Sn
 import library/mathematics/homotopy/loop
+import library/mathematics/homotopy/KG1
+
 
 -- K-step: K(G, n+1) = || Σ K(G, n) ||_{n+1}
+-- For k=0 (n=1), we use the K(G,1) construction from KG1.
 def K-step (G : abgroup) (k : nat) (prev : Pointed) : Pointed
- := (trunc (𝚺 prev.1) (plus (succ (succ zero)) k),
-     trunc₁ (𝚺 prev.1) (plus (succ (succ zero)) k) (𝜎₁ prev.1))
+ := ind-nat (λ (_ : nat), Pointed)
+    (K1 (G.1, G.2.1), K1-point (G.1, G.2.1))
+    (λ (m : nat) (_ : Pointed),
+       (trunc (𝚺 prev.1) (plus (succ (succ zero)) (succ m)),
+        trunc₁ (𝚺 prev.1) (plus (succ (succ zero)) (succ m)) (𝜎₁ prev.1)))
+    k
+
 
 -- K(G, n) tower construction using primitive ind-nat
 def K-Pointed (G : abgroup) (n : nat) : Pointed

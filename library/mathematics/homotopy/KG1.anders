@@ -35,6 +35,7 @@ def K1 (G : group) : U := ‖_‖₁ (2-quot 𝟏 (R-K1 G) (Q-K1 G))
 def K1-point (G : group) : K1 G := trunc₁ (2-quot 𝟏 (R-K1 G) (Q-K1 G)) two (2-quot₁ 𝟏 (R-K1 G) (Q-K1 G) ★)
 def K1-loop  (G : group) (g : G.1.1) : Path (K1 G) (K1-point G) (K1-point G)
  := <i> trunc₁ (2-quot 𝟏 (R-K1 G) (Q-K1 G)) two (2-quot₂ 𝟏 (R-K1 G) (Q-K1 G) ★ ★ g @ i)
+
 {-
 def K1-ind (G : group) (P : K1 G → U)
     (pPoint : P (K1-point G))

@@ -64,6 +64,15 @@ def K-point-β (G : abgroup) (n : nat) (P : Π (k : nat), K G k → U)
   : Path (P n (K-point G n)) (K-ind G n P pBase pStep (K-point G n)) (K-ind G n P pBase pStep (K-point G n))
  := <_> (K-ind G n P pBase pStep (K-point G n))
 
+-- Uniqueness (Eta):
+-- This rule must be proven by induction on n because ind-nat does not reduce on a variable n.
+def K-η (G : abgroup) (n : nat) (P : Π (k : nat), K G k → U) (h : Π (k : nat) (z : K G k), P k z)
+  : Path (Π (z : K G n), P n z) (h n) (λ (z : K G n), K-ind G n P (λ (g : G.1.1), h zero g) (λ (k : nat) (prev : Π (y : K G k), P k y) (y : K G (succ k)), h (succ k) y) z)
+ := ind-nat (λ (k : nat), Path (Π (z : K G k), P k z) (h k) (λ (z : K G k), K-ind G k P (λ (g : G.1.1), h zero g) (λ (m : nat) (pr : Π (y : K G m), P m y) (y : K G (succ m)), h (succ m) y) z))
+    (<_> (h zero))
+    (λ (k : nat) (prev : Path (Π (z : K G k), P k z) (h k) (λ (z : K G k), K-ind G k P (λ (g : G.1.1), h zero g) (λ (m : nat) (pr : Π (y : K G m), P m y) (y : K G (succ m)), h (succ m) y) z)),
+     <_> (h (succ k)))
+    n
 
 -- Loop space induction step: Ωⁿ A ≃ Ωⁿ⁺¹ Σ A
 def susp-Ω-motive (A : U) (a : A) (k : nat) (prev : PointedMap (Omega-Pointed A a k) (Omega-Pointed (𝚺 A) (𝜎₁ A) (succ k)))
@@ -89,8 +98,3 @@ def susp-Ω-map (A : U) (a : A) (n : nat) : Ωⁿ A a n → Ωⁿ (𝚺 A) (𝜎
 
 def susp-Ω-pm (A : U) (a : A) (n : nat) : PointedMap (Omega-Pointed A a n) (Omega-Pointed (𝚺 A) (𝜎₁ A) (succ n))
  := susp-Ω A a n
-
--- Uniqueness (Eta):
-def K-η (G : abgroup) (n : nat) (P : Π (k : nat), K G k → U) (h : Π (k : nat) (z : K G k), P k z)
-  : Path (Π (z : K G n), P n z) (h n) (λ (z : K G n), K-ind G n P (λ (g : G.1.1), h zero g) (λ (k : nat) (prev : Π (y : K G k), P k y) (y : K G (succ k)), h (succ k) y) z)
- := <_> (h n)

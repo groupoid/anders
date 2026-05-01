@@ -7,7 +7,6 @@ open Term
 open Gen
 open Rbv
 
-
 (* Evaluator *)
 let rec eval ctx e0 = traceEval e0; match e0 with
   | EPre u               -> VPre u
@@ -633,13 +632,9 @@ and conv v1 v2 : bool = traceConv v1 v2;
     | VPair (_, a, b), v | v, VPair (_, a, b) -> conv (vfst v) a && conv (vsnd v) b
     | VPi  (a, (p, f)), VPi  (b, (_, g))
     | VSig (a, (p, f)), VSig (b, (_, g))
-    | W    (a, (p, f)), W    (b, (_, g)) ->
-      let x = Var (p, a) in conv a b && conv (f x) (g x)
-    | VLam (a, (p, f)), VLam (b, (_, g)) ->
-      conv a b && (conv a VEmpty || let x = Var (p, a) in conv (f x) (g x))
-    | VLam (a, (p, f)), b | b, VLam (a, (p, f)) ->
-      conv a VEmpty || let x = Var (p, a) in conv (app (b, x)) (f x)
-
+    | W    (a, (p, f)), W    (b, (_, g)) -> let x = Var (p, a) in conv a b && conv (f x) (g x)
+    | VLam (a, (p, f)), VLam (b, (_, g)) -> conv a b && (conv a VEmpty || let x = Var (p, a) in conv (f x) (g x))
+    | VLam (a, (p, f)), b | b, VLam (a, (p, f)) -> conv a VEmpty || let x = Var (p, a) in conv (app (b, x)) (f x)
     | VPre u, VPre v -> ieq u v
     | VPLam f, VPLam g -> conv f g
     | VPLam f, v | v, VPLam f -> let (_, _, i) = freshDim () in conv (appFormula v i) (app (f, i))
@@ -698,12 +693,7 @@ and conv v1 v2 : bool = traceConv v1 v2;
     | VIndDisc (s1, a1, x1, nc1, nh1, ns1, z1), VIndDisc (s2, a2, x2, nc2, nh2, ns2, z2) ->
       conv s1 s2 && conv a1 a2 && conv x1 x2 && conv nc1 nc2 && conv nh1 nh2 && conv ns1 ns2 && conv z1 z2
     | VKan _, _ | _, VKan _ -> true
-(*  | VIndDisc u, VIndDisc v -> conv u v *)
     | _, _ -> false
-
-
-
-
   end || convWithSystem (v1, v2) || convProofIrrel v1 v2
 
 and convWithSystem = function
@@ -953,8 +943,6 @@ and infer ctx e : value = traceInfer e; match e with
     check ctx z (VDisc (ts, ta));
     app (tx, ez)
   | EPLam _ | EPair _ | EHole -> raise (Internal (InferError e))
-
-
 
 and inferInd fibrant ctx t e f =
   let (t', (p, g)) = extPiG (infer ctx e) in eqNf t t'; let k = g (Var (p, t)) in

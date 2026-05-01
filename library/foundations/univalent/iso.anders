@@ -5,7 +5,7 @@
 
    HoTT 2.4 Homotopies and equivalences
 
-   Copyright (c) Groupoid Infinity, 2014-2023. -}
+   Copyright (c) Groupoid Infinity, 2016-2026. -}
 
 module iso where
 import library/foundations/univalent/path

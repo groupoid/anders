@@ -21,7 +21,6 @@ let rec extractExp : exp -> string = function
   | EIm _ | EInf _ | EIndIm _ | EJoin _ -> fail "cubicaltt does not have built-in modality"
   | EGlueElem _ | EUnglue _ -> fail "not implemented yet"
   | ECoequ _ | EIota2 _ | EResp _ | EIndCoequ _ | EDisc _ | EBase _ | EHub _ | ESpoke _ | EIndDisc _ -> fail "unsupported higher inductive type"
-
   | EGlue _ -> fail "cubicaltt does not support currying of Glue"
   | EPathP _ -> fail "cubicaltt does not support (partial) currying of PathP"
   | ETransp _ -> fail "cubicaltt does not support currying of generalized transport"

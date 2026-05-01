@@ -26,10 +26,6 @@ type value =
   | VDisc of value * value | VBase of value * value * value | VHub of value * value * value | VSpoke of value * value * value * value | VIndDisc of value * value * value * value * value * value * value
   | VIm of value | VInf of value | VIndIm of value * value | VJoin of value
   | VFla of value | VFlaUnit of value | VFlaCounit of value | VIndFla of value * value
-
-
-
-
 and clos = ident * (value -> value)
 
 type term = Exp of exp | Value of value

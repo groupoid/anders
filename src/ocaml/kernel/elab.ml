@@ -80,9 +80,6 @@ let extPathP = function
   | VApp (VApp (VPathP v, u0), u1) -> (v, u0, u1)
   | v                              -> raise (Internal (ExpectedPath (rbV v)))
 
-
-
-
 let extGlue = function
   | VApp (VApp (VGlue t, r), u) -> (t, r, u)
   | v -> raise (Internal (ExpectedGlue (rbV v)))
@@ -309,7 +306,6 @@ let rec mem y = function
   | VHub (s, a, f) -> mem y s || mem y a || mem y f
   | VSpoke (s, a, f, x) -> mem y s || mem y a || mem y f || mem y x
   | VIndDisc (s, a, x, nc, nh, ns', z) -> mem y s || mem y a || mem y x || mem y nc || mem y nh || mem y ns' || mem y z
-
   | VApp (a, b) | VPartialP (a, b) | VAppFormula (a, b)
   | VTransp (a, b) | VAnd (a, b) | VOr (a, b) | VInc (a, b)
   | VSup (a, b) | VIndIm (a, b) | VIndFla (a, b) | VPair (_, a, b) -> mem y a || mem y b

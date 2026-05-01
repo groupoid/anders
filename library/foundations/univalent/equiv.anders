@@ -16,7 +16,7 @@
    HoTT 4.6 Surjections and Embedding
    HoTT 5.8.5 Equivalence Induction
 
-   Copyright (c) Groupoid Infinity, 2014-2023. -}
+   Copyright (c) Groupoid Infinity, 2016-2026. -}
 
 module equiv where
 import library/foundations/univalent/path

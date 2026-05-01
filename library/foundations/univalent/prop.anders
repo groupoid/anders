@@ -1,10 +1,10 @@
-{- Proposition: https://anders.groupoid.space/foundations/univalent/prop
+{- Proposition: https://anders.groupoid.space/foundations/univalent/prop/
    - Prop type.
 
    HoTT 3.3 Mere Proposition
    HoTT 3.4 Classical vs. intuitionistic logic
 
-   Copyright (c) Groupoid Infinity, 2014-2023. -}
+   Copyright (c) Groupoid Infinity, 2016-2026. -}
 
 module prop where
 import library/foundations/univalent/path

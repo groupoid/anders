@@ -1,4 +1,5 @@
 {- Path: https://anders.groupoid.space/foundations/univalent/path
+
    - Path Equality;
    - Computational properties;
    - Interval and De Morgan laws;
@@ -16,7 +17,7 @@
    HoTT 5.8 Identity types and identity systems
    HoTT 6.2 Induction principles and dependent paths.
 
-   Copyright (c) Groupoid Infinity, 2014-2023. -}
+   Copyright (c) Groupoid Infinity, 2016-2026. -}
 
 module path where
 import library/foundations/mltt/proto

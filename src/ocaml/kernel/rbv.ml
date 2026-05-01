@@ -65,5 +65,9 @@ let rec rbV v = (*traceRbV v;*) match v with
   | VInf v               -> EInf (rbV v)
   | VJoin v              -> EJoin (rbV v)
   | VIndIm (a, b)        -> EIndIm (rbV a, rbV b)
+  | VFla t              -> EFla (rbV t)
+  | VFlaUnit v          -> EFlaUnit (rbV v)
+  | VFlaCounit v        -> EFlaCounit (rbV v)
+  | VIndFla (a, b)      -> EIndFla (rbV a, rbV b)
 
 and rbVTele ctor t (p, g) = let x = Var (p, t) in ctor p (rbV t) (rbV (g x))

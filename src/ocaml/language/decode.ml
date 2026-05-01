@@ -103,6 +103,10 @@ struct
     | '\x5A' -> let s = exp () in let a = exp () in let f = exp () in EHub (s, a, f)
     | '\x5B' -> let s = exp () in let a = exp () in let f = exp () in let x = exp () in ESpoke (s, a, f, x)
     | '\x5C' -> let s = exp () in let a = exp () in let x = exp () in let nc = exp () in let nh = exp () in let ns' = exp () in let z = exp () in EIndDisc (s, a, x, nc, nh, ns', z)
+    | '\x60' -> EFla (exp ())
+    | '\x61' -> EFlaUnit (exp ())
+    | '\x62' -> EFlaCounit (exp ())
+    | '\x63' -> let (t, f) = exp2 () in EIndFla (t, f)
 
     | _      -> failwith "Term?"
 
@@ -159,6 +163,9 @@ struct
       Traceback (err, List.init n (fun _ -> exp2 ()))
     | '\x14' -> InvalidOpt (string ())
     | '\x15' -> let p = string () in let x = string () in InvalidOptValue (p, x)
+    | '\x16' -> ExpectedFla (exp ())
+    | '\x17' -> ExpectedFlaUnit (exp ())
+    | '\x18' -> ExpectedFlaCounit (exp ())
     | _      -> failwith "Error?"
 
   let resp () = match R.get () with

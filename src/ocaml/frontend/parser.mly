@@ -68,7 +68,8 @@
 %token GLUE GLUEELEM UNGLUE
 %token INDEMPTY INDUNIT INDBOOL
 %token W INDW SUP
-%token IM INF INDIM JOIN
+%token IM INF JOIN INDIM
+%token FLA FLAUNIT FLACOUNIT INDFLA
 %token COEQU IOTA2 RESP INDCOEQU DISC BASE HUB SPOKE INDDISC
 %token NAT ZERO SUCC INDNAT
 
@@ -91,6 +92,17 @@
 
 any_ident:
   | IDENT { $1 }
+  | FLA { "\xE2\x99\xAD" }
+  | FLAUNIT { "\xE2\x99\xAD-unit" }
+  | FLACOUNIT { "\xE2\x99\xAD-counit" }
+  | INDFLA { "ind-\xE2\x99\xAD" }
+  | IM { "\xE2\x84\x91" }
+  | INF { "\xE2\x84\x91-unit" }
+  | JOIN { "\xE2\x84\x91-join" }
+  | INDIM { "ind-\xE2\x84\x91" }
+  | INDEMPTY { "ind-empty" }
+  | INDUNIT { "ind-unit" }
+  | INDBOOL { "ind-bool" }
   | NAT { "nat" }
   | ZERO { "zero" }
   | SUCC { "succ" }
@@ -150,6 +162,10 @@ exp4 :
   | INF exp6 { EInf $2 }
   | INDIM exp6 exp6 { EIndIm ($2, $3) }
   | JOIN exp6 { EJoin $2 }
+  | FLA exp6 { EFla $2 }
+  | FLAUNIT exp6 { EFlaUnit $2 }
+  | FLACOUNIT exp6 { EFlaCounit $2 }
+  | INDFLA exp6 exp6 { EIndFla ($2, $3) }
   | COEQU exp6 exp6 exp6 exp6 { ECoequ ($2, $3, $4, $5) }
   | IOTA2 exp6 exp6 exp6 exp6 exp6 { EIota2 ($2, $3, $4, $5, $6) }
   | RESP exp6 exp6 exp6 exp6 exp6 { EResp ($2, $3, $4, $5, $6) }
@@ -188,3 +204,8 @@ declarations:
   | DEF any_ident params COLON exp2 DEFEQ EXT { Ext ($2, telescope ePi $5 $3, $7) }
   | DEF any_ident params DEFEQ exp2 { Def ($2, None, telescope eLam $5 $3) }
   | AXIOM any_ident params COLON exp2 { Axiom ($2, telescope ePi $5 $3) }
+
+decl:
+  | DEF any_ident params COLON exp2 DEFEQ exp2 { EDef ($2, $3, $5, $7) }
+  | DEF any_ident params DEFEQ exp2 { EDef ($2, $3, EHole, $5) }
+  | AXIOM any_ident params COLON exp2 { EDef ($2, $3, $5, EHole) }

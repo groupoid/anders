@@ -46,6 +46,32 @@ let inf = function
   | VJoin v -> v
   | v       -> VInf v
 
+let flaunit = function
+  | VFlaCounit v -> v
+  | v            -> VFlaUnit v
+
+let flacounit = function
+  | VFlaUnit v -> v
+  | v          -> VFlaCounit v
+
+let extFla : value -> value = function
+  | VFla v -> v
+  | v      -> raise (Internal (ExpectedFla (rbV v)))
+
+let extFlaUnit : value -> value = function
+  | VFlaUnit v -> v
+  | v          -> raise (Internal (ExpectedFlaUnit (rbV v)))
+
+let extFlaCounit : value -> value = function
+  | VFlaCounit v -> v
+  | v            -> raise (Internal (ExpectedFlaCounit (rbV v)))
+
+let isFlaUnit : value -> bool = function
+  | VFlaUnit _ -> true | _ -> false
+
+let isFlaCounit : value -> bool = function
+  | VFlaCounit _ -> true | _ -> false
+
 let inc t r = function
   | VOuc v -> v
   | v      -> VApp (VInc (t, r), v)
@@ -180,6 +206,10 @@ let rec salt (ns : ident Env.t) : exp -> exp = function
   | ESpoke (s, a, f, x) -> ESpoke (salt ns s, salt ns a, salt ns f, salt ns x)
   | EIndDisc (s, a, x, nc, nh, ns', z) -> EIndDisc (salt ns s, salt ns a, salt ns x, salt ns nc, salt ns nh, salt ns ns', salt ns z)
   | EJoin e              -> EJoin (salt ns e)
+  | EFla e               -> EFla (salt ns e)
+  | EFlaUnit e           -> EFlaUnit (salt ns e)
+  | EFlaCounit e         -> EFlaCounit (salt ns e)
+  | EIndFla (a, b)       -> EIndFla (salt ns a, salt ns b)
 
 
 and saltTele ctor ns p a b =
@@ -242,6 +272,10 @@ let rec swap i j = function
   | VIm v                -> VIm (swap i j v)
   | VInf v               -> VInf (swap i j v)
   | VIndIm (a, b)        -> VIndIm (swap i j a, swap i j b)
+  | VFla v               -> VFla (swap i j v)
+  | VFlaUnit v           -> VFlaUnit (swap i j v)
+  | VFlaCounit v         -> VFlaCounit (swap i j v)
+  | VIndFla (a, b)       -> VIndFla (swap i j a, swap i j b)
   | VCoequ (a, b, f, g)  -> VCoequ (swap i j a, swap i j b, swap i j f, swap i j g)
   | VIota2 (a, b, f, g, c) -> VIota2 (swap i j a, swap i j b, swap i j f, swap i j g, swap i j c)
   | VResp (a, b, f, g, c) -> VResp (swap i j a, swap i j b, swap i j f, swap i j g, swap i j c)
@@ -265,7 +299,8 @@ let rec mem y = function
   | VStar | VBool | VFalse | VTrue | VDir _ -> false
   | VPLam a | VFst a | VSnd a | VPathP a | VId a | VRef a
   | VJ a | VNeg a | VOuc a | VGlue a | VIndEmpty a
-  | VIndUnit a | VIndBool a | VIm a | VInf a | VJoin a -> mem y a
+  | VIndUnit a | VIndBool a | VIm a | VInf a | VJoin a
+  | VFla a | VFlaUnit a | VFlaCounit a -> mem y a
   | VIndNat (c, z, s) -> mem y c || mem y z || mem y s
   | VNat | VZero -> false
   | VSucc a -> mem y a
@@ -277,7 +312,7 @@ let rec mem y = function
 
   | VApp (a, b) | VPartialP (a, b) | VAppFormula (a, b)
   | VTransp (a, b) | VAnd (a, b) | VOr (a, b) | VInc (a, b)
-  | VSup (a, b) | VIndIm (a, b) | VPair (_, a, b) -> mem y a || mem y b
+  | VSup (a, b) | VIndIm (a, b) | VIndFla (a, b) | VPair (_, a, b) -> mem y a || mem y b
   | VSub (a, b, c) | VGlueElem (a, b, c) | VUnglue (a, b, c)
   | VIndW (a, b, c) -> mem y a || mem y b || mem y c
   | VHComp (a, b, c, d) | VCoequ (a, b, c, d) -> mem y a || mem y b || mem y c || mem y d

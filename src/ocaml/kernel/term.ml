@@ -25,6 +25,7 @@ type value =
   | VResp of value * value * value * value * value | VIndCoequ of value * value * value * value * value * value * value
   | VDisc of value * value | VBase of value * value * value | VHub of value * value * value | VSpoke of value * value * value * value | VIndDisc of value * value * value * value * value * value * value
   | VIm of value | VInf of value | VIndIm of value * value | VJoin of value
+  | VFla of value | VFlaUnit of value | VFlaCounit of value | VIndFla of value * value
 
 
 

@@ -13,37 +13,37 @@ import library/foundations/univalent/extensionality
      [nLab]  https://ncatlab.org/nlab/show/sharp+modality
 -}
 
-axiom ♯ (A : U) : U -- formation
-axiom ♯-unit (A : U) : A → ♯ A -- introduction
-def is-♯-modal (B : U) : U := isEquiv B (♯ B) (♯-unit B) -- modal predicate
+axiom sharp (A : U) : U -- formation
+axiom sharp-unit (A : U) : A → sharp A -- introduction
+def is-sharp-modal (B : U) : U := isEquiv B (sharp B) (sharp-unit B) -- modal predicate
 
 -- induction
-axiom ♯-ind (A : U) (B : ♯ A → U) (Bm : Π (x : ♯ A), is-♯-modal (B x))
-  (f : Π (a : A), B (♯-unit A a)) : Π (x : ♯ A), B x
+axiom sharp-ind (A : U) (B : sharp A → U) (Bm : Π (x : sharp A), is-sharp-modal (B x))
+  (f : Π (a : A), B (sharp-unit A a)) : Π (x : sharp A), B x
 
 -- computation
-axiom ♯-β (A : U) (B : ♯ A → U) (Bm : Π (x : ♯ A), is-♯-modal (B x))
-  (f : Π (a : A), B (♯-unit A a)) (a : A) : Path (B (♯-unit A a)) (♯-ind A B Bm f (♯-unit A a)) (f a)
+axiom sharp-β (A : U) (B : sharp A → U) (Bm : Π (x : sharp A), is-sharp-modal (B x))
+  (f : Π (a : A), B (sharp-unit A a)) (a : A) : Path (B (sharp-unit A a)) (sharp-ind A B Bm f (sharp-unit A a)) (f a)
 
 -- uniqueness
-axiom ♯-path-modal (B : U) (Bm : is-♯-modal B) (b0 b1 : B) : is-♯-modal (Path B b0 b1)
-def ♯-unique-ptwise (A B : U) (Bm : is-♯-modal B) (g h : ♯ A → B)
-  (e : Π (a : A), Path B (g (♯-unit A a)) (h (♯-unit A a))) : Π (x : ♯ A), Path B (g x) (h x)
- := ♯-ind A (λ (x : ♯ A), Path B (g x) (h x)) (λ (x : ♯ A), ♯-path-modal B Bm (g x) (h x)) e
-def ♯-η (A B : U) (Bm : is-♯-modal B) (g h : ♯ A → B)
-  (e : Π (a : A), Path B (g (♯-unit A a)) (h (♯-unit A a))) : Path (♯ A → B) g h
- := piext (♯ A) (λ (_ : ♯ A), B) g h (♯-unique-ptwise A B Bm g h e)
+axiom sharp-path-modal (B : U) (Bm : is-sharp-modal B) (b0 b1 : B) : is-sharp-modal (Path B b0 b1)
+def sharp-unique-ptwise (A B : U) (Bm : is-sharp-modal B) (g h : sharp A → B)
+  (e : Π (a : A), Path B (g (sharp-unit A a)) (h (sharp-unit A a))) : Π (x : sharp A), Path B (g x) (h x)
+ := sharp-ind A (λ (x : sharp A), Path B (g x) (h x)) (λ (x : sharp A), sharp-path-modal B Bm (g x) (h x)) e
+def sharp-η (A B : U) (Bm : is-sharp-modal B) (g h : sharp A → B)
+  (e : Π (a : A), Path B (g (sharp-unit A a)) (h (sharp-unit A a))) : Path (sharp A → B) g h
+ := piext (sharp A) (λ (_ : sharp A), B) g h (sharp-unique-ptwise A B Bm g h e)
 
 -- structural properties
-axiom ♯-modal (A : U) : is-♯-modal (♯ A)
-def ♯-join (A : U) : ♯ (♯ A) → ♯ A := inv-equiv (♯ A) (♯ (♯ A)) (♯-unit (♯ A), ♯-modal A)
-def ♯-rec (A B : U) (Bm : is-♯-modal B) (f : A → B) : ♯ A → B
- := ♯-ind A (λ (_ : ♯ A), B) (λ (_ : ♯ A), Bm) f
-def ♯-rec-β (A B : U) (Bm : is-♯-modal B) (f : A → B) (a : A) : Path B (♯-rec A B Bm f (♯-unit A a)) (f a)
- := ♯-β A (λ (_ : ♯ A), B) (λ (_ : ♯ A), Bm) f a
-def ♯-map (A B : U) (f : A → B) : ♯ A → ♯ B := ♯-rec A (♯ B) (♯-modal B) (∘ A B (♯ B) (♯-unit B) f)
-def ♯-naturality (A B : U) (f : A → B) (a : A) : Path (♯ B) (♯-unit B (f a)) (♯-map A B f (♯-unit A a))
- := <i> ♯-rec-β A (♯ B) (♯-modal B) (∘ A B (♯ B) (♯-unit B) f) a @ -i
-def ♯-counit (B : U) (Bm : is-♯-modal B) : ♯ B → B := inv-equiv B (♯ B) (♯-unit B, Bm)
-def ♯-counit-unit (B : U) (Bm : is-♯-modal B) (b : B) : Path B (♯-counit B Bm (♯-unit B b)) b
- := sec-equiv B (♯ B) (♯-unit B, Bm) b
+axiom sharp-modal (A : U) : is-sharp-modal (sharp A)
+def sharp-join (A : U) : sharp (sharp A) → sharp A := inv-equiv (sharp A) (sharp (sharp A)) (sharp-unit (sharp A), sharp-modal A)
+def sharp-rec (A B : U) (Bm : is-sharp-modal B) (f : A → B) : sharp A → B
+ := sharp-ind A (λ (_ : sharp A), B) (λ (_ : sharp A), Bm) f
+def sharp-rec-β (A B : U) (Bm : is-sharp-modal B) (f : A → B) (a : A) : Path B (sharp-rec A B Bm f (sharp-unit A a)) (f a)
+ := sharp-β A (λ (_ : sharp A), B) (λ (_ : sharp A), Bm) f a
+def sharp-map (A B : U) (f : A → B) : sharp A → sharp B := sharp-rec A (sharp B) (sharp-modal B) (∘ A B (sharp B) (sharp-unit B) f)
+def sharp-naturality (A B : U) (f : A → B) (a : A) : Path (sharp B) (sharp-unit B (f a)) (sharp-map A B f (sharp-unit A a))
+ := <i> sharp-rec-β A (sharp B) (sharp-modal B) (∘ A B (sharp B) (sharp-unit B) f) a @ -i
+def sharp-counit (B : U) (Bm : is-sharp-modal B) : sharp B → B := inv-equiv B (sharp B) (sharp-unit B, Bm)
+def sharp-counit-unit (B : U) (Bm : is-sharp-modal B) (b : B) : Path B (sharp-counit B Bm (sharp-unit B b)) b
+ := sec-equiv B (sharp B) (sharp-unit B, Bm) b

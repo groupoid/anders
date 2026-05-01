@@ -66,6 +66,10 @@ let rec eval ctx e0 = traceEval e0; match e0 with
   | EInf e               -> inf (eval ctx e)
   | EJoin e              -> join (eval ctx e)
   | EIndIm (a, b)        -> VIndIm (eval ctx a, eval ctx b)
+  | EFla e               -> VFla (eval ctx e)
+  | EFlaUnit e           -> flaunit (eval ctx e)
+  | EFlaCounit e         -> flacounit (eval ctx e)
+  | EIndFla (a, b)       -> VIndFla (eval ctx a, eval ctx b)
   | ECoequ (a, b, f, g)  -> VCoequ (eval ctx a, eval ctx b, eval ctx f, eval ctx g)
   | EIota2 (a, b, f, g, c) -> VIota2 (eval ctx a, eval ctx b, eval ctx f, eval ctx g, eval ctx c)
   | EResp (a, b, f, g, c) -> VResp (eval ctx a, eval ctx b, eval ctx f, eval ctx g, eval ctx c)
@@ -352,6 +356,7 @@ and app : value * value -> value = function
   | VIndNat (c, z, s), VSucc n -> app (app (s, n), app (VIndNat (c, z, s), n))
   (* ind-ℑ A B f (ℑ-unit a) ~> f a *)
   | VApp (VIndIm _, f), VInf a -> app (f, a)
+  | VApp (VIndFla _, f), VFlaUnit a -> app (f, a)
   | VApp (VIndIm (a, b), f), VHComp (_, r, u, u0) ->
     let g x = app (VApp (VIndIm (a, b), f), x) in
     let i = freshName "ι" in let k = freshName "κ" in
@@ -360,6 +365,8 @@ and app : value * value -> value = function
   (* ind-ℑ A B (λ _, b) x ~> b *)
   | VApp (VIndIm (a, b), VLam (t, (x, g))), v -> let u = g (Var (x, t)) in
     if mem x u then VApp (VApp (VIndIm (a, b), VLam (t, (x, g))), v) else u
+  | VApp (VIndFla (a, b), VLam (t, (x, g))), v -> let u = g (Var (x, t)) in
+    if mem x u then VApp (VApp (VIndFla (a, b), VLam (t, (x, g))), v) else u
   (* coequ-ind A B f g X i rho (ι₂ b) ~> i b *)
   | VIndCoequ (_, _, _, _, _, i, _), VIota2 (_, _, _, _, b) -> app (i, b)
   (* coequ-ind A B f g X i rho (resp a @ r) ~> rho a @ r *)
@@ -452,6 +459,10 @@ and inferV v = traceInferV v; match v with
   | VInf v -> VIm (inferV v)
   | VJoin v -> extIm (inferV v)
   | VIndIm (a, b) -> inferIndIm a b
+  | VFla t -> inferV t
+  | VFlaUnit v -> VFla (inferV v)
+  | VFlaCounit v -> extFla (inferV v)
+  | VIndFla (a, b) -> inferIndFla a b
   | VCoequ (a, _, _, _) -> VKan (extSet (inferV a))
   | VIota2 (a, b, f, g, _) -> VCoequ (a, b, f, g)
   | VResp (a, b, f, g, c) ->
@@ -499,6 +510,10 @@ and inferIndW a b c = let t = wtype a b in
 and inferIndIm a b =
   implv (VPi (a, (freshName "a", fun x -> VIm (app (b, inf x)))))
         (VPi (VIm a, (freshName "a", fun x -> VIm (app (b, x)))))
+
+and inferIndFla a b =
+  implv (VPi (a, (freshName "a", fun x -> VFla (app (b, flaunit x)))))
+        (VPi (VFla a, (freshName "a", fun x -> VFla (app (b, x)))))
 
 and inferInc t r = let a = freshName "a" in
   VPi (t, (a, fun v -> VSub (t, r, VSystem (border (solve r One) v))))
@@ -596,6 +611,10 @@ and act rho = function
   | VHub (s, a, f) -> VHub (act rho s, act rho a, act rho f)
   | VSpoke (s, a, f, x) -> VSpoke (act rho s, act rho a, act rho f, act rho x)
   | VIndDisc (s, a, x, nc, nh, ns', z) -> VIndDisc (act rho s, act rho a, act rho x, act rho nc, act rho nh, act rho ns', act rho z)
+  | VFla t               -> VFla (act rho t)
+  | VFlaUnit v           -> flaunit (act rho v)
+  | VFlaCounit v         -> flacounit (act rho v)
+  | VIndFla (a, b)       -> VIndFla (act rho a, act rho b)
 
 
 and actVar rho i = match Env.find_opt i rho with
@@ -665,6 +684,9 @@ and conv v1 v2 : bool = traceConv v1 v2;
     | VInf u, VInf v -> conv u v
     | VJoin u, VJoin v -> conv u v
     | VIndIm (a1, b1), VIndIm (a2, b2) -> conv a1 a2 && conv b1 b2
+    | VFla u, VFla v -> conv u v
+    | VFlaCounit u, VFlaCounit v -> conv u v
+    | VIndFla (a1, b1), VIndFla (a2, b2) -> conv a1 a2 && conv b1 b2
     | VCoequ (a1, b1, f1, g1), VCoequ (a2, b2, f2, g2) -> conv a1 a2 && conv b1 b2 && conv f1 f2 && conv g1 g2
     | VIota2 (a1, b1, f1, g1, c1), VIota2 (a2, b2, f2, g2, c2) -> conv a1 a2 && conv b1 b2 && conv f1 f2 && conv g1 g2 && conv c1 c2
     | VResp (a1, b1, f1, g1, c1), VResp (a2, b2, f2, g2, c2) -> conv a1 a2 && conv b1 b2 && conv f1 f2 && conv g1 g2 && conv c1 c2
@@ -846,6 +868,12 @@ and infer ctx e : value = traceInfer e; match e with
   | EIndIm (a, b) -> ignore (extSet (infer ctx a)); let t = eval ctx a in
     let (c, (x, g)) = extPiG (infer ctx b) in eqNf (VIm t) c;
     ignore (extSet (g (Var (x, c)))); inferIndIm t (eval ctx b)
+  | EFla e -> let t = infer ctx e in ignore (extSet t); t
+  | EFlaUnit e -> VFla (infer ctx e)
+  | EFlaCounit e -> extFla (infer ctx e)
+  | EIndFla (a, b) -> ignore (extSet (infer ctx a)); let t = eval ctx a in
+    let (c, (x, g)) = extPiG (infer ctx b) in eqNf (VFla t) c;
+    ignore (extSet (g (Var (x, c)))); inferIndFla t (eval ctx b)
   | ECoequ (a, b, f, g) ->
     let ta = eval ctx a in ignore (extSet (infer ctx a));
     let tb = eval ctx b in ignore (extSet (infer ctx b));

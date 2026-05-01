@@ -1,0 +1,20 @@
+module flat where
+import library/foundations/mltt/proto
+import library/foundations/univalent/path
+import library/foundations/univalent/iso
+
+-- Flat Modality ♭
+-- Synonyms for kernel primitives
+
+def Flat (A : U) := ♭ A
+def FlatUnit (A : U) := λ (a : A), ♭-unit a
+def FlatCounit (A : U) := λ (x : Flat A), ♭-counit x
+
+-- Induction Rule (Primitive: ind-♭)
+def FlatInd (A : U) := λ (B : Flat A → U), ind-♭ A B
+
+-- Uniqueness Rule (η)
+def ♭-η (A : U) := λ (x : Flat A), <p> x
+
+-- Discrete types: A type is discrete if ♭-unit is an equivalence.
+def isDiscrete (A : U) := isEquiv A (Flat A) (FlatUnit A)

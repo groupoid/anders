@@ -1,0 +1,32 @@
+module sharp where
+import library/foundations/modal/flat
+import library/foundations/univalent/iso
+
+-- Sharp Modality ♯
+-- Derived from Flat modality ♭ as its right adjoint.
+-- Definition: ♯ A := ♭ 𝟏 → A
+
+def ♯ (A : U) := ♭ 𝟏 → A
+def Sharp (A : U) := ♯ A
+
+-- Introduction Rule
+def ♯-unit (A : U) := λ (a : A), λ (_ : ♭ 𝟏), a
+def Sharp-unit (A : U) := ♯-unit A
+
+-- Elimination Rule (Counit)
+def ♯-counit (A : U) := λ (s : ♯ A), s (♭-unit ★)
+def Sharp-counit (A : U) := ♯-counit A
+
+-- Modal types: A type is codiscrete (♯-modal) if the unit is an equivalence.
+def is-♯-modal (A : U) := isEquiv A (♯ A) (♯-unit A)
+
+-- Uniqueness Rule (η)
+-- s ≡ λ x, s (♭-unit ★)
+def ♯-η (A : U) := λ (s : ♯ A), <p> λ (x : ♭ 𝟏), s (♭-η 𝟏 x @ p)
+def Sharp-η (A : U) := ♯-η A
+
+def test (A : U) := A
+
+-- Monad structure
+def ♯-join (A : U) := λ (ss : ♯ (♯ A)), λ (x : ♭ 𝟏), ss x x
+def ♯-map (A B : U) := λ (f : A → B), λ (s : ♯ A), λ (x : ♭ 𝟏), f (s x)

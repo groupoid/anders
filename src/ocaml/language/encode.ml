@@ -99,6 +99,10 @@ struct
     | EHub (s, a, f) -> W.put '\x5A'; exp s; exp a; exp f
     | ESpoke (s, a, f, x) -> W.put '\x5B'; exp s; exp a; exp f; exp x
     | EIndDisc (s, a, x, nc, nh, ns', z) -> W.put '\x5C'; exp s; exp a; exp x; exp nc; exp nh; exp ns'; exp z
+  | EFla e               -> W.put '\x60'; exp e
+  | EFlaUnit e           -> W.put '\x61'; exp e
+  | EFlaCounit e         -> W.put '\x62'; exp e
+  | EIndFla (t, f)        -> W.put '\x63'; exp2 t f
 
 
   and exp2 a b = exp a; exp b
@@ -148,6 +152,9 @@ struct
     | Traceback (e, es)      -> W.put '\x13'; error e; int (List.length es); List.iter (uncurry exp2) es
     | InvalidOpt p           -> W.put '\x14'; string p
     | InvalidOptValue (p, x) -> W.put '\x15'; string p; string x
+    | ExpectedFla e          -> W.put '\x16'; exp e
+    | ExpectedFlaUnit e      -> W.put '\x17'; exp e
+    | ExpectedFlaCounit e    -> W.put '\x18'; exp e
 
   let resp = function
     | Version (i, j, k) -> W.put '\x10'; int64 i; int64 j; int64 k

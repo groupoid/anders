@@ -51,12 +51,14 @@ let indempty = "ind-empty" | "ind\xE2\x82\x80" (* ind₀ *)
 let indunit  = "ind-unit"  | "ind\xE2\x82\x81" (* ind₁ *)
 let indbool  = "ind-bool"  | "ind\xE2\x82\x82" (* ind₂ *)
 
-let im    = "\xE2\x84\x91" (* ℑ *)
-let inf   = im "-unit" (* ℑ-unit *)
-let join  = im "-join" (* ℑ-join *)
-let indim = "ind-" im (* ind-ℑ *)
+
 
 let iota2 = "\xCE\xB9\xE2\x82\x82" (* ι₂ *)
+
+let fla        = "\xE2\x99\xAD" (* ♭ *)
+let flaunit    = fla "-unit" (* ♭-unit *)
+let flacounit  = fla "-counit" (* ♭-counit *)
+let indfla     = "ind-" fla (* ind-♭ *)
 
 rule main = parse
 | nl            { nextLine lexbuf; main lexbuf }
@@ -72,10 +74,9 @@ rule main = parse
 | "."           { DOT }              | "-"           { NEGATE }
 | defeq         { DEFEQ }            | map           { MAP }
 | arrow         { ARROW }            | prod          { PROD }
-| indempty      { INDEMPTY }         | indunit       { INDUNIT }
-| indbool       { INDBOOL }          | indim         { INDIM }
-| im            { IM }               | inf           { INF }
-| join          { JOIN }             | eof           { EOF }
+| fla           { FLA }              | flaunit       { FLAUNIT }
+| flacounit     { FLACOUNIT }        | indfla        { INDFLA }
+| eof           { EOF }
 | ident as s    {
   match s with
   | "/\\"                    | "\xE2\x88\xA7"    -> AND    (* ∧ *)
@@ -101,6 +102,17 @@ rule main = parse
   | "disc-ind"   -> INDDISC
   | "nat"        -> NAT      | "zero"            -> ZERO
   | "succ"       -> SUCC     | "ind-nat"         -> INDNAT
+  | "\xE2\x99\xAD"           -> FLA      (* ♭ *)
+  | "\xE2\x99\xAD-unit"      -> FLAUNIT  (* ♭-unit *)
+  | "\xE2\x99\xAD-counit"    -> FLACOUNIT(* ♭-counit *)
+  | "ind-\xE2\x99\xAD"       -> INDFLA   (* ind-♭ *)
+  | "\xE2\x84\x91"           -> IM       (* ℑ *)
+  | "\xE2\x84\x91-unit"      -> INF      (* ℑ-unit *)
+  | "\xE2\x84\x91-join"      -> JOIN     (* ℑ-join *)
+  | "ind-\xE2\x84\x91"       -> INDIM    (* ind-ℑ *)
+  | "ind-empty" | "ind\xE2\x82\x80" -> INDEMPTY
+  | "ind-unit"  | "ind\xE2\x82\x81" -> INDUNIT
+  | "ind-bool"  | "ind\xE2\x82\x82" -> INDBOOL
   | "definition"             | "def"
 
 

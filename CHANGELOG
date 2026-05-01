@@ -9,15 +9,16 @@ Changelog
 * Localizations
 * Étale Maps
 * Formal Disc Bundle
-* Fiber Bundles
+* Hopf Fibration
 
 1 MAY 2026 Version 5.1.0 Tesseract and K(G,n)-η:
 
-* Added strict canonical Nat to Kernel for spectral goodness at higher homotopies.
-* Fix constcubes.anders module with improved DNF solver in formula.ml.
-* Constructive K(G,n)-η in KGn.anders.
-* Sn.anders and truncation.anders are using inernal Nat.
-* Homotopy Nat with homotopical canonicity (only) is in natw.anders module.
+* Added strict canonical Nat to Kernel for spectral goodness at higher homotopies
+* Fix constcubes.anders module with improved DNF solver in formula.ml
+* Constructive K(G,n)-η in KGn.anders
+* Sn.anders and truncation.anders are using inernal Nat
+* Loop Spaces
+* Homotopy Nat with homotopical canonicity (only) is in natw.anders module
 * Updated Article: https://anders.groupoid.space/doc/anders.pdf
 
 30 APR 2026 Version 5.0.0 Disc and Equalizer:
@@ -35,12 +36,12 @@ Changelog
 
 * Glue Type
 * 0, 1, 2, W Types
-* Coequalizer Type
-* Hub-Spokes Disc Type
-* Infinitesimal Shape Modality
+* Coequalizer Type Axioms
+* Hub-Spokes Disc Type Axioms
+* Infinitesimal Shape Modality Axioms
 * Univalence, Unimorphism, Minivalence
 * Fibre Bundles
-* Homotopy (Co)Limits, Suspension, Sphere, Truncations, Quotients
+* Homotopy Colimit, Suspension, Sphere, Truncations, Quotients
 * Propositions
 * K(G,n)
 

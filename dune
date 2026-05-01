@@ -23,14 +23,18 @@
                 library/mathematics/geometry/formalDisc.anders
                 library/mathematics/homotopy/coequalizer.anders
                 library/mathematics/homotopy/constcubes.anders
+                library/mathematics/homotopy/loop.anders
+                library/mathematics/homotopy/hs.anders
+                library/mathematics/homotopy/hsw.anders
+                library/mathematics/homotopy/hopf.anders
                 library/mathematics/homotopy/pullback.anders
                 library/mathematics/homotopy/pushout.anders
-                library/mathematics/homotopy/hs.anders
                 library/mathematics/homotopy/quotient.anders
                 library/mathematics/homotopy/quotient2.anders
                 library/mathematics/homotopy/truncation.anders
                 library/mathematics/homotopy/suspension.anders
                 library/mathematics/homotopy/S1.anders
                 library/mathematics/homotopy/Sn.anders
-                library/mathematics/homotopy/KG1.anders)
+                library/mathematics/homotopy/KG1.anders
+                library/mathematics/homotopy/KGn.anders)
          (section share) (package anders))

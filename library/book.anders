@@ -6,6 +6,7 @@ import library/foundations/mltt/bool
 import library/foundations/mltt/either
 import library/foundations/mltt/maybe
 import library/foundations/mltt/nat
+import library/foundations/mltt/natw
 import library/foundations/mltt/list
 import library/foundations/mltt/fin
 import library/foundations/mltt/vec

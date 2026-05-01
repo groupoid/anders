@@ -104,7 +104,7 @@ MLTT
 
 Type Checker is based on classical MLTT-80 with 0, 1, 2 and W-types.
 
-* <a href="https://raw.githubusercontent.com/michaelt/martin-lof/master/pdfs/Bibliopolis-Book-retypeset-1984.pdf">Intuitionistic Type Theory</a> [Martin-Löf]
+* <a href="https://5ht.co/mltt-80.pdf">Intuitionistic Type Theory</a> [Martin-Löf]
 
 CCHM
 ----

@@ -32,7 +32,6 @@
                 library/mathematics/homotopy/quotient.anders
                 library/mathematics/homotopy/quotient2.anders
                 library/mathematics/homotopy/truncation.anders
-                library/mathematics/homotopy/truncationw.anders
                 library/mathematics/homotopy/suspension.anders
                 library/mathematics/homotopy/S1.anders
                 library/mathematics/homotopy/Sn.anders

@@ -14,17 +14,12 @@ def zero : ℕ := __zero
 def succ (n : ℕ) : ℕ := __succ n
 
 -- 3) Elimination Rule
-def ind-nat (C : ℕ → U) (z : C zero) (s : Π (n : ℕ), C n → C (succ n)) (n : ℕ) : C n
- := __ind_nat C z s n
-
-def ℕ-ind (C : ℕ → U) (z : C zero) (s : Π (n : ℕ), C n → C (succ n)) (n : ℕ) : C n
- := ind-nat C z s n
+def ind-nat (C : ℕ → U) (z : C zero) (s : Π (n : ℕ), C n → C (succ n)) (n : ℕ) : C n := __ind_nat C z s n
+def ℕ-ind (C : ℕ → U) (z : C zero) (s : Π (n : ℕ), C n → C (succ n)) (n : ℕ) : C n := ind-nat C z s n
 
 -- 5) Computation Rules (Judgmental)
 -- These are judgmental in the kernel, so idp is a valid witness.
-def ℕ-βz (C : ℕ → U) (z : C zero) (s : Π (n : ℕ), C n → C (succ n))
-  : Path (C zero) (ℕ-ind C z s zero) z
- := <i> z
+def ℕ-βz (C : ℕ → U) (z : C zero) (s : Π (n : ℕ), C n → C (succ n)) : Path (C zero) (ℕ-ind C z s zero) z := <i> z
 
 def ℕ-βs (C : ℕ → U) (z : C zero) (s : Π (n : ℕ), C n → C (succ n)) (n : ℕ)
   : Path (C (succ n)) (ℕ-ind C z s (succ n)) (s n (ℕ-ind C z s n))
@@ -33,15 +28,13 @@ def ℕ-βs (C : ℕ → U) (z : C zero) (s : Π (n : ℕ), C n → C (succ n)) 
 -- 6) Uniqueness / Eta Rule (Propositional)
 -- States that any function f : nat -> A is equal to induction on its values.
 def ℕ-η (f : ℕ → ℕ) : Path (ℕ → ℕ) f (λ (x : ℕ), ℕ-ind (λ (n : ℕ), ℕ) (f zero) (λ (n : ℕ) (prev : ℕ), f (succ n)) x)
- := <i> λ (x : ℕ), ℕ-ind (λ (n : ℕ), Path ℕ (f n) (ℕ-ind (λ (k : ℕ), ℕ) (f zero) (λ (k : ℕ) (prev : ℕ), f (succ k)) n))
-    (<i> f zero)
-    (λ (n : ℕ) (prev : Path ℕ (f n) (ℕ-ind (λ (k : ℕ), ℕ) (f zero) (λ (k : ℕ) (prev : ℕ), f (succ k)) n)), <i> f (succ n))
-    x @ i
+ := <i> λ (x : ℕ), ℕ-ind (λ (n : ℕ), Path ℕ (f n) (ℕ-ind (λ (k : ℕ), ℕ) (f zero) (λ (k : ℕ) (prev : ℕ), f (succ k)) n)) (<i> f zero)
+    (λ (n : ℕ) (prev : Path ℕ (f n) (ℕ-ind (λ (k : ℕ), ℕ) (f zero) (λ (k : ℕ) (prev : ℕ), f (succ k)) n)), <i> f (succ n)) x @ i
 
 -- 7) Recursion and Iteration
-def ℕ-rec (C : U) (z : C) (s : ℕ → C → C) : ℕ → C := ℕ-ind (λ (x : ℕ), C) z s
-def ℕ-iter (C : U) (z : C) (s : C → C) : ℕ → C := ℕ-rec C z (λ (x : ℕ), s)
-def ℕ-case (C : U) (z s : C) : ℕ → C := ℕ-iter C z (λ (x : C), s)
+def ℕ-rec  (C : U) (z : C) (s : ℕ → C → C) : ℕ → C := ℕ-ind  (λ (x : ℕ), C) z s
+def ℕ-iter (C : U) (z : C) (s : C → C)     : ℕ → C := ℕ-rec  C z (λ (x : ℕ), s)
+def ℕ-case (C : U) (z : C) (s : C)         : ℕ → C := ℕ-iter C z (λ (x : C), s)
 
 -- 8) Basic Arithmetic
 def plus (m n : ℕ) : ℕ := ℕ-iter ℕ n (λ (x : ℕ), succ x) m

@@ -16,6 +16,8 @@ import library/foundations/univalent/extensionality
 import library/foundations/univalent/equiv
 import library/foundations/univalent/iso
 import library/foundations/modal/infinitesimal
+import library/foundations/modal/modality
+import library/foundations/modal/sharpaxio
 import library/mathematics/algebra/algebra
 import library/mathematics/analysis/real
 import library/mathematics/analysis/borel

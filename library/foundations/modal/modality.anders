@@ -1,4 +1,4 @@
-module modal where
+module modality where
 
 def Modality :=
   Σ (modality: U → U)

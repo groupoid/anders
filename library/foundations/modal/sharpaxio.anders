@@ -1,0 +1,49 @@
+module sharpaxio where
+import library/foundations/mltt/proto
+import library/foundations/univalent/path
+import library/foundations/univalent/equiv
+import library/foundations/univalent/extensionality
+
+{-
+   References:
+     [Shulman 2015]  Brouwer's fixed-point theorem in real-cohesive HoTT
+                     https://arxiv.org/abs/1509.07584
+     [Riley–Finster–Licata 2021]  Synthetic Spectra via a Monadic and
+                     Comonadic Modality  https://arxiv.org/pdf/2102.04099
+     [nLab]  https://ncatlab.org/nlab/show/sharp+modality
+-}
+
+axiom ♯ (A : U) : U -- formation
+axiom ♯-unit (A : U) : A → ♯ A -- introduction
+def is-♯-modal (B : U) : U := isEquiv B (♯ B) (♯-unit B) -- modal predicate
+
+-- induction
+axiom ♯-ind (A : U) (B : ♯ A → U) (Bm : Π (x : ♯ A), is-♯-modal (B x))
+  (f : Π (a : A), B (♯-unit A a)) : Π (x : ♯ A), B x
+
+-- computation
+axiom ♯-β (A : U) (B : ♯ A → U) (Bm : Π (x : ♯ A), is-♯-modal (B x))
+  (f : Π (a : A), B (♯-unit A a)) (a : A) : Path (B (♯-unit A a)) (♯-ind A B Bm f (♯-unit A a)) (f a)
+
+-- uniqueness
+axiom ♯-path-modal (B : U) (Bm : is-♯-modal B) (b0 b1 : B) : is-♯-modal (Path B b0 b1)
+def ♯-unique-ptwise (A B : U) (Bm : is-♯-modal B) (g h : ♯ A → B)
+  (e : Π (a : A), Path B (g (♯-unit A a)) (h (♯-unit A a))) : Π (x : ♯ A), Path B (g x) (h x)
+ := ♯-ind A (λ (x : ♯ A), Path B (g x) (h x)) (λ (x : ♯ A), ♯-path-modal B Bm (g x) (h x)) e
+def ♯-η (A B : U) (Bm : is-♯-modal B) (g h : ♯ A → B)
+  (e : Π (a : A), Path B (g (♯-unit A a)) (h (♯-unit A a))) : Path (♯ A → B) g h
+ := piext (♯ A) (λ (_ : ♯ A), B) g h (♯-unique-ptwise A B Bm g h e)
+
+-- structural properties
+axiom ♯-modal (A : U) : is-♯-modal (♯ A)
+def ♯-join (A : U) : ♯ (♯ A) → ♯ A := inv-equiv (♯ A) (♯ (♯ A)) (♯-unit (♯ A), ♯-modal A)
+def ♯-rec (A B : U) (Bm : is-♯-modal B) (f : A → B) : ♯ A → B
+ := ♯-ind A (λ (_ : ♯ A), B) (λ (_ : ♯ A), Bm) f
+def ♯-rec-β (A B : U) (Bm : is-♯-modal B) (f : A → B) (a : A) : Path B (♯-rec A B Bm f (♯-unit A a)) (f a)
+ := ♯-β A (λ (_ : ♯ A), B) (λ (_ : ♯ A), Bm) f a
+def ♯-map (A B : U) (f : A → B) : ♯ A → ♯ B := ♯-rec A (♯ B) (♯-modal B) (∘ A B (♯ B) (♯-unit B) f)
+def ♯-naturality (A B : U) (f : A → B) (a : A) : Path (♯ B) (♯-unit B (f a)) (♯-map A B f (♯-unit A a))
+ := <i> ♯-rec-β A (♯ B) (♯-modal B) (∘ A B (♯ B) (♯-unit B) f) a @ -i
+def ♯-counit (B : U) (Bm : is-♯-modal B) : ♯ B → B := inv-equiv B (♯ B) (♯-unit B, Bm)
+def ♯-counit-unit (B : U) (Bm : is-♯-modal B) (b : B) : Path B (♯-counit B Bm (♯-unit B b)) b
+ := sec-equiv B (♯ B) (♯-unit B, Bm) b

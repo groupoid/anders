@@ -10,6 +10,8 @@
                 library/foundations/univalent/equiv.anders
                 library/foundations/univalent/iso.anders
                 library/foundations/modal/infinitesimal.anders
+                library/foundations/modal/modality.anders
+                library/foundations/modal/sharpaxio.anders
                 library/mathematics/algebra/algebra.anders
                 library/mathematics/analysis/real.anders
                 library/mathematics/analysis/topology.anders

@@ -1,0 +1,83 @@
+{- K(G,n): Eilenberg-MacLane spaces for arbitrary n.
+   
+   Implemented using:
+   - W-types (via ℕ-ind)
+   - Coequalizers (via K1 and suspensions)
+   - Hub and Spoke Disc (via truncations)
+
+   Copyright (c) Groupoid Infinity, 2016-2026. -}
+
+module KGn where
+import library/foundations/mltt/nat
+import library/mathematics/algebra/algebra
+import library/mathematics/homotopy/KG1
+import library/mathematics/homotopy/suspension
+import library/mathematics/homotopy/truncation
+import library/mathematics/homotopy/hs
+import library/mathematics/homotopy/loop
+
+def Pointed : U := summa (Ak : U), Ak
+
+-- Pointed loop space helpers
+def OmegaRefl (A : U) (a : A) : ℕ → Pointed
+ := ℕ-ind (λ (k : ℕ), Pointed) (A, a) (λ (k : ℕ) (prev : Pointed), (Path prev.1 prev.2 prev.2, <_> prev.2))
+
+def Ωⁿ (A : U) (a : A) (n : ℕ) : U := (OmegaRefl A a n).1
+def reflⁿ (A : U) (a : A) (n : ℕ) : Ωⁿ A a n := (OmegaRefl A a n).2
+
+-- K(G, n+1) for n >= 0
+def Kn (G : abgroup) : ℕ → U
+ := ℕ-ind (λ (k: ℕ), U) (K1 (G.1, G.2.1)) (λ (k : ℕ) (prev : U), trunc (𝚺 prev) (succ (succ (succ k))))
+
+-- K(G, n) for n >= 0
+-- Uses W-type based induction on ℕ.
+def K (G : abgroup) (n : ℕ) : U
+ := ℕ-ind (λ (k: ℕ), U) (discreteTopology G) (λ (k : ℕ) (prev : U), Kn G k) n
+
+-- Canonical base point for K(G, n)
+def K-point (G : abgroup) (n : ℕ) : K G n
+ := ℕ-ind (K G) (G.2.1.1.2.2.1)
+    (λ (k : ℕ) (pk : K G k),
+      ℕ-ind (λ (m: ℕ), K G (succ m)) (K1-point (G.1, G.2.1))
+      (λ (m : ℕ) (pm : K G (succ m)), trunc₁ (𝚺 (K G (succ m))) (succ (succ (succ m))) (𝜎₁ (K G (succ m))))
+      k)
+    n
+
+-- Note: K(G, 1) is constructed via Coequalizers (2-quotient).
+-- Higher K(G, n) are constructed via Truncation (Hub and Spoke Disc).
+
+{-
+-- Constructor: K-loop g n represents the n-dimensional cell for g in G
+def K-loop (G : abgroup) (n : ℕ) (g : G.1.1) : Ωⁿ (K G n) (K-point G n) n
+ := ℕ-ind (λ (k: ℕ), G.1.1 → Ωⁿ (K G k) (K-point G k) k)
+    (λ (g: G.1.1), g)
+    (λ (k : ℕ) (prev : G.1.1 → Ωⁿ (K G k) (K-point G k) k) (g : G.1.1),
+      ℕ-ind (λ (m: ℕ), G.1.1 → Ωⁿ (K G (succ m)) (K-point G (succ m)) (succ m))
+        (λ (g: G.1.1), K1-loop (G.1, G.2.1) g)
+        (λ (m : ℕ) (pm : G.1.1 → Ωⁿ (K G (succ m)) (K-point G (succ m)) (succ m)) (g : G.1.1),
+          <j> <i> hcomp (K G (succ m)) (j ∨ -j ∨ i ∨ -i)
+              [ (j = 0) -> reflⁿ (K G (succ m)) (K-point G (succ m)) (succ m) @ i,
+                (j = 1) -> reflⁿ (K G (succ m)) (K-point G (succ m)) (succ m) @ i,
+                (i = 0) -> reflⁿ (K G (succ m)) (K-point G (succ m)) (succ m) @ j,
+                (i = 1) -> reflⁿ (K G (succ m)) (K-point G (succ m)) (succ m) @ j ]
+              (trunc₁ (𝚺 (K G (succ m))) (succ (succ (succ m)))
+                (comp-Path (𝚺 (K G (succ m))) (𝜎₁ (K G (succ m))) (𝜎₂ (K G (succ m))) (𝜎₁ (K G (succ m)))
+                  (𝜎₃ (K G (succ m)) (pm g @ j))
+                  (<i> 𝜎₃ (K G (succ m)) (K-point G (succ m)) @ -i))))
+        k g)
+    n g
+
+-- Higher Induction Principle for K(G, n+1)
+-- Combines truncation induction with suspension induction.
+def K-ind-succ (G : abgroup) (n : ℕ) (P : K G (succ n) → U)
+    (nNorth : P (K-point G (succ n)))
+    (nSouth : P (trunc₁ (𝚺 (K G n)) (succ (succ n)) (𝜎₂ (K G n))))
+    (nMerid : Π (x : K G n), PathP (<i> P (trunc₁ (𝚺 (K G n)) (succ (succ n)) (𝜎₃ (K G n) x @ i))) nNorth nSouth)
+    (nHub   : Π (f : sphere (succ (succ n)) → K G (succ n)) (nF : Π (s : sphere (succ (succ n))), P (f s)), P (trunc₂ (K G (succ n)) (succ (succ n)) f))
+    (nSpoke : Π (f : sphere (succ (succ n)) → K G (succ n)) (nF : Π (s : sphere (succ (succ n))), P (f s)) (s : sphere (succ (succ n))), 
+               PathP (<i> P (trunc₃ (K G (succ n)) (succ (succ n)) f s @ i)) (nHub f nF) (nF s))
+    (z : K G (succ n)) : P z
+ := trunc-ind (𝚺 (K G n)) (succ (succ n)) P
+    (𝚺-ind (K G n) (λ (x : 𝚺 (K G n)), P (trunc₁ (𝚺 (K G n)) (succ (succ n)) x)) nNorth nSouth nMerid)
+    nHub nSpoke z
+-}

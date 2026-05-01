@@ -13,18 +13,6 @@ import library/mathematics/homotopy/truncation
 import library/mathematics/homotopy/Sn
 import library/mathematics/homotopy/loop
 
--- Pointed type structure
-def Pointed : U := Σ (Ak : U), Ak
-def Pointed-Ω (A : Pointed) : Pointed := (Path A.1 A.2 A.2, <_> A.2)
-def PointedMap (A B : Pointed) : U := Σ (f : A.1 → B.1), Path B.1 (f A.2) B.2
-
--- Omega-Pointed construction using primitive ind-nat
-def Omega-Pointed (A : U) (a : A) (n : nat) : Pointed
- := ind-nat (λ (x : nat), Pointed) (A, a) (λ (k : nat) (prev : Pointed), Pointed-Ω prev) n
-
-def Ωⁿ (A : U) (a : A) (n : nat) : U := (Omega-Pointed A a n).1
-def reflⁿ (A : U) (a : A) (n : nat) : Ωⁿ A a n := (Omega-Pointed A a n).2
-
 -- K-step: K(G, n+1) = || Σ K(G, n) ||_{n+1}
 def K-step (G : abgroup) (k : nat) (prev : Pointed) : Pointed
  := (trunc (𝚺 prev.1) (plus (succ (succ zero)) k),
@@ -73,27 +61,3 @@ def K-η (G : abgroup) (n : nat) (P : Π (k : nat), K G k → U) (h : Π (k : na
      <_> (h (succ k)))
     n
 
--- Loop space induction step: Ωⁿ A ≃ Ωⁿ⁺¹ Σ A
-def susp-Ω-motive (A : U) (a : A) (k : nat) (prev : PointedMap (Omega-Pointed A a k) (Omega-Pointed (𝚺 A) (𝜎₁ A) (succ k)))
-    (start end : Ωⁿ (𝚺 A) (𝜎₁ A) (succ k)) (p : Path (Ωⁿ (𝚺 A) (𝜎₁ A) (succ k)) start end) : U
- := PointedMap (Omega-Pointed A a (succ k)) (Path (Ωⁿ (𝚺 A) (𝜎₁ A) (succ k)) end end, <_> end)
-
-def susp-Ω-step (A : U) (a : A) (k : nat) (prev : PointedMap (Omega-Pointed A a k) (Omega-Pointed (𝚺 A) (𝜎₁ A) (succ k)))
- : PointedMap (Omega-Pointed A a (succ k)) (Omega-Pointed (𝚺 A) (𝜎₁ A) (succ (succ k)))
- := J (Ωⁿ (𝚺 A) (𝜎₁ A) (succ k)) (prev.1 (reflⁿ A a k)) (susp-Ω-motive A a k prev)
-      (λ (pk : Ωⁿ A a (succ k)), <i> prev.1 (pk @ i), <_ _> (prev.1 (reflⁿ A a k)))
-      (reflⁿ (𝚺 A) (𝜎₁ A) (succ k)) (prev.2)
-
-def susp-Ω (A : U) (a : A) (n : nat) : PointedMap (Omega-Pointed A a n) (Omega-Pointed (𝚺 A) (𝜎₁ A) (succ n))
- := ind-nat (λ (k : nat), PointedMap (Omega-Pointed A a k) (Omega-Pointed (𝚺 A) (𝜎₁ A) (succ k)))
-    (λ (x : A), comp-Path (𝚺 A) (𝜎₁ A) (𝜎₂ A) (𝜎₁ A) (𝜎₃ A x) (<i> (𝜎₃ A a) @ -i),
-     comp-inv-Path⁻¹ (𝚺 A) (𝜎₁ A) (𝜎₂ A) (𝜎₃ A a))
-    (λ (k : nat) (prev : PointedMap (Omega-Pointed A a k) (Omega-Pointed (𝚺 A) (𝜎₁ A) (succ k))),
-     susp-Ω-step A a k prev)
-    n
-
-def susp-Ω-map (A : U) (a : A) (n : nat) : Ωⁿ A a n → Ωⁿ (𝚺 A) (𝜎₁ A) (succ n)
- := (susp-Ω A a n).1
-
-def susp-Ω-pm (A : U) (a : A) (n : nat) : PointedMap (Omega-Pointed A a n) (Omega-Pointed (𝚺 A) (𝜎₁ A) (succ n))
- := susp-Ω A a n

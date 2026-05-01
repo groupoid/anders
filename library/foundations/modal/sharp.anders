@@ -1,6 +1,6 @@
 module sharp where
 import library/foundations/modal/flat
-import library/foundations/univalent/iso
+import library/foundations/univalent/equiv
 
 -- Sharp Modality ♯
 -- Derived from Flat modality ♭ as its right adjoint.

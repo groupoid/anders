@@ -27,9 +27,10 @@
                 library/mathematics/homotopy/pushout.anders
                 library/mathematics/homotopy/hs.anders
                 library/mathematics/homotopy/quotient.anders
+                library/mathematics/homotopy/quotient2.anders
                 library/mathematics/homotopy/truncation.anders
                 library/mathematics/homotopy/suspension.anders
                 library/mathematics/homotopy/S1.anders
                 library/mathematics/homotopy/Sn.anders
-                library/mathematics/homotopy/KGn.anders)
+                library/mathematics/homotopy/KG1.anders)
          (section share) (package anders))

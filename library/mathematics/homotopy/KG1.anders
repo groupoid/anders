@@ -4,7 +4,7 @@
 
     Copyright (c) Groupoid Infinity, 2016-2026. -}
 
-module KGn where
+module KG1 where
 import library/foundations/mltt/inductive
 import library/mathematics/algebra/algebra
 import library/mathematics/homotopy/suspension

@@ -37,4 +37,6 @@ let tokenToString : token -> string = function
   | DISC       -> "DISC"        | BASE       -> "BASE"
   | HUB        -> "HUB"         | SPOKE      -> "SPOKE"
   | INDDISC    -> "INDDISC"
+  | NAT        -> "NAT"         | ZERO       -> "ZERO"
+  | SUCC       -> "SUCC"        | INDNAT     -> "INDNAT"
 

@@ -82,6 +82,10 @@ struct
     | EW (a, (p, b))       -> clos '\x49' a p b
     | ESup (a, b)          -> W.put '\x4A'; exp2 a b
     | EIndW (a, b, c)      -> W.put '\x4B'; exp3 a b c
+    | ENat                 -> W.put '\x4C'
+    | EZero                -> W.put '\x4D'
+    | ESucc e              -> W.put '\x4E'; exp e
+    | EIndNat (c, z, s)    -> W.put '\x4F'; exp3 c z s
     | EIm t                -> W.put '\x50'; exp t
     | EInf e               -> W.put '\x51'; exp e
     | EIndIm (t, f)        -> W.put '\x52'; exp2 t f

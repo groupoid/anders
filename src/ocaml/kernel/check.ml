@@ -55,6 +55,10 @@ let rec eval ctx e0 = traceEval e0; match e0 with
   | EFalse               -> VFalse
   | ETrue                -> VTrue
   | EIndBool e           -> VIndBool (eval ctx e)
+  | ENat                 -> VNat
+  | EZero                -> VZero
+  | ESucc e              -> VSucc (eval ctx e)
+  | EIndNat (c, z, s)    -> VIndNat (eval ctx c, eval ctx z, eval ctx s)
   | EW (a, (p, b))       -> let t = eval ctx a in W (t, (fresh p, closByVal ctx p t b))
   | ESup (a, b)          -> VSup (eval ctx a, eval ctx b)
   | EIndW (a, b, c)      -> VIndW (eval ctx a, eval ctx b, eval ctx c)
@@ -342,6 +346,10 @@ and app : value * value -> value = function
     app (app (app (g, x), f),
       VLam (app (b, x), (freshName "b", fun y ->
         app (VApp (VIndW (a, b, c), g), app (f, y)))))
+  (* ind-nat C z s 0 ~> z *)
+  | VIndNat (c, z, s), VZero -> z
+  (* ind-nat C z s (succ n) ~> s n (app (VIndNat (c, z, s), n)) *)
+  | VIndNat (c, z, s), VSucc n -> app (app (s, n), app (VIndNat (c, z, s), n))
   (* ind-ℑ A B f (ℑ-unit a) ~> f a *)
   | VApp (VIndIm _, f), VInf a -> app (f, a)
   | VApp (VIndIm (a, b), f), VHComp (_, r, u, u0) ->
@@ -429,8 +437,12 @@ and inferV v = traceInferV v; match v with
   | VGlue t -> inferGlue t
   | VGlueElem (r, u, a) -> inferGlueElem r u (inferV a)
   | VUnglue (_, _, b) -> let (t, _, _) = extGlue (inferV b) in t
-  | VEmpty | VUnit | VBool -> VKan Z.zero
-  | VStar -> VUnit | VFalse | VTrue -> VBool
+  | VEmpty | VUnit | VBool | VNat -> VKan Z.zero
+  | VStar -> VUnit | VFalse -> VBool | VTrue -> VBool | VZero -> VNat
+  | VSucc n -> if conv (inferV n) VNat then VNat else raise (Internal (InferError (rbV v)))
+  | VIndNat (c, z, s) ->
+    let x = freshName "x" in
+    VPi (VNat, (x, fun x -> app (c, x)))
   | VIndEmpty t -> implv VEmpty t
   | VIndUnit t -> recUnit t
   | VIndBool t -> recBool t
@@ -467,6 +479,10 @@ and recUnit t = let x = freshName "x" in
 and recBool t = let x = freshName "x" in
   implv (app (t, VFalse)) (implv (app (t, VTrue))
     (VPi (VBool, (x, fun x -> app (t, x)))))
+
+and recNat t = let x = freshName "x" in
+  implv (app (t, VZero)) (implv (VPi (VNat, (freshName "n", fun n -> implv (app (t, n)) (app (t, VSucc n)))))
+    (VPi (VNat, (x, fun x -> app (t, x)))))
 
 and wtype a b = W (a, (freshName "x", fun x -> app (b, x)))
 
@@ -560,6 +576,10 @@ and act rho = function
   | VFalse               -> VFalse
   | VTrue                -> VTrue
   | VIndBool v           -> VIndBool (act rho v)
+  | VNat                 -> VNat
+  | VZero                -> VZero
+  | VSucc v              -> VSucc (act rho v)
+  | VIndNat (c, z, s)    -> VIndNat (act rho c, act rho z, act rho s)
   | W (t, (x, g))        -> W (act rho t, (x, g >> act rho))
   | VSup (a, b)          -> VSup (act rho a, act rho b)
   | VIndW (a, b, c)      -> VIndW (act rho a, act rho b, act rho c)
@@ -637,6 +657,9 @@ and conv v1 v2 : bool = traceConv v1 v2;
     | VFalse, VFalse -> true
     | VTrue, VTrue -> true
     | VIndBool u, VIndBool v -> conv u v
+    | VNat, VNat | VZero, VZero -> true
+    | VSucc u, VSucc v -> conv u v
+    | VIndNat (c1, z1, s1), VIndNat (c2, z2, s2) -> conv c1 c2 && conv z1 z2 && conv s1 s2
     | VSup (a1, b1), VSup (a2, b2) -> conv a1 a2 && conv b1 b2
     | VIndW (a1, b1, c1), VIndW (a2, b2, c2) -> conv a1 a2 && conv b1 b2 && conv c1 c2
     | VIm u, VIm v -> conv u v
@@ -791,11 +814,20 @@ and infer ctx e : value = traceInfer e; match e with
     inferGlueElem r u t
   | EUnglue (r, u, e) -> let (t, r', u') = extGlue (infer ctx e) in
     eqNf (eval ctx r) r'; eqNf (eval ctx u) u'; t
-  | EEmpty | EUnit | EBool -> VKan Z.zero
-  | EStar -> VUnit | EFalse | ETrue -> VBool
+  | EEmpty | EUnit | EBool | ENat -> VKan Z.zero
+  | EStar -> VUnit | EFalse | ETrue -> VBool | EZero -> VNat
+  | ESucc e -> check ctx e VNat; VNat
   | EIndEmpty e -> ignore (extSet (infer ctx e)); implv VEmpty (eval ctx e)
   | EIndUnit e -> inferInd false ctx VUnit e recUnit
   | EIndBool e -> inferInd false ctx VBool e recBool
+  | EIndNat (c, z, s) ->
+    let tc = eval ctx c in
+    let (t1, (_, g)) = extPiG (infer ctx c) in
+    eqNf t1 VNat;
+    ignore (extSet (g (Var (freshName "n", VNat))));
+    ignore (check ctx z (app (tc, VZero)));
+    ignore (check ctx s (VPi (VNat, (freshName "n", fun n -> implv (app (tc, n)) (app (tc, VSucc n))))));
+    VPi (VNat, (freshName "n", fun n -> app (tc, n)))
   | ESup (a, b) -> let t = eval ctx a in ignore (extSet (infer ctx a));
     let (t', (p, g)) = extPiG (infer ctx b) in eqNf t t';
     ignore (extSet (g (Var (p, t))));

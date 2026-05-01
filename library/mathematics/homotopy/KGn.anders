@@ -1,85 +1,51 @@
 {- Eilenberg-MacLane Spaces: https://anders.groupoid.space/mathematics/homotopy/KGn/
 
-   Implemented using direct W-induction to avoid library transports.
-   This version uses the most primitive recursion pattern for susp-Ω
-   to ensure judgmental reduction across the loop space tower.
+    Implemented using primitive nat and ind-nat to ensure judgmental
+    reduction across the loop space tower.
 
-   Copyright (c) Groupoid Infinity, 2014-2026. -}
+    Copyright (c) Groupoid Infinity, 2014-2026. -}
 
 module KGn where
 option irrelevance true
-import library/foundations/mltt/natw
+import library/foundations/mltt/nat
 import library/mathematics/algebra/algebra
 import library/mathematics/homotopy/suspension
-import library/mathematics/homotopy/truncationw
-import library/mathematics/homotopy/Snw
+import library/mathematics/homotopy/truncation
+import library/mathematics/homotopy/Sn
 import library/mathematics/homotopy/loop
 
 -- Pointed type structure
 def Pointed : U := Σ (Ak : U), Ak
 def Pointed-Ω (A : Pointed) : Pointed := (Path A.1 A.2 A.2, <_> A.2)
 
--- Pointed suspension truncation step
-def K-step (G : abgroup) (n : natw) (A : Pointed) : Pointed
- := (truncw (𝚺 A.1) (succw (succw (succw n))), 
-     trunc₁w (𝚺 A.1) (succw (succw (succw n))) (𝜎₁ A.1))
+-- Omega-Pointed construction using primitive ind-nat
+def Omega-Pointed (A : U) (a : A) (n : nat) : Pointed
+ := ind-nat (λ (x : nat), Pointed) (A, a) (λ (k : nat) (prev : Pointed), Pointed-Ω prev) n
 
--- Omega tower construction (naked)
-def Omega-Pointed (A : U) (a : A) (n : natw) : Pointed
- := indᵂ nat-B nat-C (λ (k : natw), Pointed)
-    (λ (b : nat-B) (f : nat-C b → natw) (g : Π (x : nat-C b), Pointed),
-       ind₂ (λ (tag : 𝟐), Π (f' : nat-C tag → natw) (g' : Π (x : nat-C tag), Pointed), Pointed)
-            (λ (f' : 𝟎 → natw) (g' : Π (x : 𝟎), Pointed), (A, a))
-            (λ (f' : 𝟏 → natw) (g' : Π (x : 𝟏), Pointed), Pointed-Ω (g' ★))
-            b f g) n
+def Ωⁿ (A : U) (a : A) (n : nat) : U := (Omega-Pointed A a n).1
+def reflⁿ (A : U) (a : A) (n : nat) : Ωⁿ A a n := (Omega-Pointed A a n).2
 
-def Ωⁿ (A : U) (a : A) (n : natw) : U := (Omega-Pointed A a n).1
-def reflⁿ (A : U) (a : A) (n : natw) : Ωⁿ A a n := (Omega-Pointed A a n).2
+-- K-step: K(G, n+1) = || Σ K(G, n) ||_{n+1}
+def K-step (G : abgroup) (k : nat) (prev : Pointed) : Pointed
+ := (trunc (𝚺 prev.1) (plus (succ (succ zero)) (succ k)),
+     trunc₁ (𝚺 prev.1) (plus (succ (succ zero)) (succ k)) (𝜎₁ prev.1))
 
--- K(G, n) tower construction (naked)
-def K-Pointed (G : abgroup) (n : natw) : Pointed
- := indᵂ nat-B nat-C (λ (k : natw), Pointed)
-    (λ (b : nat-B) (f : nat-C b → natw) (g : Π (x : nat-C b), Pointed),
-       ind₂ (λ (tag : 𝟐), Π (f' : nat-C tag → natw) (g' : Π (x : nat-C tag), Pointed), Pointed)
-            (λ (f' : 𝟎 → natw) (g' : Π (x : 𝟎), Pointed), (G.1.1, G.2.1.1.2.2.1))
-            (λ (f' : 𝟏 → natw) (g' : Π (x : 𝟏), Pointed), K-step G (f' ★) (g' ★))
-            b f g) n
+-- K(G, n) tower construction using primitive ind-nat
+def K-Pointed (G : abgroup) (n : nat) : Pointed
+ := ind-nat (λ (x : nat), Pointed)
+    (G.1.1, G.2.1.1.2.2.1)
+    (λ (k : nat) (prev : Pointed), K-step G k prev)
+    n
 
-def K (G : abgroup) (n : natw) : U := (K-Pointed G n).1
-def K-point (G : abgroup) (n : natw) : K G n := (K-Pointed G n).2
+def K (G : abgroup) (n : nat) : U := (K-Pointed G n).1
+def K-point (G : abgroup) (n : nat) : K G n := (K-Pointed G n).2
 
-{-
--- Loop space induction step: Ωⁿ A ≃ Ωⁿ⁺¹ Σ A (naked)
-def susp-Ω (A : U) (a : A) (n : natw) : Ωⁿ A a n → Ωⁿ (𝚺 A) (𝜎₁ A) (succw n)
- := indᵂ nat-B nat-C (λ (k : natw), Ωⁿ A a k → Ωⁿ (𝚺 A) (𝜎₁ A) (succw k))
-    (λ (b : nat-B) (f : nat-C b → natw) (g : Π (x : nat-C b), Ωⁿ A a (f x) → Ωⁿ (𝚺 A) (𝜎₁ A) (succw (f x))),
-       ind₂ (λ (tag : 𝟐), Π (f' : nat-C tag → natw) (g' : Π (x : nat-C tag), Ωⁿ A a (f' x) → Ωⁿ (𝚺 A) (𝜎₁ A) (succw (f' x))), Ωⁿ A a (sup nat-B nat-C tag f') → Ωⁿ (𝚺 A) (𝜎₁ A) (succw (sup nat-B nat-C tag f')))
-            (λ (f' : 𝟎 → natw) (g' : Π (x : 𝟎), Ωⁿ A a (f' x) → Ωⁿ (𝚺 A) (𝜎₁ A) (succw (f' x))),
-               λ (x : A), comp-Path (𝚺 A) (𝜎₁ A) (𝜎₂ A) (𝜎₁ A) (𝜎₃ A x) (<i> 𝜎₃ A a @ -i))
-            (λ (f' : 𝟏 → natw) (g' : Π (x : 𝟏), Ωⁿ A a (f' x) → Ωⁿ (𝚺 A) (𝜎₁ A) (succw (f' x))),
-               λ (pk : Ωⁿ A a (succw (f' ★))), <i> g' ★ (pk @ i))
-            b f g) n
+-- Loop space induction step: Ωⁿ A ≃ Ωⁿ⁺¹ Σ A
+def susp-Ω (A : U) (a : A) (n : nat) : Ωⁿ A a n → Ωⁿ (𝚺 A) (𝜎₁ A) (succ n)
+ := ind-nat (λ (k : nat), Ωⁿ A a k → Ωⁿ (𝚺 A) (𝜎₁ A) (succ k))
+    (λ (x : A), comp-Path (𝚺 A) (𝜎₁ A) (𝜎₂ A) (𝜎₁ A) (𝜎₃ A x) (<i> (𝜎₃ A a) @ -i))
+    (λ (k : nat) (prev : Ωⁿ A a k → Ωⁿ (𝚺 A) (𝜎₁ A) (succ k)) (pk : Ωⁿ A a (succ k)), <i> prev (pk @ i))
+    n
 
--- Final K-loop definition (naked)
-def K-loop (G : abgroup) (n : natw) (g : G.1.1) : Ωⁿ (K G n) (K-point G n) n
- := indᵂ nat-B nat-C (λ (k : natw), Ωⁿ (K G k) (K-point G k) k)
-    (λ (b : nat-B) (f : nat-C b → natw) (g' : Π (x : nat-C b), Ωⁿ (K G (f x)) (K-point G (f x)) (f x)),
-       ind₂ (λ (tag : 𝟐), Π (f' : nat-C tag → natw) (g'' : Π (x : nat-C tag), Ωⁿ (K G (f' x)) (K-point G (f' x)) (f' x)), Ωⁿ (K G (sup nat-B nat-C tag f')) (K-point G (sup nat-B nat-C tag f')) (sup nat-B nat-C tag f'))
-            (λ (f' : 𝟎 → natw) (g'' : Π (x : 𝟎), Ωⁿ (K G (f' x)) (K-point G (f' x)) (f' x)), g)
-            (λ (f' : 𝟏 → natw) (g'' : Π (x : 𝟏), Ωⁿ (K G (f' x)) (K-point G (f' x)) (f' x)),
-               <i> (K-step G (f' ★) (K-Pointed G (f' ★))).2 (susp-Ω (K G (f' ★)) (K-point G (f' ★)) (f' ★) (g'' ★) @ i))
-            b f g') n
-
--- Induction Principle for K(G, n+1)
-def K-ind-succ (G : abgroup) (n : natw) (P : K G (succw n) → U)
-    (nNorth : P (K-point G (succw n)))
-    (nSouth : P (trunc₁w (𝚺 (K G n)) (succw (succw (succw n))) (𝜎₂ (K G n))))
-    (nMerid : Π (x : K G n), PathP (<i> P (trunc₁w (𝚺 (K G n)) (succw (succw (succw n))) (𝜎₃ (K G n) x @ i))) nNorth nSouth)
-    (nHub   : Π (f : spherew (succw (succw (succw n))) → K G (succw n)) (nF : Π (s : spherew (succw (succw (succw n)))), P (f s)), P (trunc₂w (K G (succw n)) (succw (succw (succw n))) f))
-    (nSpoke : Π (f : spherew (succw (succw (succw n))) → K G (succw n)) (nF : Π (s : spherew (succw (succw (succw n)))), P (f s)) (s : spherew (succw (succw (succw n)))), 
-               PathP (<i> P (trunc₃w (K G (succw n)) (succw (succw (succw n))) f s @ i)) (nHub f nF) (nF s))
-    (z : K G (succw n)) : P z
- := trunc-indw (𝚺 (K G n)) (succw (succw (succw n))) P
-    (𝚺-ind (K G n) (λ (s : 𝚺 (K G n)), P (trunc₁w (𝚺 (K G n)) (succw (succw (succw n))) s)) nNorth nSouth nMerid)
-    nHub nSpoke z
--}
+def susp-Ω-pm (A : U) (a : A) (n : nat) : PointedMap (Omega-Pointed A a n) (Omega-Pointed (𝚺 A) (𝜎₁ A) (succ n))
+ := (susp-Ω A a n, <i> susp-Ω A a n (reflⁿ A a n) @ i)

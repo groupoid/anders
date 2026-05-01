@@ -86,6 +86,10 @@ struct
     | '\x49' -> let (a, p, b) = clos () in EW (a, (p, b))
     | '\x4A' -> let (a, b) = exp2 () in ESup (a, b)
     | '\x4B' -> let (a, b, c) = exp3 () in EIndW (a, b, c)
+    | '\x4C' -> ENat
+    | '\x4D' -> EZero
+    | '\x4E' -> ESucc (exp ())
+    | '\x4F' -> let (c, z, s) = exp3 () in EIndNat (c, z, s)
     | '\x50' -> EIm (exp ())
     | '\x51' -> EInf (exp ())
     | '\x52' -> let (t, f) = exp2 () in EIndIm (t, f)

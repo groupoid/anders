@@ -99,6 +99,8 @@ rule main = parse
   | "disc"       -> DISC     | "base"            -> BASE
   | "hub"        -> HUB      | "spoke"           -> SPOKE
   | "disc-ind"   -> INDDISC
+  | "nat"        -> NAT      | "zero"            -> ZERO
+  | "succ"       -> SUCC     | "ind-nat"         -> INDNAT
   | "definition"             | "def"
 
 

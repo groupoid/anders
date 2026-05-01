@@ -3,6 +3,8 @@
    open Module
    open Prefs
 
+  let ident x = Ident (x, 0L)
+
   let getVar x =
     let xs = [(!intervalPrim, EI);
               (!zeroPrim, EDir Zero);
@@ -12,7 +14,14 @@
               ("𝟐", EBool);      ("bool", EBool);
               ("★", EStar);      ("star", EStar);
               ("false", EFalse); ("0₂", EFalse);
-              ("true", ETrue);   ("1₂", ETrue)] in
+              ("true", ETrue);   ("1₂", ETrue);
+              ("nat", ENat);
+              ("__nat", ENat);   ("__zero", EZero);
+              ("__succ", ELam (ENat, (ident "n", ESucc (EVar (ident "n")))));
+              ("__ind_nat", ELam (ePi (ident "x") ENat (EKan Z.zero), (ident "C",
+                            ELam (EApp (EVar (ident "C"), EZero), (ident "z",
+                            ELam (ePi (ident "n") ENat (impl (EApp (EVar (ident "C"), EVar (ident "n"))) (EApp (EVar (ident "C"), ESucc (EVar (ident "n"))))), (ident "s",
+                            ELam (ENat, (ident "n", EApp (EIndNat (EVar (ident "C"), EVar (ident "z"), EVar (ident "s")), EVar (ident "n"))))))))))) ] in
     match List.assoc_opt x xs with Some e -> e | None -> decl x
 
   let rec telescope ctor e : tele list -> exp = function
@@ -61,6 +70,7 @@
 %token W INDW SUP
 %token IM INF INDIM JOIN
 %token COEQU IOTA2 RESP INDCOEQU DISC BASE HUB SPOKE INDDISC
+%token NAT ZERO SUCC INDNAT
 
 
 
@@ -79,7 +89,14 @@
 
 %%
 
-ident : IRREF { Irrefutable } | IDENT { ident $1 }
+any_ident:
+  | IDENT { $1 }
+  | NAT { "nat" }
+  | ZERO { "zero" }
+  | SUCC { "succ" }
+  | INDNAT { "ind-nat" }
+
+ident : IRREF { Irrefutable } | any_ident { ident $1 }
 vars : ident+ { $1 }
 lense : LPARENS vars COLON exp2 RPARENS { List.map (fun x -> (x, $4)) $2 }
 telescope : lense telescope { List.append $1 $2 } | lense { $1 }
@@ -88,8 +105,8 @@ path : IDENT { getPath $1 }
 face : LPARENS IDENT IDENT IDENT RPARENS { face $2 $3 $4 }
 
 part : face+ ARROW exp2 { ($1, $3) }
-file : MODULE IDENT WHERE line* EOF { ($2, $4) }
-line : IMPORT path+ { Import $2 } | PLUGIN path { Plugin $2 } | OPTION IDENT IDENT { Option ($2, $3) } | declarations { Decl $1 }
+file : MODULE any_ident WHERE line* EOF { ($2, $4) }
+line : IMPORT path+ { Import $2 } | PLUGIN path { Plugin $2 } | OPTION any_ident any_ident { Option ($2, $3) } | declarations { Decl $1 }
 repl : COLON IDENT exp2 EOF { Command ($2, $3) } | COLON IDENT EOF { Action $2 } | exp2 EOF { Eval $1 } | EOF { Nope }
 exp1 : exp2 COMMA exp1 { EPair (ref None, $1, $3) } | exp2 { $1 }
 
@@ -142,6 +159,7 @@ exp4 :
   | HUB exp6 exp6 exp6 { EHub ($2, $3, $4) }
   | SPOKE exp6 exp6 exp6 exp6 { ESpoke ($2, $3, $4, $5) }
   | INDDISC exp6 exp6 exp6 exp6 exp6 exp6 exp6 { EIndDisc ($2, $3, $4, $5, $6, $7, $8) }
+  | INDDISC exp6 exp6 exp6 exp6 exp6 exp6 exp6 { EIndDisc ($2, $3, $4, $5, $6, $7, $8) }
   | exp5 { $1 }
 
 
@@ -159,10 +177,14 @@ exp6:
   | NEGATE exp6 { ENeg $2 }
   | LSQ separated_list(COMMA, part) RSQ { ESystem (System.of_seq (Seq.filter_map parsePartial (List.to_seq $2))) }
   | LPARENS exp1 RPARENS { $2 }
+  | NAT { getVar "nat" }
+  | ZERO { getVar "zero" }
+  | SUCC { getVar "succ" }
+  | INDNAT { getVar "ind-nat" }
   | IDENT { getVar $1 }
 
 declarations:
-  | DEF IDENT params COLON exp2 DEFEQ exp2 { Def ($2, Some (telescope ePi $5 $3), telescope eLam $7 $3) }
-  | DEF IDENT params COLON exp2 DEFEQ EXT { Ext ($2, telescope ePi $5 $3, $7) }
-  | DEF IDENT params DEFEQ exp2 { Def ($2, None, telescope eLam $5 $3) }
-  | AXIOM IDENT params COLON exp2 { Axiom ($2, telescope ePi $5 $3) }
+  | DEF any_ident params COLON exp2 DEFEQ exp2 { Def ($2, Some (telescope ePi $5 $3), telescope eLam $7 $3) }
+  | DEF any_ident params COLON exp2 DEFEQ EXT { Ext ($2, telescope ePi $5 $3, $7) }
+  | DEF any_ident params DEFEQ exp2 { Def ($2, None, telescope eLam $5 $3) }
+  | AXIOM any_ident params COLON exp2 { Axiom ($2, telescope ePi $5 $3) }

@@ -57,6 +57,10 @@ let rec rbV v = (*traceRbV v;*) match v with
   | VIndDisc (s, a, x, nc, nh, ns', z) -> EIndDisc (rbV s, rbV a, rbV x, rbV nc, rbV nh, rbV ns', rbV z)
 
   | VIndW (a, b, c)      -> EIndW (rbV a, rbV b, rbV c)
+  | VNat                 -> ENat
+  | VZero                -> EZero
+  | VSucc v              -> ESucc (rbV v)
+  | VIndNat (c, z, s)    -> EIndNat (rbV c, rbV z, rbV s)
   | VIm t                -> EIm (rbV t)
   | VInf v               -> EInf (rbV v)
   | VJoin v              -> EJoin (rbV v)

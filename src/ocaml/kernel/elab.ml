@@ -160,6 +160,10 @@ let rec salt (ns : ident Env.t) : exp -> exp = function
   | EFalse               -> EFalse
   | ETrue                -> ETrue
   | EIndBool e           -> EIndBool (salt ns e)
+  | ENat                 -> ENat
+  | EZero                -> EZero
+  | ESucc e              -> ESucc (salt ns e)
+  | EIndNat (c, z, s)    -> EIndNat (salt ns c, salt ns z, salt ns s)
   | EW (a, (p, b))       -> saltTele eW ns p a b
   | ESup (a, b)          -> ESup (salt ns a, salt ns b)
   | EIndW (a, b, c)      -> EIndW (salt ns a, salt ns b, salt ns c)
@@ -228,6 +232,10 @@ let rec swap i j = function
   | VFalse               -> VFalse
   | VTrue                -> VTrue
   | VIndBool v           -> VIndBool (swap i j v)
+  | VNat                 -> VNat
+  | VZero                -> VZero
+  | VSucc v              -> VSucc (swap i j v)
+  | VIndNat (c, z, s)    -> VIndNat (swap i j c, swap i j z, swap i j s)
   | W (t, (x, g))        -> W (swap i j t, (x, g >> swap i j))
   | VSup (a, b)          -> VSup (swap i j a, swap i j b)
   | VIndW (a, b, c)      -> VIndW (swap i j a, swap i j b, swap i j c)
@@ -258,6 +266,9 @@ let rec mem y = function
   | VPLam a | VFst a | VSnd a | VPathP a | VId a | VRef a
   | VJ a | VNeg a | VOuc a | VGlue a | VIndEmpty a
   | VIndUnit a | VIndBool a | VIm a | VInf a | VJoin a -> mem y a
+  | VIndNat (c, z, s) -> mem y c || mem y z || mem y s
+  | VNat | VZero -> false
+  | VSucc a -> mem y a
   | VDisc (s, a) -> mem y s || mem y a
   | VBase (s, a, x) -> mem y s || mem y a || mem y x
   | VHub (s, a, f) -> mem y s || mem y a || mem y f

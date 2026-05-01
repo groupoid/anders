@@ -20,6 +20,7 @@ type value =
   | VUnit | VStar | VIndUnit of value
   | VBool | VFalse | VTrue | VIndBool of value
   | W of value * clos | VSup of value * value | VIndW of value * value * value
+  | VNat | VZero | VSucc of value | VIndNat of value * value * value
   | VCoequ of value * value * value * value | VIota2 of value * value * value * value * value
   | VResp of value * value * value * value * value | VIndCoequ of value * value * value * value * value * value * value
   | VDisc of value * value | VBase of value * value * value | VHub of value * value * value | VSpoke of value * value * value * value | VIndDisc of value * value * value * value * value * value * value

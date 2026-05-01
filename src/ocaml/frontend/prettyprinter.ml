@@ -59,11 +59,13 @@ let rec ppExp paren e = let x = match e with
   | EGlue e -> Printf.sprintf "Glue %s" (ppExp true e)
   | EGlueElem (r, u, a) -> Printf.sprintf "glue %s %s %s" (ppExp true r) (ppExp true u) (ppExp true a)
   | EUnglue (r, u, e) -> Printf.sprintf "unglue %s %s %s" (ppExp true r) (ppExp true u) (ppExp true e)
-  | EEmpty -> "𝟎" | EUnit -> "𝟏" | EBool -> "𝟐"
-  | EStar -> "★" | EFalse -> "0₂" | ETrue -> "1₂"
+  | EEmpty -> "𝟎" | EUnit -> "𝟏" | EBool -> "𝟐" | ENat -> "nat"
+  | EStar -> "★" | EFalse -> "0₂" | ETrue -> "1₂" | EZero -> "0"
   | EIndEmpty e -> Printf.sprintf "ind₀ %s" (ppExp true e)
   | EIndUnit e  -> Printf.sprintf "ind₁ %s" (ppExp true e)
   | EIndBool e  -> Printf.sprintf "ind₂ %s" (ppExp true e)
+  | ESucc e     -> Printf.sprintf "succ %s" (ppExp true e)
+  | EIndNat (c, z, s) -> Printf.sprintf "ind-nat %s %s %s" (ppExp true c) (ppExp true z) (ppExp true s)
   | EW (a, (p, b)) -> Printf.sprintf "W %s, %s" (showTeleExp (p, a)) (showExp b)
   | ESup (a, b) -> Printf.sprintf "sup %s %s" (ppExp true a) (ppExp true b)
   | EIndW (a, b, c) -> Printf.sprintf "indᵂ %s %s %s" (ppExp true a) (ppExp true b) (ppExp true c)
@@ -84,7 +86,7 @@ let rec ppExp paren e = let x = match e with
   in match e with
   | EVar _ | EFst _ | ESnd _ | EI | EPre _ | ESystem _
   | EKan _ | EHole | EDir _ | EPair _ | ENeg _
-  | EEmpty | EUnit | EBool | EStar | EFalse | ETrue -> x
+  | EEmpty | EUnit | EBool | ENat | EStar | EFalse | ETrue | EZero -> x
   | _ -> parens paren x
 
 and showExp e = ppExp false e

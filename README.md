@@ -38,7 +38,7 @@ Anders is a HoTT proof assistant based on:
   de Rham stack modality;
   Disc and Coequalizer primitives.
 We tend not to touch general recursive higher inductive schemes yet,
-instead we will try to express as much HIT as possible through W, Coequlizer and HubSpokes Disc
+instead we will try to express as much HIT as possible through W, Coequlizer and Hub Spokes Disc
 in the style of HoTT/Coq homotopy library and Three-HIT theorem.
 
 Features

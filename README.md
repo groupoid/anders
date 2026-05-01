@@ -41,8 +41,8 @@ Features
 --------
 
 * Homepage: https://anders.groupoid.space/
-* Fibrant MLTT-style 0-1-2-Π-Σ-W primitives with Uₙ hierarchy in 500 LOC
-* Cofibrant CHM-style I primitives with pretypes hierarchy Vₙ in 500 LOC
+* Fibrant MLTT-style N-=-0-1-2-Π-Σ-W primitives with Uₙ hierarchy in 500 LOC
+* Cofibrant CHM-style I (PathP) primitives with pretypes hierarchy Vₙ in 500 LOC
 * Generalized Transport and Homogeneous Composition core Kan operations
 * Partial Elements
 * Cubical Subtypes
@@ -117,7 +117,7 @@ Anders was built by strictly following CCHM publications:
 * <a href="http://www.cse.chalmers.se/~simonhu/papers/p.pdf">Gluing for type theory</a> [Kaposi, Huber, Sattler]
 * <a href="https://doi.org/10.1017/S0960129521000311">Cubical Methods in HoTT/UF</a> [Mörtberg]
 
-We tried to bring in as little of ourselves as possible. 
+We tried to bring in as little of ourselves as possible.
 
 HTS
 ---
@@ -144,24 +144,18 @@ Benchmarks
 Intel i5-12400. Compilation under second, full library type check under 1/3 of a second.
 
 ```
-$ time dune build
-
-real    0m0.796s
-user    0m1.912s
-sys     0m0.416s
+% dune build
+3.19s user 2.64s system 135% cpu 4.297 total
 ```
 
 ```
-$ time dune exec anders check lib/book.anders
-
-real    0m0.268s
-user    0m0.017s
-sys     0m0.017s
+% dune exec anders profile check library/book.anders
+0.06s user 0.05s system 8% cpu 1.188 total
 ```
 
 # Anders: Homotopy Library
 
-Anders is a HoTT proof assistant based on: classical MLTT-80 with 0, 1, 2, W types;
+Anders is a HoTT proof assistant based on: classical MLTT-80 with Pi, Sigma, Nat, Id, 0, 1, 2, W types;
 CCHM in CHM flavour as cubical type system with hcomp/trans Kan operations;
 HTS sctrict equality on pretypes; de Rham stack modality primitives.
 We tend not to touch general recursive higher inductive schemes yet,

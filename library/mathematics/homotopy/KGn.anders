@@ -28,8 +28,8 @@ def reflⁿ (A : U) (a : A) (n : nat) : Ωⁿ A a n := (Omega-Pointed A a n).2
 
 -- K-step: K(G, n+1) = || Σ K(G, n) ||_{n+1}
 def K-step (G : abgroup) (k : nat) (prev : Pointed) : Pointed
- := (trunc (𝚺 prev.1) (plus (succ (succ zero)) (succ k)),
-     trunc₁ (𝚺 prev.1) (plus (succ (succ zero)) (succ k)) (𝜎₁ prev.1))
+ := (trunc (𝚺 prev.1) (plus (succ (succ zero)) k),
+     trunc₁ (𝚺 prev.1) (plus (succ (succ zero)) k) (𝜎₁ prev.1))
 
 -- K(G, n) tower construction using primitive ind-nat
 def K-Pointed (G : abgroup) (n : nat) : Pointed
@@ -41,9 +41,31 @@ def K-Pointed (G : abgroup) (n : nat) : Pointed
 def K (G : abgroup) (n : nat) : U := (K-Pointed G n).1
 def K-point (G : abgroup) (n : nat) : K G n := (K-Pointed G n).2
 
--- Loop space induction step: Ωⁿ A ≃ Ωⁿ⁺¹ Σ A
--- Implemented as a PointedMap to carry the base point preservation witness.
+-- K(G, n) Rules
+-- Elimination (Induction): 
+-- P must be a family over the whole tower to allow induction on n.
+def K-ind (G : abgroup) (n : nat) (P : Π (k : nat), K G k → U)
+    (pBase : Π (g : G.1.1), P zero g)
+    (pStep : Π (k : nat) (prev : Π (z : K G k), P k z) (z : K G (succ k)), P (succ k) z)
+    (z : K G n) : P n z
+ := ind-nat (λ (k : nat), Π (pB : Π (g : G.1.1), P zero g),
+              (Π (m : nat) (pr : Π (y : K G m), P m y) (y : K G (succ m)), P (succ m) y) →
+              (Π (z : K G k), P k z))
+    (λ (pB : Π (g : G.1.1), P zero g) (pS : Π (m : nat) (pr : Π (y : K G m), P m y) (y : K G (succ m)), P (succ m) y) (z : K G zero), pB z)
+    (λ (k : nat) (prev : Π (pB : Π (g : G.1.1), P zero g) (pS : Π (m : nat) (pr : Π (y : K G m), P m y) (y : K G (succ m)), P (succ m) y) (z : K G k), P k z)
+       (pB : Π (g : G.1.1), P zero g) (pS : Π (m : nat) (pr : Π (y : K G m), P m y) (y : K G (succ m)), P (succ m) y) (z : K G (succ k)),
+       pS k (λ (y : K G k), prev pB pS y) z)
+    n pBase pStep z
 
+-- Computation Rule (Beta):
+def K-point-β (G : abgroup) (n : nat) (P : Π (k : nat), K G k → U)
+    (pBase : Π (g : G.1.1), P zero g)
+    (pStep : Π (k : nat) (prev : Π (z : K G k), P k z) (z : K G (succ k)), P (succ k) z)
+  : Path (P n (K-point G n)) (K-ind G n P pBase pStep (K-point G n)) (K-ind G n P pBase pStep (K-point G n))
+ := <_> (K-ind G n P pBase pStep (K-point G n))
+
+
+-- Loop space induction step: Ωⁿ A ≃ Ωⁿ⁺¹ Σ A
 def susp-Ω-motive (A : U) (a : A) (k : nat) (prev : PointedMap (Omega-Pointed A a k) (Omega-Pointed (𝚺 A) (𝜎₁ A) (succ k)))
     (start end : Ωⁿ (𝚺 A) (𝜎₁ A) (succ k)) (p : Path (Ωⁿ (𝚺 A) (𝜎₁ A) (succ k)) start end) : U
  := PointedMap (Omega-Pointed A a (succ k)) (Path (Ωⁿ (𝚺 A) (𝜎₁ A) (succ k)) end end, <_> end)
@@ -67,3 +89,10 @@ def susp-Ω-map (A : U) (a : A) (n : nat) : Ωⁿ A a n → Ωⁿ (𝚺 A) (𝜎
 
 def susp-Ω-pm (A : U) (a : A) (n : nat) : PointedMap (Omega-Pointed A a n) (Omega-Pointed (𝚺 A) (𝜎₁ A) (succ n))
  := susp-Ω A a n
+
+{-
+-- Uniqueness (Eta):
+def K-η (G : abgroup) (n : nat) (P : Π (k : nat), K G k → U) (h : Π (k : nat) (z : K G k), P k z)
+  : Path (Π (z : K G n), P n z) (h n) (λ (z : K G n), K-ind G n P (λ (g : G.1.1), h zero g) (λ (k : nat) (prev : Π (y : K G k), P k y) (y : K G (succ k)), h (succ k) y) z)
+ := <_> (h n)
+-}

@@ -25,9 +25,10 @@ type exp =
 | EPartial of exp | EPartialP of exp * exp | ESystem of exp System.t     (* Partial Funs *)
 | ESub of exp * exp * exp | EInc of exp * exp | EOuc of exp          (* Cubical Subtypes *)
 | EGlue of exp | EGlueElem of exp * exp * exp | EUnglue of exp                (* Glueing *)
-| EIm of exp | EInf of exp | EIndIm of exp * exp | EJoin of exp        (* Infinitesimals *)
 | ECoeq of exp | EIota of exp | EResp of exp | EIndCoeq of exp            (* Coequalizer *)
 | EDisc of exp | EBase of exp | EHub of exp | ESpoke of exp | EIndDisc of exp    (* Disc *)
+| EIm of exp | EInf of exp | EIndIm of exp * exp | EJoin of exp        (* Infinitesimals *)
+| EFla of exp | EFlaUnit of exp | EFlaCounit of exp | EIndFla of exp * exp       (* Flat *)
 ```
 
 Anders is a HoTT proof assistant based on:
@@ -55,6 +56,7 @@ Features
 * Hub Spokes Disc
 * Nat in Kernel for spectral goodness under higher homotopies
 * Infinitesimal Shape Modality (de Rham Stack)
+* Flat Modality (Sharp is derived)
 * Parser in 80 LOC
 * Lexer in 80 LOC
 * Small Kernel in 1000 LOC

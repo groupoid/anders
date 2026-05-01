@@ -67,7 +67,7 @@ type exp =
   | EDisc of exp * exp | EBase of exp * exp * exp | EHub of exp * exp * exp              (* Disc *)
   | ESpoke of exp * exp * exp * exp | EIndDisc of exp * exp * exp * exp * exp * exp * exp
   | EIm of exp | EInf of exp | EIndIm of exp * exp | EJoin of exp      (* Infinitesimal Modality *)
-  | EFla of exp | EFlaUnit of exp | EFlaCounit of exp | EIndFla of exp * exp                     (* Flat Modality *)
+  | EFla of exp | EFlaUnit of exp | EFlaCounit of exp | EIndFla of exp * exp    (* Flat Modality *)
 
 type tele = ident * exp
 

@@ -6,6 +6,7 @@ import library/foundations/mltt/bool
 import library/foundations/mltt/either
 import library/foundations/mltt/maybe
 import library/foundations/mltt/nat
+import library/foundations/mltt/natw
 import library/foundations/mltt/list
 import library/foundations/mltt/fin
 import library/foundations/mltt/vec
@@ -15,6 +16,9 @@ import library/foundations/univalent/extensionality
 import library/foundations/univalent/equiv
 import library/foundations/univalent/iso
 import library/foundations/modal/infinitesimal
+import library/foundations/modal/modality
+import library/foundations/modal/sharp
+import library/foundations/modal/flat
 import library/mathematics/algebra/algebra
 import library/mathematics/analysis/real
 import library/mathematics/analysis/borel
@@ -22,18 +26,6 @@ import library/mathematics/analysis/topology
 import library/mathematics/geometry/bundle
 import library/mathematics/geometry/etale
 import library/mathematics/geometry/formalDisc
-import library/mathematics/homotopy/coequalizer
-import library/mathematics/homotopy/constcubes
-import library/mathematics/homotopy/pullback
-import library/mathematics/homotopy/pushout
-import library/mathematics/homotopy/hs
-import library/mathematics/homotopy/quotient
-import library/mathematics/homotopy/truncation
-import library/mathematics/homotopy/suspension
-import library/mathematics/homotopy/loop
-import library/mathematics/homotopy/S1
-import library/mathematics/homotopy/Sn
-import library/mathematics/homotopy/KGn
 import library/mathematics/categories/category
 import library/mathematics/categories/cartesian
 import library/mathematics/categories/functor
@@ -44,3 +36,18 @@ import library/mathematics/categories/topos
 import library/mathematics/categories/meta/favonia
 import library/mathematics/categories/meta/kraus
 import library/mathematics/categories/meta/awodey
+import library/mathematics/homotopy/coequalizer
+import library/mathematics/homotopy/hs
+import library/mathematics/homotopy/constcubes
+import library/mathematics/homotopy/pullback
+import library/mathematics/homotopy/pushout
+import library/mathematics/homotopy/quotient
+import library/mathematics/homotopy/quotient2
+import library/mathematics/homotopy/truncation
+import library/mathematics/homotopy/suspension
+import library/mathematics/homotopy/loop
+import library/mathematics/homotopy/hopf
+import library/mathematics/homotopy/S1
+import library/mathematics/homotopy/Sn
+import library/mathematics/homotopy/KG1
+-- import library/mathematics/homotopy/KGn -- comment for speed

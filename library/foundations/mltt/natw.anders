@@ -1,0 +1,29 @@
+{- Homotopy Natural Numbers: https://anders.groupoid.space/foundations/mltt/natw/
+   - Homotopy Nat.
+   Implemented using W primitives using transp enforcing Homotopy Canonicity and Losing Strong Canonicity.
+   Copyright (c) Groupoid Infinity, 2014-2026. -}
+
+module natw where
+import library/foundations/mltt/inductive
+
+def nat-B : U := 𝟐
+def nat-C : nat-B → U := ind₂ (λ (_ : 𝟐), U) 𝟎 𝟏
+def natw : U := W (x : nat-B), nat-C x
+
+def zerow : natw := sup nat-B nat-C 0₂ (λ (x : 𝟎), ind₀ natw x)
+def succw (n : natw) : natw := sup nat-B nat-C 1₂ (λ (u : 𝟏), n)
+
+def nat-ind (P : natw → U) (p0 : P zerow) (ps : Π (n : natw), P n → P (succw n)) (n : natw) : P n
+ := indᵂ nat-B nat-C P
+    (λ (b : nat-B) (f : nat-C b → natw) (g : Π (x : nat-C b), P (f x)),
+      ind₂ (λ (tag : 𝟐), Π (f' : nat-C tag → natw) (g' : Π (x : nat-C tag), P (f' x)), P (sup nat-B nat-C tag f'))
+           (λ (f' : 𝟎 → natw) (g' : Π (x : 𝟎), P (f' x)),
+              transp (<i> P (sup nat-B nat-C 0₂ (λ (x : 𝟎),
+                ind₀ (PathP (<_> natw) (ind₀ natw x) (f' x)) x @ i))) 0 p0)
+           (λ (f' : 𝟏 → natw) (g' : Π (x : 𝟏), P (f' x)),
+              transp (<i> P (sup nat-B nat-C 1₂ (λ (u : 𝟏),
+                ind₁ (λ (v : 𝟏), Path natw (f' ★) (f' v)) (<_> f' ★) u @ i))) 0 (ps (f' ★) (g' ★)))
+           b f g) n
+
+def nat-rec (A : U) (a : A) (f : natw → A → A) : natw → A := nat-ind (λ (x : natw), A) a f
+def nat-iter (A : U) (a : A) (f : A → A) : natw → A := nat-rec A a (λ (n : natw) (x : A), f x)

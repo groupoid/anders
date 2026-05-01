@@ -2,7 +2,7 @@
 
    HoTT 2.15
 
-   Copyright (c) Groupoid Infinity, 2014-2025. -}
+   Copyright (c) Groupoid Infinity, 2016-2026. -}
 
 module suspension where
 import library/mathematics/homotopy/pushout
@@ -22,7 +22,9 @@ def 𝚺-ind (X : U) (P : 𝚺 X → U)
     (south : P (𝜎₂ X))
     (merid : Π (x: X), PathP (<i> P (𝜎₃ X x @ i)) (north) (south)) (y: 𝚺 X) : P y
  := pushout-ind 𝟏 𝟏 X (const₁ X) (const₁ X) P
-      (λ (_ : 𝟏), north) (λ (_ : 𝟏), south) merid y
+      (1-ind (λ (u : 𝟏), P (po₁ 𝟏 𝟏 X (const₁ X) (const₁ X) u)) north)
+      (1-ind (λ (u : 𝟏), P (po₂ 𝟏 𝟏 X (const₁ X) (const₁ X) u)) south)
+      merid y
 
 def 𝚺-rec (A X : U) (north south : X) (merid : A → Path X north south) (y : 𝚺 A) : X
  := 𝚺-ind A (λ (_ : 𝚺 A), X) north south (λ (a : A), merid a) y
@@ -37,16 +39,14 @@ def 𝚺-β₂ (A : U) (P : 𝚺 A → U) (north : P (𝜎₁ A)) (south : P (�
   : Path (P (𝜎₂ A)) (𝚺-ind A P north south merid (𝜎₂ A)) south
  := idp (P (𝜎₂ A)) south
 
-def 𝚺-η-pointwise (A : U) (P : 𝚺 A → U) (h : Π (z : 𝚺 A), P z) (z : 𝚺 A) :
-  Path (P z) (h z) (𝚺-ind A P (h (𝜎₁ A)) (h (𝜎₂ A)) (λ (x : A), <i> h (𝜎₃ A x @ i)) z)
+def 𝚺-η-pointwise (A : U) (P : 𝚺 A → U) (h : Π (z : 𝚺 A), P z) (z : 𝚺 A)
+  : Path (P z) (h z) (𝚺-ind A P (h (𝜎₁ A)) (h (𝜎₂ A)) (λ (x : A), <i> h (𝜎₃ A x @ i)) z)
  := 𝚺-ind A (λ (z : 𝚺 A), Path (P z) (h z) (𝚺-ind A P (h (𝜎₁ A)) (h (𝜎₂ A)) (λ (x : A), <i> h (𝜎₃ A x @ i)) z))
       (idp (P (𝜎₁ A)) (h (𝜎₁ A)))
       (idp (P (𝜎₂ A)) (h (𝜎₂ A)))
       (λ (x : A), <k> idp (P (𝜎₃ A x @ k)) (h (𝜎₃ A x @ k))) z
 
-def 𝚺-η (A : U) (P : 𝚺 A → U) (h : Π (z : 𝚺 A), P z) :
-  Path (Π (z : 𝚺 A), P z) h (𝚺-ind A P (h (𝜎₁ A)) (h (𝜎₂ A)) (λ (x : A), <i> h (𝜎₃ A x @ i)))
+def 𝚺-η (A : U) (P : 𝚺 A → U) (h : Π (z : 𝚺 A), P z)
+  : Path (Π (z : 𝚺 A), P z) h (𝚺-ind A P (h (𝜎₁ A)) (h (𝜎₂ A)) (λ (x : A), <i> h (𝜎₃ A x @ i)))
  := piext (𝚺 A) P h (𝚺-ind A P (h (𝜎₁ A)) (h (𝜎₂ A)) (λ (x : A), <i> h (𝜎₃ A x @ i)))
           (𝚺-η-pointwise A P h)
-
-

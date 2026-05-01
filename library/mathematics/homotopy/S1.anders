@@ -1,3 +1,10 @@
+{- S^1: https://anders.groupoid.space/mathematics/homotopy/s1/
+   - S^1 Sphere (Circle).
+
+   HoTT 6.4 Circles and Spheres
+
+   Copyright (c) Groupoid Infinity, 2016-2026. -}
+
 module S1 where
 import library/mathematics/homotopy/coequalizer
 import library/foundations/mltt/bool
@@ -9,7 +16,11 @@ def baseS1 : S¹ := iota 𝟏 𝟏 (id 𝟏) (id 𝟏) ★
 def loop : Path S¹ baseS1 baseS1 := resp′ 𝟏 𝟏 (id 𝟏) (id 𝟏) ★
 
 def S1-ind (X : S¹ → U) (nBase : X baseS1) (nLoop : PathP (<i> X (loop @ i)) nBase nBase) (z : S¹)
-  := coequ-ind 𝟏 𝟏 (id 𝟏) (id 𝟏) X (λ (_ : 𝟏), nBase) (λ (_ : 𝟏), nLoop) z
+  := coequ-ind 𝟏 𝟏 (id 𝟏) (id 𝟏) X
+       (1-ind (λ (u : 𝟏), X (iota 𝟏 𝟏 (id 𝟏) (id 𝟏) u)) nBase)
+       (1-ind (λ (u : 𝟏), PathP (<i> X (resp′ 𝟏 𝟏 (id 𝟏) (id 𝟏) u @ i))
+                          (1-ind (λ (v : 𝟏), X (iota 𝟏 𝟏 (id 𝟏) (id 𝟏) v)) nBase u)
+                          (1-ind (λ (v : 𝟏), X (iota 𝟏 𝟏 (id 𝟏) (id 𝟏) v)) nBase u)) nLoop) z
 
 def S1-β₁ (X : S¹ → U) (nBase : X baseS1) (nLoop : PathP (<i> X (loop @ i)) nBase nBase)
   := idp (X baseS1) nBase

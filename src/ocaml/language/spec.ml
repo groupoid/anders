@@ -61,16 +61,13 @@ type exp =
   | EUnit | EStar | EIndUnit of exp                                                         (* 𝟏 *)
   | EBool | EFalse | ETrue | EIndBool of exp                                                (* 𝟐 *)
   | EW of exp * (ident * exp) | ESup of exp * exp | EIndW of exp * exp * exp                (* W *)
-  | ECoequ of exp * exp * exp * exp | EIota2 of exp * exp * exp * exp * exp                 (* Coequalizer *)
+  | ENat | EZero | ESucc of exp | EIndNat of exp * exp * exp                              (* Nat *)
+  | ECoequ of exp * exp * exp * exp | EIota2 of exp * exp * exp * exp * exp       (* Coequalizer *)
   | EResp of exp * exp * exp * exp * exp | EIndCoequ of exp * exp * exp * exp * exp * exp * exp
-  | EDisc of exp | EBase of exp | EHub of exp | ESpoke of exp | EIndDisc of exp          (* Disc *)
+  | EDisc of exp * exp | EBase of exp * exp * exp | EHub of exp * exp * exp              (* Disc *)
+  | ESpoke of exp * exp * exp * exp | EIndDisc of exp * exp * exp * exp * exp * exp * exp
   | EIm of exp | EInf of exp | EIndIm of exp * exp | EJoin of exp      (* Infinitesimal Modality *)
-
-
-
-
-type extension =
-  | EDisc of exp | EBase of exp | EHub of exp | ESpoke of exp | EIndDisc of exp          (* Disc *)
+  | EFla of exp | EFlaUnit of exp | EFlaCounit of exp | EIndFla of exp * exp    (* Flat Modality *)
 
 type tele = ident * exp
 
@@ -120,6 +117,9 @@ type error =
   | ExpectedConj     of exp
   | ExpectedIm       of exp
   | ExpectedInf      of exp
+  | ExpectedFla      of exp
+  | ExpectedFlaUnit  of exp
+  | ExpectedFlaCounit of exp
   | ExpectedGlue     of exp
   | ExpectedSup      of exp
   | DNFSolverError   of exp * dir

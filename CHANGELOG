@@ -1,6 +1,26 @@
 Changelog
 =========
 
+1 MAY 2026 Version 5.1.0 Tesseract and K(G,n)-η:
+
+* Added strict canonical Nat to Kernel for spectral goodness at higher homotopies.
+* Fix constcubes.anders module with improved DNF solver in formula.ml.
+* Constructive K(G,n)-η in KGn.anders.
+* Sn.anders and truncation.anders are using inernal Nat.
+* Homotopy Nat with homotopical canonicity (only) is in natw.anders module.
+* Updated Article: https://anders.groupoid.space/doc/anders.pdf
+
+30 APR 2026 Version 5.0.0 Complete Kernel:
+
+* Disc and Hub Spokes kernel primitives
+* Hub Spokes Disc in W
+* Lambda in W
+* Borel sets
+* Basic Topology
+* Locally Small Categories
+* Symmetric Monoidal Categories
+* OCaml 5.0
+
 14 APR 2022 Version 1.4.0 Microkernel Pipeline:
 
 * Microkernel Architecture: Kernel, Proof Shell, and Tactics Server with open binary protocols

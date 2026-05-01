@@ -30,8 +30,8 @@ let rec eval ctx e0 = traceEval e0; match e0 with
   | EAppFormula (e, x)   -> appFormula (eval ctx e) (eval ctx x)
   | EI                   -> VI
   | EDir d               -> VDir d
-  | EAnd (e1, e2)        -> evalAnd (eval ctx e1) (eval ctx e2)
-  | EOr (e1, e2)         -> evalOr (eval ctx e1) (eval ctx e2)
+  | EAnd (e1, e2)        -> andFormula (eval ctx e1, eval ctx e2)
+  | EOr (e1, e2)         -> orFormula (eval ctx e1, eval ctx e2)
   | ENeg e               -> negFormula (eval ctx e)
   | ETransp (p, i)       -> VTransp (eval ctx p, eval ctx i)
   | EHComp (t, r, u, u0) -> hcomp (eval ctx t) (eval ctx r) (eval ctx u) (eval ctx u0)
@@ -55,6 +55,10 @@ let rec eval ctx e0 = traceEval e0; match e0 with
   | EFalse               -> VFalse
   | ETrue                -> VTrue
   | EIndBool e           -> VIndBool (eval ctx e)
+  | ENat                 -> VNat
+  | EZero                -> VZero
+  | ESucc e              -> VSucc (eval ctx e)
+  | EIndNat (c, z, s)    -> VIndNat (eval ctx c, eval ctx z, eval ctx s)
   | EW (a, (p, b))       -> let t = eval ctx a in W (t, (fresh p, closByVal ctx p t b))
   | ESup (a, b)          -> VSup (eval ctx a, eval ctx b)
   | EIndW (a, b, c)      -> VIndW (eval ctx a, eval ctx b, eval ctx c)
@@ -62,15 +66,32 @@ let rec eval ctx e0 = traceEval e0; match e0 with
   | EInf e               -> inf (eval ctx e)
   | EJoin e              -> join (eval ctx e)
   | EIndIm (a, b)        -> VIndIm (eval ctx a, eval ctx b)
+  | EFla e               -> VFla (eval ctx e)
+  | EFlaUnit e           -> flaunit (eval ctx e)
+  | EFlaCounit e         -> flacounit (eval ctx e)
+  | EIndFla (a, b)       -> VIndFla (eval ctx a, eval ctx b)
   | ECoequ (a, b, f, g)  -> VCoequ (eval ctx a, eval ctx b, eval ctx f, eval ctx g)
   | EIota2 (a, b, f, g, c) -> VIota2 (eval ctx a, eval ctx b, eval ctx f, eval ctx g, eval ctx c)
   | EResp (a, b, f, g, c) -> VResp (eval ctx a, eval ctx b, eval ctx f, eval ctx g, eval ctx c)
   | EIndCoequ (a, b, f, g, x, i, rho) -> VIndCoequ (eval ctx a, eval ctx b, eval ctx f, eval ctx g, eval ctx x, eval ctx i, eval ctx rho)
-  | EDisc e -> VDisc (eval ctx e)
-  | EBase e -> VBase (eval ctx e)
-  | EHub e -> VHub (eval ctx e)
-  | ESpoke e -> VSpoke (eval ctx e)
-  | EIndDisc e -> VIndDisc (eval ctx e)
+  | EDisc (s, a) -> VDisc (eval ctx s, eval ctx a)
+  | EBase (s, a, x) -> VBase (eval ctx s, eval ctx a, eval ctx x)
+  | EHub (s, a, f) -> VHub (eval ctx s, eval ctx a, eval ctx f)
+  | ESpoke (s, a, f, x) -> VSpoke (eval ctx s, eval ctx a, eval ctx f, eval ctx x)
+  | EIndDisc (s, a, x, nc, nh, ns', z) ->
+    let ts = eval ctx s in let ta = eval ctx a in let tx = eval ctx x in
+    let tnc = eval ctx nc in let tnh = eval ctx nh in let tns = eval ctx ns' in
+    let tz = eval ctx z in
+    begin match tz with
+      | VBase (_, _, v) -> app (tnc, v)
+      | VHub (_, _, f) ->
+        let nF = VLam (ts, (freshName "s", fun v -> VIndDisc (ts, ta, tx, tnc, tnh, tns, app (f, v)))) in
+        app (app (tnh, f), nF)
+      | VAppFormula (VSpoke (_, _, f, y), r) ->
+        let nF = VLam (ts, (freshName "s", fun v -> VIndDisc (ts, ta, tx, tnc, tnh, tns, app (f, v)))) in
+        appFormula (app (app (app (tns, f), nF), y)) r
+      | _ -> VIndDisc (ts, ta, tx, tnc, tnh, tns, tz)
+    end
 
 
 and appFormula v x = match v with
@@ -79,6 +100,12 @@ and appFormula v x = match v with
     begin match x with
       | VDir Zero -> VIota2 (a, b, f, g, app (f, c))
       | VDir One  -> VIota2 (a, b, f, g, app (g, c))
+      | i         -> VAppFormula (v, i)
+    end
+  | VSpoke (s, a, f, y) ->
+    begin match x with
+      | VDir Zero -> VHub (s, a, f)
+      | VDir One  -> app (f, y)
       | i         -> VAppFormula (v, i)
     end
   | VKan _ -> begin match x with | VDir Zero -> VKan Z.zero | VDir One -> VKan Z.zero | i -> VAppFormula (v, i) end
@@ -144,7 +171,7 @@ and transport i p phi u0 = match p, phi, u0 with
   | VApp (VApp (VPathP p, v), w), _, _ ->
     let j = freshName "ι" in let k = freshName "κ" in
     VPLam (VLam (VI, (j, fun j ->
-      let uj = appFormula u0 j in let r = evalOr phi (evalOr j (negFormula j)) in
+      let uj = appFormula u0 j in let r = orFormula (phi, orFormula (j, negFormula j)) in
       comp (fun k -> appFormula (act0 i k p) j) r k
         (VSystem (unionSystem (border (solve phi One) uj)
                  (unionSystem (border (solve j Zero) (swap i k v))
@@ -158,7 +185,7 @@ and transport i p phi u0 = match p, phi, u0 with
     let uj k = bimap (fun j -> if i = j then k else dim j) upd u in
     let uzero = uj vzero in let a0 = unglue (getFormulaV uzero) (VSystem uzero) u0 in
 
-    let phi1 = solve phi One in let ksi = evalOr phi psi' in
+    let phi1 = solve phi One in let ksi = orFormula (phi, psi') in
     let a1 = comp (fun j -> act0 i j a) ksi i (VSystem (unionSystem (border phi1 a0) ts)) a0 in
 
     let fib = System.map (fun x -> VPair (ref None, x, idp a1))
@@ -170,7 +197,7 @@ and transport i p phi u0 = match p, phi, u0 with
       (t, w, contr (fiber b t (vfst w) a1) (app (vsnd w, a1)) ksi fib)) u1 in
 
     let chi = getFormulaV u1 in
-    let a1' = homcom b (evalOr chi phi) i
+    let a1' = homcom b (orFormula (chi, phi)) i
       (VSystem (unionSystem (System.map (fun (_, _, p) ->
         appFormula (vsnd p) (dim i)) fib') (border phi1 a1))) a1 in
 
@@ -189,7 +216,7 @@ and transport i p phi u0 = match p, phi, u0 with
   | _, _, _ -> VApp (VTransp (VPLam (VLam (VI, (i, fun j -> act0 i j p))), phi), u0)
 
 and transFill i p phi u0 j = let (k, _, _) = freshDim () in
-  transport k (act0 i (evalAnd (dim k) j) p) (evalOr phi (negFormula j)) u0
+  transport k (act0 i (andFormula (dim k, j)) p) (orFormula (phi, negFormula j)) u0
 
 and hcomp t r u u0 = let i = freshName "ι" in homcom t r i (app (u, dim i)) u0
 
@@ -205,7 +232,7 @@ and idEquiv t =
           VPLam (VLam (VI, (freshName "i", fun i ->
             let p = vsnd u in pairv (appFormula p i)
               (VPLam (VLam (VI, (freshName "j", fun j ->
-                appFormula p (evalAnd i j))))))))))))))
+                appFormula p (andFormula (i, j)))))))))))))))
 
 and idtoeqv i e = let a = act0 i vzero e in
   transport i (equiv a e) vzero (idEquiv a)
@@ -235,7 +262,7 @@ and homcom t r i u u0 = match t, r, u, u0 with
   | VApp (VApp (VPathP t, v), w), _, _, _ ->
     let j = freshName "ι" in
     VPLam (VLam (VI, (j, fun j ->
-      homcom (appFormula t j) (evalOr r (evalOr j (negFormula j))) i
+      homcom (appFormula t j) (orFormula (r, orFormula (j, negFormula j))) i
           (VSystem (unionSystem (walk (flip appFormula j) r u)
                    (unionSystem (border (solve j One)  w)
                                 (border (solve j Zero) v))))
@@ -248,7 +275,7 @@ and homcom t r i u u0 = match t, r, u, u0 with
     let ts = System.map (fun (t, w) -> (t, w, hfill t r i (VSystem u) u0)) (System.map eta t) in
     let t1 = System.map (fun (t, w, x) -> pairv t (pairv w (x vone))) ts in
 
-    let a1 = homcom a (evalOr r phi) i (VSystem (unionSystem
+    let a1 = homcom a (orFormula (r, phi)) i (VSystem (unionSystem
       (System.map (fun (_, w, x) -> app (vfst w, x (dim i))) ts)
       (System.map (unglue phi (VSystem t)) u))) (unglue phi (VSystem t) u0) in
 
@@ -263,7 +290,7 @@ and homcom t r i u u0 = match t, r, u, u0 with
     let a1 = a' vone in let j = freshName "ι" in let y = freshName "b" in
     let f1 = homcom (implv (b a1) (W (t, (x, b)))) r i
       (VSystem (System.map (fun (a, f) -> VLam (act0 i vone a, (y, fun y ->
-          app (f, transport j (b (act0 i (evalOr (negFormula (dim j)) (dim i)) a)) vzero y)))) u'))
+          app (f, transport j (b (act0 i (orFormula (negFormula (dim j), dim i)) a)) vzero y)))) u'))
       (VLam (b a1, (y, fun y -> app (f0, transport j (b (a' (VNeg (dim j)))) vzero y)))) in
     VApp (VApp (VSup (t, b'), a1), f1)
   (* hcomp (ℑ A) r (λ (i : I), [(r = 1) → ℑ-unit (u i 1=1)]) (ℑ-unit (ouc u₀)) ~>
@@ -273,12 +300,12 @@ and homcom t r i u u0 = match t, r, u, u0 with
   | _, _, _, _ -> VHComp (t, r, VLam (VI, (i, fun j -> VSystem (walk (act0 i j) r u))), u0)
 
 and comp t r i u u0 = let j = freshName "ι" in
-  homcom (t vone) r i (VSystem (walk (transport j (t (evalOr (dim i) (dim j))) (dim i)) r u))
+  homcom (t vone) r i (VSystem (walk (transport j (t (orFormula (dim i, dim j))) (dim i)) r u))
     (transport j (t (dim j)) vzero u0)
 
 and hfill t r i u u0 j = let k = freshName "κ" in
-  homcom t (evalOr (negFormula j) r) k
-    (VSystem (unionSystem (walk (act0 i (evalAnd (dim k) j)) r u)
+  homcom t (orFormula (negFormula j, r)) k
+    (VSystem (unionSystem (walk (act0 i (andFormula (dim k, j))) r u)
       (border (solve j Zero) u0))) u0
 
 and ouc v = match v, inferV v with
@@ -323,8 +350,13 @@ and app : value * value -> value = function
     app (app (app (g, x), f),
       VLam (app (b, x), (freshName "b", fun y ->
         app (VApp (VIndW (a, b, c), g), app (f, y)))))
+  (* ind-nat C z s 0 ~> z *)
+  | VIndNat (c, z, s), VZero -> z
+  (* ind-nat C z s (succ n) ~> s n (app (VIndNat (c, z, s), n)) *)
+  | VIndNat (c, z, s), VSucc n -> app (app (s, n), app (VIndNat (c, z, s), n))
   (* ind-ℑ A B f (ℑ-unit a) ~> f a *)
   | VApp (VIndIm _, f), VInf a -> app (f, a)
+  | VApp (VIndFla _, f), VFlaUnit a -> app (f, a)
   | VApp (VIndIm (a, b), f), VHComp (_, r, u, u0) ->
     let g x = app (VApp (VIndIm (a, b), f), x) in
     let i = freshName "ι" in let k = freshName "κ" in
@@ -333,11 +365,23 @@ and app : value * value -> value = function
   (* ind-ℑ A B (λ _, b) x ~> b *)
   | VApp (VIndIm (a, b), VLam (t, (x, g))), v -> let u = g (Var (x, t)) in
     if mem x u then VApp (VApp (VIndIm (a, b), VLam (t, (x, g))), v) else u
+  | VApp (VIndFla (a, b), VLam (t, (x, g))), v -> let u = g (Var (x, t)) in
+    if mem x u then VApp (VApp (VIndFla (a, b), VLam (t, (x, g))), v) else u
   (* coequ-ind A B f g X i rho (ι₂ b) ~> i b *)
   | VIndCoequ (_, _, _, _, _, i, _), VIota2 (_, _, _, _, b) -> app (i, b)
   (* coequ-ind A B f g X i rho (resp a @ r) ~> rho a @ r *)
   | VIndCoequ (_, _, _, _, _, _, rho), VAppFormula (VResp (_, _, _, _, a), r) ->
     appFormula (app (rho, a)) r
+  (* disc-ind S A X nc nh ns (base S A a) ~> nc a *)
+  | VIndDisc (_, _, _, nc, _, _, _), VBase (_, _, a) -> app (nc, a)
+  (* disc-ind S A X nc nh ns (hub S A f) ~> nh f (λ s, disc-ind S A X nc nh ns (f s)) *)
+  | VIndDisc (s, a, x, nc, nh, ns, _), VHub (_, _, f) ->
+    let nF = VLam (s, (freshName "s", fun v -> app (VIndDisc (s, a, x, nc, nh, ns, VDir One), app (f, v)))) in
+    app (app (nh, f), nF)
+  (* disc-ind S A X nc nh ns (spoke S A f y @ r) ~> ns f (λ s, disc-ind S A X nc nh ns (f s)) y @ r *)
+  | VIndDisc (s, a, x, nc, nh, ns, _), VAppFormula (VSpoke (_, _, f, y), r) ->
+    let nF = VLam (s, (freshName "s", fun v -> app (VIndDisc (s, a, x, nc, nh, ns, VDir One), app (f, v)))) in
+    appFormula (app (app (app (ns, f), nF), y)) r
   | f, x -> VApp (f, x)
 
 and evalSystem ctx = bimap (getRho ctx) (fun mu t -> eval (faceEnv mu ctx) t)
@@ -400,8 +444,12 @@ and inferV v = traceInferV v; match v with
   | VGlue t -> inferGlue t
   | VGlueElem (r, u, a) -> inferGlueElem r u (inferV a)
   | VUnglue (_, _, b) -> let (t, _, _) = extGlue (inferV b) in t
-  | VEmpty | VUnit | VBool -> VKan Z.zero
-  | VStar -> VUnit | VFalse | VTrue -> VBool
+  | VEmpty | VUnit | VBool | VNat -> VKan Z.zero
+  | VStar -> VUnit | VFalse -> VBool | VTrue -> VBool | VZero -> VNat
+  | VSucc n -> if conv (inferV n) VNat then VNat else raise (Internal (InferError (rbV v)))
+  | VIndNat (c, z, s) ->
+    let x = freshName "x" in
+    VPi (VNat, (x, fun x -> app (c, x)))
   | VIndEmpty t -> implv VEmpty t
   | VIndUnit t -> recUnit t
   | VIndBool t -> recBool t
@@ -411,6 +459,10 @@ and inferV v = traceInferV v; match v with
   | VInf v -> VIm (inferV v)
   | VJoin v -> extIm (inferV v)
   | VIndIm (a, b) -> inferIndIm a b
+  | VFla t -> inferV t
+  | VFlaUnit v -> VFla (inferV v)
+  | VFlaCounit v -> extFla (inferV v)
+  | VIndFla (a, b) -> inferIndFla a b
   | VCoequ (a, _, _, _) -> VKan (extSet (inferV a))
   | VIota2 (a, b, f, g, _) -> VCoequ (a, b, f, g)
   | VResp (a, b, f, g, c) ->
@@ -418,7 +470,14 @@ and inferV v = traceInferV v; match v with
     let p = VPLam (VLam (VI, (freshName "i", fun _ -> t))) in
     VApp (VApp (VPathP p, VIota2 (a, b, f, g, app (f, c))), VIota2 (a, b, f, g, app (g, c)))
   | VIndCoequ (a, b, f, g, x, _, _) -> VPi (VCoequ (a, b, f, g), (freshName "z", fun z -> app (x, z)))
-  | VDisc _ | VBase _ | VHub _ | VSpoke _ | VIndDisc _ -> VKan Z.zero
+  | VDisc (_, a) -> VKan (extSet (inferV a))
+  | VBase (s, a, _) -> VDisc (s, a)
+  | VHub (s, a, _) -> VDisc (s, a)
+  | VSpoke (s, a, f, y) ->
+    let t = VDisc (s, a) in
+    let p = VPLam (VLam (VI, (freshName "i", fun _ -> t))) in
+    VApp (VApp (VPathP p, VHub (s, a, f)), app (f, y))
+  | VIndDisc (s, a, x, _, _, _, z) -> app (x, z)
   | VPLam _ | VPair _ | VHole -> raise (Internal (InferError (rbV v)))
 
 
@@ -431,6 +490,10 @@ and recUnit t = let x = freshName "x" in
 and recBool t = let x = freshName "x" in
   implv (app (t, VFalse)) (implv (app (t, VTrue))
     (VPi (VBool, (x, fun x -> app (t, x)))))
+
+and recNat t = let x = freshName "x" in
+  implv (app (t, VZero)) (implv (VPi (VNat, (freshName "n", fun n -> implv (app (t, n)) (app (t, VSucc n)))))
+    (VPi (VNat, (x, fun x -> app (t, x)))))
 
 and wtype a b = W (a, (freshName "x", fun x -> app (b, x)))
 
@@ -447,6 +510,10 @@ and inferIndW a b c = let t = wtype a b in
 and inferIndIm a b =
   implv (VPi (a, (freshName "a", fun x -> VIm (app (b, inf x)))))
         (VPi (VIm a, (freshName "a", fun x -> VIm (app (b, x)))))
+
+and inferIndFla a b =
+  implv (VPi (a, (freshName "a", fun x -> VFla (app (b, flaunit x)))))
+        (VPi (VFla a, (freshName "a", fun x -> VFla (app (b, x)))))
 
 and inferInc t r = let a = freshName "a" in
   VPi (t, (a, fun v -> VSub (t, r, VSystem (border (solve r One) v))))
@@ -507,8 +574,8 @@ and act rho = function
   | VJ v                 -> VJ (act rho v)
   | VI                   -> VI
   | VDir d               -> VDir d
-  | VAnd (u, v)          -> evalAnd (act rho u) (act rho v)
-  | VOr (u, v)           -> evalOr (act rho u) (act rho v)
+  | VAnd (u, v)          -> andFormula (act rho u, act rho v)
+  | VOr (u, v)           -> orFormula (act rho u, act rho v)
   | VNeg u               -> negFormula (act rho u)
   | VInc (t, r)          -> VInc (act rho t, act rho r)
   | VOuc v               -> ouc (act rho v)
@@ -524,6 +591,10 @@ and act rho = function
   | VFalse               -> VFalse
   | VTrue                -> VTrue
   | VIndBool v           -> VIndBool (act rho v)
+  | VNat                 -> VNat
+  | VZero                -> VZero
+  | VSucc v              -> VSucc (act rho v)
+  | VIndNat (c, z, s)    -> VIndNat (act rho c, act rho z, act rho s)
   | W (t, (x, g))        -> W (act rho t, (x, g >> act rho))
   | VSup (a, b)          -> VSup (act rho a, act rho b)
   | VIndW (a, b, c)      -> VIndW (act rho a, act rho b, act rho c)
@@ -535,11 +606,15 @@ and act rho = function
   | VIota2 (a, b, f, g, c) -> VIota2 (act rho a, act rho b, act rho f, act rho g, act rho c)
   | VResp (a, b, f, g, c) -> VResp (act rho a, act rho b, act rho f, act rho g, act rho c)
   | VIndCoequ (a, b, f, g, x, i, p) -> VIndCoequ (act rho a, act rho b, act rho f, act rho g, act rho x, act rho i, act rho p)
-  | VDisc t -> VDisc (act rho t)
-  | VBase t -> VBase (act rho t)
-  | VHub t -> VHub (act rho t)
-  | VSpoke t -> VSpoke (act rho t)
-  | VIndDisc t -> VIndDisc (act rho t)
+  | VDisc (s, a) -> VDisc (act rho s, act rho a)
+  | VBase (s, a, x) -> VBase (act rho s, act rho a, act rho x)
+  | VHub (s, a, f) -> VHub (act rho s, act rho a, act rho f)
+  | VSpoke (s, a, f, x) -> VSpoke (act rho s, act rho a, act rho f, act rho x)
+  | VIndDisc (s, a, x, nc, nh, ns', z) -> VIndDisc (act rho s, act rho a, act rho x, act rho nc, act rho nh, act rho ns', act rho z)
+  | VFla t               -> VFla (act rho t)
+  | VFlaUnit v           -> flaunit (act rho v)
+  | VFlaCounit v         -> flacounit (act rho v)
+  | VIndFla (a, b)       -> VIndFla (act rho a, act rho b)
 
 
 and actVar rho i = match Env.find_opt i rho with
@@ -574,16 +649,15 @@ and conv v1 v2 : bool = traceConv v1 v2;
     | VPathP a, VPathP b -> conv a b
     | VPartialP (t1, r1), VPartialP (t2, r2) -> conv t1 t2 && conv r1 r2
     | VAppFormula (f, x), VAppFormula (g, y) -> conv f g && conv x y
-    | VSystem xs, VSystem ys -> keys xs = keys ys && System.for_all (fun _ b -> b) (intersectionWith conv xs ys)
+    | VSystem xs, VSystem ys -> System.equal conv xs ys
     | VSystem xs, x | x, VSystem xs -> System.for_all (fun alpha y -> conv (app (upd alpha x, VRef vone)) y) xs
     | VTransp (p, i), VTransp (q, j) -> conv p q && conv i j
     | VHComp (t1, r1, u1, v1), VHComp (t2, r2, u2, v2) -> conv t1 t2 && conv r1 r2 && conv u1 u2 && conv v1 v2
     | VSub (a, i, u), VSub (b, j, v) -> conv a b && conv i j && conv u v
-    | VOr (x, y), VDir Zero | VAnd (x, y), VDir One  -> conv x v2 && conv y v2
-    | VOr (x, y), VDir One  | VAnd (x, y), VDir Zero -> conv x v2 || conv y v2
-    | VOr _,  _ | _, VOr _  -> orEq v1 v2
-    | VAnd _, _ | _, VAnd _ -> andEq v1 v2
-    | VNeg x, VNeg y -> conv x y
+    | VOr _, _ | _, VOr _
+    | VAnd _, _ | _, VAnd _
+    | VNeg _, _ | _, VNeg _
+    | VDir _, _ | _, VDir _ -> orEq v1 v2
     | VI, VI -> true
     | VDir u, VDir v -> u = v
     | VId u, VId v | VJ u, VJ v -> conv u v
@@ -601,24 +675,29 @@ and conv v1 v2 : bool = traceConv v1 v2;
     | VFalse, VFalse -> true
     | VTrue, VTrue -> true
     | VIndBool u, VIndBool v -> conv u v
+    | VNat, VNat | VZero, VZero -> true
+    | VSucc u, VSucc v -> conv u v
+    | VIndNat (c1, z1, s1), VIndNat (c2, z2, s2) -> conv c1 c2 && conv z1 z2 && conv s1 s2
     | VSup (a1, b1), VSup (a2, b2) -> conv a1 a2 && conv b1 b2
     | VIndW (a1, b1, c1), VIndW (a2, b2, c2) -> conv a1 a2 && conv b1 b2 && conv c1 c2
     | VIm u, VIm v -> conv u v
     | VInf u, VInf v -> conv u v
     | VJoin u, VJoin v -> conv u v
     | VIndIm (a1, b1), VIndIm (a2, b2) -> conv a1 a2 && conv b1 b2
+    | VFla u, VFla v -> conv u v
+    | VFlaCounit u, VFlaCounit v -> conv u v
+    | VIndFla (a1, b1), VIndFla (a2, b2) -> conv a1 a2 && conv b1 b2
     | VCoequ (a1, b1, f1, g1), VCoequ (a2, b2, f2, g2) -> conv a1 a2 && conv b1 b2 && conv f1 f2 && conv g1 g2
     | VIota2 (a1, b1, f1, g1, c1), VIota2 (a2, b2, f2, g2, c2) -> conv a1 a2 && conv b1 b2 && conv f1 f2 && conv g1 g2 && conv c1 c2
     | VResp (a1, b1, f1, g1, c1), VResp (a2, b2, f2, g2, c2) -> conv a1 a2 && conv b1 b2 && conv f1 f2 && conv g1 g2 && conv c1 c2
     | VIndCoequ (a1, b1, f1, g1, x1, i1, p1), VIndCoequ (a2, b2, f2, g2, x2, i2, p2) -> conv a1 a2 && conv b1 b2 && conv f1 f2 && conv g1 g2 && conv x1 x2 && conv i1 i2 && conv p1 p2
-    | VDisc _, _ | _, VDisc _ -> true
-(*    | VDisc u, VDisc v -> conv u v *)
-    | VBase u, VBase v -> conv u v
-    | VHub u, VHub v -> conv u v
-    | VAppFormula (VSpoke _, _), _ | _, VAppFormula (VSpoke _, _) -> true
-    | VSpoke u, VSpoke v -> conv u v
+    | VDisc (s1, a1), VDisc (s2, a2) -> conv s1 s2 && conv a1 a2
+    | VBase (s1, a1, x1), VBase (s2, a2, x2) -> conv s1 s2 && conv a1 a2 && conv x1 x2
+    | VHub (s1, a1, f1), VHub (s2, a2, f2) -> conv s1 s2 && conv a1 a2 && conv f1 f2
+    | VSpoke (s1, a1, f1, x1), VSpoke (s2, a2, f2, x2) -> conv s1 s2 && conv a1 a2 && conv f1 f2 && conv x1 x2
+    | VIndDisc (s1, a1, x1, nc1, nh1, ns1, z1), VIndDisc (s2, a2, x2, nc2, nh2, ns2, z2) ->
+      conv s1 s2 && conv a1 a2 && conv x1 x2 && conv nc1 nc2 && conv nh1 nh2 && conv ns1 ns2 && conv z1 z2
     | VKan _, _ | _, VKan _ -> true
-    | VIndDisc _, _ | _, VIndDisc _ -> true
 (*  | VIndDisc u, VIndDisc v -> conv u v *)
     | _, _ -> false
 
@@ -676,7 +755,7 @@ and check ctx (e0 : exp) (t0 : value) =
     | t -> raise (Internal (Ineq (EPre u, rbV t)))
   end
   | ESystem ts, VPartialP (u, i) ->
-    eqNf (eval ctx (getFormula ts)) i;
+    eqNf (getFormulaV ts) i;
     System.iter (fun alpha e ->
       check (faceEnv alpha ctx) e
         (app (upd alpha u, VRef vone))) ts;
@@ -746,7 +825,7 @@ and infer ctx e : value = traceInfer e; match e with
   end
   | ESystem ts -> checkOverlapping ctx ts;
     VPartialP (VSystem (System.mapi (fun mu -> infer (faceEnv mu ctx)) ts),
-               eval ctx (getFormula ts))
+               getFormulaV ts)
   | EGlue e -> ignore (extKan (infer ctx e)); inferGlue (eval ctx e)
   | EGlueElem (e, u0, a) -> check ctx e VI; let r = eval ctx e in let t = infer ctx a in
     check ctx u0 (partialv (equivPtSingl t) r); let u = eval ctx u0 in
@@ -756,11 +835,20 @@ and infer ctx e : value = traceInfer e; match e with
     inferGlueElem r u t
   | EUnglue (r, u, e) -> let (t, r', u') = extGlue (infer ctx e) in
     eqNf (eval ctx r) r'; eqNf (eval ctx u) u'; t
-  | EEmpty | EUnit | EBool -> VKan Z.zero
-  | EStar -> VUnit | EFalse | ETrue -> VBool
+  | EEmpty | EUnit | EBool | ENat -> VKan Z.zero
+  | EStar -> VUnit | EFalse | ETrue -> VBool | EZero -> VNat
+  | ESucc e -> check ctx e VNat; VNat
   | EIndEmpty e -> ignore (extSet (infer ctx e)); implv VEmpty (eval ctx e)
   | EIndUnit e -> inferInd false ctx VUnit e recUnit
   | EIndBool e -> inferInd false ctx VBool e recBool
+  | EIndNat (c, z, s) ->
+    let tc = eval ctx c in
+    let (t1, (_, g)) = extPiG (infer ctx c) in
+    eqNf t1 VNat;
+    ignore (extSet (g (Var (freshName "n", VNat))));
+    ignore (check ctx z (app (tc, VZero)));
+    ignore (check ctx s (VPi (VNat, (freshName "n", fun n -> implv (app (tc, n)) (app (tc, VSucc n))))));
+    VPi (VNat, (freshName "n", fun n -> app (tc, n)))
   | ESup (a, b) -> let t = eval ctx a in ignore (extSet (infer ctx a));
     let (t', (p, g)) = extPiG (infer ctx b) in eqNf t t';
     ignore (extSet (g (Var (p, t))));
@@ -780,6 +868,12 @@ and infer ctx e : value = traceInfer e; match e with
   | EIndIm (a, b) -> ignore (extSet (infer ctx a)); let t = eval ctx a in
     let (c, (x, g)) = extPiG (infer ctx b) in eqNf (VIm t) c;
     ignore (extSet (g (Var (x, c)))); inferIndIm t (eval ctx b)
+  | EFla e -> let t = infer ctx e in ignore (extSet t); t
+  | EFlaUnit e -> VFla (infer ctx e)
+  | EFlaCounit e -> extFla (infer ctx e)
+  | EIndFla (a, b) -> ignore (extSet (infer ctx a)); let t = eval ctx a in
+    let (c, (x, g)) = extPiG (infer ctx b) in eqNf (VFla t) c;
+    ignore (extSet (g (Var (x, c)))); inferIndFla t (eval ctx b)
   | ECoequ (a, b, f, g) ->
     let ta = eval ctx a in ignore (extSet (infer ctx a));
     let tb = eval ctx b in ignore (extSet (infer ctx b));
@@ -815,7 +909,49 @@ and infer ctx e : value = traceInfer e; match e with
       let u0 = app (ti, app (ef, c)) in let u1 = app (ti, app (eg, c)) in
       VApp (VApp (VPathP p, u0), u1))));
     VPi (t, (freshName "z", fun z -> app (tx, z)))
-  | EDisc _ | EBase _ | EHub _ | ESpoke _ | EIndDisc _ -> VKan Z.zero
+  | EDisc (s, a) ->
+    let ts = eval ctx s in ignore (extSet (infer ctx s));
+    let ta = eval ctx a in ignore (extSet (infer ctx a));
+    VKan (extSet (infer ctx a))
+  | EBase (s, a, v) ->
+    let ts = eval ctx s in ignore (extSet (infer ctx s));
+    let ta = eval ctx a in ignore (extSet (infer ctx a));
+    check ctx v ta; VDisc (ts, ta)
+  | EHub (s, a, f) ->
+    let ts = eval ctx s in ignore (extSet (infer ctx s));
+    let ta = eval ctx a in ignore (extSet (infer ctx a));
+    check ctx f (implv ts (VDisc (ts, ta))); VDisc (ts, ta)
+  | ESpoke (s, a, f, y) ->
+    let ts = eval ctx s in ignore (extSet (infer ctx s));
+    let ta = eval ctx a in ignore (extSet (infer ctx a));
+    let ef = eval ctx f in let ey = eval ctx y in
+    check ctx f (implv ts (VDisc (ts, ta)));
+    check ctx y ts;
+    let t = VDisc (ts, ta) in
+    let p = VPLam (VLam (VI, (freshName "i", fun _ -> t))) in
+    VApp (VApp (VPathP p, VHub (ts, ta, ef)), app (ef, ey))
+  | EIndDisc (s, a, x, nc, nh, ns, z) ->
+    let ts = eval ctx s in ignore (extSet (infer ctx s));
+    let ta = eval ctx a in ignore (extSet (infer ctx a));
+    let tx = eval ctx x in
+    check ctx x (implv (VDisc (ts, ta)) (VKan Z.zero));
+    check ctx nc (VPi (ta, (freshName "a", fun v -> app (tx, VBase (ts, ta, v)))));
+    let tnc = eval ctx nc in
+    check ctx nh (VPi (implv ts (VDisc (ts, ta)), (freshName "f", fun f ->
+      VPi (VPi (ts, (freshName "s", fun v -> app (tx, app (f, v)))), (freshName "nF", fun _ ->
+        app (tx, VHub (ts, ta, f)))))));
+    let tnh = eval ctx nh in
+    check ctx ns (VPi (implv ts (VDisc (ts, ta)), (freshName "f", fun f ->
+      VPi (VPi (ts, (freshName "s", fun v -> app (tx, app (f, v)))), (freshName "nF", fun nF ->
+        VPi (ts, (freshName "y", fun y ->
+          let p = VPLam (VLam (VI, (freshName "k", fun k ->
+            app (tx, appFormula (VSpoke (ts, ta, f, y)) k)))) in
+          let u0 = app (app (tnh, f), nF) in
+          let u1 = app (nF, y) in
+          VApp (VApp (VPathP p, u0), u1))))))));
+    let ez = eval ctx z in
+    check ctx z (VDisc (ts, ta));
+    app (tx, ez)
   | EPLam _ | EPair _ | EHole -> raise (Internal (InferError e))
 
 

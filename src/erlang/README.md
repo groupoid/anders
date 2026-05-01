@@ -239,7 +239,7 @@ The main purpose of Anders is doing Homotopy Theory:
 ```
 $ dune exec anders repl
 
-Anders Proof Assistant version 1.4.0
+Anders Proof Assistant version 5.0.0
 Copyright © 2021–2022 Groupoid Infinity.
 
 For help type ‘:h’.

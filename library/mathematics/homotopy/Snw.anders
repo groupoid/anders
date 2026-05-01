@@ -1,0 +1,23 @@
+{- n-Sphere: https://anders.groupoid.space/mathematics/homotopy/sphere/
+   Based on strict natw. -}
+
+module Snw where
+import library/foundations/mltt/natw
+import library/mathematics/homotopy/suspension
+
+-- 1) Formation Rule
+def spherew : natw → U := nat-iter U 𝟐 𝚺
+def Snw (n : natw) : U := spherew n
+
+-- 2) Introduction Rules
+def north_nw (n : natw) : spherew (succw n) := 𝜎₁ (spherew n)
+def south_nw (n : natw) : spherew (succw n) := 𝜎₂ (spherew n)
+def merid_nw (n : natw) (x : spherew n) : Path (spherew (succw n)) (north_nw n) (south_nw n) := 𝜎₃ (spherew n) x
+
+-- 3) Dependent Elimination Rule
+def Snw-ind (n : natw) (P : spherew (succw n) → U)
+      (nNorth : P (north_nw n))
+      (nSouth : P (south_nw n))
+      (nMerid : Π (x : spherew n), PathP (<i> P (merid_nw n x @ i)) nNorth nSouth)
+      (x : spherew (succw n)) : P x
+ := 𝚺-ind (spherew n) P nNorth nSouth nMerid x

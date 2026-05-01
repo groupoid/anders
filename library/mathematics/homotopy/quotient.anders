@@ -1,65 +1,34 @@
+{- Quotients: https://anders.groupoid.space/mathematics/homotopy/quotient/
+   - Higher-Inductive Type of Quotients.
+
+   Copyright (c) Groupoid Infinity, 2016-2026. -}
+
 module quotient where
 import library/foundations/univalent/path
 import library/mathematics/homotopy/coequalizer
 
-def quot (A : U) (R : A → A → U) : U 
-  := coeq (Σ (x y : A), R x y) A (λ (p : Σ (x y : A), R x y), p.1) (λ (p : Σ (x y : A), R x y), p.2.1)
+def quot (A : U) (R : A → A → U) : U
+ := coeq (Σ (x y : A), R x y) A (λ (p : Σ (x y : A), R x y), p.1) (λ (p : Σ (x y : A), R x y), p.2.1)
 
-def quot₁ (A : U) (R : A → A → U) (a : A) 
-  := iota (Σ (x y : A), R x y) A (λ (p : Σ (x y : A), R x y), p.1) (λ (p : Σ (x y : A), R x y), p.2.1) a
+def quot₁ (A : U) (R : A → A → U) (a : A)
+ := iota (Σ (x y : A), R x y) A (λ (p : Σ (x y : A), R x y), p.1) (λ (p : Σ (x y : A), R x y), p.2.1) a
 
-def quot₂ (A : U) (R : A → A → U) (x y : A) (r : R x y) 
-  := <i> resp′ (Σ (x y : A), R x y) A (λ (p : Σ (x y : A), R x y), p.1) (λ (p : Σ (x y : A), R x y), p.2.1) (x, (y, r)) @ i
+def quot₂ (A : U) (R : A → A → U) (x y : A) (r : R x y)
+ := <i> resp′ (Σ (x y : A), R x y) A (λ (p : Σ (x y : A), R x y), p.1) (λ (p : Σ (x y : A), R x y), p.2.1) (x, (y, r)) @ i
 
-def quot-ind (A : U) (R : A → A → U) (X : quot A R → U)
-      (nPoint : Π (a : A), X (quot₁ A R a))
-      (nPath : Π (x y : A) (r : R x y), PathP (<i> X (quot₂ A R x y r @ i)) (nPoint x) (nPoint y))
-      (z : quot A R) 
-  := coequ-ind (Σ (x y : A), R x y) A (λ (p : Σ (x y : A), R x y), p.1) (λ (p : Σ (x y : A), R x y), p.2.1) X nPoint 
-               (λ (p : Σ (x y : A), R x y), nPath p.1 p.2.1 p.2.2) z
+def quot-ind (A : U) (R : A → A → U) (X : quot A R → U) (nPoint : Π (a : A), X (quot₁ A R a))
+    (nPath : Π (x y : A) (r : R x y), PathP (<i> X (quot₂ A R x y r @ i)) (nPoint x) (nPoint y)) (z : quot A R)
+ := coequ-ind (Σ (x y : A), R x y) A (λ (p : Σ (x y : A), R x y), p.1) (λ (p : Σ (x y : A), R x y), p.2.1) X nPoint
+    (λ (p : Σ (x y : A), R x y), nPath p.1 p.2.1 p.2.2) z
 
-def quot-β₁ (A : U) (R : A → A → U) (X : quot A R → U)
-      (nPoint : Π (a : A), X (quot₁ A R a))
-      (nPath : Π (x y : A) (r : R x y), PathP (<i> X (quot₂ A R x y r @ i)) (nPoint x) (nPoint y)) (a : A)
-    := idp (X (quot₁ A R a)) (nPoint a)
-
+def quot-β₁ (A : U) (R : A → A → U) (X : quot A R → U) (nPoint : Π (a : A), X (quot₁ A R a))
+    (nPath : Π (x y : A) (r : R x y), PathP (<i> X (quot₂ A R x y r @ i)) (nPoint x) (nPoint y)) (a : A)
+ := idp (X (quot₁ A R a)) (nPoint a)
 
 def quot-β₂ (A : U) (R : A → A → U) (X : quot A R → U)
       (nPoint : Π (a : A), X (quot₁ A R a))
       (nPath : Π (x y : A) (r : R x y), PathP (<i> X (quot₂ A R x y r @ i)) (nPoint x) (nPoint y)) (x y : A) (r : R x y)
-    := idp (PathP (<i> X (quot₂ A R x y r @ i)) (nPoint x) (nPoint y)) (nPath x y r)
+ := idp (PathP (<i> X (quot₂ A R x y r @ i)) (nPoint x) (nPoint y)) (nPath x y r)
 
 def quot-η (A : U) (R : A → A → U) (X : quot A R → U) (h : Π (z : quot A R), X z)
-  := idp (Π (z : quot A R), X z) h
-
-def R¯ (A : U) (R : A → A → U) (x y : A) : U := Path (quot A R) (quot₁ A R x) (quot₁ A R y)
-def |-| (A : U) (R : A → A → U) (x y : A) (r : R x y) : R¯ A R x y := quot₂ A R x y r
-
-def ro (A : U) (R : A → A → U) (x y : A) (p : Path A x y) : R¯ A R x y := <i> quot₁ A R (p @ i)
-def −¹ (A : U) (R : A → A → U) (x y : A) (r : R¯ A R x y) : R¯ A R y x := <i> r @ -i
-def −·− (A : U) (R : A → A → U) (x y z : A) (r : R¯ A R x y) (r' : R¯ A R y z ) : R¯ A R x z
- := comp-Path (quot A R) (quot₁ A R x) (quot₁ A R y) (quot₁ A R z) r r'
-
-
-def 2-quot (A : U) (R : A → A → U) (Q : Π (x y : A), R¯ A R x y → R¯ A R x y → U) : U := 𝟏
-def 2-quot₁ (A : U) (R : A → A → U) (Q : Π (x y : A), R¯ A R x y → R¯ A R x y → U) (a: A) := ★
-def 2-quot₂ (A : U) (R : A → A → U) (Q : Π (x y : A), R¯ A R x y → R¯ A R x y → U) (x y : A) (r : R x y) := idp 𝟏 ★
-
-def 2-quot₃ (A : U) (R : A → A → U) (Q : Π (x y : A), R¯ A R x y → R¯ A R x y → U) (x y : A) (r1 r2 : R x y) (q : Q x y (|-| A R x y r1) (|-| A R x y r2))
- := idp (Path 𝟏 ★ ★) (idp 𝟏 ★)
-
-def 2-quot-ind (A : U) (R : A → A → U) (Q : Π (x y : A), R¯ A R x y → R¯ A R x y → U) (X : 2-quot A R Q → U)
-      (nPoint : Π (a : A), X (2-quot₁ A R Q a))
-      (nPath : Π (x y : A) (r : R x y), PathP (<i> X (2-quot₂ A R Q x y r @ i)) (nPoint x) (nPoint y))
-      (n2Path : Π (x y : A) (r1 r2 : R x y) (q : Q x y (|-| A R x y r1) (|-| A R x y r2)), PathP (<i> PathP (<j> X (2-quot₃ A R Q x y r1 r2 q @ i @ j)) (nPoint x) (nPoint y)) (nPath x y r1) (nPath x y r2))
-      (z : 2-quot A R Q) := disc-ind z
-
-def 2-quot-β₁ (A : U) (R : A → A → U) (Q : Π (x y : A), R¯ A R x y → R¯ A R x y → U) (X : 2-quot A R Q → U)
-      (nPoint : Π (a : A), X (2-quot₁ A R Q a))
-      (nPath : Π (x y : A) (r : R x y), PathP (<i> X (2-quot₂ A R Q x y r @ i)) (nPoint x) (nPoint y))
-      (n2Path : Π (x y : A) (r1 r2 : R x y) (q : Q x y (|-| A R x y r1) (|-| A R x y r2)), PathP (<i> PathP (<j> X (2-quot₃ A R Q x y r1 r2 q @ i @ j)) (nPoint x) (nPoint y)) (nPath x y r1) (nPath x y r2))
-      (a : A)
-  := idp (X (2-quot₁ A R Q a)) (nPoint a)
-
-def 2-quot-η (A : U) (R : A → A → U) (Q : Π (x y : A), R¯ A R x y → R¯ A R x y → U) (X : 2-quot A R Q → U) (h : Π (z : 2-quot A R Q), X z)
-  := idp (Π (z : 2-quot A R Q), X z) h
+ := idp (Π (z : quot A R), X z) h

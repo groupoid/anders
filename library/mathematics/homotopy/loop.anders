@@ -4,22 +4,31 @@
    HoTT 8.1 0-Truncations Loop Space of Circle
    HoTT 8.4 Fiber Sequence and long exact sequence
 
-   Copyright (c) Groupoid Infinity, 2014-2026. -}
+   Copyright (c) Groupoid Infinity, 2016-2026. -}
 
 module loop where
 import library/foundations/univalent/path
 
+-- Pointed type structure
+def Pointed : U := Σ (Ak : U), Ak
+def Pointed-Ω (A : Pointed) : Pointed := (Path A.1 A.2 A.2, <_> A.2)
+def PointedMap (A B : Pointed) : U := Σ (f : A.1 → B.1), Path B.1 (f A.2) B.2
+
+-- Omega-Pointed construction using primitive ind-nat
+def Omega-Pointed (A : U) (a : A) (n : nat) : Pointed
+ := ind-nat (λ (x : nat), Pointed) (A, a) (λ (k : nat) (prev : Pointed), Pointed-Ω prev) n
+
 def Ω (A : U) (a₀ : A) : U := Path A a₀ a₀
-
 def Ω-refl (A : U) (a₀ : A) : Ω A a₀ := idp A a₀
+def Ωⁿ (A : U) (a : A) (n : nat) : U := (Omega-Pointed A a n).1
+def reflⁿ (A : U) (a : A) (n : nat) : Ωⁿ A a n := (Omega-Pointed A a n).2
 
-def Ω-ind (A : U) (a₀ : A) (P : Π (x : A) (γ : Path A a₀ x), U) (p₀ : P a₀ (Ω-refl A a₀)) (x : A) (γ : Path A a₀ x) : P x γ :=
-  subst (singl A a₀) (λ (z : singl A a₀), P z.1 z.2) (eta A a₀) (x, γ) (contr A a₀ x γ) p₀
+def Ω-ind (A : U) (a₀ : A) (P : Π (x : A) (γ : Path A a₀ x), U) (p₀ : P a₀ (Ω-refl A a₀)) (x : A) (γ : Path A a₀ x) : P x γ
+ := subst (singl A a₀) (λ (z : singl A a₀), P z.1 z.2) (eta A a₀) (x, γ) (contr A a₀ x γ) p₀
 
 def Ω-comp (A : U) (a₀ : A) (P : Π (x : A) (γ : Path A a₀ x), U) (p₀ : P a₀ (Ω-refl A a₀))
   : PathP (<_> P a₀ (Ω-refl A a₀)) (Ω-ind A a₀ P p₀ a₀ (Ω-refl A a₀)) p₀ :=
   <i> subst-comp (singl A a₀) (λ (z : singl A a₀), P z.1 z.2) (eta A a₀) p₀ @ -i
-
 
 def Ω-uniq (A : U) (a₀ : A) (P : Π (x : A) (γ : Path A a₀ x), U) (f : Π (x : A) (γ : Path A a₀ x), P x γ)
     (h-comp : PathP (<_> P a₀ (Ω-refl A a₀)) (f a₀ (Ω-refl A a₀)) (Ω-ind A a₀ P (f a₀ (Ω-refl A a₀)) a₀ (Ω-refl A a₀)))
@@ -27,3 +36,28 @@ def Ω-uniq (A : U) (a₀ : A) (P : Π (x : A) (γ : Path A a₀ x), U) (f : Π 
  := <i> λ (x : A) (γ : Path A a₀ x), subst (singl A a₀)
           (λ (z : singl A a₀), PathP (<_> P z.1 z.2) (f z.1 z.2) (Ω-ind A a₀ P (f a₀ (Ω-refl A a₀)) z.1 z.2))
           (eta A a₀) (x, γ) (contr A a₀ x γ) h-comp @ i
+
+-- Loop space induction step: Ωⁿ A ≃ Ωⁿ⁺¹ Σ A
+def susp-Ω-motive (A : U) (a : A) (k : nat) (prev : PointedMap (Omega-Pointed A a k) (Omega-Pointed (𝚺 A) (𝜎₁ A) (succ k)))
+    (start end : Ωⁿ (𝚺 A) (𝜎₁ A) (succ k)) (p : Path (Ωⁿ (𝚺 A) (𝜎₁ A) (succ k)) start end) : U
+ := PointedMap (Omega-Pointed A a (succ k)) (Path (Ωⁿ (𝚺 A) (𝜎₁ A) (succ k)) end end, <_> end)
+
+def susp-Ω-step (A : U) (a : A) (k : nat) (prev : PointedMap (Omega-Pointed A a k) (Omega-Pointed (𝚺 A) (𝜎₁ A) (succ k)))
+ : PointedMap (Omega-Pointed A a (succ k)) (Omega-Pointed (𝚺 A) (𝜎₁ A) (succ (succ k)))
+ := J (Ωⁿ (𝚺 A) (𝜎₁ A) (succ k)) (prev.1 (reflⁿ A a k)) (susp-Ω-motive A a k prev)
+      (λ (pk : Ωⁿ A a (succ k)), <i> prev.1 (pk @ i), <_ _> (prev.1 (reflⁿ A a k)))
+      (reflⁿ (𝚺 A) (𝜎₁ A) (succ k)) (prev.2)
+
+def susp-Ω (A : U) (a : A) (n : nat) : PointedMap (Omega-Pointed A a n) (Omega-Pointed (𝚺 A) (𝜎₁ A) (succ n))
+ := ind-nat (λ (k : nat), PointedMap (Omega-Pointed A a k) (Omega-Pointed (𝚺 A) (𝜎₁ A) (succ k)))
+    (λ (x : A), comp-Path (𝚺 A) (𝜎₁ A) (𝜎₂ A) (𝜎₁ A) (𝜎₃ A x) (<i> (𝜎₃ A a) @ -i),
+     comp-inv-Path⁻¹ (𝚺 A) (𝜎₁ A) (𝜎₂ A) (𝜎₃ A a))
+    (λ (k : nat) (prev : PointedMap (Omega-Pointed A a k) (Omega-Pointed (𝚺 A) (𝜎₁ A) (succ k))),
+     susp-Ω-step A a k prev)
+    n
+
+def susp-Ω-map (A : U) (a : A) (n : nat) : Ωⁿ A a n → Ωⁿ (𝚺 A) (𝜎₁ A) (succ n)
+ := (susp-Ω A a n).1
+
+def susp-Ω-pm (A : U) (a : A) (n : nat) : PointedMap (Omega-Pointed A a n) (Omega-Pointed (𝚺 A) (𝜎₁ A) (succ n))
+ := susp-Ω A a n

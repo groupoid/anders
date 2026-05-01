@@ -1,50 +1,53 @@
 {- Natural Numbers: https://anders.groupoid.space/foundations/mltt/nat/
    - Nat.
-
-   HoTT 2.13 Natural Numbers
-   HoTT 5.3 W-Types
-   HoTT 5.5 Homotopy-inductive types
-
-   Copyright (c) Groupoid Infinity, 2014-2023. -}
+   Implemented using kernel primitives for judgmental beta-reduction.
+   Copyright (c) Groupoid Infinity, 2014-2026. -}
 
 module nat where
-import library/foundations/mltt/inductive
 import library/foundations/univalent/path
 
-def ℕ-ctor := ind₂ (λ (f : 𝟐), U) 𝟎 𝟏
-def ℕ := W (x : 𝟐), ℕ-ctor x
-def zero : ℕ := sup 𝟐 ℕ-ctor 0₂ (ind₀ ℕ)
-def succ (n : ℕ) : ℕ := sup 𝟐 ℕ-ctor 1₂ (λ (x : 𝟏), n)
+-- 1) Formation Rule
+def ℕ : U := __nat
 
-def 𝟎⟶ℕ (C : ℕ → U) (f : 𝟎 → ℕ) : C zero → C (sup 𝟐 ℕ-ctor 0₂ f)
- := transp (<i> C (sup 𝟐 ℕ-ctor 0₂ (λ (x : 𝟎), ind₀ (PathP (<_> ℕ) (ind₀ ℕ x) (f x)) x @ i))) 0
+-- 2) Introduction Rules
+def zero : ℕ := __zero
+def succ (n : ℕ) : ℕ := __succ n
 
-def 𝟏⟶ℕ (C : ℕ → U) (f : 𝟏 → ℕ) : C (succ (f ★)) → C (sup 𝟐 ℕ-ctor 1₂ f)
- := transp (<i> C (sup 𝟐 ℕ-ctor 1₂ (λ (x : 𝟏), ind₁ (λ (y : 𝟏), PathP (<_> ℕ) (f ★) (f y)) (<_> f ★) x @ i))) 0
+-- 3) Elimination Rule
+def ind-nat (C : ℕ → U) (z : C zero) (s : Π (n : ℕ), C n → C (succ n)) (n : ℕ) : C n := __ind_nat C z s n
+def ℕ-ind (C : ℕ → U) (z : C zero) (s : Π (n : ℕ), C n → C (succ n)) (n : ℕ) : C n := ind-nat C z s n
 
-def ℕ-ind (C : ℕ → U) (z : C zero) (s : Π (n : ℕ), C n → C (succ n)) : Π (n : ℕ), C n
- := indᵂ 𝟐 ℕ-ctor C
-    (ind₂ (λ (x : 𝟐), Π (f : ℕ-ctor x → ℕ), (Π (b : ℕ-ctor x), C (f b)) → C (sup 𝟐 ℕ-ctor x f))
-          (λ (f : 𝟎 → ℕ) (g : Π (x : 𝟎), C (f x)), 𝟎⟶ℕ C f z)
-          (λ (f : 𝟏 → ℕ) (g : Π (x : 𝟏), C (f x)), 𝟏⟶ℕ C f (s (f ★) (g ★))))
+-- 5) Computation Rules (Judgmental)
+-- These are judgmental in the kernel, so idp is a valid witness.
+def ℕ-βz (C : ℕ → U) (z : C zero) (s : Π (n : ℕ), C n → C (succ n)) : Path (C zero) (ℕ-ind C z s zero) z := <i> z
 
-def ℕ-rec (C : U) (z : C) (s : ℕ → C → C) : ℕ → C := ℕ-ind (λ (_ : ℕ), C) z s
-def ℕ-iter (C : U) (z : C) (s : C → C) : ℕ → C := ℕ-rec C z (λ (_ : ℕ), s)
-def ℕ-case (C : U) (z s : C) : ℕ → C := ℕ-iter C z (λ (_ : C), s)
-def plus : ℕ → ℕ → ℕ := ℕ-iter (ℕ → ℕ) (idfun ℕ) (∘ ℕ ℕ ℕ succ)
-def mult : ℕ → ℕ → ℕ := ℕ-rec (ℕ → ℕ) (\(_: ℕ), zero) (\(_: ℕ) (x: ℕ → ℕ) (m: ℕ), plus m (x m))
-def one : ℕ := succ zero
-def two : ℕ := succ one
+def ℕ-βs (C : ℕ → U) (z : C zero) (s : Π (n : ℕ), C n → C (succ n)) (n : ℕ)
+  : Path (C (succ n)) (ℕ-ind C z s (succ n)) (s n (ℕ-ind C z s n))
+ := <i> s n (ℕ-ind C z s n)
+
+-- 6) Uniqueness / Eta Rule (Propositional)
+-- States that any function f : nat -> A is equal to induction on its values.
+def ℕ-η (f : ℕ → ℕ) : Path (ℕ → ℕ) f (λ (x : ℕ), ℕ-ind (λ (n : ℕ), ℕ) (f zero) (λ (n : ℕ) (prev : ℕ), f (succ n)) x)
+ := <i> λ (x : ℕ), ℕ-ind (λ (n : ℕ), Path ℕ (f n) (ℕ-ind (λ (k : ℕ), ℕ) (f zero) (λ (k : ℕ) (prev : ℕ), f (succ k)) n)) (<i> f zero)
+    (λ (n : ℕ) (prev : Path ℕ (f n) (ℕ-ind (λ (k : ℕ), ℕ) (f zero) (λ (k : ℕ) (prev : ℕ), f (succ k)) n)), <i> f (succ n)) x @ i
+
+-- 7) Recursion and Iteration
+def ℕ-rec  (C : U) (z : C) (s : ℕ → C → C) : ℕ → C := ℕ-ind  (λ (x : ℕ), C) z s
+def ℕ-iter (C : U) (z : C) (s : C → C)     : ℕ → C := ℕ-rec  C z (λ (x : ℕ), s)
+def ℕ-case (C : U) (z : C) (s : C)         : ℕ → C := ℕ-iter C z (λ (x : C), s)
+
+-- 8) Basic Arithmetic
+def plus (m n : ℕ) : ℕ := ℕ-iter ℕ n (λ (x : ℕ), succ x) m
+def mult (m n : ℕ) : ℕ := ℕ-rec ℕ zero (λ (x : ℕ) (prev : ℕ), plus n prev) m
+
+-- 9) Constants
+def one   : ℕ := succ zero
+def two   : ℕ := succ one
 def three : ℕ := succ two
-def four : ℕ := succ three
-def five : ℕ := succ four
-def six : ℕ := succ five
+def four  : ℕ := succ three
+def five  : ℕ := succ four
+def six   : ℕ := succ five
 def seven : ℕ := succ six
 def eight : ℕ := succ seven
-def nine : ℕ := succ eight
-def ten : ℕ := succ nine
-
-def 5′ : ℕ := plus two three
-def 10′ : ℕ := mult 5′ two
-def 55′ : ℕ := plus (mult 5′ 10′) 5′
-
+def nine  : ℕ := succ eight
+def ten   : ℕ := succ nine

@@ -1,8 +1,13 @@
+{- n-Sphere: https://anders.groupoid.space/mathematics/homotopy/nsphere/
+
+   HoTT 6.4 Circles and Spheres
+
+   Copyright (c) Groupoid Infinity, 2016-2026. -}
+
 module Sn where
 import library/foundations/mltt/nat
 import library/foundations/univalent/extensionality
 import library/mathematics/homotopy/suspension
-option girard true
 
 -- 1) Formation Rule
 def sphere : ℕ → U := ℕ-iter U 𝟐 𝚺
@@ -40,5 +45,4 @@ def Sn-β₂ (n : ℕ) (P : sphere (succ n) → U)
 def Sn-η (n : ℕ) (P : sphere (succ n) → U) (h : Π (z : sphere (succ n)), P z)
   : Path (Π (z : sphere (succ n)), P z) h (Sn-ind n P (h (north_n n)) (h (south_n n)) (λ (x : sphere n), <i> h (merid_n n x @ i)))
  := 𝚺-η (sphere n) P h
-
-
+ 

@@ -82,6 +82,10 @@ struct
     | EW (a, (p, b))       -> clos '\x49' a p b
     | ESup (a, b)          -> W.put '\x4A'; exp2 a b
     | EIndW (a, b, c)      -> W.put '\x4B'; exp3 a b c
+    | ENat                 -> W.put '\x4C'
+    | EZero                -> W.put '\x4D'
+    | ESucc e              -> W.put '\x4E'; exp e
+    | EIndNat (c, z, s)    -> W.put '\x4F'; exp3 c z s
     | EIm t                -> W.put '\x50'; exp t
     | EInf e               -> W.put '\x51'; exp e
     | EIndIm (t, f)        -> W.put '\x52'; exp2 t f
@@ -90,11 +94,15 @@ struct
     | EIota2 (a, b, f, g, c) -> W.put '\x55'; exp5 a b f g c
     | EResp (a, b, f, g, c) -> W.put '\x56'; exp5 a b f g c
     | EIndCoequ (a, b, f, g, x, i, rho) -> W.put '\x57'; exp7 a b f g x i rho
-    | EDisc e -> W.put '\x58'; exp e
-    | EBase e -> W.put '\x59'; exp e
-    | EHub e -> W.put '\x5A'; exp e
-    | ESpoke e -> W.put '\x5B'; exp e
-    | EIndDisc e -> W.put '\x5C'; exp e
+    | EDisc (s, a) -> W.put '\x58'; exp s; exp a
+    | EBase (s, a, x) -> W.put '\x59'; exp s; exp a; exp x
+    | EHub (s, a, f) -> W.put '\x5A'; exp s; exp a; exp f
+    | ESpoke (s, a, f, x) -> W.put '\x5B'; exp s; exp a; exp f; exp x
+    | EIndDisc (s, a, x, nc, nh, ns', z) -> W.put '\x5C'; exp s; exp a; exp x; exp nc; exp nh; exp ns'; exp z
+  | EFla e               -> W.put '\x60'; exp e
+  | EFlaUnit e           -> W.put '\x61'; exp e
+  | EFlaCounit e         -> W.put '\x62'; exp e
+  | EIndFla (t, f)        -> W.put '\x63'; exp2 t f
 
 
   and exp2 a b = exp a; exp b
@@ -144,6 +152,9 @@ struct
     | Traceback (e, es)      -> W.put '\x13'; error e; int (List.length es); List.iter (uncurry exp2) es
     | InvalidOpt p           -> W.put '\x14'; string p
     | InvalidOptValue (p, x) -> W.put '\x15'; string p; string x
+    | ExpectedFla e          -> W.put '\x16'; exp e
+    | ExpectedFlaUnit e      -> W.put '\x17'; exp e
+    | ExpectedFlaCounit e    -> W.put '\x18'; exp e
 
   let resp = function
     | Version (i, j, k) -> W.put '\x10'; int64 i; int64 j; int64 k

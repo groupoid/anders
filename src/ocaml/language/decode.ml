@@ -86,6 +86,10 @@ struct
     | '\x49' -> let (a, p, b) = clos () in EW (a, (p, b))
     | '\x4A' -> let (a, b) = exp2 () in ESup (a, b)
     | '\x4B' -> let (a, b, c) = exp3 () in EIndW (a, b, c)
+    | '\x4C' -> ENat
+    | '\x4D' -> EZero
+    | '\x4E' -> ESucc (exp ())
+    | '\x4F' -> let (c, z, s) = exp3 () in EIndNat (c, z, s)
     | '\x50' -> EIm (exp ())
     | '\x51' -> EInf (exp ())
     | '\x52' -> let (t, f) = exp2 () in EIndIm (t, f)
@@ -94,11 +98,15 @@ struct
     | '\x55' -> let (a, b, c, d, e) = exp5 () in EIota2 (a, b, c, d, e)
     | '\x56' -> let (a, b, c, d, e) = exp5 () in EResp (a, b, c, d, e)
     | '\x57' -> let (a, b, c, d, e, f, g) = exp7 () in EIndCoequ (a, b, c, d, e, f, g)
-    | '\x58' -> EDisc (exp ())
-    | '\x59' -> EBase (exp ())
-    | '\x5A' -> EHub (exp ())
-    | '\x5B' -> ESpoke (exp ())
-    | '\x5C' -> EIndDisc (exp ())
+    | '\x58' -> let s = exp () in let a = exp () in EDisc (s, a)
+    | '\x59' -> let s = exp () in let a = exp () in let x = exp () in EBase (s, a, x)
+    | '\x5A' -> let s = exp () in let a = exp () in let f = exp () in EHub (s, a, f)
+    | '\x5B' -> let s = exp () in let a = exp () in let f = exp () in let x = exp () in ESpoke (s, a, f, x)
+    | '\x5C' -> let s = exp () in let a = exp () in let x = exp () in let nc = exp () in let nh = exp () in let ns' = exp () in let z = exp () in EIndDisc (s, a, x, nc, nh, ns', z)
+    | '\x60' -> EFla (exp ())
+    | '\x61' -> EFlaUnit (exp ())
+    | '\x62' -> EFlaCounit (exp ())
+    | '\x63' -> let (t, f) = exp2 () in EIndFla (t, f)
 
     | _      -> failwith "Term?"
 
@@ -155,6 +163,9 @@ struct
       Traceback (err, List.init n (fun _ -> exp2 ()))
     | '\x14' -> InvalidOpt (string ())
     | '\x15' -> let p = string () in let x = string () in InvalidOptValue (p, x)
+    | '\x16' -> ExpectedFla (exp ())
+    | '\x17' -> ExpectedFlaUnit (exp ())
+    | '\x18' -> ExpectedFlaCounit (exp ())
     | _      -> failwith "Error?"
 
   let resp () = match R.get () with

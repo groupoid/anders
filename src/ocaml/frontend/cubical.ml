@@ -17,6 +17,7 @@ let rec extractExp : exp -> string = function
   | EUnit | EStar | EIndUnit _ -> fail "cubicaltt does not have built-in unit type"
   | EBool | EFalse | ETrue | EIndBool _ -> fail "cubicaltt does not have built-in bool type"
   | EW _ | ESup _ | EIndW _ -> fail "cubicaltt does not have built-in W-types"
+  | ENat | EZero | ESucc _ | EIndNat _ -> fail "cubicaltt does not have built-in Nat type"
   | EIm _ | EInf _ | EIndIm _ | EJoin _ -> fail "cubicaltt does not have built-in modality"
   | EGlueElem _ | EUnglue _ -> fail "not implemented yet"
   | ECoequ _ | EIota2 _ | EResp _ | EIndCoequ _ | EDisc _ | EBase _ | EHub _ | ESpoke _ | EIndDisc _ -> fail "unsupported higher inductive type"

@@ -59,11 +59,13 @@ let rec ppExp paren e = let x = match e with
   | EGlue e -> Printf.sprintf "Glue %s" (ppExp true e)
   | EGlueElem (r, u, a) -> Printf.sprintf "glue %s %s %s" (ppExp true r) (ppExp true u) (ppExp true a)
   | EUnglue (r, u, e) -> Printf.sprintf "unglue %s %s %s" (ppExp true r) (ppExp true u) (ppExp true e)
-  | EEmpty -> "𝟎" | EUnit -> "𝟏" | EBool -> "𝟐"
-  | EStar -> "★" | EFalse -> "0₂" | ETrue -> "1₂"
+  | EEmpty -> "𝟎" | EUnit -> "𝟏" | EBool -> "𝟐" | ENat -> "nat"
+  | EStar -> "★" | EFalse -> "0₂" | ETrue -> "1₂" | EZero -> "0"
   | EIndEmpty e -> Printf.sprintf "ind₀ %s" (ppExp true e)
   | EIndUnit e  -> Printf.sprintf "ind₁ %s" (ppExp true e)
   | EIndBool e  -> Printf.sprintf "ind₂ %s" (ppExp true e)
+  | ESucc e     -> Printf.sprintf "succ %s" (ppExp true e)
+  | EIndNat (c, z, s) -> Printf.sprintf "ind-nat %s %s %s" (ppExp true c) (ppExp true z) (ppExp true s)
   | EW (a, (p, b)) -> Printf.sprintf "W %s, %s" (showTeleExp (p, a)) (showExp b)
   | ESup (a, b) -> Printf.sprintf "sup %s %s" (ppExp true a) (ppExp true b)
   | EIndW (a, b, c) -> Printf.sprintf "indᵂ %s %s %s" (ppExp true a) (ppExp true b) (ppExp true c)
@@ -71,20 +73,24 @@ let rec ppExp paren e = let x = match e with
   | EInf e -> Printf.sprintf "ℑ-unit %s" (ppExp true e)
   | EJoin e -> Printf.sprintf "ℑ-join %s" (ppExp true e)
   | EIndIm (a, b) -> Printf.sprintf "ind-ℑ %s %s" (ppExp true a) (ppExp true b)
+  | EFla e -> Printf.sprintf "♭ %s" (ppExp true e)
+  | EFlaUnit e -> Printf.sprintf "♭-unit %s" (ppExp true e)
+  | EFlaCounit e -> Printf.sprintf "♭-counit %s" (ppExp true e)
+  | EIndFla (a, b) -> Printf.sprintf "ind-♭ %s %s" (ppExp true a) (ppExp true b)
   | ECoequ (a, b, f, g) -> Printf.sprintf "coequ %s %s %s %s" (ppExp true a) (ppExp true b) (ppExp true f) (ppExp true g)
   | EIota2 (a, b, f, g, c) -> Printf.sprintf "ι₂ %s %s %s %s %s" (ppExp true a) (ppExp true b) (ppExp true f) (ppExp true g) (ppExp true c)
   | EResp (a, b, f, g, c) -> Printf.sprintf "resp %s %s %s %s %s" (ppExp true a) (ppExp true b) (ppExp true f) (ppExp true g) (ppExp true c)
   | EIndCoequ (a, b, f, g, x, i, rho) -> Printf.sprintf "coequ-ind %s %s %s %s %s %s %s" (ppExp true a) (ppExp true b) (ppExp true f) (ppExp true g) (ppExp true x) (ppExp true i) (ppExp true rho)
-  | EDisc e -> Printf.sprintf "disc %s" (ppExp true e)
-  | EBase e -> Printf.sprintf "base %s" (ppExp true e)
-  | EHub e -> Printf.sprintf "hub %s" (ppExp true e)
-  | ESpoke e -> Printf.sprintf "spoke %s" (ppExp true e)
-  | EIndDisc e -> Printf.sprintf "disc-ind %s" (ppExp true e)
+  | EDisc (s, a) -> Printf.sprintf "disc %s %s" (ppExp true s) (ppExp true a)
+  | EBase (s, a, x) -> Printf.sprintf "base %s %s %s" (ppExp true s) (ppExp true a) (ppExp true x)
+  | EHub (s, a, f) -> Printf.sprintf "hub %s %s %s" (ppExp true s) (ppExp true a) (ppExp true f)
+  | ESpoke (s, a, f, x) -> Printf.sprintf "spoke %s %s %s %s" (ppExp true s) (ppExp true a) (ppExp true f) (ppExp true x)
+  | EIndDisc (s, a, x, nc, nh, ns', z) -> Printf.sprintf "disc-ind %s %s %s %s %s %s %s" (ppExp true s) (ppExp true a) (ppExp true x) (ppExp true nc) (ppExp true nh) (ppExp true ns') (ppExp true z)
 
   in match e with
   | EVar _ | EFst _ | ESnd _ | EI | EPre _ | ESystem _
   | EKan _ | EHole | EDir _ | EPair _ | ENeg _
-  | EEmpty | EUnit | EBool | EStar | EFalse | ETrue -> x
+  | EEmpty | EUnit | EBool | ENat | EStar | EFalse | ETrue | EZero -> x
   | _ -> parens paren x
 
 and showExp e = ppExp false e

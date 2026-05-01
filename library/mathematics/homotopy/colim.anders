@@ -1,3 +1,9 @@
+{- Colimit: https://anders.groupoid.space/mathematics/homotopy/colimit/
+
+   HoTT 7.4 Colimits of n-types
+
+   Copyright (c) Groupoid Infinity, 2016-2026. -}
+
 module colimit where
 import library/foundations/mltt/nat
 import library/foundations/mltt/w

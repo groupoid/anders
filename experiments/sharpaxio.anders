@@ -1,0 +1,49 @@
+module sharpaxio where
+import library/foundations/mltt/proto
+import library/foundations/univalent/path
+import library/foundations/univalent/equiv
+import library/foundations/univalent/extensionality
+
+{-
+   References:
+     [Shulman 2015]  Brouwer's fixed-point theorem in real-cohesive HoTT
+                     https://arxiv.org/abs/1509.07584
+     [Riley–Finster–Licata 2021]  Synthetic Spectra via a Monadic and
+                     Comonadic Modality  https://arxiv.org/pdf/2102.04099
+     [nLab]  https://ncatlab.org/nlab/show/sharp+modality
+-}
+
+axiom sharp (A : U) : U -- formation
+axiom sharp-unit (A : U) : A → sharp A -- introduction
+def is-sharp-modal (B : U) : U := isEquiv B (sharp B) (sharp-unit B) -- modal predicate
+
+-- induction
+axiom sharp-ind (A : U) (B : sharp A → U) (Bm : Π (x : sharp A), is-sharp-modal (B x))
+  (f : Π (a : A), B (sharp-unit A a)) : Π (x : sharp A), B x
+
+-- computation
+axiom sharp-β (A : U) (B : sharp A → U) (Bm : Π (x : sharp A), is-sharp-modal (B x))
+  (f : Π (a : A), B (sharp-unit A a)) (a : A) : Path (B (sharp-unit A a)) (sharp-ind A B Bm f (sharp-unit A a)) (f a)
+
+-- uniqueness
+axiom sharp-path-modal (B : U) (Bm : is-sharp-modal B) (b0 b1 : B) : is-sharp-modal (Path B b0 b1)
+def sharp-unique-ptwise (A B : U) (Bm : is-sharp-modal B) (g h : sharp A → B)
+  (e : Π (a : A), Path B (g (sharp-unit A a)) (h (sharp-unit A a))) : Π (x : sharp A), Path B (g x) (h x)
+ := sharp-ind A (λ (x : sharp A), Path B (g x) (h x)) (λ (x : sharp A), sharp-path-modal B Bm (g x) (h x)) e
+def sharp-η (A B : U) (Bm : is-sharp-modal B) (g h : sharp A → B)
+  (e : Π (a : A), Path B (g (sharp-unit A a)) (h (sharp-unit A a))) : Path (sharp A → B) g h
+ := piext (sharp A) (λ (_ : sharp A), B) g h (sharp-unique-ptwise A B Bm g h e)
+
+-- structural properties
+axiom sharp-modal (A : U) : is-sharp-modal (sharp A)
+def sharp-join (A : U) : sharp (sharp A) → sharp A := inv-equiv (sharp A) (sharp (sharp A)) (sharp-unit (sharp A), sharp-modal A)
+def sharp-rec (A B : U) (Bm : is-sharp-modal B) (f : A → B) : sharp A → B
+ := sharp-ind A (λ (_ : sharp A), B) (λ (_ : sharp A), Bm) f
+def sharp-rec-β (A B : U) (Bm : is-sharp-modal B) (f : A → B) (a : A) : Path B (sharp-rec A B Bm f (sharp-unit A a)) (f a)
+ := sharp-β A (λ (_ : sharp A), B) (λ (_ : sharp A), Bm) f a
+def sharp-map (A B : U) (f : A → B) : sharp A → sharp B := sharp-rec A (sharp B) (sharp-modal B) (∘ A B (sharp B) (sharp-unit B) f)
+def sharp-naturality (A B : U) (f : A → B) (a : A) : Path (sharp B) (sharp-unit B (f a)) (sharp-map A B f (sharp-unit A a))
+ := <i> sharp-rec-β A (sharp B) (sharp-modal B) (∘ A B (sharp B) (sharp-unit B) f) a @ -i
+def sharp-counit (B : U) (Bm : is-sharp-modal B) : sharp B → B := inv-equiv B (sharp B) (sharp-unit B, Bm)
+def sharp-counit-unit (B : U) (Bm : is-sharp-modal B) (b : B) : Path B (sharp-counit B Bm (sharp-unit B b)) b
+ := sec-equiv B (sharp B) (sharp-unit B, Bm) b

@@ -10,38 +10,43 @@ Modal Homotopy Type System.
 
 ```OCaml
 type exp =
-  | EPre of Z.t | EKan of Z.t | EVar of name | EHole                                 (* cosmos *)
-  | EPi of exp * (name * exp) | ELam of exp * (name * exp) | EApp of exp * exp           (* pi *)
-  | ESig of exp * (name * exp) | EPair of tag * exp * exp | EFst of exp | ESnd of exp (* sigma *)
-  | EId of exp | ERef of exp | EJ of exp | EField of exp * string           (* strict equality *)
-  | EPathP of exp | EPLam of exp | EAppFormula of exp * exp                   (* path equality *)
-  | EI | EDir of dir | EAnd of exp * exp | EOr of exp * exp | ENeg of exp     (* CCHM interval *)
-  | ETransp of exp * exp | EHComp of exp * exp * exp * exp                   (* Kan operations *)
-  | EPartial of exp | EPartialP of exp * exp | ESystem of exp System.t    (* partial functions *)
-  | ESub of exp * exp * exp | EInc of exp * exp | EOuc of exp              (* cubical subtypes *)
-  | EGlue of exp | EGlueElem of exp * exp * exp | EUnglue of exp                    (* glueing *)
-  | EEmpty | EIndEmpty of exp                                                             (* 𝟎 *)
-  | EUnit | EStar | EIndUnit of exp                                                       (* 𝟏 *)
-  | EBool | EFalse | ETrue | EIndBool of exp                                              (* 𝟐 *)
-  | EW of exp * (name * exp) | ESup of exp * exp | EIndW of exp * exp * exp               (* W *)
-  | EIm of exp | EInf of exp | EIndIm of exp * exp | EJoin of exp    (* Infinitesimal Modality *)
-  | ECoeq of exp | EIota of exp | EResp of exp | EIndCoeq of exp                (* Coequalizer *)
-  | EDisc of exp | EBase of exp | EHub of exp | ESpoke of exp | EIndDisc of exp        (* Disc *)
+| EPre of Z.t | EKan of Z.t | EVar of name | EHole                             (* Cosmos *)
+| ENat | EZero | ESucc of exp | EIndNat of exp * exp * exp  (* Canonical Natural Numbers *)
+| EPi of exp * (name * exp) | ELam of exp * (name * exp) | EApp of exp * exp        (* Π *)
+| ESig of exp * (name * exp) | EPair of tag * exp * exp | EFst of exp | ESnd of exp (* Σ *)
+| EId of exp | ERef of exp | EJ of exp | EField of exp * string       (* Strict Equality *)
+| EEmpty | EIndEmpty of exp                                                         (* 𝟎 *)
+| EUnit | EStar | EIndUnit of exp                                                   (* 𝟏 *)
+| EBool | EFalse | ETrue | EIndBool of exp                                          (* 𝟐 *)
+| EW of exp * (name * exp) | ESup of exp * exp | EIndW of exp * exp * exp           (* W *)
+| EPathP of exp | EPLam of exp | EAppFormula of exp * exp               (* Path Equality *)
+| EI | EDir of dir | EAnd of exp * exp | EOr of exp * exp | ENeg of exp (* CCHM Interval *)
+| ETransp of exp * exp | EHComp of exp * exp * exp * exp               (* Kan Operations *)
+| EPartial of exp | EPartialP of exp * exp | ESystem of exp System.t     (* Partial Funs *)
+| ESub of exp * exp * exp | EInc of exp * exp | EOuc of exp          (* Cubical Subtypes *)
+| EGlue of exp | EGlueElem of exp * exp * exp | EUnglue of exp                (* Glueing *)
+| ECoeq of exp | EIota of exp | EResp of exp | EIndCoeq of exp            (* Coequalizer *)
+| EDisc of exp | EBase of exp | EHub of exp | ESpoke of exp | EIndDisc of exp    (* Disc *)
+| EIm of exp | EInf of exp | EIndIm of exp * exp | EJoin of exp        (* Infinitesimals *)
+| EFla of exp | EFlaUnit of exp | EFlaCounit of exp | EIndFla of exp * exp       (* Flat *)
 ```
 
-Anders is a HoTT proof assistant based on: classical MLTT-80 with 0, 1, 2, W types;
-CCHM in CHM flavour as cubical type system with hcomp/trans Kan operations;
-HTS sctrict equality on pretypes; de Rham stack modality primitives.
+Anders is a HoTT proof assistant based on:
+  classical MLTT-80 with N, 0, 1, 2, W types;
+  CCHM in CHM flavour as cubical type system with hcomp/trans Kan operations;
+  HTS sctrict equality on pretypes;
+  de Rham stack modality;
+  Disc and Coequalizer primitives.
 We tend not to touch general recursive higher inductive schemes yet,
-instead we will try to express as much HIT as possible through W,
-Coequlizer and HubSpokes Disc in the style of HoTT/Coq homotopy library and Three-HIT theorem.
+instead we will try to express as much HIT as possible through W, Coequlizer and HubSpokes Disc
+in the style of HoTT/Coq homotopy library and Three-HIT theorem.
 
 Features
 --------
 
 * Homepage: https://anders.groupoid.space/
-* Fibrant MLTT-style 0-1-2-Π-Σ-W primitives with Uₙ hierarchy in 500 LOC
-* Cofibrant CHM-style I primitives with pretypes hierarchy Vₙ in 500 LOC
+* Fibrant MLTT-style N-0-1-2-Π-Σ-W primitives with Uₙ hierarchy in 500 LOC
+* Cofibrant CHM-style I (PathP) primitives with pretypes hierarchy Vₙ in 500 LOC
 * Generalized Transport and Homogeneous Composition core Kan operations
 * Partial Elements
 * Cubical Subtypes
@@ -49,7 +54,9 @@ Features
 * Strict Equality on pretypes
 * Coequalizer
 * Hub Spokes Disc
+* Nat in Kernel for spectral goodness under higher homotopies
 * Infinitesimal Shape Modality (de Rham Stack)
+* Flat Modality (Sharp is derived)
 * Parser in 80 LOC
 * Lexer in 80 LOC
 * Small Kernel in 1000 LOC
@@ -58,7 +65,7 @@ Features
 * Poor man's records as Σ with named accessors to telescope variables
 * 1D syntax with top-level declarations
 * Groupoid Infinity CCHM Homotopy Library: https://anders.groupoid.space/library/
-* Best suited for academic papers and fast type checking
+* Pure basis best suited for academic papers on W-types and verifiable type checking
 
 Setup
 -------------
@@ -115,7 +122,7 @@ Anders was built by strictly following CCHM publications:
 * <a href="http://www.cse.chalmers.se/~simonhu/papers/p.pdf">Gluing for type theory</a> [Kaposi, Huber, Sattler]
 * <a href="https://doi.org/10.1017/S0960129521000311">Cubical Methods in HoTT/UF</a> [Mörtberg]
 
-We tried to bring in as little of ourselves as possible. 
+We tried to bring in as little of ourselves as possible.
 
 HTS
 ---
@@ -139,27 +146,21 @@ Infinitesimal Modality was added for direct support of Synthetic Differential Ge
 Benchmarks
 ----------
 
-Intel i5-12400. Compilation under second, full library type check under 1/3 of a second.
+Intel i5-12400 or M4: Compilation in three seconds, full library type checks in one minute with K(G,n)-η.
 
 ```
-$ time dune build
-
-real    0m0.796s
-user    0m1.912s
-sys     0m0.416s
+% dune build
+3.19s user 2.64s system 135% cpu 4.297 total
 ```
 
 ```
-$ time dune exec anders check lib/book.anders
-
-real    0m0.268s
-user    0m0.017s
-sys     0m0.017s
+% dune exec anders profile check library/book.anders
+0.06s user 0.05s system 8% cpu 1.188 total
 ```
 
 # Anders: Homotopy Library
 
-Anders is a HoTT proof assistant based on: classical MLTT-80 with 0, 1, 2, W types;
+Anders is a HoTT proof assistant based on: classical MLTT-80 with Pi, Sigma, Nat, Id, 0, 1, 2, W types;
 CCHM in CHM flavour as cubical type system with hcomp/trans Kan operations;
 HTS sctrict equality on pretypes; de Rham stack modality primitives.
 We tend not to touch general recursive higher inductive schemes yet,
@@ -239,8 +240,8 @@ The main purpose of Anders is doing Homotopy Theory:
 ```
 $ dune exec anders repl
 
-Anders Proof Assistant version 1.4.0
-Copyright © 2021–2022 Groupoid Infinity.
+Anders Proof Assistant version 5.0.0
+Copyright © 2016–2026 Groupoid Infinity.
 
 For help type ‘:h’.
 

@@ -1,0 +1,32 @@
+module natw where
+import library/foundations/mltt/inductive
+
+-- Enable judgmental irrelevance for 0 and 1 to allow strict W-reduction
+option irrelevance true
+
+-- 1) Formation Rule
+-- We define nat-B as 1 + 1 and nat-C as the family returning 0 or 1.
+-- We use the primitives directly to avoid universe-fixed library helpers.
+def nat-B : U := Σ (b : 𝟐), ind₂ (λ (x : 𝟐), U) 𝟏 𝟏 b
+def nat-C (x : nat-B) : U := ind₂ (λ (b : 𝟐), ind₂ (λ (y : 𝟐), U) 𝟏 𝟏 b → U) (λ (u : 𝟏), 𝟎) (λ (u : 𝟏), 𝟏) x.1 x.2
+def natw : U := W (x : nat-B), nat-C x
+
+-- 2) Introduction Rules
+def zerow : natw := sup nat-B nat-C (0₂, ★) (λ (x : 𝟎), ind₀ natw x)
+def succw (n : natw) : natw := sup nat-B nat-C (1₂, ★) (λ (u : 𝟏), n)
+
+-- 3) Strict Elimination Rule (Judgmental Beta)
+-- Because of 'irrelevance true', (sup (0₂, u) f) is judgmentally 'zero'
+-- and (sup (1₂, u) f) is judgmentally 'succ (f ★)'.
+def nat-ind (P : natw → U) (p0 : P zerow) (ps : Π (n : natw), P n → P (succw n)) (n : natw) : P n
+ := indᵂ nat-B nat-C P
+    (λ (b : nat-B) (f : nat-C b → natw) (g : Π (x : nat-C b), P (f x)),
+      ind₂ (λ (tag : 𝟐), Π (u : ind₂ (λ (z : 𝟐), U) 𝟏 𝟏 tag), Π (f' : nat-C (tag, u) → natw), (Π (x : nat-C (tag, u)), P (f' x)) → P (sup nat-B nat-C (tag, u) f'))
+           (λ (u : 𝟏) (f' : nat-C (0₂, u) → natw) (g' : Π (x : nat-C (0₂, u)), P (f' x)), p0)
+           (λ (u : 𝟏) (f' : nat-C (1₂, u) → natw) (g' : Π (x : nat-C (1₂, u)), P (f' x)), ps (f' ★) (g' ★))
+           b.1 b.2 f g)
+    n
+
+-- Non-dependent recursion
+def nat-rec (A : U) (a : A) (f : natw → A → A) : natw → A := nat-ind (λ (x : natw), A) a f
+def nat-iter (A : U) (a : A) (f : A → A) : natw → A := nat-rec A a (λ (n : natw) (x : A), f x)

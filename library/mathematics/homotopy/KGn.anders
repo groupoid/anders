@@ -6,7 +6,6 @@
     Copyright (c) Groupoid Infinity, 2014-2026. -}
 
 module KGn where
-option irrelevance true
 import library/foundations/mltt/nat
 import library/mathematics/algebra/algebra
 import library/mathematics/homotopy/suspension

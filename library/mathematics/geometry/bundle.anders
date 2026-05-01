@@ -13,7 +13,6 @@ import library/foundations/mltt/sigma
 import library/foundations/univalent/iso
 import library/mathematics/homotopy/pullback
 import library/mathematics/homotopy/truncation
-option girard true
 
 def Family (B : U) : U₁ := B → U
 def Fibration (B : U) : U₁ := Σ (X : U), X → B

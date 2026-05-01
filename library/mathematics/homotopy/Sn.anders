@@ -8,7 +8,6 @@ module Sn where
 import library/foundations/mltt/nat
 import library/foundations/univalent/extensionality
 import library/mathematics/homotopy/suspension
-option girard true
 
 -- 1) Formation Rule
 def sphere : ℕ → U := ℕ-iter U 𝟐 𝚺

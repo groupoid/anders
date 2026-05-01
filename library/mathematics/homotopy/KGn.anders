@@ -14,24 +14,18 @@ import library/mathematics/homotopy/Sn
 import library/mathematics/homotopy/loop
 import library/mathematics/homotopy/KG1
 
-
 -- K-step: K(G, n+1) = || Σ K(G, n) ||_{n+1}
 -- For k=0 (n=1), we use the K(G,1) construction from KG1.
 def K-step (G : abgroup) (k : nat) (prev : Pointed) : Pointed
  := ind-nat (λ (_ : nat), Pointed)
-    (K1 (G.1, G.2.1), K1-point (G.1, G.2.1))
+    (K1 (G.1, G.2.1), K1-point (G.1, G.2.1)) -- place unit here istead to understand how fast raw type checking is
     (λ (m : nat) (_ : Pointed),
        (trunc (𝚺 prev.1) (plus (succ (succ zero)) (succ m)),
-        trunc₁ (𝚺 prev.1) (plus (succ (succ zero)) (succ m)) (𝜎₁ prev.1)))
-    k
-
+        trunc₁ (𝚺 prev.1) (plus (succ (succ zero)) (succ m)) (𝜎₁ prev.1))) k
 
 -- K(G, n) tower construction using primitive ind-nat
 def K-Pointed (G : abgroup) (n : nat) : Pointed
- := ind-nat (λ (x : nat), Pointed)
-    (G.1.1, G.2.1.1.2.2.1)
-    (λ (k : nat) (prev : Pointed), K-step G k prev)
-    n
+ := ind-nat (λ (x : nat), Pointed) (G.1.1, G.2.1.1.2.2.1) (λ (k : nat) (prev : Pointed), K-step G k prev) n
 
 def K (G : abgroup) (n : nat) : U := (K-Pointed G n).1
 def K-point (G : abgroup) (n : nat) : K G n := (K-Pointed G n).2
@@ -66,6 +60,4 @@ def K-η (G : abgroup) (n : nat) (P : Π (k : nat), K G k → U) (h : Π (k : na
  := ind-nat (λ (k : nat), Path (Π (z : K G k), P k z) (h k) (λ (z : K G k), K-ind G k P (λ (g : G.1.1), h zero g) (λ (m : nat) (pr : Π (y : K G m), P m y) (y : K G (succ m)), h (succ m) y) z))
     (<_> (h zero))
     (λ (k : nat) (prev : Path (Π (z : K G k), P k z) (h k) (λ (z : K G k), K-ind G k P (λ (g : G.1.1), h zero g) (λ (m : nat) (pr : Π (y : K G m), P m y) (y : K G (succ m)), h (succ m) y) z)),
-     <_> (h (succ k)))
-    n
-
+     <_> (h (succ k))) n

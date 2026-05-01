@@ -1,9 +1,6 @@
 {- Natural Numbers: https://anders.groupoid.space/foundations/mltt/nat/
    - Nat.
-
    Implemented using kernel primitives for judgmental beta-reduction.
-   Provides standard MLTT rules: Formation, Introduction, Elimination, and Computation.
-
    Copyright (c) Groupoid Infinity, 2014-2026. -}
 
 module nat where

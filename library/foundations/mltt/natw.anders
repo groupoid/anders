@@ -1,3 +1,8 @@
+{- Homotopy Natural Numbers: https://anders.groupoid.space/foundations/mltt/natw/
+   - Homotopy Nat.
+   Implemented using W primitives using transp enforcing Homotopy Canonicity and Losing Strong Canonicity.
+   Copyright (c) Groupoid Infinity, 2014-2026. -}
+
 module natw where
 import library/foundations/mltt/inductive
 
@@ -18,8 +23,7 @@ def nat-ind (P : natw → U) (p0 : P zerow) (ps : Π (n : natw), P n → P (succ
            (λ (f' : 𝟏 → natw) (g' : Π (x : 𝟏), P (f' x)),
               transp (<i> P (sup nat-B nat-C 1₂ (λ (u : 𝟏),
                 ind₁ (λ (v : 𝟏), Path natw (f' ★) (f' v)) (<_> f' ★) u @ i))) 0 (ps (f' ★) (g' ★)))
-           b f g)
-    n
+           b f g) n
 
 def nat-rec (A : U) (a : A) (f : natw → A → A) : natw → A := nat-ind (λ (x : natw), A) a f
 def nat-iter (A : U) (a : A) (f : A → A) : natw → A := nat-rec A a (λ (n : natw) (x : A), f x)

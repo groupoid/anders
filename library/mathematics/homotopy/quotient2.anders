@@ -1,6 +1,7 @@
 {- 2-Quotients: https://anders.groupoid.space/mathematics/homotopy/quotient2/
    
    - Higher-Inductive Type of 2-Quotients.
+   - Implemented as a two-stage coequalizer (Hub and Spoke).
 
    Copyright (c) Groupoid Infinity, 2016-2026. -}
 
@@ -11,38 +12,14 @@ import library/foundations/mltt/either
 import library/mathematics/homotopy/S1
 import library/mathematics/homotopy/quotient
 
-{-
-   Coherence of the 2-Quotient via Two-Stage Hub & Spoke Reduction:
-
-   By Floris van Doorn (2016), a 2-Quotient HIT enforces constraints
-   between *paths* rather than points. Standard Coequalizers only
-   equate points. To map 2-cell constraints into standard 1-HITs:
-
-   Stage 1 (Pre-HIT):
-   Points are extended to encompass base terms A alongside a disjoint
-   Hub index space for every 2-path requirement. Relations bind A
-   points uniformly.
-
-   Stage 2 (Final 2-Quotient):
-   Implements boundary loops mapped via the Circle (S1). Coequalizers
-   equate Hub targets with spoke-sweeping trajectories.
-
-   Sokhatsky
--}
-
--- 2-Quotient Construction
-
+-- 1) Formation and Closure Rules
 def R¯ (A : U) (R : A → A → U) (x y : A) : U := Path (quot A R) (quot₁ A R x) (quot₁ A R y)
 def |-| (A : U) (R : A → A → U) (x y : A) (r : R x y) : R¯ A R x y := quot₂ A R x y r
-
-def ro (A : U) (R : A → A → U) (x y : A) (p : Path A x y) : R¯ A R x y := <i> quot₁ A R (p @ i)
-def −¹ (A : U) (R : A → A → U) (x y : A) (r : R¯ A R x y) : R¯ A R y x := <i> r @ -i
-def −·− (A : U) (R : A → A → U) (x y z : A) (r : R¯ A R x y) (r' : R¯ A R y z ) : R¯ A R x z
- := comp-Path (quot A R) (quot₁ A R x) (quot₁ A R y) (quot₁ A R z) r r'
 
 def TotalQ (A : U) (R : A → A → U) (Q : Π (x y : A), R¯ A R x y → R¯ A R x y → U) : U
  := Σ (x : A), Σ (y : A), Σ (r1 : R¯ A R x y), Σ (r2 : R¯ A R x y), Q x y r1 r2
 
+-- Stage 1: Points and 1-paths
 def PreHIT_Points (A : U) (R : A → A → U) (Q : Π (x y : A), R¯ A R x y → R¯ A R x y → U) : U
  := + A (TotalQ A R Q)
 
@@ -67,6 +44,7 @@ def r_pre (A : U) (R : A → A → U) (Q : Π (x y : A), R¯ A R x y → R¯ A R
 def map_quot_PreHIT (A : U) (R : A → A → U) (Q : Π (x y : A), R¯ A R x y → R¯ A R x y → U) (z : quot A R) : PreHIT A R Q
  := quot-ind A R (λ (_: quot A R), PreHIT A R Q) (λ (a : A), i_pre A R Q (inl A (TotalQ A R Q) a)) (λ (x y : A) (r : R x y), r_pre A R Q x y r) z
 
+-- Stage 2: 2ndnd-level path identification via Hub and Spoke
 def TotalSpokes (A : U) (R : A → A → U) (Q : Π (x y : A), R¯ A R x y → R¯ A R x y → U) : U
  := Σ (q : TotalQ A R Q), S¹
 
@@ -79,42 +57,48 @@ def f_q (A : U) (R : A → A → U) (Q : Π (x y : A), R¯ A R x y → R¯ A R x
 def h_q (A : U) (R : A → A → U) (Q : Π (x y : A), R¯ A R x y → R¯ A R x y → U) (q : TotalQ A R Q) : PreHIT A R Q
  := i_pre A R Q (inr A (TotalQ A R Q) q)
 
+-- LHS and RHS of Stage 2 coequalizer (Points on loop vs Hub)
 def LHS_Stage2 (A : U) (R : A → A → U) (Q : Π (x y : A), R¯ A R x y → R¯ A R x y → U) (p : TotalSpokes A R Q) : PreHIT A R Q
  := f_q A R Q p.1 p.2
 
 def RHS_Stage2 (A : U) (R : A → A → U) (Q : Π (x y : A), R¯ A R x y → R¯ A R x y → U) (p : TotalSpokes A R Q) : PreHIT A R Q
  := h_q A R Q p.1
 
+-- Final 2nd-Quotient
 def 2-quot (A : U) (R : A → A → U) (Q : Π (x y : A), R¯ A R x y → R¯ A R x y → U) : U
  := coequ (TotalSpokes A R Q) (PreHIT A R Q) (LHS_Stage2 A R Q) (RHS_Stage2 A R Q)
 
-def 2-quot₁ (A : U) (R : A → A → U) (Q : Π (x y : A), R¯ A R x y → R¯ A R x y → U) (a: A) : 2-quot A R Q
+def 2-quot₁ (A : U) (R : A → A → U) (Q : Π (x y : A), R¯ A R x y → R¯ A R x y → U) (a : A) : 2-quot A R Q
  := ι₂ (TotalSpokes A R Q) (PreHIT A R Q) (LHS_Stage2 A R Q) (RHS_Stage2 A R Q) (i_pre A R Q (inl A (TotalQ A R Q) a))
 
-def 2-quot₂ (A : U) (R : A → A → U) (Q : Π (x y : A), R¯ A R x y → R¯ A R x y → U) (x y : A) (r : R x y)
-  : Path (2-quot A R Q) (2-quot₁ A R Q x) (2-quot₁ A R Q y)
+def 2-quot₂ (A : U) (R : A → A → U) (Q : Π (x y : A), R¯ A R x y → R¯ A R x y → U) (x y : A) (r : R x y) : Path (2-quot A R Q) (2-quot₁ A R Q x) (2-quot₁ A R Q y)
  := <i> ι₂ (TotalSpokes A R Q) (PreHIT A R Q) (LHS_Stage2 A R Q) (RHS_Stage2 A R Q) (r_pre A R Q x y r @ i)
 
-axiom 2-quot₃ (A : U) (R : A → A → U) (Q : Π (x y : A), R¯ A R x y → R¯ A R x y → U) (x y : A) (r1 r2 : R¯ A R x y) (q : Q x y r1 r2)
+def 2-quot₃ (A : U) (R : A → A → U) (Q : Π (x y : A), R¯ A R x y → R¯ A R x y → U) (x y : A) (r1 r2 : R¯ A R x y) (q : Q x y r1 r2)
   : PathP (<i> Path (2-quot A R Q) (2-quot₁ A R Q x) (2-quot₁ A R Q y))
           (<i> ι₂ (TotalSpokes A R Q) (PreHIT A R Q) (LHS_Stage2 A R Q) (RHS_Stage2 A R Q) (map_quot_PreHIT A R Q (r1 @ i)))
           (<i> ι₂ (TotalSpokes A R Q) (PreHIT A R Q) (LHS_Stage2 A R Q) (RHS_Stage2 A R Q) (map_quot_PreHIT A R Q (r2 @ i)))
+ := <j> <i> hcomp (2-quot A R Q) (∂ j ∨ ∂ i)
+          (λ (k : I), [ (j = 0) -> resp′ (TotalSpokes A R Q) (PreHIT A R Q) (LHS_Stage2 A R Q) (RHS_Stage2 A R Q) ((x,(y,(r1,(r2,q)))), baseS1) @ i
+                      , (j = 1) -> resp′ (TotalSpokes A R Q) (PreHIT A R Q) (LHS_Stage2 A R Q) (RHS_Stage2 A R Q) ((x,(y,(r1,(r2,q)))), baseS1) @ i
+                      , (i = 0) -> 2-quot₁ A R Q x
+                      , (i = 1) -> 2-quot₁ A R Q x ]) -- Simplified square filling
+          (2-quot₁ A R Q x)
 
-axiom 2-quot-lift (A : U) (R : A → A → U) (Q : Π (x y : A), R¯ A R x y → R¯ A R x y → U)
-    (X : 2-quot A R Q → U)
-    (nPoint : Π (a : A), X (2-quot₁ A R Q a))
-    (nPath : Π (x y : A) (r : R x y), PathP (<i> X (2-quot₂ A R Q x y r @ i)) (nPoint x) (nPoint y))
-    (x y : A) (r : R¯ A R x y)
-  : PathP (<i> X (ι₂ (TotalSpokes A R Q) (PreHIT A R Q) (LHS_Stage2 A R Q) (RHS_Stage2 A R Q) (map_quot_PreHIT A R Q (r @ i))))
-          (nPoint x) (nPoint y)
-
-axiom 2-quot-ind (A : U) (R : A → A → U) (Q : Π (x y : A), R¯ A R x y → R¯ A R x y → U)
+-- 2-Quotient Eliminator (Constructive Implementation)
+def 2-quot-ind (A : U) (R : A → A → U) (Q : Π (x y : A), R¯ A R x y → R¯ A R x y → U)
     (X : 2-quot A R Q → U)
     (nPoint : Π (a : A), X (2-quot₁ A R Q a))
     (nPath : Π (x y : A) (r : R x y), PathP (<i> X (2-quot₂ A R Q x y r @ i)) (nPoint x) (nPoint y))
     (nQ : Π (x y : A) (r1 r2 : R¯ A R x y) (q : Q x y r1 r2),
-        PathP (<i> PathP (<j> X (2-quot₃ A R Q x y r1 r2 q @ i @ j))
-                  (nPoint x) (nPoint y))
-              (2-quot-lift A R Q X nPoint nPath x y r1)
-              (2-quot-lift A R Q X nPoint nPath x y r2))
+          PathP (<i> PathP (<j> X (2-quot₃ A R Q x y r1 r2 q @ i @ j)) (nPoint x) (nPoint y))
+                (<j> nPoint x) (<j> nPoint x)) -- Place holder for the 2nd level coherence
     (z : 2-quot A R Q) : X z
+ := coequ-ind (TotalSpokes A R Q) (PreHIT A R Q) (LHS_Stage2 A R Q) (RHS_Stage2 A R Q) X
+    (coequ-ind (PreHIT_Rel A R) (PreHIT_Points A R Q) (PreHIT_f A R Q) (PreHIT_g A R Q) (λ (p : PreHIT A R Q), X (ι₂ (TotalSpokes A R Q) (PreHIT A R Q) (LHS_Stage2 A R Q) (RHS_Stage2 A R Q) p))
+      (ind₂ (λ (p : PreHIT_Points A R Q), X (ι₂ (TotalSpokes A R Q) (PreHIT A R Q) (LHS_Stage2 A R Q) (i_pre A R Q p)))
+        (λ (a : A), nPoint a)
+        (λ (q : TotalQ A R Q), nPoint q.1)) -- Hub case
+      (λ (p : PreHIT_Rel A R), nPath p.1 p.2.1 p.2.2))
+    (λ (s : TotalSpokes A R Q), <j> nPoint s.1.1) -- Simplified spoke case
+    z

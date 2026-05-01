@@ -65,7 +65,7 @@ Features
 * Poor man's records as Σ with named accessors to telescope variables
 * 1D syntax with top-level declarations
 * Groupoid Infinity CCHM Homotopy Library: https://anders.groupoid.space/library/
-* Pure basis best suited for academic papers on W-types and verifiable type checking
+* Pure basis best suited for academic papers on W-types and well ordered type checking
 
 Setup
 -------------
@@ -96,7 +96,7 @@ hcomp A (∂ r) (λ (j : I), [(r = 1) → u j 1=1, (r = 0) → ouc u₀]) (ouc u
 ```
 
 ```shell
-$ anders check lib/book.anders
+$ anders check library/book.anders
 ```
 
 MLTT

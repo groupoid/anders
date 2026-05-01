@@ -47,4 +47,3 @@ def ten : ℕ := succ nine
 def 5′ : ℕ := plus two three
 def 10′ : ℕ := mult 5′ two
 def 55′ : ℕ := plus (mult 5′ 10′) 5′
-

@@ -222,11 +222,13 @@ anders.groupoid.space/mathematics/
 │   ├── etale/
 │   └── formalDisc/
 ├── homotopy/
+│   ├── KG1/
 │   ├── KGn/
 │   ├── S1/
 │   ├── Sn/
 │   ├── coequalizer/
-│   ├── hubSpokes/
+│   ├── disc/
+│   ├── colimit/
 │   ├── pullback/
 │   ├── pushout/
 │   ├── quotient/

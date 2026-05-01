@@ -110,32 +110,25 @@ def cc (A : U) (a : A) (p : Path A a a)
 {- Advanced -}
 
 
-def sgb (A : U) (a b : A) (p : Path A a b) : Square A a b b b p (<_> b) p (<_> b) :=
-<j i> p @ i ∨ j
+def sgb (A : U) (a b : A) (p : Path A a b) : Square A a b b b p (<_> b) p (<_> b) := <j i> p @ i ∨ j
+def sg₀ (A : U) (a b : A) (p : Path A a b) : Square A a b a b p p (<_> a) (<_> b) := <_> p
+def sg₁ (A : U) (a b : A) (p : Path A a b) : Square A a a a b (<_> a) p (<_> a) p := <j i> p @ i ∧ j
 
-def sg₀ (A : U) (a b : A) (p : Path A a b) : Square A a b a b p p (<_> a) (<_> b) :=
-<_> p
-
-def sg₁ (A : U) (a b : A) (p : Path A a b) : Square A a a a b (<_> a) p (<_> a) p :=
-<j i> p @ i ∧ j
-
-def csg (A : U) (a b c : A) (p : Path A a b) (q : Path A b c) : Square A a b b c p q p q :=
-<j i> hcomp A (∂ i ∨ ∂ j)
+def csg (A : U) (a b c : A) (p : Path A a b) (q : Path A b c) : Square A a b b c p q p q
+ := <j i> hcomp A (∂ i ∨ ∂ j)
       (λ (k : I), [(i = 0) → sg₀ A a b p @ k @ j,
                    (i = 1) → sg₁ A b c q @ k @ j,
                    (j = 0) → sg₀ A a b p @ k @ i,
-                   (j = 1) → sg₁ A b c q @ k @ i])
-      (sgb A a b p @ i @ j)
+                   (j = 1) → sg₁ A b c q @ k @ i]) (sgb A a b p @ i @ j)
 
 def tb (A : U) (a : A) (p : Path A a a) :
   Tesseract A a a a a a a a a a a a a a a a a p p p p p p p p
             (cs A a p) (cs A a p) p p p p (cs A a p) (cs A a p) (cs A a p) (cs A a p) (cc A a p) p p p p p (<_> a) p (<_> a)
             (cs A a p) (sb A a p) p p p (<_> a) (cs A a p) (sb A a p) (cs A a p) (sb A a p) (cb A a p) p p p p p p p (<_> a)
             (cs A a p) (cs A a p) (cs A a p) (cs A a p) (cs A a p) (sb A a p) (cs A a p) (sb A a p) (cs A a p)
-            (cs A a p) (cs A a p) (sb A a p) (cc A a p) (cb A a p) (cc A a p) (cb A a p) (cc A a p) (cb A a p) :=
-<l k j i> cc A a p @ (i ∨ j ∨ k ∨ l)
-                   @ ((i ∨ j ∨ k) ∧ (i ∨ j ∨ l) ∧ (i ∨ k ∨ l) ∧ (j ∨ k ∨ l))
-                   @ ((i ∨ j) ∧ (i ∨ k) ∧ (i ∨ l) ∧ (j ∨ k) ∧ (j ∨ l) ∧ (k ∨ l))
+            (cs A a p) (cs A a p) (sb A a p) (cc A a p) (cb A a p) (cc A a p) (cb A a p) (cc A a p) (cb A a p)
+ := <l k j i> cc A a p @ (i ∨ j ∨ k ∨ l) @ ((i ∨ j ∨ k) ∧ (i ∨ j ∨ l) ∧ (i ∨ k ∨ l) ∧ (j ∨ k ∨ l))
+    @ ((i ∨ j) ∧ (i ∨ k) ∧ (i ∨ l) ∧ (j ∨ k) ∧ (j ∨ l) ∧ (k ∨ l))
 
 def t₀ (A : U) (a : A) (p : Path A a a) :
   Tesseract A a a a a a a a a a a a a a a a a
@@ -146,8 +139,7 @@ def t₀ (A : U) (a : A) (p : Path A a a) :
             (<_> a) (<_> a) (<_> a) (<_> a) (<_> a) (<_> a) (<_> a) (<_> a)
             (s₀ A a p) (s₀ A a p) (s₀ A a p) (s₀ A a p) (s₀ A a p) (s₀ A a p)
             (s₀ A a p) (s₀ A a p) (s₀ A a p) (s₀ A a p) (s₀ A a p) (s₀ A a p)
-            (c₀ A a p) (c₀ A a p) (c₀ A a p) (c₀ A a p) (c₀ A a p) (c₀ A a p) :=
-<_> cc A a p
+            (c₀ A a p) (c₀ A a p) (c₀ A a p) (c₀ A a p) (c₀ A a p) (c₀ A a p) := <_> cc A a p
 
 def t₁ (A : U) (a : A) (p : Path A a a) :
   Tesseract A a a a a a a a a a a a a a a a a
@@ -159,9 +151,8 @@ def t₁ (A : U) (a : A) (p : Path A a a) :
             (s₀ A a p) (s₀ A a p) (s₀ A a p) (s₀ A a p)
             (s₀ A a p) (s₁ A a p) (s₀ A a p) (s₁ A a p)
             (s₀ A a p) (s₀ A a p) (s₀ A a p) (s₁ A a p)
-            (c₀ A a p) (c₁ A a p) (c₀ A a p) (c₁ A a p) (c₀ A a p) (c₁ A a p) :=
-<l k j i> cc A a p @ (i ∧ j ∧ k ∧ l) @ (i ∨ j ∨ k)
-                   @ ((i ∨ j) ∧ (i ∨ k) ∧ (j ∨ k))
+            (c₀ A a p) (c₁ A a p) (c₀ A a p) (c₁ A a p) (c₀ A a p) (c₁ A a p)
+ := <l k j i> cc A a p @ (i ∧ j ∧ k ∧ l) @ (i ∨ j ∨ k) @ ((i ∨ j) ∧ (i ∨ k) ∧ (j ∨ k))
 
 def ct (A : U) (a : A) (p : Path A a a) :
   Tesseract A a a a a a a a a a a a a a a a a
@@ -172,8 +163,8 @@ def ct (A : U) (a : A) (p : Path A a a) :
             p p p p p p p p
             (cs A a p) (cs A a p) (cs A a p) (cs A a p) (cs A a p) (cs A a p)
             (cs A a p) (cs A a p) (cs A a p) (cs A a p) (cs A a p) (cs A a p)
-            (cc A a p) (cc A a p) (cc A a p) (cc A a p) (cc A a p) (cc A a p) :=
-<l k j i> hcomp A (∂ i ∨ ∂ j ∨ ∂ k ∨ ∂ l)
+            (cc A a p) (cc A a p) (cc A a p) (cc A a p) (cc A a p) (cc A a p)
+ := <l k j i> hcomp A (∂ i ∨ ∂ j ∨ ∂ k ∨ ∂ l)
           (λ (m : I), [(i = 0) → t₀ A a p @ m @ j @ k @ l,
                        (i = 1) → t₁ A a p @ m @ j @ k @ l,
                        (j = 0) → t₀ A a p @ m @ i @ k @ l,
@@ -181,47 +172,41 @@ def ct (A : U) (a : A) (p : Path A a a) :
                        (k = 0) → t₀ A a p @ m @ i @ j @ l,
                        (k = 1) → t₁ A a p @ m @ i @ j @ l,
                        (l = 0) → t₀ A a p @ m @ i @ j @ k,
-                       (l = 1) → t₁ A a p @ m @ i @ j @ k])
-          (tb A a p @ i @ j @ k @ l)
+                       (l = 1) → t₁ A a p @ m @ i @ j @ k]) (tb A a p @ i @ j @ k @ l)
 
-def cgb (A : U) (a b c : A) (p : Path A a b) (q : Path A b c) : 
-  Cube A a b b c b c c c p q p q
-       q (<_> c) q (<_> c) (csg A a b c p q) (sgb A b c q)
-       p q q (<_> c) (csg A a b c p q) (sgb A b c q) (csg A a b c p q) (sgb A b c q) :=
-<k j i> csg A a b c p q @ (i ∨ j ∨ k) @ ((i ∨ j) ∧ (i ∨ k) ∧ (j ∨ k))
+def cgb (A : U) (a b c : A) (p : Path A a b) (q : Path A b c)
+  : Cube A a b b c b c c c p q p q q (<_> c) q (<_> c) (csg A a b c p q)
+         (sgb A b c q) p q q (<_> c) (csg A a b c p q) (sgb A b c q) (csg A a b c p q) (sgb A b c q)
+:= <k j i> csg A a b c p q @ (i ∨ j ∨ k) @ ((i ∨ j) ∧ (i ∨ k) ∧ (j ∨ k))
 
-def cg₀ (A : U) (a b c : A) (p : Path A a b) (q : Path A b c) :
-  Cube A a b b c a b b c p q p q p q p q
-      (csg A a b c p q) (csg A a b c p q)
-      (<_> a) (<_> b) (<_> b) (<_> c)
-      (sg₀ A a b p) (sg₀ A b c q) (sg₀ A a b p) (sg₀ A b c q) :=
-<_> csg A a b c p q
+def cg₀ (A : U) (a b c : A) (p : Path A a b) (q : Path A b c)
+  : Cube A a b b c a b b c p q p q p q p q (csg A a b c p q) (csg A a b c p q)
+         (<_> a) (<_> b) (<_> b) (<_> c) (sg₀ A a b p) (sg₀ A b c q) (sg₀ A a b p) (sg₀ A b c q)
+ := <_> csg A a b c p q
 
-def cg₁ (A : U) (a b c : A) (p : Path A a b) (q : Path A b c) :
-  Cube A a b b b a b b c p (<_> b) p (<_> b) p q p q
-      (sgb A a b p) (csg A a b c p q) (<_> a) (<_> b) (<_> b) q
-      (sg₀ A a b p) (sg₁ A b c q) (sg₀ A a b p) (sg₁ A b c q) :=
-<k j i> csg A a b c p q @ (i ∧ j ∧ k) @ (i ∨ j)
+def cg₁ (A : U) (a b c : A) (p : Path A a b) (q : Path A b c)
+  : Cube A a b b b a b b c p (<_> b) p (<_> b) p q p q (sgb A a b p) (csg A a b c p q) (<_> a) (<_> b) (<_> b) q
+         (sg₀ A a b p) (sg₁ A b c q) (sg₀ A a b p) (sg₁ A b c q)
+ := <k j i> csg A a b c p q @ (i ∧ j ∧ k) @ (i ∨ j)
 
-def ccg (A : U) (a b c d : A) (p : Path A a b) (q : Path A b c) (r : Path A c d) :
-  Cube A a b b c b c c d p q p q q r q r (csg A a b c p q) (csg A b c d q r)
-       p q q r (csg A a b c p q) (csg A b c d q r) (csg A a b c p q) (csg A b c d q r) :=
-<k j i> hcomp A (∂ i ∨ ∂ j ∨ ∂ k)
+def ccg (A : U) (a b c d : A) (p : Path A a b) (q : Path A b c) (r : Path A c d)
+  : Cube A a b b c b c c d p q p q q r q r (csg A a b c p q) (csg A b c d q r)
+         p q q r (csg A a b c p q) (csg A b c d q r) (csg A a b c p q) (csg A b c d q r)
+ := <k j i> hcomp A (∂ i ∨ ∂ j ∨ ∂ k)
         (λ (l : I), [(i = 0) → cg₀ A a b c p q @ l @ j @ k,
                      (i = 1) → cg₁ A b c d q r @ l @ j @ k,
                      (j = 0) → cg₀ A a b c p q @ l @ i @ k,
                      (j = 1) → cg₁ A b c d q r @ l @ i @ k,
                      (k = 0) → cg₀ A a b c p q @ l @ i @ j,
-                     (k = 1) → cg₁ A b c d q r @ l @ i @ j])
-        (cgb A a b c p q @ i @ j @ k)
+                     (k = 1) → cg₁ A b c d q r @ l @ i @ j]) (cgb A a b c p q @ i @ j @ k)
 
-def cc₂ (A : U) (a : A) (p : Path A a a) :
-  Cube A a a a a a a a a p p p p p p p p
-      (cs A a p) (cs A a p) p p p p (cs A a p) (cs A a p) (cs A a p) (cs A a p) :=
-ccg A a a a a p p p
+def cc₂ (A : U) (a : A) (p : Path A a a)
+  : Cube A a a a a a a a a p p p p p p p p
+         (cs A a p) (cs A a p) p p p p (cs A a p) (cs A a p) (cs A a p) (cs A a p)
+ := ccg A a a a a p p p
 
-def tgb (A : U) (a b c d : A) (p : Path A a b) (q : Path A b c) (r : Path A c d) :
-  Tesseract A a b b c b c c d b c c d c d d d
+def tgb (A : U) (a b c d : A) (p : Path A a b) (q : Path A b c) (r : Path A c d)
+  : Tesseract A a b b c b c c d b c c d c d d d
             p q p q q r q r (csg A a b c p q) (csg A b c d q r) p q q r
             (csg A a b c p q) (csg A b c d q r) (csg A a b c p q) (csg A b c d q r) (ccg A a b c d p q r)
             q r q r r (<_> d) r (<_> d) (csg A b c d q r) (sgb A c d r) q r r (<_> d)
@@ -232,13 +217,13 @@ def tgb (A : U) (a b c d : A) (p : Path A a b) (q : Path A b c) (r : Path A c d)
             (csg A a b c p q) (csg A b c d q r) (csg A b c d q r) (sgb A c d r)
             (ccg A a b c d p q r) (cgb A b c d q r)
             (ccg A a b c d p q r) (cgb A b c d q r)
-            (ccg A a b c d p q r) (cgb A b c d q r) :=
-<l k j i> ccg A a b c d p q r @ (i ∨ j ∨ k ∨ l)
-                              @ ((i ∨ j ∨ k) ∧ (i ∨ j ∨ l) ∧ (i ∨ k ∨ l) ∧ (j ∨ k ∨ l))
-                              @ ((i ∨ j) ∧ (i ∨ k) ∧ (i ∨ l) ∧ (j ∨ k) ∧ (j ∨ l) ∧ (k ∨ l))
+            (ccg A a b c d p q r) (cgb A b c d q r)
+ := <l k j i> ccg A a b c d p q r @ (i ∨ j ∨ k ∨ l)
+    @ ((i ∨ j ∨ k) ∧ (i ∨ j ∨ l) ∧ (i ∨ k ∨ l) ∧ (j ∨ k ∨ l))
+    @ ((i ∨ j) ∧ (i ∨ k) ∧ (i ∨ l) ∧ (j ∨ k) ∧ (j ∨ l) ∧ (k ∨ l))
 
-def tg₀ (A : U) (a b c d : A) (p : Path A a b) (q : Path A b c) (r : Path A c d) :
-  Tesseract A a b b c b c c d a b b c b c c d
+def tg₀ (A : U) (a b c d : A) (p : Path A a b) (q : Path A b c) (r : Path A c d)
+  : Tesseract A a b b c b c c d a b b c b c c d
             p q p q q r q r (csg A a b c p q) (csg A b c d q r) p q q r
             (csg A a b c p q) (csg A b c d q r) (csg A a b c p q) (csg A b c d q r) (ccg A a b c d p q r)
             p q p q q r q r (csg A a b c p q) (csg A b c d q r) p q q r
@@ -249,18 +234,18 @@ def tg₀ (A : U) (a b c d : A) (p : Path A a b) (q : Path A b c) (r : Path A c 
             (sg₀ A a b p) (sg₀ A b c q) (sg₀ A b c q) (sg₀ A c d r)
             (cg₀ A a b c p q) (cg₀ A b c d q r)
             (cg₀ A a b c p q) (cg₀ A b c d q r)
-            (cg₀ A a b c p q) (cg₀ A b c d q r) :=
-<_> ccg A a b c d p q r
+            (cg₀ A a b c p q) (cg₀ A b c d q r)
+ := <_> ccg A a b c d p q r
 
-def tg₁ (A : U) (a b c d : A) (p : Path A a b) (q : Path A b c) (r : Path A c d) :
-  Tesseract A a b b c b c c c a b b c b c c d
+def tg₁ (A : U) (a b c d : A) (p : Path A a b) (q : Path A b c) (r : Path A c d)
+  : Tesseract A a b b c b c c c a b b c b c c d
             p q p q q (<_> c) q (<_> c) (csg A a b c p q) (sgb A b c q)
             p q q (<_> c)
             (csg A a b c p q) (sgb A b c q) (csg A a b c p q) (sgb A b c q)
             (cgb A a b c p q)
             p q p q q r q r (csg A a b c p q) (csg A b c d q r)
             p q q r
-            (csg A a b c p q) (csg A b c d q r) (csg A a b c p q) (csg A b c d q r) 
+            (csg A a b c p q) (csg A b c d q r) (csg A a b c p q) (csg A b c d q r)
             (ccg A a b c d p q r)
             (<_> a) (<_> b) (<_> b) (<_> c) (<_> b) (<_> c) (<_> c) r
             (sg₀ A a b p) (sg₀ A b c q) (sg₀ A a b p) (sg₀ A b c q)
@@ -268,12 +253,11 @@ def tg₁ (A : U) (a b c d : A) (p : Path A a b) (q : Path A b c) (r : Path A c 
             (sg₀ A a b p) (sg₀ A b c q) (sg₀ A b c q) (sg₁ A c d r)
             (cg₀ A a b c p q) (cg₁ A b c d q r)
             (cg₀ A a b c p q) (cg₁ A b c d q r)
-            (cg₀ A a b c p q) (cg₁ A b c d q r) :=
-<l k j i> ccg A a b c d p q r @ (i ∧ j ∧ k ∧ l) @ (i ∨ j ∨ k)
-                              @ ((i ∨ j) ∧ (i ∨ k) ∧ (j ∨ k))
+            (cg₀ A a b c p q) (cg₁ A b c d q r)
+ := <l k j i> ccg A a b c d p q r @ (i ∧ j ∧ k ∧ l) @ (i ∨ j ∨ k) @ ((i ∨ j) ∧ (i ∨ k) ∧ (j ∨ k))
 
-def ctg (A : U) (a b c d e : A) (p : Path A a b) (q : Path A b c) (r : Path A c d) (s : Path A d e) :
-  Tesseract A a b b c b c c d b c c d c d d e p q p q q r q r (csg A a b c p q) (csg A b c d q r) p q q r
+def ctg (A : U) (a b c d e : A) (p : Path A a b) (q : Path A b c) (r : Path A c d) (s : Path A d e)
+  : Tesseract A a b b c b c c d b c c d c d d e p q p q q r q r (csg A a b c p q) (csg A b c d q r) p q q r
             (csg A a b c p q) (csg A b c d q r) (csg A a b c p q) (csg A b c d q r) (ccg A a b c d p q r)
             q r q r r s r s (csg A b c d q r) (csg A c d e r s) q r r s
             (csg A b c d q r) (csg A c d e r s) (csg A b c d q r) (csg A c d e r s) (ccg A b c d e q r s)
@@ -283,8 +267,8 @@ def ctg (A : U) (a b c d e : A) (p : Path A a b) (q : Path A b c) (r : Path A c 
             (csg A a b c p q) (csg A b c d q r) (csg A b c d q r) (csg A c d e r s)
             (ccg A a b c d p q r) (ccg A b c d e q r s)
             (ccg A a b c d p q r) (ccg A b c d e q r s)
-            (ccg A a b c d p q r) (ccg A b c d e q r s) :=
-<l k j i> hcomp A (∂ i ∨ ∂ j ∨ ∂ k ∨ ∂ l)
+            (ccg A a b c d p q r) (ccg A b c d e q r s)
+ := <l k j i> hcomp A (∂ i ∨ ∂ j ∨ ∂ k ∨ ∂ l)
           (λ (m : I), [(i = 0) → tg₀ A a b c d p q r @ m @ j @ k @ l,
                        (i = 1) → tg₁ A b c d e q r s @ m @ j @ k @ l,
                        (j = 0) → tg₀ A a b c d p q r @ m @ i @ k @ l,
@@ -292,11 +276,10 @@ def ctg (A : U) (a b c d e : A) (p : Path A a b) (q : Path A b c) (r : Path A c 
                        (k = 0) → tg₀ A a b c d p q r @ m @ i @ j @ l,
                        (k = 1) → tg₁ A b c d e q r s @ m @ i @ j @ l,
                        (l = 0) → tg₀ A a b c d p q r @ m @ i @ j @ k,
-                       (l = 1) → tg₁ A b c d e q r s @ m @ i @ j @ k])
-          (tgb A a b c d p q r @ i @ j @ k @ l)
+                       (l = 1) → tg₁ A b c d e q r s @ m @ i @ j @ k]) (tgb A a b c d p q r @ i @ j @ k @ l)
 
-def ct₂ (A : U) (a : A) (p : Path A a a) :
-  Tesseract A a a a a a a a a a a a a a a a a
+def ct₂ (A : U) (a : A) (p : Path A a a)
+  : Tesseract A a a a a a a a a a a a a a a a a
             p p p p p p p p (cs A a p) (cs A a p)
             p p p p (cs A a p) (cs A a p) (cs A a p) (cs A a p) (cc A a p)
             p p p p p p p p (cs A a p) (cs A a p)
@@ -304,6 +287,6 @@ def ct₂ (A : U) (a : A) (p : Path A a a) :
             p p p p p p p p
             (cs A a p) (cs A a p) (cs A a p) (cs A a p) (cs A a p) (cs A a p)
             (cs A a p) (cs A a p) (cs A a p) (cs A a p) (cs A a p) (cs A a p)
-            (cc A a p) (cc A a p) (cc A a p) (cc A a p) (cc A a p) (cc A a p) :=
-ctg A a a a a a p p p p
+            (cc A a p) (cc A a p) (cc A a p) (cc A a p) (cc A a p) (cc A a p)
+ := ctg A a a a a a p p p p
 

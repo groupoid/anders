@@ -36,4 +36,3 @@ def mu : Π (x : S¹), equiv S¹ S¹
 
 def H1 : Π (x : 𝚺 S¹), U := 𝚺-ind S¹ (λ (_ : 𝚺 S¹), U) S¹ S¹ (λ (x : S¹), ua S¹ S¹ (mu x))
 def TH1 : U := Σ (c : 𝚺 S¹), H1 c
-

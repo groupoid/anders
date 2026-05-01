@@ -61,7 +61,7 @@ type exp =
   | EUnit | EStar | EIndUnit of exp                                                         (* 𝟏 *)
   | EBool | EFalse | ETrue | EIndBool of exp                                                (* 𝟐 *)
   | EW of exp * (ident * exp) | ESup of exp * exp | EIndW of exp * exp * exp                (* W *)
-  | ENat | EZero | ESucc of exp | EIndNat of exp * exp * exp                          (* Nat *)
+  | ENat | EZero | ESucc of exp | EIndNat of exp * exp * exp                              (* Nat *)
   | ECoequ of exp * exp * exp * exp | EIota2 of exp * exp * exp * exp * exp       (* Coequalizer *)
   | EResp of exp * exp * exp * exp * exp | EIndCoequ of exp * exp * exp * exp * exp * exp * exp
   | EDisc of exp * exp | EBase of exp * exp * exp | EHub of exp * exp * exp              (* Disc *)

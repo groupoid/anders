@@ -24,6 +24,7 @@ type exp =
 | EUnit | EStar | EIndUnit of exp                                                   (* 𝟏 *)
 | EBool | EFalse | ETrue | EIndBool of exp                                          (* 𝟐 *)
 | EW of exp * (name * exp) | ESup of exp * exp | EIndW of exp * exp * exp           (* W *)
+| ENat | EZero | ESucc of exp | EIndNat of exp * exp * exp                        (* Nat *)
 | EIm of exp | EInf of exp | EIndIm of exp * exp | EJoin of exp        (* infinitesimals *)
 | ECoeq of exp | EIota of exp | EResp of exp | EIndCoeq of exp            (* Coequalizer *)
 | EDisc of exp | EBase of exp | EHub of exp | ESpoke of exp | EIndDisc of exp    (* Disc *)
@@ -49,6 +50,7 @@ Features
 * Strict Equality on pretypes
 * Coequalizer
 * Hub Spokes Disc
+* Nat (in Kernel) for computational K(G,n)
 * Infinitesimal Shape Modality (de Rham Stack)
 * Parser in 80 LOC
 * Lexer in 80 LOC

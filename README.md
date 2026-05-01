@@ -141,7 +141,7 @@ Infinitesimal Modality was added for direct support of Synthetic Differential Ge
 Benchmarks
 ----------
 
-Intel i5-12400. Compilation under second, full library type check under 1/3 of a second.
+Intel i5-12400 or M4: Compilation under second, full library type checks in one second.
 
 ```
 % dune build

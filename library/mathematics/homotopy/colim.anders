@@ -76,6 +76,6 @@ def graph-inc (Vtx Edge : U) (s t : Edge → Vtx) (D : Vtx → U) (act : Π (e :
 
 def graph-glue (Vtx Edge : U) (s t : Edge → Vtx) (D : Vtx → U) (act : Π (e : Edge), D (s e) → D (t e)) (e : Edge) (d : D (s e))
   : Path (GraphColim Vtx Edge s t D act) (graph-inc Vtx Edge s t D act (s e) d) (graph-inc Vtx Edge s t D act (t e) (act e d))
-  := resp (Σ (e : Edge), D (s e)) (Σ (v : Vtx), D v)
-          (λ (x : Σ (e : Edge), D (s e)), (s x.1, x.2))
-          (λ (x : Σ (e : Edge), D (s e)), (t x.1, act x.1 x.2)) (e, d)
+ := resp (Σ (e : Edge), D (s e)) (Σ (v : Vtx), D v)
+         (λ (x : Σ (e : Edge), D (s e)), (s x.1, x.2))
+         (λ (x : Σ (e : Edge), D (s e)), (t x.1, act x.1 x.2)) (e, d)

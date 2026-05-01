@@ -35,7 +35,7 @@ Anders is a HoTT proof assistant based on:
   classical MLTT-80 with N, 0, 1, 2, W types;
   CCHM in CHM flavour as cubical type system with hcomp/trans Kan operations;
   HTS sctrict equality on pretypes;
-  de Rham stack modality;
+  de Rham stack and Flat modalities;
   Disc and Coequalizer primitives.
 We tend not to touch general recursive higher inductive schemes yet,
 instead we will try to express as much HIT as possible through W, Coequlizer and Hub Spokes Disc
@@ -188,6 +188,9 @@ anders.groupoid.space/foundations/
 │   ├── sigma/
 │   └── vec/
 ├── modal/
+│   ├── flat/
+│   ├── sharp/
+│   ├── modality/
 │   └── infinitesimal/
 └── univalent/
     ├── equiv/

@@ -1,0 +1,47 @@
+{- Hedberg: https://anders.groupoid.space/foundations/univalent/hedberg/
+
+   - Stability and Discretness leads to Set
+
+   Copyright (c) Groupoid Infinity, 2016-2026. -}
+
+module hedberg where
+import library/foundations/mltt/either
+import library/foundations/univalent/path
+
+def stable (A : U) : U := ((A → 𝟎) → 𝟎) → A
+def dec (A : U) : U := + A (A → 𝟎)
+def discrete (A : U) : U := Π (a b : A), dec (Path A a b)
+
+def propN0 (x y : 𝟎) : Path 𝟎 x y := ind₀ (Path 𝟎 x y) x
+def propNeg (A : U) (f g : A → 𝟎) : Path (A → 𝟎) f g := <i> λ (x : A), propN0 (f x) (g x) @ i
+
+def exConst (A : U) : U := Σ (f : A → A), Π (x y : A), Path A (f x) (f y)
+
+def stableConst (A : U) (h : stable A) : exConst A
+ := (λ (x : A), h (λ (f : A → 𝟎), f x), λ (x y : A), <i> h (propNeg (A → 𝟎) (λ (f : A → 𝟎), f x) (λ (f : A → 𝟎), f y) @ i))
+
+def hedbergLemma (A : U) (a b : A) (f : Π (x : A), Path A a x → Path A a x) (p : Path A a b)
+  : PathP (<i> PathP (<j> A) a (p @ i)) (f a (<_> a)) (f b p)
+ := <i> <j> hcomp A (∂ i ∨ ∂ j)
+    (λ (k : I), [ (i = 0) -> f a (<_> a) @ (j ∧ k),
+                  (i = 1) -> f b p @ (j ∧ k),
+                  (j = 0) -> a,
+                  (j = 1) -> f (p @ i) (<k> p @ (i ∧ k)) @ k ]) a
+
+def hedbergStable (A : U) (a b : A) (h : Π (x : A), stable (Path A a x)) (p q : Path A a b) : Path (Path A a b) p q
+ := <j i> hcomp A (∂ i ∨ ∂ j)
+    (λ (k : I), [ (j = 0) -> (hedbergLemma A a b (λ (x : A) (p : Path A a x), (stableConst (Path A a x) (h x)).1 p) p) @ i @ k,
+                  (j = 1) -> (hedbergLemma A a b (λ (x : A) (p : Path A a x), (stableConst (Path A a x) (h x)).1 p) q @ i @ k),
+                  (i = 0) -> (stableConst (Path A a a) (h a)).1 (<_> a) @ k,
+                  (i = 1) -> (stableConst (Path A a b) (h b)).2 p q @ j @ k ]) a
+
+def hedbergS (A : U) (h : Π (a x : A), stable (Path A a x)) : isSet A
+ := λ (a b : A), hedbergStable A a b (h a)
+
+def decStable (A : U) : dec A → stable A
+ := +-ind A (A → 𝟎) (λ (_ : dec A), stable A)
+    (λ (a : A) (_ : (A → 𝟎) → 𝟎), a)
+    (λ (na : A → 𝟎) (nna : (A → 𝟎) → 𝟎), ind₀ A (nna na))
+
+def hedberg (A : U) (h : discrete A) : isSet A
+ := λ (a b : A), hedbergStable A a b (λ (x : A), decStable (Path A a x) (h a x))

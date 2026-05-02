@@ -1,0 +1,165 @@
+{- Homotopy Groups of Spheres: https://anders.groupoid.space/mathematics/homotopy/groups/
+
+   - Homotopy Groups of Spheres;
+   - Loop Space of S1 equals to Z.
+
+   HoTT 8.1 Pi_1(S^1) = Z
+
+   Copyright (c) Groupoid Infinity, 2016-2026. -}
+
+module homotopy where
+import library/foundations/mltt/nat
+import library/foundations/mltt/either
+import library/foundations/mltt/bool
+import library/foundations/univalent/path
+import library/foundations/univalent/iso
+import library/mathematics/homotopy/S1
+import library/mathematics/homotopy/Sn
+import library/mathematics/homotopy/truncation
+import library/mathematics/homotopy/loop
+import library/mathematics/homotopy/suspension
+
+-- [Z Helpers]
+def Z : U := + ℕ ℕ
+def zeroZ : Z := inr ℕ ℕ zero
+def auxsucZ : ℕ → Z := ℕ-rec Z (inr ℕ ℕ zero) (λ (n : ℕ) (_ : Z), inl ℕ ℕ n)
+def auxpredZ : ℕ → Z := ℕ-rec Z (inl ℕ ℕ zero) (λ (n : ℕ) (_ : Z), inr ℕ ℕ n)
+def sucZ (x : Z) : Z := +-ind ℕ ℕ (λ (_ : Z), Z) auxsucZ (λ (v : ℕ), inr ℕ ℕ (succ v)) x
+def predZ (x : Z) : Z := +-ind ℕ ℕ (λ (_ : Z), Z) (λ (u : ℕ), inl ℕ ℕ (succ u)) auxpredZ x
+
+def sucpredZ (x : Z) : Path Z (sucZ (predZ x)) x
+ := +-ind ℕ ℕ (λ (z : Z), Path Z (sucZ (predZ z)) z)
+    (λ (u : ℕ), <_> inl ℕ ℕ u)
+    (ℕ-ind (λ (v : ℕ), Path Z (sucZ (predZ (inr ℕ ℕ v))) (inr ℕ ℕ v))
+           (<_> inr ℕ ℕ zero)
+           (λ (n : ℕ) (prev : Path Z (sucZ (predZ (inr ℕ ℕ n))) (inr ℕ ℕ n)), <_> inr ℕ ℕ (succ n))) x
+
+def predsucZ (x : Z) : Path Z (predZ (sucZ x)) x
+ := +-ind ℕ ℕ (λ (z : Z), Path Z (predZ (sucZ z)) z)
+    (ℕ-ind (λ (u : ℕ), Path Z (predZ (sucZ (inl ℕ ℕ u))) (inl ℕ ℕ u))
+           (<_> inl ℕ ℕ zero)
+           (λ (n : ℕ) (prev : Path Z (predZ (sucZ (inl ℕ ℕ n))) (inl ℕ ℕ n)), <_> inl ℕ ℕ (succ n)))
+    (λ (v : ℕ), <_> inr ℕ ℕ v) x
+
+-- [Equivalence for Z]
+
+axiom sucZIsEquivProp (y : Z) (z : fiber Z Z sucZ y) : Path (fiber Z Z sucZ y) (predZ y, <i> sucpredZ y @ -i) z
+
+def sucZIsEquiv : isEquiv Z Z sucZ
+ := λ (y : Z), ((predZ y, <i> sucpredZ y @ -i), sucZIsEquivProp y)
+
+def sucPathZ : Path U Z Z
+ := <i> Glue Z (∂ i) [ (i = 0) -> (Z, sucZ, sucZIsEquiv),
+                       (i = 1) -> (Z, λ (x : Z), x, idIsEquiv Z) ]
+
+-- Homogeneous Structure on A = (<i>A)
+def homogeneous (A : U) : U
+ := Σ (e : A) (translationsFamily : A → Path U A A),
+    Π (x : A), Path A (transp (translationsFamily x) 0 e) x
+
+-- Definition. Homotopy Groups of Spheres : \pi_{n}S^{m} = ||\Omega^{n}(S^{m})||_0
+def piS (n m : ℕ) : U := ℕ-ind (λ (_ : ℕ), U) (‖_‖₀ (Ωⁿ 𝟐 0₂ n)) (λ (x : ℕ) (_ : U), ‖_‖₀ (Ωⁿ (Sn (succ x)) (north x) n)) m
+
+-- Theorem. Loop Space of S1 equals to Z : \Omega^{1}(S^{1}) = Z
+
+def helix (z : S¹) : U
+ := S1-ind (λ (_ : S¹), U) Z sucPathZ z
+
+def encode' (x : S¹) (p : Path S¹ baseS1 x) : helix x
+ := transp (<i> helix (p @ i)) 0 zeroZ
+
+def oneTurn (l : Path S¹ baseS1 baseS1) : Path S¹ baseS1 baseS1
+ := pcomp S¹ baseS1 baseS1 baseS1 l loop
+
+def invLoop : Path S¹ baseS1 baseS1 := <i> loop @ -i
+
+def backTurn (l : Path S¹ baseS1 baseS1) : Path S¹ baseS1 baseS1
+ := pcomp S¹ baseS1 baseS1 baseS1 l invLoop
+
+def loopPos : ℕ → Path S¹ baseS1 baseS1
+ := ℕ-ind (λ (_ : ℕ), Path S¹ baseS1 baseS1) (<_> baseS1) (λ (n : ℕ) (prev : Path S¹ baseS1 baseS1), oneTurn prev)
+
+def loopNeg : ℕ → Path S¹ baseS1 baseS1
+ := ℕ-ind (λ (_ : ℕ), Path S¹ baseS1 baseS1) invLoop (λ (n : ℕ) (prev : Path S¹ baseS1 baseS1), backTurn prev)
+
+def loopIt (z : Z) : Path S¹ baseS1 baseS1
+ := +-ind ℕ ℕ (λ (_ : Z), Path S¹ baseS1 baseS1) loopNeg loopPos z
+
+def ze (n : ℕ) (b : 𝟐) : Z := rec₂ Z (inl ℕ ℕ n) (inr ℕ ℕ n) b
+
+def hlx (b : 𝟐) : Path U Z Z
+ := rec₂ (Path U Z Z) (<i> helix (loop @ -i)) (<i> helix (loop @ i)) b
+
+axiom lemTurn (n : ℕ) (b : 𝟐) : Path Z (transp (hlx b) 0 (ze n b)) (ze (succ n) b)
+{- := ind₂ (λ (x : 𝟐), Path Z (transp (hlx x) 0 (ze n x)) (ze (succ n) x))
+    (<_> inl ℕ ℕ (succ n))
+    (<_> inr ℕ ℕ (succ n)) b -}
+
+def lemFib1 (A : U) (F G : A → U) (a : A) (fa : F a → G a) (x : A) (p : Path A a x) (fx : F x → G x)
+  : Path U (Path (F a → G x) (λ (u : F a), transp (<i> G (p @ i)) 0 (fa u)) (λ (u : F a), fx (transp (<i> F (p @ i)) 0 u)))
+           (PathP (<i> F (p @ i) → G (p @ i)) fa fx)
+ := subst (singl A a) (λ (z : singl A a), Π (fz : F z.1 → G z.1),
+      Path U (Path (F a → G z.1) (λ (u : F a), transp (<i> G (z.2 @ i)) 0 (fa u)) (λ (u : F a), fz (transp (<i> F (z.2 @ i)) 0 u)))
+             (PathP (<i> F (z.2 @ i) → G (z.2 @ i)) fa fz))
+    (a, idp A a) (x, p) (contr A a x p)
+    (λ (ga : F a → G a), <j> Path (F a → G a) (λ (u : F a), transp (<_> G a) j (fa u)) (λ (u : F a), ga (transp (<_> F a) j u))) fx
+
+def corFib1 (A : U) (F G : A → U) (a : A) (fa ga : F a → G a) (p : Path A a a)
+    (h : Π (u : F a), Path (G a) (transp (<i> G (p @ i)) 0 (fa u)) (ga (transp (<i> F (p @ i)) 0 u)))
+  : PathP (<i> F (p @ i) → G (p @ i)) fa ga
+ := transp (lemFib1 A F G a fa a p ga) 0 (<i> λ (u : F a), h u @ i)
+
+axiom decodeLoop (n : Z) : PathP (<i> Path S¹ baseS1 (loop @ i)) (loopIt n) (loopIt (sucZ n))
+
+axiom decode' (x : S¹) (z : helix x) : Path S¹ baseS1 x
+{- := S1-ind (λ (u : S¹), helix u → Path S¹ baseS1 u) loopIt
+      (corFib1 S¹ helix (λ (u : S¹), Path S¹ baseS1 u) baseS1 loopIt loopIt loop
+      (λ (n : Z), <i> transp (<j> Path S¹ baseS1 (loop @ (i ∨ j))) i (decodeLoop n @ i))) x z -}
+
+def substPathP (A B : U) (p : Path U A B) (x : A) (y : B) (q : Path B (transp p 0 x) y) : PathP p x y
+ := transp (<i> PathP p x (q @ i)) 0 (fill (λ (j : I), p @ j) x)
+
+axiom encodeDecodeLoop : Path U (Π (z : Z), Path Z (encode' baseS1 (decode' baseS1 z)) z) (Π (z : Z), Path Z (encode' baseS1 (decode' baseS1 z)) z)
+{- := <i> Π (n : helix (loop @ i)), Path (helix (loop @ i)) (encode (loop @ i) (decode (loop @ i) n)) n -}
+
+{-
+def encodePos (n : ℕ) : Path Z (encode baseS1 (loopPos n)) (inr ℕ ℕ n)
+ := ℕ-ind (λ (k : ℕ), Path Z (encode baseS1 (loopPos k)) (inr ℕ ℕ k))
+    (<_> inr ℕ ℕ zero)
+    (λ (k : ℕ) (_ : Path Z (encode baseS1 (loopPos k)) (inr ℕ ℕ k)), lemTurn k 1₂) n
+
+def encodeNeg (n : ℕ) : Path Z (encode baseS1 (loopNeg n)) (inl ℕ ℕ n)
+ := ℕ-ind (λ (k : ℕ), Path Z (encode baseS1 (loopNeg k)) (inl ℕ ℕ k))
+    (<_> inl ℕ ℕ zero)
+    (λ (k : ℕ) (_ : Path Z (encode baseS1 (loopNeg k)) (inl ℕ ℕ k)), lemTurn k 0₂) n
+
+def retractBaseZ (n : Z) : Path Z (encode baseS1 (decode baseS1 n)) n
+ := +-ind ℕ ℕ (λ (z : Z), Path Z (encode baseS1 (decode baseS1 z)) z)
+    encodeNeg encodePos n
+
+def retractBaseLoop : Π (n : Z), Path Z (encode baseS1 (decode baseS1 n)) n
+ := transp encodeDecodeLoop 0 retractBaseZ
+-}
+
+axiom ZSet (a b : Z) (p q : Path Z a b) : Path (Path Z a b) p q
+axiom retractBaseZ (n : Z) : Path Z (encode' baseS1 (decode' baseS1 n)) n
+axiom retractBaseLoop : Π (n : Z), Path Z (encode' baseS1 (decode' baseS1 n)) n
+
+def retractTransport : Path (Π (n : Z), Path Z (encode' baseS1 (decode' baseS1 n)) n) retractBaseLoop retractBaseZ
+ := <i> λ (n : Z), ZSet (encode' baseS1 (decode' baseS1 n)) n (retractBaseLoop n) (retractBaseZ n) @ i
+
+axiom retractZ (x : S¹) (n : helix x) : Path (helix x) (encode' x (decode' x n)) n
+{- := S1-ind (λ (u : S¹), Π (v : helix u), Path (helix u) (encode u (decode u v)) v) retractBaseZ
+    (<i> λ (n : helix (loop @ i)), (substPathP (Π (z : Z), Path Z (encode baseS1 (decode baseS1 z)) z) (Π (z : Z), Path Z (encode baseS1 (decode baseS1 z)) z)
+    encodeDecodeLoop retractBaseZ retractBaseZ retractTransport @ i) n) x n -}
+
+axiom sectionZ (x : S¹) (p : Path S¹ baseS1 x) : Path (Path S¹ baseS1 x) (decode' x (encode' x p)) p
+{- := transp (<i> Path (Path S¹ baseS1 (p @ i)) (decode (p @ i) (encode (p @ i) (<j> p @ i ∧ j))) (<j> p @ i ∧ j)) 0 (<_> idp S¹ baseS1) -}
+
+def helixFamily (x : S¹) : Path U (helix x) (Path S¹ baseS1 x)
+ := iso→Path (helix x) (Path S¹ baseS1 x) (decode' x) (encode' x) (sectionZ x) (retractZ x)
+
+def loopS1eqZ : Path U Z (Path S¹ baseS1 baseS1) := helixFamily baseS1
+def circleLoop : U := Path S¹ baseS1 baseS1
+def omegaS1isZ : Path U circleLoop Z := <i> helixFamily baseS1 @ -i
+

@@ -51,3 +51,18 @@ def seven : ℕ := succ six
 def eight : ℕ := succ seven
 def nine  : ℕ := succ eight
 def ten   : ℕ := succ nine
+
+def ffineqtt (h: Path 𝟐 0₂ 1₂) : 𝟎
+ := transp (<i> ind₂ (λ(_: 𝟐), U) 𝟎 𝟏 (h @ -i)) 0 ★
+
+def isZero (k : ℕ) : 𝟐 := ind-nat (λ (_ : ℕ), 𝟐) 1₂ (λ (_ : ℕ) (_ : 𝟐), 0₂) k
+def isSucc (k : ℕ) : 𝟐 := ind-nat (λ (_ : ℕ), 𝟐) 0₂ (λ (_ : ℕ) (_ : 𝟐), 1₂) k
+
+def znots (n : ℕ) (p : Path ℕ zero (succ n)) : 𝟎
+ := ffineqtt (<i> isZero (p @ -i))
+
+def snotz (n : ℕ) (p : Path ℕ (succ n) zero) : 𝟎
+ := ffineqtt (<i> isSucc (p @ -i))
+
+def prednat (n m : ℕ) (p : Path ℕ (succ n) (succ m)) : Path ℕ n m
+ := <i> ind-nat (λ (x : ℕ), ℕ) n (λ (x : ℕ) (_ : ℕ), x) (p @ i)

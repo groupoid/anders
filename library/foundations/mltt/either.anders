@@ -80,3 +80,15 @@ def 5₇ : 𝟕 := inr 𝟑 𝟒 2₄
 def 6₇ : 𝟕 := inr 𝟑 𝟒 3₄
 def ind₇ (C : 𝟕 → U) (c₀ : C 0₇) (c₁ : C 1₇) (c₂ : C 2₇) (c₃ : C 3₇) (c₄ : C 4₇) (c₅ : C 5₇) (c₆ : C 6₇) : Π (x : 𝟕), C x
  := +-ind 𝟑 𝟒 C (ind₃ (λ (x : 𝟑), C (0₂, x)) c₀ c₁ c₂) (ind₄ (λ (x : 𝟒), C (1₂, x)) c₃ c₄ c₅ c₆)
+
+def inl-inj (A B : U) (a a1 : A) (p : Path (+ A B) (inl A B a) (inl A B a1)) : Path A a a1
+ := cong (+ A B) A (λ (x : + A B), +-ind A B (λ (_ : + A B), A) (λ (u : A), u) (λ (_ : B), a) x) (inl A B a) (inl A B a1) p
+
+def inr-inj (A B : U) (b b1 : B) (p : Path (+ A B) (inr A B b) (inr A B b1)) : Path B b b1
+ := cong (+ A B) B (λ (x : + A B), +-ind A B (λ (_ : + A B), B) (λ (_ : A), b) (λ (v : B), v) x) (inr A B b) (inr A B b1) p
+
+def inlNotinr (A B : U) (a : A) (b : B) (p : Path (+ A B) (inl A B a) (inr A B b)) : 𝟎
+ := transp (<i> ind₂ (λ (x : 𝟐), U) 𝟏 𝟎 (p @ i).1) 0 star
+
+def inrNotinl (A B : U) (a : A) (b : B) (p : Path (+ A B) (inr A B b) (inl A B a)) : 𝟎
+ := transp (<i> ind₂ (λ (x : 𝟐), U) 𝟎 𝟏 (p @ i).1) 0 star

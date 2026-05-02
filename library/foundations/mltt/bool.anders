@@ -33,14 +33,14 @@ def cor723 (A: U) (h: Π (x y: A), ((Path A x y -> 𝟎) -> 𝟎) -> Path A x y)
  := th722 A (λ (x y: A), (Path A x y -> 𝟎) -> 𝟎) (λ (x: A) (g: Path A x x -> 𝟎), g (<i0> x))
             (λ(x y: A) (a b: (Path A x y -> 𝟎) -> 𝟎), <j> λ (p: Path A x y -> 𝟎), ind₀ (Path 𝟎 (a p) (b p)) (a p) @ j) h
 
-def ffineqtt (h: Path 𝟐 0₂ 1₂) : 𝟎
+def ffineqtt' (h: Path 𝟐 0₂ 1₂) : 𝟎
  := transp (<i> ind₂ (λ(_: 𝟐), U) 𝟎 𝟏 (h @ -i)) 0 ★
 
 def boolset : isSet 𝟐
  := cor723 𝟐 (ind₂ (λ (x: 𝟐), Π (y: 𝟐), ((Path 𝟐 x y -> 𝟎) ->𝟎) -> Path 𝟐 x y)
                (ind₂ (λ (y: 𝟐), ((Path 𝟐 0₂ y -> 𝟎) -> 𝟎) -> Path 𝟐 0₂ y)
                  (λ (h00: ((Path 𝟐 0₂ 0₂ -> 𝟎) -> 𝟎)), <i1> 0₂)
-                   (λ (h01: ((Path 𝟐 0₂ 1₂ -> 𝟎) -> 𝟎)), ind₀ (Path 𝟐 0₂ 1₂) (h01 ffineqtt)))
+                   (λ (h01: ((Path 𝟐 0₂ 1₂ -> 𝟎) -> 𝟎)), ind₀ (Path 𝟐 0₂ 1₂) (h01 ffineqtt')))
                (ind₂ (λ (y: 𝟐), ((Path 𝟐 1₂ y -> 𝟎) ->𝟎) -> Path 𝟐 1₂ y)
-                 (λ (h10: ((Path 𝟐 1₂ 0₂ -> 𝟎) -> 𝟎)), ind₀ (Path 𝟐 1₂ 0₂) (h10 (λ (g: Path 𝟐 1₂ 0₂), ffineqtt (<l> g @ -l))))
+                 (λ (h10: ((Path 𝟐 1₂ 0₂ -> 𝟎) -> 𝟎)), ind₀ (Path 𝟐 1₂ 0₂) (h10 (λ (g: Path 𝟐 1₂ 0₂), ffineqtt' (<l> g @ -l))))
                    (λ (h11: ((Path 𝟐 1₂ 1₂ -> 𝟎) -> 𝟎)), <j> 1₂)))

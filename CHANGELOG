@@ -1,7 +1,7 @@
 Changelog
 =========
 
-7 MAY 2026 Version 5.5.0 Modalities and Differential Geometry:
+14 MAY 2026 Version 5.5.0 Modalities and Differential Geometry:
 
 * Flat Modality
 * Sharp Modality (derived through Flat)
@@ -12,7 +12,7 @@ Changelog
 * Homotopy Colimits
 * Homotopy Groups
 
-1 MAY 2026 Version 5.1.0 Tesseract and K(G,n)-η:
+2 MAY 2026 Version 5.1.0 Tesseract and K(G,n)-η:
 
 * Added strict canonical Nat to Kernel for spectral goodness at higher homotopies
 * Fix constcubes.anders module with improved DNF solver in formula.ml

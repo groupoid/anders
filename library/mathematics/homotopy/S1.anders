@@ -6,8 +6,8 @@
    Copyright (c) Groupoid Infinity, 2016-2026. -}
 
 module S1 where
-import library/mathematics/homotopy/coequalizer
 import library/foundations/mltt/bool
+import library/mathematics/homotopy/coequalizer
 
 -- [Shulman] 2015
 
@@ -15,21 +15,14 @@ def S¹ : U := coeq 𝟏 𝟏 (id 𝟏) (id 𝟏)
 def baseS1 : S¹ := iota 𝟏 𝟏 (id 𝟏) (id 𝟏) ★
 def loop : Path S¹ baseS1 baseS1 := resp′ 𝟏 𝟏 (id 𝟏) (id 𝟏) ★
 
-def S1-ind (X : S¹ → U) (nBase : X baseS1) (nLoop : PathP (<i> X (loop @ i)) nBase nBase) (z : S¹)
+def S1-ind (X : S¹ → U) (b : X baseS1) (l : PathP (<i> X (loop @ i)) b b) (z : S¹)
   := coequ-ind 𝟏 𝟏 (id 𝟏) (id 𝟏) X
-       (1-ind (λ (u : 𝟏), X (iota 𝟏 𝟏 (id 𝟏) (id 𝟏) u)) nBase)
-       (1-ind (λ (u : 𝟏), PathP (<i> X (resp′ 𝟏 𝟏 (id 𝟏) (id 𝟏) u @ i))
-                          (1-ind (λ (v : 𝟏), X (iota 𝟏 𝟏 (id 𝟏) (id 𝟏) v)) nBase u)
-                          (1-ind (λ (v : 𝟏), X (iota 𝟏 𝟏 (id 𝟏) (id 𝟏) v)) nBase u)) nLoop) z
+     (1-ind (λ (u : 𝟏), X (iota 𝟏 𝟏 (id 𝟏) (id 𝟏) u)) b)   (1-ind (λ (u : 𝟏), PathP (<i> X (resp′ 𝟏 𝟏 (id 𝟏) (id 𝟏) u @ i))
+     (1-ind (λ (v : 𝟏), X (iota 𝟏 𝟏 (id 𝟏) (id 𝟏) v)) b u) (1-ind (λ (v : 𝟏), X (iota 𝟏 𝟏 (id 𝟏) (id 𝟏) v)) b u)) l) z
 
-def S1-β₁ (X : S¹ → U) (nBase : X baseS1) (nLoop : PathP (<i> X (loop @ i)) nBase nBase)
-  := idp (X baseS1) nBase
-
-def S1-β₂ (X : S¹ → U) (nBase : X baseS1) (nLoop : PathP (<i> X (loop @ i)) nBase nBase)
-  := idp (PathP (<i> X (loop @ i)) nBase nBase) nLoop
-
-def S1-η (X : S¹ → U) (h : Π (z : S¹), X z)
-  := idp (Π (z : S¹), X z) h
+def S1-β₁ (X : S¹ → U) (nBase : X baseS1) (nLoop : PathP (<i> X (loop @ i)) nBase nBase) := idp (X baseS1) nBase
+def S1-β₂ (X : S¹ → U) (nBase : X baseS1) (nLoop : PathP (<i> X (loop @ i)) nBase nBase) := idp (PathP (<i> X (loop @ i)) nBase nBase) nLoop
+def S1-η (X : S¹ → U) (h : Π (z : S¹), X z)                                              := idp (Π (z : S¹), X z) h
 
 -- [Sokhatsky] 2022
 
@@ -51,14 +44,9 @@ def WS¹-ind (C : WS¹ → U) (b : C Wbase) (l : Π (w : WS¹), C w → C (Wloop
           (λ (f : 𝟎 → WS¹) (g : Π (x : 𝟎), C (f x)), 𝟎⟶WS¹ C f b)
           (λ (f : Loop₀ → WS¹) (g : Π (x : Loop₀), C (f x)), Loop₀⟶WS¹ C f (l (f (<_> false)) (g (<_> false)))))
 
-def WS¹-rec (C : U) (b : C) (l : WS¹ → C → C) : WS¹ → C := WS¹-ind (λ (_ : WS¹), C) b l
+def WS¹-rec (C : U) (b : C) (l : WS¹ → C → C) : WS¹ → C                                  := WS¹-ind (λ (_ : WS¹), C) b l
+def WS¹-β₁ (C : WS¹ → U) (b : C Wbase) (l : Π (w : WS¹), C w → C (Wloop w))              := idp (C Wbase) b
+def WS¹-β₂ (C : WS¹ → U) (b : C Wbase) (l : Π (w : WS¹), C w → C (Wloop w)) (w : WS¹)    := idp (C (Wloop w)) (l w (WS¹-ind C b l w))
+def WS¹-η (C : WS¹ → U) (h : Π (w : WS¹), C w)                                           := idp (Π (w : WS¹), C w) h
 
-def WS¹-β₁ (C : WS¹ → U) (b : C Wbase) (l : Π (w : WS¹), C w → C (Wloop w))
-  := idp (C Wbase) b
-
-def WS¹-β₂ (C : WS¹ → U) (b : C Wbase) (l : Π (w : WS¹), C w → C (Wloop w)) (w : WS¹)
-  := idp (C (Wloop w)) (l w (WS¹-ind C b l w))
-
-def WS¹-η (C : WS¹ → U) (h : Π (w : WS¹), C w)
-  := idp (Π (w : WS¹), C w) h
-
+    

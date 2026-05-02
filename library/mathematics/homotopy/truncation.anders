@@ -1,7 +1,7 @@
 {- Truncation: https://anders.groupoid.space/mathematics/homotopy/truncation/
 
-   HoTT 6.9
-   HoTT 7.3
+   HoTT 6.9 HIT: Truncations
+   HoTT 7.3 Homotopy n-Types: Truncations
 
    Copyright (c) Groupoid Infinity, 2016-2026. -}
 
@@ -11,12 +11,10 @@ import library/foundations/mltt/either
 import library/mathematics/homotopy/Sn
 import library/mathematics/homotopy/hs
 
-{- Generic ℕ-indexed Truncations -}
-
-def trunc (A : U) (n : ℕ) : U := hs (sphere n) A
-def trunc₁ (A : U) (n : ℕ) (x : A) := center (sphere n) A x
-def trunc₂ (A : U) (n : ℕ) (f : sphere n → hs (sphere n) A) := hub' (sphere n) A f
-def trunc₃ (A : U) (n : ℕ) (f : sphere n → hs (sphere n) A) (s : sphere n) := spoke' (sphere n) A f s
+def trunc  (A : U) (n : ℕ)        : U := hs (sphere n) A
+def trunc₁ (A : U) (n : ℕ) (x : A)                                         : trunc A n := center (sphere n) A x
+def trunc₂ (A : U) (n : ℕ) (f : sphere n → hs (sphere n) A)                : trunc A n := hub' (sphere n) A f
+def trunc₃ (A : U) (n : ℕ) (f : sphere n → hs (sphere n) A) (s : sphere n)             := spoke' (sphere n) A f s
 
 def ‖_‖₋₁ (A : U) : U := trunc A zero
 def ‖_‖₀ (A : U) : U := trunc A one
@@ -27,22 +25,22 @@ def isSurjective (A B : U) (f : A → B) : U := Π (b : B), ‖_‖₋₁ (fiber
 def surjective (A B : U) : U := Σ (f : A → B), isSurjective A B f
 
 def trunc-ind (A : U) (n : ℕ) (P : trunc A n → U)
-      (nCenter : Π (a : A), P (trunc₁ A n a))
-      (nHub : Π (f : sphere n → hs (sphere n) A) (nF : Π (s : sphere n), P (f s)), P (trunc₂ A n f))
-      (nSpoke : Π (f : sphere n → hs (sphere n) A) (nF : Π (s : sphere n), P (f s)) (s : sphere n), PathP (<i> P (trunc₃ A n f s @ i)) (nHub f nF) (nF s))
-      (x : trunc A n) := hs-ind (sphere n) A P nCenter nHub nSpoke x
+    (nCenter : Π (a : A), P (trunc₁ A n a))
+    (nHub : Π (f : sphere n → hs (sphere n) A) (nF : Π (s : sphere n), P (f s)), P (trunc₂ A n f))
+    (nSpoke : Π (f : sphere n → hs (sphere n) A) (nF : Π (s : sphere n), P (f s)) (s : sphere n), PathP (<i> P (trunc₃ A n f s @ i)) (nHub f nF) (nF s)) (x : trunc A n)
+ := hs-ind (sphere n) A P nCenter nHub nSpoke x
 
 def trunc-β₁ (A : U) (n : ℕ) (P : trunc A n → U)
-      (nCenter : Π (a : A), P (trunc₁ A n a))
-      (nHub : Π (f : sphere n → hs (sphere n) A) (nF : Π (s : sphere n), P (f s)), P (trunc₂ A n f))
-      (nSpoke : Π (f : sphere n → hs (sphere n) A) (nF : Π (s : sphere n), P (f s)) (s : sphere n), PathP (<i> P (trunc₃ A n f s @ i)) (nHub f nF) (nF s)) (a : A)
-    := idp (P (trunc₁ A n a)) (nCenter a)
+    (nCenter : Π (a : A), P (trunc₁ A n a))
+    (nHub : Π (f : sphere n → hs (sphere n) A) (nF : Π (s : sphere n), P (f s)), P (trunc₂ A n f))
+    (nSpoke : Π (f : sphere n → hs (sphere n) A) (nF : Π (s : sphere n), P (f s)) (s : sphere n), PathP (<i> P (trunc₃ A n f s @ i)) (nHub f nF) (nF s)) (a : A)
+ := idp (P (trunc₁ A n a)) (nCenter a)
 
 def trunc-β₂ (A : U) (n : ℕ) (P : trunc A n → U)
-      (nCenter : Π (a : A), P (trunc₁ A n a))
-      (nHub : Π (f : sphere n → hs (sphere n) A) (nF : Π (s : sphere n), P (f s)), P (trunc₂ A n f))
-      (nSpoke : Π (f : sphere n → hs (sphere n) A) (nF : Π (s : sphere n), P (f s)) (s : sphere n), PathP (<i> P (trunc₃ A n f s @ i)) (nHub f nF) (nF s)) (f : sphere n → hs (sphere n) A)
-    := idp (P (trunc₂ A n f)) (nHub f (λ (s : sphere n), trunc-ind A n P nCenter nHub nSpoke (f s)))
+    (nCenter : Π (a : A), P (trunc₁ A n a))
+    (nHub : Π (f : sphere n → hs (sphere n) A) (nF : Π (s : sphere n), P (f s)), P (trunc₂ A n f))
+    (nSpoke : Π (f : sphere n → hs (sphere n) A) (nF : Π (s : sphere n), P (f s)) (s : sphere n), PathP (<i> P (trunc₃ A n f s @ i)) (nHub f nF) (nF s)) (f : sphere n → hs (sphere n) A)
+ := idp (P (trunc₂ A n f)) (nHub f (λ (s : sphere n), trunc-ind A n P nCenter nHub nSpoke (f s)))
 
 def trunc-η (A : U) (n : ℕ) (P : trunc A n → U) (h : Π (z : trunc A n), P z)
-  := idp (Π (z : trunc A n), P z) h
+ := idp (Π (z : trunc A n), P z) h

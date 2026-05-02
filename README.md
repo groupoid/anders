@@ -111,15 +111,15 @@ CCHM
 
 Anders was built by strictly following CCHM publications:
 
-* <a href="http://www.cse.chalmers.se/~simonhu/papers/cubicaltt.pdf">CTT: a constructive interpretation of the univalence axiom</a> [Cohen, Coquand, Huber, Mörtberg]
+* <a href="https://arxiv.org/pdf/1611.02108">CTT: a constructive interpretation of the univalence axiom</a> [Cohen, Coquand, Huber, Mörtberg]
 * <a href="https://staff.math.su.se/anders.mortberg/papers/cubicalhits.pdf">On Higher Inductive Types in Cubical Type Theory</a> [Coquand, Huber, Mörtberg]
 * <a href="https://arxiv.org/pdf/1607.04156.pdf">Canonicity for Cubical Type Theory</a> [Huber]
-* <a href="http://www.cse.chalmers.se/~simonhu/papers/can.pdf">Canonicity and homotopy canonicity for cubical type theory</a> [Coquand, Huber, Sattler]
+* <a href="https://arxiv.org/pdf/1607.04156">Canonicity and homotopy canonicity for cubical type theory</a> [Coquand, Huber, Sattler]
 * <a href="https://staff.math.su.se/anders.mortberg/papers/cubicalsynthetic.pdf">Cubical Synthetic Homotopy Theory</a> [Mörtberg, Pujet]
 * <a href="https://staff.math.su.se/anders.mortberg/papers/unifying.pdf">Unifying Cubical Models of Univalent Type Theory</a> [Cavallo, Mörtberg, Swan]
 * <a href="https://staff.math.su.se/anders.mortberg/papers/cubicalagda.pdf">Cubical Agda: A Dependently Typed PL with Univalence and HITs</a> [Vezzosi, Mörtberg, Abel]
 * <a href="https://simhu.github.io/misc/hcomp.pdf">A Cubical Type Theory for Higher Inductive Types</a> [Huber]
-* <a href="http://www.cse.chalmers.se/~simonhu/papers/p.pdf">Gluing for type theory</a> [Kaposi, Huber, Sattler]
+* <a href="https://drops.dagstuhl.de/storage/00lipics/lipics-vol131-fscd2019/LIPIcs.FSCD.2019.25/LIPIcs.FSCD.2019.25.pdf">Gluing for type theory</a> [Kaposi, Huber, Sattler]
 * <a href="https://doi.org/10.1017/S0960129521000311">Cubical Methods in HoTT/UF</a> [Mörtberg]
 
 We tried to bring in as little of ourselves as possible.
@@ -131,7 +131,7 @@ Anders supports classical Homotopy Type System with two identities.
 
 * <a href="https://www.math.ias.edu/vladimir/sites/math.ias.edu.vladimir/files/HTS.pdf">A simple type system with two identity types</a> [Voevodsky]
 * <a href="https://arxiv.org/pdf/1705.03307.pdf">Two-level type theory and applications</a> [Annenkov, Capriotti, Kraus, Sattler]
-* <a href="https://types21.liacs.nl/download/syntax-for-two-level-type-theory/">Syntax for two-level type theory</a> [Bonacina, Ahrens]
+* <a href="https://hott-uf.github.io/2021/HoTTUF_2021_paper_5.pdf">Syntax for two-level type theory</a> [Bonacina, Ahrens]
 
 Modalities
 ----------
@@ -141,7 +141,8 @@ Infinitesimal Modality was added for direct support of Synthetic Differential Ge
 * <a href="https://arxiv.org/pdf/1310.7930v1.pdf">Differential cohomology in a cohesive ∞-topos</a> [Schreiber]
 * <a href="https://arxiv.org/pdf/1806.05966.pdf">Cartan Geometry in Modal Homotopy Type Theory</a> [Cherubini]
 * <a href="https://hott-uf.github.io/2017/abstracts/cohesivett.pdf">Differential Cohesive Type Theory</a> [Gross, Licata, New, Paykin, Riley, Shulman, Cherubini]
-* <a href="https://arxiv.org/abs/1509.07584">Brouwer's fixed-point theorem in real-cohesive homotopy type theory</a> [Shulman]
+* <a href="https://arxiv.org/pdf/1509.07584">Brouwer's fixed-point theorem in real-cohesive homotopy type theory</a> [Shulman]
+* <a href="https://5ht.co/three.pdf">Three-HIT theorem</a> [Bauer, van der Weide]
 
 Benchmarks
 ----------

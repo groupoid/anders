@@ -161,13 +161,6 @@ Intel i5-12400 or M4: Compilation in three seconds, full library type checks in 
 
 # Anders: Homotopy Library
 
-Anders is a HoTT proof assistant based on: classical MLTT-80 with Pi, Sigma, Nat, Id, 0, 1, 2, W types;
-CCHM in CHM flavour as cubical type system with hcomp/trans Kan operations;
-HTS sctrict equality on pretypes; de Rham stack modality primitives.
-We tend not to touch general recursive higher inductive schemes yet,
-instead we will try to express as much HIT as possible through W,
-Coequlizer and HubSpokes Disc in the style of HoTT/Coq homotopy library and Three-HIT theorem.
-
 Here is given the Anders Homotopy Library.
 
 ### Foundations
@@ -246,7 +239,7 @@ The main purpose of Anders is doing Homotopy Theory:
 ```
 $ dune exec anders repl
 
-Anders Proof Assistant version 5.0.0
+Anders Proof Assistant version 5.1.0
 Copyright © 2016–2026 Groupoid Infinity.
 
 For help type ‘:h’.

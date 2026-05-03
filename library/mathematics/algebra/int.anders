@@ -1,4 +1,4 @@
-{- Integers: https://anders.groupoid.space/mathematics/algebra/int/
+{- Integers: https://anders.groupoid.space/mathematics/algebra/int
    Copyright (c) Groupoid Infinity, 2016-2026. -}
 
 module int where

@@ -8,7 +8,7 @@
    HoTT 5.4 Inductive types are initial algebras
    HoTT 5.5 Homotopy-in
 
-   Copyright (c) Groupoid Infinity, 2016-2026. -}
+   Copyright (c) Groupoid Infinity, 2014-2023. -}
 
 module inductive where
 import library/foundations/univalent/path

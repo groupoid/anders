@@ -4,7 +4,7 @@
 
    HoTT 1.9 Exercise
 
-   Copyright (c) Groupoid Infinity, 2016-2026. -}
+   Copyright (c) Groupoid Infinity, 2014-2023. -}
 
 module fin where
 import library/foundations/mltt/either

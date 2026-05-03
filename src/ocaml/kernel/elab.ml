@@ -28,6 +28,30 @@ let extInf : value -> value = function
   | VInf v -> v
   | v      -> raise (Internal (ExpectedInf (rbV v)))
 
+let extSucc : value -> value = function
+  | VSucc v -> v
+  | v       -> raise (Internal (InferError (rbV v)))
+
+let extIota2 : value -> value = function
+  | VIota2 (_, _, _, _, v) -> v
+  | v                      -> raise (Internal (InferError (rbV v)))
+
+let extBase : value -> value = function
+  | VBase (_, _, v) -> v
+  | v               -> raise (Internal (InferError (rbV v)))
+
+let extHub : value -> value = function
+  | VHub (_, _, f) -> f
+  | v              -> raise (Internal (InferError (rbV v)))
+
+let extResp : value -> value = function
+  | VResp (_, _, _, _, c) -> c
+  | v -> raise (Internal (InferError (rbV v)))
+
+let extSpoke : value -> value * value = function
+  | VSpoke (_, _, f, x) -> (f, x)
+  | v -> raise (Internal (InferError (rbV v)))
+
 let extSup : value -> value * value = function
   | VApp (VApp (VSup _, a), f) -> (a, f)
   | v                          -> raise (Internal (ExpectedSup (rbV v)))
@@ -35,8 +59,35 @@ let extSup : value -> value * value = function
 let isInf : value -> bool = function
   | VInf _ -> true | _ -> false
 
+let isZero : value -> bool = function
+  | VZero -> true | _ -> false
+
+let isSucc : value -> bool = function
+  | VSucc _ -> true | _ -> false
+
+let isIota2 : value -> bool = function
+  | VIota2 _ -> true | _ -> false
+
+let isResp : value -> bool = function
+  | VResp _ -> true | _ -> false
+
+let isBase : value -> bool = function
+  | VBase _ -> true | _ -> false
+
+let isHub : value -> bool = function
+  | VHub _ -> true | _ -> false
+
+let isSpoke : value -> bool = function
+  | VSpoke _ -> true | _ -> false
+
 let isSup : value -> bool = function
   | VApp (VApp (VSup _, _), _) -> true | _ -> false
+
+let isRespFormula v = match v with VAppFormula (VResp _, _) -> true | _ -> false
+let isSpokeFormula v = match v with VAppFormula (VSpoke _, _) -> true | _ -> false
+
+let extRespFormula v = match v with VAppFormula (VResp (_, _, _, _, c), _) -> c | _ -> raise (Internal (InferError (rbV v)))
+let extSpokeFormula v = match v with VAppFormula (VSpoke (_, _, f, x), _) -> (f, x) | _ -> raise (Internal (InferError (rbV v)))
 
 let join = function
   | VInf v -> v
@@ -201,7 +252,7 @@ let rec salt (ns : ident Env.t) : exp -> exp = function
   | EBase (s, a, x) -> EBase (salt ns s, salt ns a, salt ns x)
   | EHub (s, a, f) -> EHub (salt ns s, salt ns a, salt ns f)
   | ESpoke (s, a, f, x) -> ESpoke (salt ns s, salt ns a, salt ns f, salt ns x)
-  | EIndDisc (s, a, x, nc, nh, ns', z) -> EIndDisc (salt ns s, salt ns a, salt ns x, salt ns nc, salt ns nh, salt ns ns', salt ns z)
+  | EIndDisc (s, a, x, nc, nh, ns') -> EIndDisc (salt ns s, salt ns a, salt ns x, salt ns nc, salt ns nh, salt ns ns')
   | EJoin e              -> EJoin (salt ns e)
   | EFla e               -> EFla (salt ns e)
   | EFlaUnit e           -> EFlaUnit (salt ns e)
@@ -281,41 +332,13 @@ let rec swap i j = function
   | VBase (s, a, x) -> VBase (swap i j s, swap i j a, swap i j x)
   | VHub (s, a, f) -> VHub (swap i j s, swap i j a, swap i j f)
   | VSpoke (s, a, f, x) -> VSpoke (swap i j s, swap i j a, swap i j f, swap i j x)
-  | VIndDisc (s, a, x, nc, nh, ns', z) -> VIndDisc (swap i j s, swap i j a, swap i j x, swap i j nc, swap i j nh, swap i j ns', swap i j z)
+  | VIndDisc (s, a, x, nc, nh, ns') -> VIndDisc (swap i j s, swap i j a, swap i j x, swap i j nc, swap i j nh, swap i j ns')
   | VJoin v              -> VJoin (swap i j v)
 
 
 and swapVar i j k = if i = k then j else k
 
-let rec mem y = function
-  | Var (x, _) -> x = y
-  | VLam (t, (x, g)) | VPi (t, (x, g))
-  | VSig (t, (x, g)) | W (t, (x, g)) -> memClos y t x g
-  | VSystem ts -> System.exists (fun mu v -> Env.mem y mu || mem y v) ts
-  | VKan _ | VPre _ | VHole | VI | VEmpty | VUnit
-  | VStar | VBool | VFalse | VTrue | VDir _ -> false
-  | VPLam a | VFst a | VSnd a | VPathP a | VId a | VRef a
-  | VJ a | VNeg a | VOuc a | VGlue a | VIndEmpty a
-  | VIndUnit a | VIndBool a | VIm a | VInf a | VJoin a
-  | VFla a | VFlaUnit a | VFlaCounit a -> mem y a
-  | VIndNat (c, z, s) -> mem y c || mem y z || mem y s
-  | VNat | VZero -> false
-  | VSucc a -> mem y a
-  | VDisc (s, a) -> mem y s || mem y a
-  | VBase (s, a, x) -> mem y s || mem y a || mem y x
-  | VHub (s, a, f) -> mem y s || mem y a || mem y f
-  | VSpoke (s, a, f, x) -> mem y s || mem y a || mem y f || mem y x
-  | VIndDisc (s, a, x, nc, nh, ns', z) -> mem y s || mem y a || mem y x || mem y nc || mem y nh || mem y ns' || mem y z
-  | VApp (a, b) | VPartialP (a, b) | VAppFormula (a, b)
-  | VTransp (a, b) | VAnd (a, b) | VOr (a, b) | VInc (a, b)
-  | VSup (a, b) | VIndIm (a, b) | VIndFla (a, b) | VPair (_, a, b) -> mem y a || mem y b
-  | VSub (a, b, c) | VGlueElem (a, b, c) | VUnglue (a, b, c)
-  | VIndW (a, b, c) -> mem y a || mem y b || mem y c
-  | VHComp (a, b, c, d) | VCoequ (a, b, c, d) -> mem y a || mem y b || mem y c || mem y d
-  | VIota2 (a, b, f, g, c) | VResp (a, b, f, g, c) -> mem y a || mem y b || mem y f || mem y g || mem y c
-  | VIndCoequ (a, b, f, g, x, k, rho) -> mem y a || mem y b || mem y f || mem y g || mem y x || mem y k || mem y rho
-
-and memClos y t x g = if x = y then false else mem y (g (Var (x, t)))
+let mem y v = IdentSet.mem y (get_support v)
 
 let extErr = function
   | Internal err -> err

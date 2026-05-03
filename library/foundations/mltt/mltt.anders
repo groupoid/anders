@@ -3,7 +3,7 @@
    — Sigma;
    — Path.
 
-   Copyright (c) Groupoid Infinity, 2016-2026. -}
+   Copyright (c) Groupoid Infinity, 2014-2025. -}
 
 module mltt where
 option girard true

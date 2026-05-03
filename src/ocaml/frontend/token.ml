@@ -39,4 +39,6 @@ let tokenToString : token -> string = function
   | INDDISC    -> "INDDISC"
   | NAT        -> "NAT"         | ZERO       -> "ZERO"
   | SUCC       -> "SUCC"        | INDNAT     -> "INDNAT"
+  | FLA        -> "FLA"         | FLAUNIT    -> "FLAUNIT"
+  | FLACOUNIT  -> "FLACOUNIT"   | INDFLA     -> "INDFLA"
 

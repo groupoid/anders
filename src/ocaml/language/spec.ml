@@ -65,7 +65,7 @@ type exp =
   | ECoequ of exp * exp * exp * exp | EIota2 of exp * exp * exp * exp * exp       (* Coequalizer *)
   | EResp of exp * exp * exp * exp * exp | EIndCoequ of exp * exp * exp * exp * exp * exp * exp
   | EDisc of exp * exp | EBase of exp * exp * exp | EHub of exp * exp * exp              (* Disc *)
-  | ESpoke of exp * exp * exp * exp | EIndDisc of exp * exp * exp * exp * exp * exp * exp
+  | ESpoke of exp * exp * exp * exp | EIndDisc of exp * exp * exp * exp * exp * exp
   | EIm of exp | EInf of exp | EIndIm of exp * exp | EJoin of exp      (* Infinitesimal Modality *)
   | EFla of exp | EFlaUnit of exp | EFlaCounit of exp | EIndFla of exp * exp    (* Flat Modality *)
 

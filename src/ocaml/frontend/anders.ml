@@ -23,7 +23,7 @@ let help =
              | indices               | silent
              | repl                  | help "
 
-let repl = ref false
+
 let cmd : cmdline -> unit = function
   | Check     filename -> Repl.check filename
   | Lex       filename -> Reader.lex filename
@@ -35,7 +35,7 @@ let cmd : cmdline -> unit = function
     | "interval" -> Prefs.intervalPrim := value
     | _          -> raise (UnknownPrimitive prim)
   end
-  | Repl         -> repl := true
+  | Repl         -> Prefs.repl := true
   | Help         -> print_endline Repl.banner; print_endline help
   | Trace        -> Prefs.indices := true; Radio.set "trace" "true"
   | Receive      -> Radio.receive ()
@@ -67,7 +67,7 @@ let defaults = function
 
 let rec main () =
   try Array.to_list Sys.argv |> List.tl |> parseArgs |> defaults |> List.iter cmd;
-    if !repl then Repl.repl () else ()
+    if !Prefs.repl then Repl.repl () else ()
   with Restart -> Radio.wipe (); main ()
 
 let () = main ()

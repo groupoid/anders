@@ -57,9 +57,9 @@ Features
 * Nat in Kernel for spectral goodness under higher homotopies
 * Infinitesimal Shape Modality (de Rham Stack)
 * Flat Modality (Sharp is derived)
-* Parser in 80 LOC
-* Lexer in 80 LOC
-* Small Kernel in 1000 LOC
+* Parser in 180 LOC
+* Lexer in 120 LOC
+* Small Kernel in 2000 LOC
 * UTF-8 support including universe levels
 * Lean syntax for ΠΣW
 * Poor man's records as Σ with named accessors to telescope variables
@@ -80,19 +80,20 @@ Samples
 You can find some examples in the `share` directory of the Anders package.
 
 ```Lean
-def comp-Path⁻¹ (A : U) (a b : A) (p : Path A a b) :
-  Path (Path A a a) (comp-Path A a b a p (<i> p @ -i)) (<_> a) :=
-<k j> hcomp A (∂ j ∨ k) (λ (i : I), [(j = 0) → a, (j = 1) → p @ -i ∧ -k, (k = 1) → a]) (p @ j ∧ -k)
+def comp-Path⁻¹ (A : U) (a b : A) (p : Path A a b)
+  : Path (Path A a a) (comp-Path A a b a p (<i> p @ -i)) (<_> a)
+ := <k j> hcomp A (∂ j ∨ k) (λ (i : I), [ (j = 0) → a,
+    (j = 1) → p @ -i ∧ -k, (k = 1) → a]) (p @ j ∧ -k)
 
-def kan (A : U) (a b c d : A) (p : Path A a c) (q : Path A b d) (r : Path A a b) : Path A c d :=
-<i> hcomp A (∂ i) (λ (j : I), [(i = 0) → p @ j, (i = 1) → q @ j]) (r @ i)
+def kan (A : U) (a b c d : A) (p : Path A a c) (q : Path A b d) (r : Path A a b)
+  : Path A c d := <i> hcomp A (∂ i) (λ (j : I), [(i = 0) → p @ j, (i = 1) → q @ j]) (r @ i)
 
-def comp (A : I → U) (r : I) (u : Π (i : I), Partial (A i) r) (u₀ : (A 0)[r ↦ u 0]) : A 1 :=
-hcomp (A 1) r (λ (i : I), [(r = 1) → transp (<j>A (i ∨ j)) i (u i 1=1)]) (transp(<i> A i) 0 (ouc u₀))
+def comp (A : I → U) (r : I) (u : Π (i : I), Partial (A i) r) (u₀ : (A 0)[r ↦ u 0]) : A 1
+ := hcomp (A 1) r (λ (i : I), [(r = 1) → transp (<j>A (i ∨ j)) i (u i 1=1)])
+    (transp(<i> A i) 0 (ouc u₀))
 
-def ghcomp (A : U) (r : I) (u : I → Partial A r) (u₀ : A[r ↦ u 0]) : A :=
-hcomp A (∂ r) (λ (j : I), [(r = 1) → u j 1=1, (r = 0) → ouc u₀]) (ouc u₀)
-
+def ghcomp (A : U) (r : I) (u : I → Partial A r) (u₀ : A[r ↦ u 0]) : A
+ := hcomp A (∂ r) (λ (j : I), [(r = 1) → u j 1=1, (r = 0) → ouc u₀]) (ouc u₀)
 ```
 
 ```shell

@@ -3,7 +3,7 @@
 
    HoTT 1.5 Product types
 
-   Copyright (c) Groupoid Infinity, 2016-2026. -}
+   Copyright (c) Groupoid Infinity, 2014-2023. -}
 
 module pi where
 import library/foundations/univalent/path

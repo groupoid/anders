@@ -1,7 +1,5 @@
-{- Hedberg: https://anders.groupoid.space/foundations/univalent/hedberg/
-
+{- Set Theory:
    - Stability and Discretness leads to Set
-
    Copyright (c) Groupoid Infinity, 2016-2026. -}
 
 module hedberg where

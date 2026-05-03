@@ -85,7 +85,7 @@ let rec ppExp paren e = let x = match e with
   | EBase (s, a, x) -> Printf.sprintf "base %s %s %s" (ppExp true s) (ppExp true a) (ppExp true x)
   | EHub (s, a, f) -> Printf.sprintf "hub %s %s %s" (ppExp true s) (ppExp true a) (ppExp true f)
   | ESpoke (s, a, f, x) -> Printf.sprintf "spoke %s %s %s %s" (ppExp true s) (ppExp true a) (ppExp true f) (ppExp true x)
-  | EIndDisc (s, a, x, nc, nh, ns', z) -> Printf.sprintf "disc-ind %s %s %s %s %s %s %s" (ppExp true s) (ppExp true a) (ppExp true x) (ppExp true nc) (ppExp true nh) (ppExp true ns') (ppExp true z)
+  | EIndDisc (s, a, x, nc, nh, ns') -> Printf.sprintf "disc-ind %s %s %s %s %s %s" (ppExp true s) (ppExp true a) (ppExp true x) (ppExp true nc) (ppExp true nh) (ppExp true ns')
 
   in match e with
   | EVar _ | EFst _ | ESnd _ | EI | EPre _ | ESystem _

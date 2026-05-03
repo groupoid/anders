@@ -3,7 +3,7 @@
 
    HoTT 9.9 The Rezk completion
 
-   Copyright (c) Groupoid Infinity, 2016-2026. -}
+   Copyright (c) Groupoid Infinity, 2014-2023. -}
 
 module groupoid where
 import library/foundations/univalent/path

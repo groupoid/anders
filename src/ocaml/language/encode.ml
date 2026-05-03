@@ -98,7 +98,7 @@ struct
     | EBase (s, a, x) -> W.put '\x59'; exp s; exp a; exp x
     | EHub (s, a, f) -> W.put '\x5A'; exp s; exp a; exp f
     | ESpoke (s, a, f, x) -> W.put '\x5B'; exp s; exp a; exp f; exp x
-    | EIndDisc (s, a, x, nc, nh, ns', z) -> W.put '\x5C'; exp s; exp a; exp x; exp nc; exp nh; exp ns'; exp z
+    | EIndDisc (s, a, x, nc, nh, ns') -> W.put '\x5C'; exp6 s a x nc nh ns'
   | EFla e               -> W.put '\x60'; exp e
   | EFlaUnit e           -> W.put '\x61'; exp e
   | EFlaCounit e         -> W.put '\x62'; exp e
@@ -109,6 +109,7 @@ struct
   and exp3 a b c = exp a; exp b; exp c
   and exp4 a b c d = exp a; exp b; exp c; exp d
   and exp5 a b c d e = exp a; exp b; exp c; exp d; exp e
+  and exp6 a b c d e f = exp a; exp b; exp c; exp d; exp e; exp f
   and exp7 a b c d e f g = exp a; exp b; exp c; exp d; exp e; exp f; exp g
 
   and clos idx a p b = W.put idx; exp a; ident p; exp b

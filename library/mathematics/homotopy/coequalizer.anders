@@ -40,5 +40,34 @@ def coequ-η-pointwise (A B : U) (f g : A → B) (X : coeq A B f g → U) (h : �
 
 def coequ-η (A B : U) (f g : A → B) (X : coeq A B f g → U) (h : Π (z : coeq A B f g), X z)
   : Path (Π (z : coeq A B f g), X z) h (λ (z : coeq A B f g), coequ-ind A B f g X (λ (b : B), h (iota A B f g b)) (λ (x : A), <i> h (resp′ A B f g x @ i)) z)
- := piext (coeq A B f g) X h (λ (z : coeq A B f g), coequ-ind A B f g X (λ (b : B), h (iota A B f g b)) (λ (x : A), <i> h (resp′ A B f g x @ i)) z)
-          (coequ-η-pointwise A B f g X h)
+  := piext (coeq A B f g) X h (λ (z : coeq A B f g), coequ-ind A B f g X (λ (b : B), h (iota A B f g b)) (λ (x : A), <i> h (resp′ A B f g x @ i)) z)
+           (coequ-η-pointwise A B f g X h)
+
+--- Reality Check
+
+def trans-coequ (A B : U) (f g : A → B) (u₀ : coequ A B f g) : coequ A B f g
+ := transp (<i> coequ A B f g) 0 u₀
+
+def trans-coequ′ (A B : U) (f g : A → B) (u₀ : coequ A B f g) : coequ A B f g
+ := u₀
+
+def trans-coequ-is-correct (A B : U) (f g : A → B) (u₀ : coequ A B f g)
+ : Path (coequ A B f g) (trans-coequ A B f g u₀) (trans-coequ′ A B f g u₀) := <_> trans-coequ A B f g u₀
+
+def hcomp-coequ-iota (A B : U) (f g : A → B) (r : I) (b : B) : coequ A B f g
+ := iota A B f g (hcomp B r (λ (i : I), [(r = 1) → b]) b)
+
+def hcomp-coequ-iota-is-correct (A B : U) (f g : A → B) (r : I) (b : B)
+ : Path (coequ A B f g) (hcomp (coequ A B f g) r (λ (i : I), [(r = 1) → iota A B f g b]) (iota A B f g b))
+                        (hcomp-coequ-iota A B f g r b)
+ := <_> hcomp-coequ-iota A B f g r b
+
+def hcomp-coequ-resp (A B : U) (f g : A → B) (r : I) (x : A)
+ : Path (coequ A B f g) (hcomp-coequ-iota A B f g r (f x)) (hcomp-coequ-iota A B f g r (g x))
+ := <i> hcomp (coequ A B f g) r (λ (k : I), [(r = 1) → resp′ A B f g x @ i]) (resp′ A B f g x @ i)
+
+def hcomp-coequ-resp-is-correct (A B : U) (f g : A → B) (r : I) (x : A)
+ : Path (Path (coequ A B f g) (hcomp-coequ-iota A B f g r (f x)) (hcomp-coequ-iota A B f g r (g x)))
+        (<i> hcomp (coequ A B f g) r (λ (k : I), [(r = 1) → resp′ A B f g x @ i]) (resp′ A B f g x @ i))
+        (hcomp-coequ-resp A B f g r x)
+ := <_> hcomp-coequ-resp A B f g r x

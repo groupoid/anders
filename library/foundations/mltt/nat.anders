@@ -5,6 +5,7 @@
 
 module nat where
 import library/foundations/univalent/path
+import library/foundations/mltt/bool
 
 -- 1) Formation Rule
 def ℕ : U := __nat
@@ -52,8 +53,6 @@ def eight : ℕ := succ seven
 def nine  : ℕ := succ eight
 def ten   : ℕ := succ nine
 
-def ffineqtt (h: Path 𝟐 0₂ 1₂) : 𝟎
- := transp (<i> ind₂ (λ(_: 𝟐), U) 𝟎 𝟏 (h @ -i)) 0 ★
 
 def isZero (k : ℕ) : 𝟐 := ind-nat (λ (_ : ℕ), 𝟐) 1₂ (λ (_ : ℕ) (_ : 𝟐), 0₂) k
 def isSucc (k : ℕ) : 𝟐 := ind-nat (λ (_ : ℕ), 𝟐) 0₂ (λ (_ : ℕ) (_ : 𝟐), 1₂) k
@@ -66,3 +65,28 @@ def snotz (n : ℕ) (p : Path ℕ (succ n) zero) : 𝟎
 
 def prednat (n m : ℕ) (p : Path ℕ (succ n) (succ m)) : Path ℕ n m
  := <i> ind-nat (λ (x : ℕ), ℕ) n (λ (x : ℕ) (_ : ℕ), x) (p @ i)
+
+--- Reality Check
+
+def trans-ℕ (u₀ : ℕ) : ℕ
+ := transp (<i> ℕ) 0 u₀
+
+def trans-ℕ′ (u₀ : ℕ) : ℕ
+ := u₀
+
+def trans-ℕ-is-correct (u₀ : ℕ)
+ : Path ℕ (trans-ℕ u₀) (trans-ℕ′ u₀) := <_> trans-ℕ u₀
+
+def hcomp-ℕ-zero (r : I) : ℕ
+ := zero
+
+def hcomp-ℕ-zero-is-correct (r : I)
+ : Path ℕ (hcomp ℕ r (λ (k : I), [(r = 1) → zero]) zero) (hcomp-ℕ-zero r)
+ := <_> zero
+
+def hcomp-ℕ-succ (r : I) (u : I → Partial ℕ r) (u₀ : ℕ [r ↦ u 0]) : ℕ
+ := succ (hcomp ℕ r u (ouc u₀))
+
+def hcomp-ℕ-succ-is-correct (r : I) (u : I → Partial ℕ r) (u₀ : ℕ [r ↦ u 0])
+ : Path ℕ (hcomp ℕ r (λ (k : I), [(r = 1) → succ (u k 1=1)]) (succ (ouc u₀))) (hcomp-ℕ-succ r u u₀)
+ := <_> hcomp-ℕ-succ r u u₀

@@ -3,7 +3,7 @@
 
    https://en.wikipedia.org/wiki/Glivenko%27s_translation
 
-   Copyright (c) Groupoid Infinity, 2016-2026. -}
+   Copyright (c) Groupoid Infinity, 2014-2022. -}
 
 module glivenko where
 import library/foundations/mltt/proto

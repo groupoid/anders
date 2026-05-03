@@ -12,10 +12,10 @@ import library/foundations/mltt/fin
 import library/foundations/mltt/vec
 import library/foundations/univalent/path
 import library/foundations/univalent/prop
+import library/foundations/univalent/hedberg
 import library/foundations/univalent/extensionality
 import library/foundations/univalent/equiv
 import library/foundations/univalent/iso
-import library/foundations/univalent/hedberg
 import library/foundations/modal/infinitesimal
 import library/foundations/modal/modality
 import library/foundations/modal/sharp
@@ -53,5 +53,4 @@ import library/mathematics/homotopy/hopf
 import library/mathematics/homotopy/S1
 import library/mathematics/homotopy/Sn
 import library/mathematics/homotopy/KG1
-import library/mathematics/homotopy/homotopy
--- import library/mathematics/homotopy/KGn -- comment for speed
+import library/mathematics/homotopy/KGn

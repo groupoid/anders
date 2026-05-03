@@ -13,24 +13,29 @@ def sucPathZ : Path U Z Z
 def helix (x : S¹) : U
   := S1-ind (λ (_ : S¹), U) Z sucPathZ x
 
-axiom encode (x : S¹) (p : Path S¹ baseS1 x) : helix x
-{- := subst S¹ helix baseS1 x p zeroZ -}
+def encode (x : S¹) (p : Path S¹ baseS1 x) : helix x
+  := subst S¹ helix baseS1 x p zeroZ
 
-axiom decode (x : S¹) (c : helix x) : Path S¹ baseS1 x
-{- := S1-ind (λ (y : S¹), Π (_ : helix y), Path S¹ baseS1 y)
-     (λ (n : Z), +-ind ℕ ℕ (λ (m : Z), Path S¹ baseS1 baseS1)
-     (λ (n : ℕ), ind-nat (λ (k : ℕ), Path S¹ baseS1 baseS1)
-     (<_> baseS1) (λ (k : ℕ) (p : Path S¹ baseS1 baseS1), <i> (loop @ -i) ∘ p) n) (λ (n : ℕ),
-      ind-nat (λ (k : ℕ), Path S¹ baseS1 baseS1) (<_> baseS1) (λ (k : ℕ) (p : Path S¹ baseS1 baseS1), <i> (loop @ i) ∘ p) n) n)
+def loopN (n : ℕ) : Path S¹ baseS1 baseS1 :=
+  ind-nat (λ (_ : ℕ), Path S¹ baseS1 baseS1) (idp S¹ baseS1) (λ (_ : ℕ) (p : Path S¹ baseS1 baseS1), pcomp S¹ baseS1 baseS1 baseS1 loop p) n
+
+def invLoopN (n : ℕ) : Path S¹ baseS1 baseS1 :=
+  ind-nat (λ (_ : ℕ), Path S¹ baseS1 baseS1) (idp S¹ baseS1) (λ (_ : ℕ) (p : Path S¹ baseS1 baseS1), pcomp S¹ baseS1 baseS1 baseS1 (sym S¹ baseS1 baseS1 loop) p) n
+
+def decode_baseS1 (n : Z) : Path S¹ baseS1 baseS1 :=
+  +-ind ℕ ℕ (λ (_ : Z), Path S¹ baseS1 baseS1) invLoopN loopN n
+
+def decode (x : S¹) (c : helix x) : Path S¹ baseS1 x
+  := S1-ind (λ (y : S¹), Π (_ : helix y), Path S¹ baseS1 y)
+     (λ (n : Z), idp S¹ baseS1)
      (<i> λ (c : helix (loop @ i)),
-       transp (<j> Path S¹ baseS1 (loop @ i ∨ j)) -i
-         (+-ind ℕ ℕ (λ (m : Z), Path S¹ baseS1 baseS1)
-         (λ (n : ℕ), ind-nat (λ (k : ℕ), Path S¹ baseS1 baseS1)
-         (<_> baseS1) (λ (k : ℕ) (p : Path S¹ baseS1 baseS1), <i> (loop @ -i) ∘ p) n) (λ (n : ℕ),
-         ind-nat (λ (k : ℕ), Path S¹ baseS1 baseS1) (<_> baseS1) (λ (k : ℕ) (p : Path S¹ baseS1 baseS1),
-         <i> (loop @ i) ∘ p) n) (ouc (unglue (∂ i) [(i = 0) → (Z, sucEquivZ), (i = 1) → (Z, idEquivZ)] c)))) x c
--}
+        <j> hcomp S¹ (∂ i ∨ ∂ j)
+              (λ (k : I), [ (i = 0) → baseS1,
+                            (i = 1) → baseS1,
+                            (j = 0) → baseS1,
+                            (j = 1) → loop @ i ])
+              baseS1) x c
 
 -- π₁(S¹) = ℤ
-axiom loopS1equalsZ : Path U (Path S¹ baseS1 baseS1) Z
-{- := iso→Path (Path S¹ baseS1 baseS1) Z (encode baseS1) (decode baseS1) (λ (n : Z), <_> n) (λ (p : Path S¹ baseS1 baseS1), <_> p) -}
+def loopS1equalsZ : Path U (Path S¹ baseS1 baseS1) Z
+ := iso→Path (Path S¹ baseS1 baseS1) Z (encode baseS1) (decode baseS1) (λ (n : Z), <_> n) ?

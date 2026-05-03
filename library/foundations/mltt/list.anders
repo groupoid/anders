@@ -3,7 +3,7 @@
 
    HoTT 5.3 W-Types
 
-   Copyright (c) Groupoid Infinity, 2016-2026. -}
+   Copyright (c) Groupoid Infinity, 2014-2022. -}
 
 module list where
 import library/foundations/mltt/maybe

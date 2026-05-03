@@ -102,7 +102,7 @@ struct
     | '\x59' -> let s = exp () in let a = exp () in let x = exp () in EBase (s, a, x)
     | '\x5A' -> let s = exp () in let a = exp () in let f = exp () in EHub (s, a, f)
     | '\x5B' -> let s = exp () in let a = exp () in let f = exp () in let x = exp () in ESpoke (s, a, f, x)
-    | '\x5C' -> let s = exp () in let a = exp () in let x = exp () in let nc = exp () in let nh = exp () in let ns' = exp () in let z = exp () in EIndDisc (s, a, x, nc, nh, ns', z)
+    | '\x5C' -> let (s, a, x, nc, nh, ns') = exp6 () in EIndDisc (s, a, x, nc, nh, ns')
     | '\x60' -> EFla (exp ())
     | '\x61' -> EFlaUnit (exp ())
     | '\x62' -> EFlaCounit (exp ())
@@ -114,6 +114,7 @@ struct
   and exp3 () = let a = exp () in let b = exp () in let c = exp () in (a, b, c)
   and exp4 () = let a = exp () in let b = exp () in let c = exp () in let d = exp () in (a, b, c, d)
   and exp5 () = let a = exp () in let b = exp () in let c = exp () in let d = exp () in let e = exp () in (a, b, c, d, e)
+  and exp6 () = let a = exp () in let b = exp () in let c = exp () in let d = exp () in let e = exp () in let f = exp () in (a, b, c, d, e, f)
   and exp7 () = let a = exp () in let b = exp () in let c = exp () in let d = exp () in let e = exp () in let f = exp () in let g = exp () in (a, b, c, d, e, f, g)
 
   and clos () = let a = exp () in let p = ident () in let b = exp () in (a, p, b)

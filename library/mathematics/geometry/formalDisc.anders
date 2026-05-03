@@ -5,7 +5,7 @@
 
    https://arxiv.org/pdf/1806.05966.pdf
 
-   Copyright (c) Groupoid Infinity, 2016-2026. -}
+   Copyright (c) Groupoid Infinity, 2014-2022. -}
 
 module formalDisc where
 import library/foundations/univalent/path

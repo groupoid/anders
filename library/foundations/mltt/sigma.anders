@@ -5,7 +5,7 @@
    HoTT 2.6 Cartesian Product
    HoTT 2.7 Sigma Types
 
-   Copyright (c) Groupoid Infinity, 2016-2026. -}
+   Copyright (c) Groupoid Infinity, 2014-2023. -}
 
 module sigma where
 import library/foundations/univalent/path

@@ -36,6 +36,9 @@ let rec prettyPrintError : error -> string = function
   | Traceback (e, es)      ->
     List.map (fun (e, t)   -> Printf.sprintf "When trying to typecheck\n  %s\nAgainst type\n  %s\n" (showExp e) (showExp t)) es
     |> String.concat "" |> flip (^) (prettyPrintError e)
+  | ExpectedFla x          -> Printf.sprintf "“%s” expected to be a flat modality" (showExp x)
+  | ExpectedFlaUnit x      -> Printf.sprintf "“%s” expected to be a flat modality unit" (showExp x)
+  | ExpectedFlaCounit x    -> Printf.sprintf "“%s” expected to be a flat modality counit" (showExp x)
   | InvalidOpt x           -> Printf.sprintf "Unknown option “%s”\n" x
   | InvalidOptValue (p, x) -> Printf.sprintf "Unknown value “%s” of option “%s”\n" p x
 
@@ -55,4 +58,5 @@ let prettyPrintExn : exn -> unit = function
   | ex                                 -> Printf.printf "Uncaught exception: %s\n" (Printexc.to_string ex)
 
 let handleErrors (f : 'a -> 'b) (x : 'a) (default : 'b) : 'b =
-  try f x with ex -> prettyPrintExn ex; default
+  try f x with ex -> prettyPrintExn ex;
+    if !Prefs.repl then default else exit 1

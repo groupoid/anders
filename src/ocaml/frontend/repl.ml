@@ -16,7 +16,7 @@ Information about command line options can be found at ‘anders help’."
 
 let banner =
   Printf.sprintf "Anders Proof Assistant version %Ld.%Ld.%Ld
-Copyright © 2016–2026 Groupoid Infinity." 5L 5L 0L
+Copyright © 2016–2026 Groupoid Infinity." 5L 0L 0L
 
 let loaded : Files.t ref = ref Files.empty
 
@@ -35,5 +35,6 @@ let repl () =
   print_endline ("\n" ^ banner ^ "\n\nFor help type ‘:h’.\n");
   try while true do
     print_string "> "; let line = read_line () in
-    handleErrors (fun x -> main (Reader.parseErr Parser.repl (Lexing.from_string x) "<stdin>")) line ()
+    handleErrors (fun x -> main (Reader.parseErr Parser.repl
+      (Lexing.from_string x) "<stdin>")) line ()
   done with End_of_file -> ()

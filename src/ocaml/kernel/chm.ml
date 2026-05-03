@@ -23,22 +23,22 @@ let assign x t e = ctx := Env.add (ident x) (Global, Value t, getTerm e) !ctx
 let promote fn = try fn () with exc -> Error (extErr exc)
 
 let proto : req -> resp = function
-  | Check (e0, t0)     -> promote (fun () -> let t = freshExp t0 in
+  | Check (e0, t0)     -> promote (fun () -> reset_fuel (); let t = freshExp t0 in
     ignore (extSet (infer !ctx t)); check !ctx (freshExp e0) (eval !ctx t); OK)
   | Infer e            -> promote (fun () -> Term (rbV (infer !ctx (freshExp e))))
   | Eval e             -> promote (fun () -> Term (rbV (eval !ctx (freshExp e))))
   | Conv (e1, e2)      -> promote (fun () -> Bool (conv (eval !ctx (freshExp e1))
                                                         (eval !ctx (freshExp e2))))
-  | Def (x, t0, e0)    -> promote (fun () ->
+  | Def (x, t0, e0)    -> promote (fun () -> reset_fuel ();
     if Env.mem (ident x) !ctx then Error (AlreadyDeclared x)
     else (let t = freshExp t0 in let e = freshExp e0 in
       ignore (extSet (infer !ctx t)); let t' = eval !ctx t in
       check !ctx e t'; assign x t' e; OK))
-  | Assign (x, t0, e0) -> promote (fun () ->
+  | Assign (x, t0, e0) -> promote (fun () -> reset_fuel ();
     if Env.mem (ident x) !ctx then Error (AlreadyDeclared x)
     else (let t = freshExp t0 in ignore (extSet (infer !ctx t));
           assign x (eval !ctx t) (freshExp e0); OK))
-  | Assume (x, t0)     -> promote (fun () -> let t = freshExp t0 in
+  | Assume (x, t0)     -> promote (fun () -> reset_fuel (); let t = freshExp t0 in
     let y = ident x in if Env.mem y !ctx then Error (AlreadyDeclared x)
     else (ignore (extSet (infer !ctx t)); let t' = eval !ctx t in
           ctx := Env.add y (Global, Value t', Value (Var (y, t'))) !ctx; OK))
@@ -57,7 +57,6 @@ let proto : req -> resp = function
 
 let () = try while true do
   Serialize.resp (try proto (Deserialize.req ())
-    with Invalid_argument xs
-       | Failure xs -> Error (Unknown xs));
+    with exc -> Error (extErr exc));
   flush_all ()
 done with End_of_file -> ()

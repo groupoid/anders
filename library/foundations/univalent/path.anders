@@ -1,4 +1,4 @@
-{- Path: https://anders.groupoid.space/foundations/univalent/path/
+{- Path: https://anders.groupoid.space/foundations/univalent/path
 
    - Path Equality;
    - Computational properties;
@@ -393,7 +393,28 @@ def idfun′=idfun″ (A : U) : Path (A → A) (idfun′ A) (idfun″ A)
  := comp-Path (A → A) (idfun′ A) (idfun A) (idfun″ A) (<i> idfun=idfun′ A @ -i) (idfun=idfun″ A)
 
 def 𝟏-contr : Π (x : 𝟏), Path 𝟏 x ★
- := ind₁ (λ (x : 𝟏), Path 𝟏 x ★) (<_> ★)
+  := ind₁ (λ (x : 𝟏), Path 𝟏 x ★) (<_> ★)
 
 def contr-impl-prop (A : U) (H : isContr A) : isProp A
- := λ (a b : A), <i> hcomp A (∂ i) (λ (j : I), [(i = 0) → H.2 a @ j, (i = 1) → H.2 b @ j]) H.1
+  := λ (a b : A), <i> hcomp A (∂ i) (λ (j : I), [ (i = 0) → (H.2 a @ j), (i = 1) → (H.2 b @ j) ]) H.1
+
+def lemPropPathP (A : I → U) (pA : Π (i : I), isProp (A i)) (a0 : A 0) (a1 : A 1) : PathP (<i> A i) a0 a1
+  := <i> pA i (transp (<j> A (i ∧ j)) 0 a0) (transp (<j> A (i ∨ -j)) 0 a1) @ i
+
+def lemSig (A : U) (B : A → U) (pB : Π (x : A), isProp (B x)) (u v : Σ (x : A), B x) (p : Path A u.1 v.1) : Path (Σ (x : A), B x) u v
+  := <i> (p @ i, lemPropPathP (λ (j : I), B (p @ j)) (λ (j : I), pB (p @ j)) u.2 v.2 @ i)
+
+def propPi (A : U) (B : A → U) (pB : Π (x : A), isProp (B x)) : isProp (Π (x : A), B x)
+  := λ (f g : Π (x : A), B x), <i> λ (x : A), pB x (f x) (g x) @ i
+
+def propSet (A : U) (h : isProp A) : isSet A
+  := λ (a b : A) (p q : Path A a b),
+     <j i> hcomp A (∂ i ∨ ∂ j) (λ (k : I), [ (i = 0) → h a a @ k, (i = 1) → h a b @ k,
+                                            (j = 0) → h a (p @ i) @ k, (j = 1) → h a (q @ i) @ k]) a
+
+def propIsProp (A : U) : isProp (isProp A)
+  := λ (f g : isProp A), <i> λ (a b : A), propSet A f a b (f a b) (g a b) @ i
+
+def propIsSet (A : U) : isProp (isSet A)
+  := λ (f g : isSet A), <i> λ (a b : A) (p q : Path A a b),
+     propSet (Path A a b) (f a b) p q (f a b p q) (g a b p q) @ i

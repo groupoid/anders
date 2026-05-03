@@ -174,8 +174,7 @@ exp4 :
   | BASE exp6 exp6 exp6 { EBase ($2, $3, $4) }
   | HUB exp6 exp6 exp6 { EHub ($2, $3, $4) }
   | SPOKE exp6 exp6 exp6 exp6 { ESpoke ($2, $3, $4, $5) }
-  | INDDISC exp6 exp6 exp6 exp6 exp6 exp6 exp6 { EIndDisc ($2, $3, $4, $5, $6, $7, $8) }
-  | INDDISC exp6 exp6 exp6 exp6 exp6 exp6 exp6 { EIndDisc ($2, $3, $4, $5, $6, $7, $8) }
+  | INDDISC exp6 exp6 exp6 exp6 exp6 exp6 { EIndDisc ($2, $3, $4, $5, $6, $7) }
   | exp5 { $1 }
 
 

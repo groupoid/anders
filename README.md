@@ -188,6 +188,7 @@ anders.groupoid.space/foundations/
 │   └── infinitesimal/
 └── univalent/
     ├── equiv/
+    ├── hedberg/
     ├── extensionality/
     ├── iso/
     ├── path/

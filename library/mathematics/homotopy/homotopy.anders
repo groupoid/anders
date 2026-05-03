@@ -3,7 +3,7 @@
 
 module homotopy where
 import library/mathematics/homotopy/S1
-import library/mathematics/algebra/Z
+import library/mathematics/algebra/int
 import library/foundations/univalent/iso
 
 def sucPathZ : Path U Z Z

@@ -1,7 +1,7 @@
 {- Integers: https://anders.groupoid.space/mathematics/algebra/Z
    Copyright (c) Groupoid Infinity, 2014-2026. -}
 
-module Z where
+module int where
 import library/foundations/mltt/nat
 import library/foundations/mltt/either
 import library/foundations/univalent/path

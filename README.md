@@ -201,8 +201,9 @@ In the `mathematics` folder you will find Mathematical Components for HTS:
 ```
 anders.groupoid.space/mathematics/
 ├── algebra/
+│   ├── algebra/
 │   ├── homology/
-│   └── algebra/
+│   └── int/
 ├── analysis/
 │   ├── real/
 │   └── topology/
@@ -222,6 +223,9 @@ anders.groupoid.space/mathematics/
 │   ├── Sn/
 │   ├── coequalizer/
 │   ├── disc/
+│   ├── hopf/
+│   ├── loop/
+│   ├── pcoequ/
 │   ├── colimit/
 │   ├── pullback/
 │   ├── pushout/

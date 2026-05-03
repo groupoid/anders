@@ -28,8 +28,8 @@ def Ω-ind (A : U) (a₀ : A) (P : Π (x : A) (γ : Path A a₀ x), U) (p₀ : P
  := subst (singl A a₀) (λ (z : singl A a₀), P z.1 z.2) (eta A a₀) (x, γ) (contr A a₀ x γ) p₀
 
 def Ω-comp (A : U) (a₀ : A) (P : Π (x : A) (γ : Path A a₀ x), U) (p₀ : P a₀ (Ω-refl A a₀))
-  : PathP (<_> P a₀ (Ω-refl A a₀)) (Ω-ind A a₀ P p₀ a₀ (Ω-refl A a₀)) p₀ :=
-  <i> subst-comp (singl A a₀) (λ (z : singl A a₀), P z.1 z.2) (eta A a₀) p₀ @ -i
+  : PathP (<_> P a₀ (Ω-refl A a₀)) (Ω-ind A a₀ P p₀ a₀ (Ω-refl A a₀)) p₀
+ := <i> subst-comp (singl A a₀) (λ (z : singl A a₀), P z.1 z.2) (eta A a₀) p₀ @ -i
 
 def Ω-uniq (A : U) (a₀ : A) (P : Π (x : A) (γ : Path A a₀ x), U) (f : Π (x : A) (γ : Path A a₀ x), P x γ)
     (h-comp : PathP (<_> P a₀ (Ω-refl A a₀)) (f a₀ (Ω-refl A a₀)) (Ω-ind A a₀ P (f a₀ (Ω-refl A a₀)) a₀ (Ω-refl A a₀)))
@@ -44,21 +44,14 @@ def susp-Ω-motive (A : U) (a : A) (k : nat) (prev : PointedMap (Omega-Pointed A
  := PointedMap (Omega-Pointed A a (succ k)) (Path (Ωⁿ (𝚺 A) (𝜎₁ A) (succ k)) end end, <_> end)
 
 def susp-Ω-step (A : U) (a : A) (k : nat) (prev : PointedMap (Omega-Pointed A a k) (Omega-Pointed (𝚺 A) (𝜎₁ A) (succ k)))
- : PointedMap (Omega-Pointed A a (succ k)) (Omega-Pointed (𝚺 A) (𝜎₁ A) (succ (succ k)))
+  : PointedMap (Omega-Pointed A a (succ k)) (Omega-Pointed (𝚺 A) (𝜎₁ A) (succ (succ k)))
  := J (Ωⁿ (𝚺 A) (𝜎₁ A) (succ k)) (prev.1 (reflⁿ A a k)) (susp-Ω-motive A a k prev)
-      (λ (pk : Ωⁿ A a (succ k)), <i> prev.1 (pk @ i), <_ _> (prev.1 (reflⁿ A a k)))
-      (reflⁿ (𝚺 A) (𝜎₁ A) (succ k)) (prev.2)
+      (λ (pk : Ωⁿ A a (succ k)), <i> prev.1 (pk @ i), <_ _> (prev.1 (reflⁿ A a k))) (reflⁿ (𝚺 A) (𝜎₁ A) (succ k)) (prev.2)
 
 def susp-Ω (A : U) (a : A) (n : nat) : PointedMap (Omega-Pointed A a n) (Omega-Pointed (𝚺 A) (𝜎₁ A) (succ n))
  := ind-nat (λ (k : nat), PointedMap (Omega-Pointed A a k) (Omega-Pointed (𝚺 A) (𝜎₁ A) (succ k)))
-    (λ (x : A), comp-Path (𝚺 A) (𝜎₁ A) (𝜎₂ A) (𝜎₁ A) (𝜎₃ A x) (<i> (𝜎₃ A a) @ -i),
-     comp-inv-Path⁻¹ (𝚺 A) (𝜎₁ A) (𝜎₂ A) (𝜎₃ A a))
-    (λ (k : nat) (prev : PointedMap (Omega-Pointed A a k) (Omega-Pointed (𝚺 A) (𝜎₁ A) (succ k))),
-     susp-Ω-step A a k prev)
-    n
+    (λ (x : A), comp-Path (𝚺 A) (𝜎₁ A) (𝜎₂ A) (𝜎₁ A) (𝜎₃ A x) (<i> (𝜎₃ A a) @ -i), comp-inv-Path⁻¹ (𝚺 A) (𝜎₁ A) (𝜎₂ A) (𝜎₃ A a))
+    (λ (k : nat) (prev : PointedMap (Omega-Pointed A a k) (Omega-Pointed (𝚺 A) (𝜎₁ A) (succ k))), susp-Ω-step A a k prev) n
 
-def susp-Ω-map (A : U) (a : A) (n : nat) : Ωⁿ A a n → Ωⁿ (𝚺 A) (𝜎₁ A) (succ n)
- := (susp-Ω A a n).1
-
-def susp-Ω-pm (A : U) (a : A) (n : nat) : PointedMap (Omega-Pointed A a n) (Omega-Pointed (𝚺 A) (𝜎₁ A) (succ n))
- := susp-Ω A a n
+def susp-Ω-map (A : U) (a : A) (n : nat) : Ωⁿ A a n → Ωⁿ (𝚺 A) (𝜎₁ A) (succ n) := (susp-Ω A a n).1
+def susp-Ω-pm (A : U) (a : A) (n : nat) : PointedMap (Omega-Pointed A a n) (Omega-Pointed (𝚺 A) (𝜎₁ A) (succ n)) := susp-Ω A a n

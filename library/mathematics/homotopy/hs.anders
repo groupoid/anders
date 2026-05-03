@@ -51,40 +51,33 @@ def hs-β₃ (S A : U) (X : hs S A → U)
         (nSpoke f (λ (s : S), hs-ind S A X nCenter nHub nSpoke (f s)) s)
 
 -- 5) Uniqueness Rule
-def hs-η (S A : U) (X : hs S A → U) (h : Π (z : hs S A), X z) (hs-map : Π (z : hs S A), X z)
- := idp (Π (z : hs S A), X z) h
+def hs-η (S A : U) (X : hs S A → U) (h : Π (z : hs S A), X z) (hs-map : Π (z : hs S A), X z) := idp (Π (z : hs S A), X z) h
 
 --- Reality Check
 
-def trans-hs (S A : U) (u₀ : hs S A) : hs S A
- := transp (<i> hs S A) 0 u₀
-
-def trans-hs′ (S A : U) (u₀ : hs S A) : hs S A
- := u₀
+def trans-hs (S A : U) (u₀ : hs S A) : hs S A := transp (<i> hs S A) 0 u₀
+def trans-hs′ (S A : U) (u₀ : hs S A) : hs S A := u₀
 
 def trans-hs-is-correct (S A : U) (u₀ : hs S A)
- : Path (hs S A) (trans-hs S A u₀) (trans-hs′ S A u₀) := <_> trans-hs S A u₀
+  : Path (hs S A) (trans-hs S A u₀) (trans-hs′ S A u₀)
+ := <_> trans-hs S A u₀
 
 def hcomp-hs-base (S A : U) (r : I) (u : I → Partial A r) (u₀ : A[r ↦ u 0]) : hs S A
  := center S A (hcomp A r u (ouc u₀))
 
 def hcomp-hs-base-is-correct (S A : U) (r : I) (a : A)
- : Path (hs S A) (hcomp (hs S A) r (λ (i : I), [(r = 1) → center S A a]) (center S A a))
-                (center S A (hcomp A r (λ (i : I), [(r = 1) → a]) a))
+  : Path (hs S A) (hcomp (hs S A) r (λ (i : I), [(r = 1) → center S A a]) (center S A a)) (center S A (hcomp A r (λ (i : I), [(r = 1) → a]) a))
  := <_> center S A (hcomp A r (λ (i : I), [(r = 1) → a]) a)
 
 def hcomp-hs-hub-is-correct (S A : U) (r : I) (f : S → hs S A)
- : Path (hs S A) (hcomp (hs S A) r (λ (i : I), [(r = 1) → hub' S A f]) (hub' S A f))
-                (hub' S A (hcomp (S → hs S A) r (λ (i : I), [(r = 1) → f]) f))
+  : Path (hs S A) (hcomp (hs S A) r (λ (i : I), [(r = 1) → hub' S A f]) (hub' S A f)) (hub' S A (hcomp (S → hs S A) r (λ (i : I), [(r = 1) → f]) f))
  := <_> hub' S A (hcomp (S → hs S A) r (λ (i : I), [(r = 1) → f]) f)
 
 def hcomp-hs-spoke (S A : U) (r : I) (f : S → hs S A) (y : S)
- : Path (hs S A) (hub' S A (hcomp (S → hs S A) r (λ (k : I), [(r = 1) → f]) f))
-                (hcomp (hs S A) r (λ (k : I), [(r = 1) → f y]) (f y))
+  : Path (hs S A) (hub' S A (hcomp (S → hs S A) r (λ (k : I), [(r = 1) → f]) f)) (hcomp (hs S A) r (λ (k : I), [(r = 1) → f y]) (f y))
  := <i> hcomp (hs S A) r (λ (k : I), [(r = 1) → spoke' S A f y @ i]) (spoke' S A f y @ i)
 
 def hcomp-hs-spoke-is-correct (S A : U) (r : I) (f : S → hs S A) (y : S)
- : Path (Path (hs S A) (hub' S A (hcomp (S → hs S A) r (λ (k : I), [(r = 1) → f]) f)) (hcomp (hs S A) r (λ (k : I), [(r = 1) → f y]) (f y)))
-        (<i> hcomp (hs S A) r (λ (k : I), [(r = 1) → spoke' S A f y @ i]) (spoke' S A f y @ i))
-        (hcomp-hs-spoke S A r f y)
+  : Path (Path (hs S A) (hub' S A (hcomp (S → hs S A) r (λ (k : I), [(r = 1) → f]) f)) (hcomp (hs S A) r (λ (k : I), [(r = 1) → f y]) (f y)))
+         (<i> hcomp (hs S A) r (λ (k : I), [(r = 1) → spoke' S A f y @ i]) (spoke' S A f y @ i)) (hcomp-hs-spoke S A r f y)
  := <_> hcomp-hs-spoke S A r f y

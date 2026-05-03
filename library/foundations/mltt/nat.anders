@@ -1,7 +1,7 @@
 {- Natural Numbers: https://anders.groupoid.space/foundations/mltt/nat/
    - Nat.
    Implemented using kernel primitives for judgmental beta-reduction.
-   Copyright (c) Groupoid Infinity, 2014-2026. -}
+   Copyright (c) Groupoid Infinity, 2016-2026. -}
 
 module nat where
 import library/foundations/univalent/path

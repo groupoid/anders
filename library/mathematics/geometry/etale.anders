@@ -3,7 +3,7 @@
 
    EGA4 4.1 Etale maps
 
-   Copyright (c) Groupoid Infinity, 2014-2022. -}
+   Copyright (c) Groupoid Infinity, 2016-2026. -}
 
 module etale where
 import library/foundations/modal/infinitesimal

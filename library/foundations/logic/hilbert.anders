@@ -3,7 +3,7 @@
 
    https://en.wikipedia.org/wiki/List_of_Hilbert_systems
 
-   Copyright (c) Groupoid Infinity, 2014-2022. -}
+   Copyright (c) Groupoid Infinity, 2016-2026. -}
 
 module hilbert where
 import library/foundations/univalent/path

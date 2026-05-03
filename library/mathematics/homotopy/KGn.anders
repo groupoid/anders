@@ -3,7 +3,7 @@
     Implemented using primitive nat and ind-nat to ensure judgmental
     reduction across the loop space tower.
 
-    Copyright (c) Groupoid Infinity, 2014-2026. -}
+    Copyright (c) Groupoid Infinity, 2016-2026. -}
 
 module KGn where
 import library/foundations/mltt/nat

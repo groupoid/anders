@@ -1,5 +1,5 @@
 {- Hopf Fibration: https://anders.groupoid.space/mathematics/homotopy/hopf/
-   Copyright (c) Groupoid Infinity, 2014-2026. -}
+   Copyright (c) Groupoid Infinity, 2016-2026. -}
 
 module hopf where
 import library/foundations/univalent/path

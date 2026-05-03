@@ -1,5 +1,5 @@
-{- Integers: https://anders.groupoid.space/mathematics/algebra/Z
-   Copyright (c) Groupoid Infinity, 2014-2026. -}
+{- Integers: https://anders.groupoid.space/mathematics/algebra/int/
+   Copyright (c) Groupoid Infinity, 2016-2026. -}
 
 module int where
 import library/foundations/mltt/nat

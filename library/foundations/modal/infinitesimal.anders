@@ -3,7 +3,7 @@
 
    HoTT 7.7 Modalities
 
-   Copyright (c) Groupoid Infinity, 2014-2023. -}
+   Copyright (c) Groupoid Infinity, 2016-2026. -}
 
 module infinitesimal where
 import library/foundations/univalent/path

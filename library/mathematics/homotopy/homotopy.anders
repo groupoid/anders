@@ -1,5 +1,5 @@
 {- Homotopy Groups: https://anders.groupoid.space/mathematics/homotopy/groups/
-   Copyright (c) Groupoid Infinity, 2014-2026. -}
+   Copyright (c) Groupoid Infinity, 2016-2026. -}
 
 module homotopy where
 import library/mathematics/homotopy/S1

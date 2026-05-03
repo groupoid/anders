@@ -1,7 +1,7 @@
 {- Homotopy Natural Numbers: https://anders.groupoid.space/foundations/mltt/natw/
    - Homotopy Nat.
    Implemented using W primitives using transp enforcing Homotopy Canonicity and Losing Strong Canonicity.
-   Copyright (c) Groupoid Infinity, 2014-2026. -}
+   Copyright (c) Groupoid Infinity, 2016-2026. -}
 
 module natw where
 import library/foundations/mltt/inductive

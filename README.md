@@ -212,29 +212,29 @@ anders.groupoid.space/mathematics/
 │   ├── abelian/
 │   ├── category/
 │   ├── functor/
+│   ├── topos/
 │   └── groupoid/
 ├── geometry/
 │   ├── bundle/
 │   ├── etale/
 │   └── formalDisc/
-├── homotopy/
-│   ├── KG1/
-│   ├── KGn/
-│   ├── S1/
-│   ├── Sn/
-│   ├── coequalizer/
-│   ├── disc/
-│   ├── hopf/
-│   ├── loop/
-│   ├── pcoequ/
-│   ├── colimit/
-│   ├── pullback/
-│   ├── pushout/
-│   ├── quotient/
-│   ├── suspension/
-│   └── truncation/
-└── topoi/
-    └── topos/
+└── homotopy/
+    ├── KG1/
+    ├── KGn/
+    ├── S1/
+    ├── Sn/
+    ├── coequalizer/
+    ├── disc/
+    ├── hopf/
+    ├── loop/
+    ├── pcoequ/
+    ├── colimit/
+    ├── pullback/
+    ├── pushout/
+    ├── quotient/
+    ├── quotient2/
+    ├── suspension/
+    └── truncation/
 ```
 
 ## Usage

@@ -438,24 +438,30 @@ block content
                     Transport is defined on fibrant types (only) and type checker should cover all the cases.
                     Note that <b>transpⁱ (Pathʲ A v w) φ u₀</b> case is relying on <b>comp</b> operation
                     which depends on <b>hcomp</b> primitive.
-
                 code.
                     transpⁱ N φ u₀ = u₀
                     transpⁱ U φ A = A
-                    transpⁱ (Π (x : A), B) φ u₀ v = transpⁱ B(x/w) φ (u₀ w(i/0)), w = transp-Fill⁻ⁱ A φ v, v : A(i/1)
-                    transpⁱ (Σ (x : A), B) φ u₀ = (transpⁱ A φ (u₀.1), transpⁱ B(x/v) φ(u₀.2)), v = transp-Fillⁱ A φ u₀.1
-                    transpⁱ (Pathʲ A v w) φ u₀ = 〈j〉 compⁱ A [φ ↦ u₀ j, (j=0) ↦ v, (j=1) ↦ w] (u₀ j)
-                    transpⁱ G ψ u₀ = glue [φ(i/1) ↦ t′₁] a′₁ : G(i/1), G = Glue [φ ↦ (T,w)] A
-                    transpⁱ (W (x : A), B) φ (sup a f) = sup (transpⁱ A φ a) (transpⁱ (B(v) → W) φ f), v = transp-Fillⁱ A φ a
+                    transpⁱ (Π (x : A), B) φ u₀ v = transpⁱ B(x/w) φ (u₀ w(i/0))
+                    transpⁱ (Σ (x : A), B) φ u₀ = (transpⁱ A φ (u₀.1),transpⁱ B(x/v) φ(u₀.2))
+                    transpⁱ (Pathʲ A v w) φ u₀ = 〈j〉compⁱ A [φ ↦ u₀ j, (j=0) ↦ v, (j=1) ↦ w] (u₀ j)
+                    transpⁱ (Glue [φ ↦ (T,w)] A) ψ u₀ = glue [φ(i/1) ↦ t′₁] a′₁ : B(i/1)
                     transpⁱ (Coequ A B f g) φ (ι₂ b) = ι₂ (transpⁱ B φ b)
                     transpⁱ (Coequ A B f g) φ (resp a j) = resp (transpⁱ A φ a) j
                     transpⁱ (Disc S A) φ (base a) = base (transpⁱ A φ a)
                     transpⁱ (Disc S A) φ (hub f) = hub (transpⁱ (S → Disc S A) φ f)
-                    transpⁱ (Disc S A) φ (spoke f y j) = spoke (transpⁱ (S → Disc S A) φ f) (transpⁱ S φ y) j
+                    transpⁱ (Disc S A) φ (spoke f y j)
+                          = spoke (transpⁱ (S → Disc S A) φ f) (transpⁱ S φ y) j
                     transpⁱ (ℑ A) φ (ℑ-unit a) = ℑ-unit (transpⁱ A φ a)
                     transpⁱ (♭ A) φ (♭-unit a) = ♭-unit (transpⁱ A φ a)
                     transp⁻ⁱ A φ u = (transpⁱ A(i/1−i) φ u)(i/1−i) : A(i/0)
                     transp-Fillⁱ A φ u₀ = transpʲ A(i/i∧j) (φ∨(i=0)) u₀ : A
+                br.
+                code.
+                    w = transpFill⁻ⁱ A φ v, v : A(i/1)
+                    v = transpFillⁱ A φ u₀.1
+                    u : A(j/0), v : A(j/1)
+                    transp⁻ⁱ A φ u = (transpⁱ A(i/1−i) φ u)(i/1−i) : A(i/0)
+                    transpFillⁱ A φ u₀ = transpʲ A(i/i∧j) (φ∨(i=0)) u₀ : A
                 br.
                 +tex.
                     $\mathbf{Partial\ Elements}$. In order to explicitly define <b>hcomp</b>
@@ -507,18 +513,27 @@ block content
                     hcompⁱ N [φ ↦ S u] (S u₀) = S (hcompⁱ N [φ ↦ u] u₀)
                     hcompⁱ U [φ ↦ E] A = Glue [φ ↦ (E(i/1), equivⁱ E(i/1−i))] A
                     hcompⁱ (Π (x : A), B) [φ ↦ u] u₀ v = hcompⁱ B(x/v) [φ ↦ u v] (u₀ v)
-                    hcompⁱ (Σ (x : A), B) [φ ↦ u] u₀ = (v(i/1), compⁱ B(x/v) [φ ↦ u.2] u₀.2), v = hcomp-Fillⁱ A [φ ↦ u.1] u₀.1
-                    hcompⁱ (Pathʲ A v w) [φ ↦ u] u₀ = 〈j〉 hcompⁱ A [ φ ↦ u j, (j = 0) ↦ v, (j = 1) ↦ w ] (u₀ j)
-                    hcompⁱ G [ψ ↦ u] u₀ = glue [φ ↦ t₁] a₁ : G, G = Glue [φ ↦ (T,w)] A, t₁ = u(i/1) : T, a₁ = unglue u(i/1) : A, glue [φ ↦ t₁] a1 = t₁ : T
-                    hcompⁱ (W (x : A), B) [φ ↦ sup a f] (sup a₀ f₀) = sup (hcompⁱ A [φ ↦ a] a₀) (hcompⁱ (B(v) → W) [φ ↦ f] f₀), v = hcomp-Fillⁱ A [φ ↦ a] a₀
+                    hcompⁱ (Σ (x : A), B) [φ ↦ u] u₀ = (v(i/1), compⁱ B(x/v) [φ ↦ u.2] u₀.2)
+                    hcompⁱ (Pathʲ A v w) [φ ↦ u] u₀ = 〈j〉hcompⁱ A [ φ ↦ u j, (j = 0) ↦ v, (j = 1) ↦ w ] (u₀ j)
+                    hcompⁱ (Glue [φ ↦ (T,w)] A) [ψ ↦ u] u₀
+                         = glue [φ ↦ t₁] a₁
+                         = glue [φ ↦ u(i/1)] (unglue u(i/1))
+                         = u(i/1) : Glue [φ ↦ (T,w)] A
                     hcompⁱ (Coequ A B f g) [φ ↦ ι₂ u] (ι₂ u₀) = ι₂ (hcompⁱ B [φ ↦ u] u₀)
                     hcompⁱ (Coequ A B f g) [φ ↦ resp a j] (resp a₀ j) = resp (hcompⁱ A [φ ↦ a] a₀) j
                     hcompⁱ (Disc S A) [φ ↦ base a] (base a₀) = base (hcompⁱ A [φ ↦ a] a₀)
                     hcompⁱ (Disc S A) [φ ↦ hub f] (hub f₀) = hub (hcompⁱ (S → Disc S A) [φ ↦ f] f₀)
-                    hcompⁱ (Disc S A) [φ ↦ spoke f y j] (spoke f₀ y₀ j) = spoke (hcompⁱ (S → Disc S A) [φ ↦ f] f₀) (hcompⁱ S [φ ↦ y] y₀) j
+                    hcompⁱ (Disc S A) [φ ↦ spoke f y j] (spoke f₀ y₀ j)
+                         = spoke (hcompⁱ (S → Disc S A) [φ ↦ f] f₀) (hcompⁱ S [φ ↦ y] y₀) j
                     hcompⁱ (ℑ A) [φ ↦ ℑ-unit u] (ℑ-unit u₀) = ℑ-unit (hcompⁱ A [φ ↦ u] u₀)
                     hcompⁱ (♭ A) [φ ↦ ♭-unit u] (♭-unit u₀) = ♭-unit (hcompⁱ A [φ ↦ u] u₀)
-                    hсomp-Fillⁱ A [φ ↦ u] u₀ = hcompʲ A [φ ↦ u(i/i∧j), (i=0) ↦ u₀] u₀ : A
+                br.
+                code.
+                    hfillⁱ A [φ ↦ u] u₀ = hcompʲ A [φ ↦ u(i/i∧j), (i=0) ↦ u₀] u₀ : A
+                    v = hfillⁱ A [φ ↦ u.1] u₀.1
+                    t₁ = u(i/1) : T
+                    a₁ = unglue u(i/1) : A
+                    glue [φ ↦ t₁] a1 = t₁ : T
                 br.
 
                 h2#id Strict Equality

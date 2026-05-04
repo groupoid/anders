@@ -100,8 +100,8 @@ def ghcomp (A : U) (r : I) (u : I → Partial A r) (u₀ : A[r ↦ u 0]) : A
 $ anders check library/book.anders
 ```
 
-HTS Equations
--------------
+Canonical Equations
+-------------------
 
 ```
 transpⁱ N φ u₀ = u₀

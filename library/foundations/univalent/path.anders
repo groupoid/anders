@@ -264,7 +264,7 @@ def comp-Path-assoc (A : U) (a b c d : A) (f : Path A a b) (g : Path A b c) (h :
 --- also known as Simon Huber Equations:
 --- https://simhu.github.io/misc/hcomp.pdf
 
-{-  CCHM/HTS/HoTT Equations:
+{-  CCHM/HTS/HoTT Canonical (Huber) Equations:
 
     transpⁱ N φ u₀ = u₀
     transpⁱ U φ A = A

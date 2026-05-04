@@ -11,7 +11,7 @@ import library/foundations/mltt/either
 import library/mathematics/homotopy/Sn
 import library/mathematics/homotopy/hs
 
-def trunc  (A : U) (n : ℕ)        : U := hs (sphere n) A
+def trunc  (A : U) (n : ℕ)                                                 : U         := hs (sphere n) A
 def trunc₁ (A : U) (n : ℕ) (x : A)                                         : trunc A n := center (sphere n) A x
 def trunc₂ (A : U) (n : ℕ) (f : sphere n → hs (sphere n) A)                : trunc A n := hub' (sphere n) A f
 def trunc₃ (A : U) (n : ℕ) (f : sphere n → hs (sphere n) A) (s : sphere n)             := spoke' (sphere n) A f s

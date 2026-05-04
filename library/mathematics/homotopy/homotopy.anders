@@ -33,7 +33,7 @@ def decode (x : S¹) (c : helix x) : Path S¹ baseS1 x
              (λ (k : I), [ (i = 0) → baseS1,
                            (i = 1) → baseS1,
                            (j = 0) → baseS1,
-                           (j = 1) → loop @ i ]) baseS1) x c
+                           (j = 1) → baseS1 ]) baseS1) x c
 
 -- π₁(S¹) = ℤ
 def loopS1equalsZ

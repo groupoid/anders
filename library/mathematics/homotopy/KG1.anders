@@ -12,7 +12,6 @@ import library/mathematics/homotopy/truncation
 import library/mathematics/homotopy/quotient
 import library/mathematics/homotopy/quotient2
 
-
 def 𝚺ₓ (A: U) : ℕ → U := ℕ-iter U A 𝚺
 def discreteTopology (G : abgroup) : U := G.1.1
 def R-K1 (G : group) : 𝟏 → 𝟏 → U := λ (x y : 𝟏), G.1.1
@@ -27,9 +26,7 @@ def Q-K1-base (G : group) (r1 r2 : R¯ 𝟏 (R-K1 G) ★ ★) : U
 
 def Q-K1 (G : group) (x y : 𝟏) (r1 r2 : R¯ 𝟏 (R-K1 G) x y) : U
  := ind₁ (λ (x : 𝟏), Π (y : 𝟏) (r1 r2 : R¯ 𝟏 (R-K1 G) x y), U)
-         (λ (y : 𝟏), ind₁ (λ (y : 𝟏), Π (r1 r2 : R¯ 𝟏 (R-K1 G) ★ y), U)
-                        (Q-K1-base G) y)
-         x y r1 r2
+         (λ (y : 𝟏), ind₁ (λ (y : 𝟏), Π (r1 r2 : R¯ 𝟏 (R-K1 G) ★ y), U) (Q-K1-base G) y) x y r1 r2
 
 def K1 (G : group) : U := ‖_‖₁ (2-quot 𝟏 (R-K1 G) (Q-K1 G))
 def K1-point (G : group) : K1 G := trunc₁ (2-quot 𝟏 (R-K1 G) (Q-K1 G)) two (2-quot₁ 𝟏 (R-K1 G) (Q-K1 G) ★)

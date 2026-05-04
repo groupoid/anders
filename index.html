@@ -307,9 +307,7 @@ transport along paths built out of equivalences.
   | glue: lang → lang → gluening lang
   | unglue: lang → lang → gluening lang</code><br><h2 id="induction">Generic Higher Inductive Schemes</h2><p>The further development of induction inside <b>MLTT</b> provers led
 to the theory of polynomial functors and well-founded trees,
-known in programming languages as inductive types.</p><p>Inductive types could be encoded in PTS/Cedile using non-recursive
-representation of Bohm-Berarducci schemes or with categorical impredicative
-encoding by Steve Awodey.</p><p>Anders currently don’t support Lean-compatible generic inductive schemes
+known in programming languages as inductive types.</p><p>Anders currently don’t support Lean-compatible generic inductive schemes
 definition but in case it will the following AST occurs:
 </p><code>inductive tele (A: U) : U | emp: tele A | tel: name → A → tele A → tele A
 inductive branch (A: U) : U | br: name → branch A | args: list name → A → branch A
@@ -321,9 +319,9 @@ inductive hit (lang: U)
   | htor: name → list lang → list lang → lang → hit lang
   | case: name → lang → list (branch lang) → hit lang
 </code><p>So instead of generic inductive schemes Anders supports well-founded
-trees (W-types). Basic data types like List, Nat, Fin, Vec are
+trees (W-types). Basic data types like List, Fin, Vec are
 implemented as W-types in base library. As for higher inductive types
-Anders has Three-HIT basis (Coequalizer, HubSpoke and Colimit) to
+Anders has Three-HIT basis (Coequalizer, Hub Spokes Disk, and Well-founded trees) to
 express other HIT.</p><p>The non-well-founded trees (M-types) or infinite coinductive trees
 are useful for modeling infinite processes and are part
 of Milner’s Pi-calculus. Coinductive streams could be

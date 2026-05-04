@@ -8,6 +8,18 @@ import library/foundations/univalent/path
 import library/foundations/univalent/iso
 import library/foundations/univalent/hedberg
 
+def inl-inj (A B : U) (a a1 : A) (p : Path (+ A B) (inl A B a) (inl A B a1)) : Path A a a1
+ := cong (+ A B) A (λ (x : + A B), +-ind A B (λ (_ : + A B), A) (λ (u : A), u) (λ (_ : B), a) x) (inl A B a) (inl A B a1) p
+
+def inr-inj (A B : U) (b b1 : B) (p : Path (+ A B) (inr A B b) (inr A B b1)) : Path B b b1
+ := cong (+ A B) B (λ (x : + A B), +-ind A B (λ (_ : + A B), B) (λ (_ : A), b) (λ (v : B), v) x) (inr A B b) (inr A B b1) p
+
+def inlNotinr (A B : U) (a : A) (b : B) (p : Path (+ A B) (inl A B a) (inr A B b)) : 𝟎
+ := transp (<i> ind₂ (λ (x : 𝟐), U) 𝟏 𝟎 (p @ i).1) 0 star
+
+def inrNotinl (A B : U) (a : A) (b : B) (p : Path (+ A B) (inr A B b) (inl A B a)) : 𝟎
+ := transp (<i> ind₂ (λ (x : 𝟐), U) 𝟎 𝟏 (p @ i).1) 0 star
+
 def Z : U := + ℕ ℕ
 def zeroZ : Z := inr ℕ ℕ zero
 
@@ -38,8 +50,7 @@ def idEquivZ : equiv Z Z := (idfun Z, idIsEquiv Z)
 def natDec : discrete ℕ
   := λ (n m : ℕ),
      (ℕ-ind (λ (n : ℕ), Π (m : ℕ), dec (Path ℕ n m))
-     (ℕ-ind (λ (m : ℕ), dec (Path ℕ zero m))
-            (inl (Path ℕ zero zero) (Path ℕ zero zero → 𝟎) (<_> zero))
+     (ℕ-ind (λ (m : ℕ), dec (Path ℕ zero m)) (inl (Path ℕ zero zero) (Path ℕ zero zero → 𝟎) (<_> zero))
             (λ (m : ℕ) (prev : dec (Path ℕ zero m)), inr (Path ℕ zero (succ m)) (Path ℕ zero (succ m) → 𝟎) (λ (p : Path ℕ zero (succ m)), znots m p)))
      (λ (n : ℕ) (prev : Π (m : ℕ), dec (Path ℕ n m)),
         ℕ-ind (λ (m : ℕ), dec (Path ℕ (succ n) m))
@@ -47,25 +58,20 @@ def natDec : discrete ℕ
         (λ (m : ℕ) (prevM : dec (Path ℕ (succ n) m)),
            +-ind (Path ℕ n m) (Path ℕ n m → 𝟎) (λ (_ : dec (Path ℕ n m)), dec (Path ℕ (succ n) (succ m)))
            (λ (p : Path ℕ n m), inl (Path ℕ (succ n) (succ m)) (Path ℕ (succ n) (succ m) → 𝟎) (<i> succ (p @ i)))
-           (λ (np : Path ℕ n m → 𝟎), inr (Path ℕ (succ n) (succ m)) (Path ℕ (succ n) (succ m) → 𝟎) (λ (p : Path ℕ (succ n) (succ m)), np (prednat n m p)))
-           (prev m)))) n m
+           (λ (np : Path ℕ n m → 𝟎), inr (Path ℕ (succ n) (succ m)) (Path ℕ (succ n) (succ m) → 𝟎) (λ (p : Path ℕ (succ n) (succ m)), np (prednat n m p))) (prev m)))) n m
 
 def orDisc (A B : U) (dA : discrete A) (dB : discrete B) (z z1 : + A B) : dec (Path (+ A B) z z1)
   := +-ind A B (λ (x : + A B), dec (Path (+ A B) x z1))
      (λ (a : A), +-ind A B (λ (y : + A B), dec (Path (+ A B) (inl A B a) y))
        (λ (a1 : A), +-ind (Path A a a1) (Path A a a1 → 𝟎) (λ (_ : dec (Path A a a1)), dec (Path (+ A B) (inl A B a) (inl A B a1)))
                     (λ (p : Path A a a1), inl (Path (+ A B) (inl A B a) (inl A B a1)) (Path (+ A B) (inl A B a) (inl A B a1) → 𝟎) (<i> inl A B (p @ i)))
-                    (λ (np : Path A a a1 → 𝟎), inr (Path (+ A B) (inl A B a) (inl A B a1)) (Path (+ A B) (inl A B a) (inl A B a1) → 𝟎) (λ (p : Path (+ A B) (inl A B a) (inl A B a1)), np (inl-inj A B a a1 p)))
-                    (dA a a1))
-       (λ (b : B), inr (Path (+ A B) (inl A B a) (inr A B b)) (Path (+ A B) (inl A B a) (inr A B b) → 𝟎) (inlNotinr A B a b))
-       z1)
+                    (λ (np : Path A a a1 → 𝟎), inr (Path (+ A B) (inl A B a) (inl A B a1)) (Path (+ A B) (inl A B a) (inl A B a1) → 𝟎) (λ (p : Path (+ A B) (inl A B a) (inl A B a1)), np (inl-inj A B a a1 p))) (dA a a1))
+       (λ (b : B), inr (Path (+ A B) (inl A B a) (inr A B b)) (Path (+ A B) (inl A B a) (inr A B b) → 𝟎) (inlNotinr A B a b)) z1)
      (λ (b : B), +-ind A B (λ (y : + A B), dec (Path (+ A B) (inr A B b) y))
        (λ (a : A), inr (Path (+ A B) (inr A B b) (inl A B a)) (Path (+ A B) (inr A B b) (inl A B a) → 𝟎) (inrNotinl A B a b))
        (λ (b1 : B), +-ind (Path B b b1) (Path B b b1 → 𝟎) (λ (_ : dec (Path B b b1)), dec (Path (+ A B) (inr A B b) (inr A B b1)))
                     (λ (p : Path B b b1), inl (Path (+ A B) (inr A B b) (inr A B b1)) (Path (+ A B) (inr A B b) (inr A B b1) → 𝟎) (<i> inr A B (p @ i)))
-                    (λ (np : Path B b b1 → 𝟎), inr (Path (+ A B) (inr A B b) (inr A B b1)) (Path (+ A B) (inr A B b) (inr A B b1) → 𝟎) (λ (p : Path (+ A B) (inr A B b) (inr A B b1)), np (inr-inj A B b b1 p)))
-                    (dB b b1))
-       z1) z
+                    (λ (np : Path B b b1 → 𝟎), inr (Path (+ A B) (inr A B b) (inr A B b1)) (Path (+ A B) (inr A B b) (inr A B b1) → 𝟎) (λ (p : Path (+ A B) (inr A B b) (inr A B b1)), np (inr-inj A B b b1 p))) (dB b b1)) z1) z
 
 def ZSet : isSet Z := hedberg Z (orDisc ℕ ℕ natDec natDec)
 

@@ -418,3 +418,4 @@ def propIsProp (A : U) : isProp (isProp A)
 def propIsSet (A : U) : isProp (isSet A)
   := λ (f g : isSet A), <i> λ (a b : A) (p q : Path A a b),
      propSet (Path A a b) (f a b) p q (f a b p q) (g a b p q) @ i
+

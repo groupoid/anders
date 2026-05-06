@@ -297,10 +297,13 @@ and transport_internal i p phi u0 = match p, phi, u0 with
        transport i (app (c, VSucc n)) phi (app (app (s, n), ih)))))) in
     VIndNat (c', z', s')
 
-  | VIndBool c as p, phi, u0  -> VIndBool (act0 i vone c)
+  | VIndBool c as p, phi, u0  ->
+     VIndBool (act0 i vone c)
   | VIndUnit c as p, phi, u0  -> VIndUnit (act0 i vone c)
   | VIndEmpty c as p, phi, u0 -> VIndEmpty (act0 i vone c)
   | VHComp (VKan _, _, sys, u0), phi, a ->
+     print_string  "OK";
+     flush stdout;
      let u = match sys with VSystem s -> s | _ -> System.empty in
      let u' = System.map eta (forall i u) in
      let psi' = getFormulaV u' in

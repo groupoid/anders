@@ -9,6 +9,28 @@ import library/foundations/mltt/nat
 import library/mathematics/algebra/int
 import library/foundations/univalent/iso
 
+-- Intermediary Type that carries number of turns of a path along the circle
+-- This type is used to define the loop space of S¹ and
+-- its higher-dimensional analogues  
+
+def sucPathZ : Path U Z Z := iso→Path Z Z sucZ predZ sucpredZ predsucZ
+def helix (x : S¹) : U := S1-ind (λ (_ : S¹), U) Z sucPathZ x
+
+-- Transport Helix Paths from Integers
+
+def loopPos (n : ℕ) : Path S¹ baseS1 baseS1
+ := ind-nat (λ (_ : ℕ), Path S¹ baseS1 baseS1) (idp S¹ baseS1)
+            (λ (_ : ℕ) (p : Path S¹ baseS1 baseS1), pcomp S¹ baseS1 baseS1 baseS1 p loopS1) n
+
+def loopNeg (n : ℕ) : Path S¹ baseS1 baseS1
+ := ind-nat (λ (_ : ℕ), Path S¹ baseS1 baseS1) (idp S¹ baseS1)
+            (λ (_ : ℕ) (p : Path S¹ baseS1 baseS1), pcomp S¹ baseS1 baseS1 baseS1 p (sym S¹ baseS1 baseS1 loopS1)) n
+
+-- Encoding a path along S¹ as an element of helix
+-- This is done by transporting an element of Z along S¹ using the path p
+-- The result is an element of helix x, which is a path
+-- along S¹ that starts at baseS1 and ends at x
+
 -- Loops
 
 def compS1' := pcomp S¹ baseS1 baseS1 baseS1
@@ -26,23 +48,20 @@ def triv : loopS1' := idp S¹ baseS1
 def l0   : loopS1' := triv
 def l1   : loopS1' := oneTurn l0
 
-def loopPos (n : ℕ) : Path S¹ baseS1 baseS1
- := ind-nat (λ (_ : ℕ), Path S¹ baseS1 baseS1) (idp S¹ baseS1)
-            (λ (_ : ℕ) (p : Path S¹ baseS1 baseS1), pcomp S¹ baseS1 baseS1 baseS1 p loopS1) n
+-- Helix Path from Integer
 
-def loopNeg (n : ℕ) : Path S¹ baseS1 baseS1
- := ind-nat (λ (_ : ℕ), Path S¹ baseS1 baseS1) (idp S¹ baseS1)
-            (λ (_ : ℕ) (p : Path S¹ baseS1 baseS1), pcomp S¹ baseS1 baseS1 baseS1 p (sym S¹ baseS1 baseS1 loopS1)) n
+def encode (x : S¹) (p : Path S¹ baseS1 x) : helix x
+:= subst S¹ helix baseS1 x p zeroZ
+
+-- Paths with n turns
 
 def loopZ  (n : ℕ) : 𝟐 → loopS1' := ind₂ (\(_: 𝟐), Path S¹ baseS1 baseS1) (loopNeg n) (loopPos n)
 def turnZ (x : loopS1') : 𝟐 → loopS1' := ind₂ (\(_: 𝟐), Path S¹ baseS1 baseS1) (oneTurnInv x) (oneTurn x)
 
-def sucPathZ : Path U Z Z := iso→Path Z Z sucZ predZ sucpredZ predsucZ
-def helix (x : S¹) : U := S1-ind (λ (_ : S¹), U) Z sucPathZ x
-def encode (x : S¹) (p : Path S¹ baseS1 x) : helix x := subst S¹ helix baseS1 x p zeroZ
-
 def loopIt (n : Z) : Path S¹ baseS1 baseS1
  := +-ind ℕ ℕ (λ (_ : Z), Path S¹ baseS1 baseS1) (λ (n : ℕ), loopNeg (succ n)) loopPos n
+
+-- Transport Integers from Helix Paths
 
 def lemTransC (A : U) (a : A) : Path A (transp (<_> A) 0 a) a
   := <j> transp (<_> A) j a
@@ -57,19 +76,7 @@ def corFib1 (A : U) (F G : A -> U) (a : A) (fa ga : Π (u : F a), G a) (p : Path
         (pcomp (G a) (ga' u) (transp (<_> G a) 0 (ga' u)) (ga'' (transp (<_> F a) 0 u)) (<i> lemTransC (G a) (ga' u) @ -i) (ha u))
         (<i> ga'' (lemTransC (F a) u @ i)) @ i) a p fa ga h
 
-def SuspBool→S¹ : 𝚺 𝟐 → S¹
- := 𝚺-rec 𝟐 S¹ baseS1 baseS1 (ind₂ (λ (_ : 𝟐), Path S¹ baseS1 baseS1) loopS1 (idp S¹ baseS1))
-
--- S¹→SuspBool : S¹ → 𝚺 𝟐
-def S¹→SuspBool : S¹ → 𝚺 𝟐
- := S1-ind (λ (_ : S¹), 𝚺 𝟐) (𝜎₁ 𝟐) (pcomp (𝚺 𝟐) (𝜎₁ 𝟐) (𝜎₂ 𝟐) (𝜎₁ 𝟐) (𝜎₃ 𝟐 0₂) (<i> 𝜎₃ 𝟐 1₂ @ -i))
-
-def S¹→SuspBool→S¹-loop : PathP (<i> Path S¹ (SuspBool→S¹ (S¹→SuspBool (loopS1 @ i))) (loopS1 @ i)) (idp S¹ baseS1) (idp S¹ baseS1)
- := <i j> hfill S¹ (∂ i) (λ (k : I), [ (i = 0) → baseS1, (i = 1) → baseS1 ]) (inc S¹ (∂ i) (loopS1 @ i)) -j
-
--- S¹→SuspBool→S¹ : (x : S¹) → SuspBool→S¹ (S¹→SuspBool x) ≡ x
-def S¹→SuspBool→S¹ (x : S¹) : Path S¹ (SuspBool→S¹ (S¹→SuspBool x)) x
- := S1-ind (λ (y : S¹), Path S¹ (SuspBool→S¹ (S¹→SuspBool y)) y) (idp S¹ baseS1) S¹→SuspBool→S¹-loop x
+-- Windings
 
 def winding (p : loopS1') : Z := trans Z Z (<i> helix (p @ i)) zeroZ
 
@@ -78,14 +85,34 @@ def loopZ2 : Z := winding loop2
 def loopZ3 : Z := winding loop3
 def loopZ4 : Z := winding loop4
 
+-- Integer from Helix Path
+
 def decode (x : S¹) (c : helix x) : Path S¹ baseS1 x
  := S1-ind (λ (y : S¹), helix y → Path S¹ baseS1 y) loopIt
        (corFib1 S¹ helix (λ (y : S¹), Path S¹ baseS1 y) baseS1 loopIt loopIt loop
          (λ (u : Z), +-ind ℕ ℕ (λ (v : Z), Path (Path S¹ baseS1 baseS1) (pcomp S¹ baseS1 baseS1 baseS1 (loopIt v) loop) (loopIt (sucZ v)))
-            (λ (n : ℕ), <_> invLoopN n)
-            (λ (n : ℕ), <_> loopN (succ n)) u)) x c
+            (λ (n : ℕ), <_> loopNeg n)
+            (λ (n : ℕ), <_> loopPos (succ n)) u)) x c
 
 -- π₁(S¹) = ℤ
 def loopS1equalsZ
   : Path U (Path S¹ baseS1 baseS1) Z
  := iso→Path (Path S¹ baseS1 baseS1) Z (encode baseS1) (decode baseS1) (λ (n : Z), <_> n) ?
+
+-- Other Theorems
+
+def SuspBool→S¹ : 𝚺 𝟐 → S¹
+ := 𝚺-rec 𝟐 S¹ baseS1 baseS1 (ind₂ (λ (_ : 𝟐), Path S¹ baseS1 baseS1) loopS1 (idp S¹ baseS1))
+
+def S¹→SuspBool : S¹ → 𝚺 𝟐
+ := S1-ind (λ (_ : S¹), 𝚺 𝟐) (𝜎₁ 𝟐) (pcomp (𝚺 𝟐) (𝜎₁ 𝟐) (𝜎₂ 𝟐) (𝜎₁ 𝟐) (𝜎₃ 𝟐 0₂) (<i> 𝜎₃ 𝟐 1₂ @ -i))
+
+def S¹→SuspBool→S¹-loop
+  : PathP (<i> Path S¹ (SuspBool→S¹ (S¹→SuspBool (loopS1 @ i))) (loopS1 @ i)) (idp S¹ baseS1) (idp S¹ baseS1)
+ := <i j> hfill S¹ (∂ i) (λ (k : I), 
+    [ (i = 0) → baseS1, 
+      (i = 1) → baseS1 ]) (inc S¹ (∂ i) (loopS1 @ i)) -j
+
+def S¹→SuspBool→S¹ (x : S¹) : Path S¹ (SuspBool→S¹ (S¹→SuspBool x)) x
+ := S1-ind (λ (y : S¹), Path S¹ (SuspBool→S¹ (S¹→SuspBool y)) y) (idp S¹ baseS1)
+           S¹→SuspBool→S¹-loop x

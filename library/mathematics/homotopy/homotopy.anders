@@ -48,18 +48,16 @@ def triv : loopS1' := idp S¹ baseS1
 def l0   : loopS1' := triv
 def l1   : loopS1' := oneTurn l0
 
--- Helix Path from Integer
-
-def encode (x : S¹) (p : Path S¹ baseS1 x) : helix x
-:= subst S¹ helix baseS1 x p zeroZ
-
--- Paths with n turns
-
 def loopZ  (n : ℕ) : 𝟐 → loopS1' := ind₂ (\(_: 𝟐), Path S¹ baseS1 baseS1) (loopNeg n) (loopPos n)
 def turnZ (x : loopS1') : 𝟐 → loopS1' := ind₂ (\(_: 𝟐), Path S¹ baseS1 baseS1) (oneTurnInv x) (oneTurn x)
 
 def loopIt (n : Z) : Path S¹ baseS1 baseS1
  := +-ind ℕ ℕ (λ (_ : Z), Path S¹ baseS1 baseS1) (λ (n : ℕ), loopNeg (succ n)) loopPos n
+
+-- Helix Path from Integer
+
+def encode (x : S¹) (p : Path S¹ baseS1 x) : helix x
+:= subst S¹ helix baseS1 x p zeroZ
 
 -- Transport Integers from Helix Paths
 

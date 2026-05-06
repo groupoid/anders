@@ -14,11 +14,15 @@ let extSigG : value -> value * clos = function
 
 let extSet : value -> Z.t = function
   | VPre n | VKan n -> n
-  | v               -> raise (Internal (ExpectedType (rbV v)))
+  | VEmpty | VUnit | VBool | VNat
+  | VIm _ | VFla _ | VPathP _ | VId _ | VPi _ | VSig _ | VDisc _ | W _ | VCoequ _ -> Z.zero
+  | v -> raise (Internal (ExpectedType (rbV v)))
 
 let extKan : value -> Z.t = function
   | VKan n -> n
-  | v      -> raise (Internal (ExpectedKan (rbV v)))
+  | VEmpty | VUnit | VBool | VNat
+  | VIm _ | VFla _ | VPathP _ | VId _ | VPi _ | VSig _ | VDisc _ | W _ | VCoequ _ -> Z.zero
+  | v -> raise (Internal (ExpectedKan (rbV v)))
 
 let extIm : value -> value = function
   | VIm v -> v
@@ -65,11 +69,28 @@ let isZero : value -> bool = function
 let isSucc : value -> bool = function
   | VSucc _ -> true | _ -> false
 
+let isStar : value -> bool = function
+  | VStar -> true | _ -> false
+
+let isFalse : value -> bool = function
+  | VFalse -> true | _ -> false
+
+let isTrue : value -> bool = function
+  | VTrue -> true | _ -> false
+
+let is_constant_clos (_, f) =
+  let p = freshName "κ" in
+  not (IdentSet.mem p (get_support (f (Var (p, VI)))))
+
 let isIota2 : value -> bool = function
   | VIota2 _ -> true | _ -> false
 
 let isResp : value -> bool = function
   | VResp _ -> true | _ -> false
+
+let is_constant_motive = function
+  | VLam (_, f) -> is_constant_clos f
+  | _ -> false
 
 let isBase : value -> bool = function
   | VBase _ -> true | _ -> false

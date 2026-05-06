@@ -89,11 +89,11 @@ let rec support = function
     IdentSet.union (support s) (IdentSet.union (support a) (IdentSet.union (support x) (IdentSet.union (support nc) (IdentSet.union (support nh) (support ns)))))
   | VIndNat (c, z, s) -> IdentSet.union (support c) (IdentSet.union (support z) (support s))
   | VNeg v -> support v
-let support_cache_size = 256
+let support_cache_size = 1048576
 let support_cache = Array.make support_cache_size (VHole, IdentSet.empty)
 let support_cache_idx = ref 0
 let get_support v =
-  let h = (Hashtbl.hash v) land (support_cache_size - 1) in
+  let h = (Hashtbl.hash_param 10 100 v) land (support_cache_size - 1) in
   let (v', s) = support_cache.(h) in
   if v == v' then s else
   let s = support v in

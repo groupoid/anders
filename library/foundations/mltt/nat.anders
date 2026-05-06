@@ -9,6 +9,7 @@ import library/foundations/mltt/bool
 
 -- 1) Formation Rule
 def ℕ : U := __nat
+def nat := ℕ
 
 -- 2) Introduction Rules
 def zero : ℕ := __zero

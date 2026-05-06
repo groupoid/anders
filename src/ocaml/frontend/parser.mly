@@ -15,7 +15,6 @@
               ("★", EStar);      ("star", EStar);
               ("false", EFalse); ("0₂", EFalse);
               ("true", ETrue);   ("1₂", ETrue);
-              ("nat", ENat);
               ("__nat", ENat);   ("__zero", EZero);
               ("__succ", ELam (ENat, (ident "n", ESucc (EVar (ident "n")))));
               ("__ind_nat", ELam (ePi (ident "x") ENat (EKan Z.zero), (ident "C",
@@ -103,10 +102,10 @@ any_ident:
   | INDEMPTY { "ind-empty" }
   | INDUNIT { "ind-unit" }
   | INDBOOL { "ind-bool" }
-  | NAT { "nat" }
-  | ZERO { "zero" }
-  | SUCC { "succ" }
-  | INDNAT { "ind-nat" }
+  | NAT { "__nat" }
+  | ZERO { "__zero" }
+  | SUCC { "__succ" }
+  | INDNAT { "__ind_nat" }
 
 ident : IRREF { Irrefutable } | any_ident { ident $1 }
 vars : ident+ { $1 }
@@ -192,10 +191,10 @@ exp6:
   | NEGATE exp6 { ENeg $2 }
   | LSQ separated_list(COMMA, part) RSQ { ESystem (System.of_seq (Seq.filter_map parsePartial (List.to_seq $2))) }
   | LPARENS exp1 RPARENS { $2 }
-  | NAT { getVar "nat" }
-  | ZERO { getVar "zero" }
-  | SUCC { getVar "succ" }
-  | INDNAT { getVar "ind-nat" }
+  | NAT { getVar "__nat" }
+  | ZERO { getVar "__zero" }
+  | SUCC { getVar "__succ" }
+  | INDNAT { getVar "__ind_nat" }
   | IDENT { getVar $1 }
 
 declarations:

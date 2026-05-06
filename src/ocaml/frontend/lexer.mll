@@ -100,8 +100,8 @@ rule main = parse
   | "disc"       -> DISC     | "base"            -> BASE
   | "hub"        -> HUB      | "spoke"           -> SPOKE
   | "disc-ind"   -> INDDISC
-  | "nat"        -> NAT      | "zero"            -> ZERO
-  | "succ"       -> SUCC     | "ind-nat"         -> INDNAT
+  | "__nat"        -> NAT      | "__zero"            -> ZERO
+  | "__succ"       -> SUCC     | "__ind_nat"         -> INDNAT
   | "\xE2\x99\xAD"           -> FLA      (* ♭ *)
   | "\xE2\x99\xAD-unit"      -> FLAUNIT  (* ♭-unit *)
   | "\xE2\x99\xAD-counit"    -> FLACOUNIT(* ♭-counit *)
@@ -114,9 +114,6 @@ rule main = parse
   | "ind-unit"  | "ind\xE2\x82\x81" -> INDUNIT
   | "ind-bool"  | "ind\xE2\x82\x82" -> INDBOOL
   | "definition"             | "def"
-
-
-
   | "theorem"                | "lemma"
   | "corollary"              | "proposition"     -> DEF
   | "axiom"                  | "postulate"       -> AXIOM

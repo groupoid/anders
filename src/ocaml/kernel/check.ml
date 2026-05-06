@@ -7,7 +7,7 @@ open Term
 open Gen
 open Rbv
 
-let timeout = 1000.0
+let timeout = 5.0
 let startTime = ref (Unix.gettimeofday ())
 let fuel = ref 1000000
 let conv_depth = ref 0
@@ -907,21 +907,43 @@ and act_internal rho v = match v with
   | VSystem ts           -> VSystem (bimap (actVar rho) (fun mu -> upd mu >> act rho) ts)
   | VSub (t, i, u)       -> VSub (act rho t, act rho i, act rho u)
   | VTransp (p, i)       -> VTransp (act rho p, act rho i)
-  | VHComp (t, r, u, u0) -> hcomp (act rho t) (act rho r) (act rho u) (act rho u0)
-  | VAppFormula (f, x)   -> appFormula (act rho f) (act rho x)
-  | VId v                -> VId (act rho v)
-  | VRef v               -> VRef (act rho v)
-  | VJ v                 -> VJ (act rho v)
+  | VHComp (t, r, u, u0) as v ->
+    let t' = act rho t in let r' = act rho r in
+    let u' = act rho u in let u0' = act rho u0 in
+    if t == t' && r == r' && u == u' && u0 == u0' then v
+    else hcomp t' r' u' u0'
+  | VAppFormula (f, x) as v ->
+    let f' = act rho f in let x' = act rho x in
+    if f == f' && x == x' then v else appFormula f' x'
+  | VId v as v'          ->
+    let v'' = act rho v in if v == v'' then v' else VId v''
+  | VRef v as v'         ->
+    let v'' = act rho v in if v == v'' then v' else VRef v''
+  | VJ v as v'           ->
+    let v'' = act rho v in if v == v'' then v' else VJ v''
   | VI                   -> VI
   | VDir d               -> VDir d
-  | VAnd (u, v)          -> andFormula (act rho u, act rho v)
-  | VOr (u, v)           -> orFormula (act rho u, act rho v)
-  | VNeg u               -> negFormula (act rho u)
-  | VInc (t, r)          -> VInc (act rho t, act rho r)
-  | VOuc v               -> ouc (act rho v)
-  | VGlue v              -> VGlue (act rho v)
-  | VGlueElem (r, u, a)  -> glue (act rho r) (act rho u) (act rho a)
-  | VUnglue (r, u, b)    -> unglue (act rho r) (act rho u) (act rho b)
+  | VAnd (u, v) as w     ->
+    let u' = act rho u in let v' = act rho v in
+    if u == u' && v == v' then w else andFormula (u', v')
+  | VOr (u, v) as w      ->
+    let u' = act rho u in let v' = act rho v in
+    if u == u' && v == v' then w else orFormula (u', v')
+  | VNeg u as v          ->
+    let u' = act rho u in if u == u' then v else negFormula u'
+  | VInc (t, r) as v     ->
+    let t' = act rho t in let r' = act rho r in
+    if t == t' && r == r' then v else VInc (t', r')
+  | VOuc v as v'         ->
+    let v'' = act rho v in if v == v'' then v' else ouc v''
+  | VGlue v as v'        ->
+    let v'' = act rho v in if v == v'' then v' else VGlue v''
+  | VGlueElem (r, u, a) as v ->
+    let r' = act rho r in let u' = act rho u in let a' = act rho a in
+    if r == r' && u == u' && a == a' then v else glue r' u' a'
+  | VUnglue (r, u, b) as v ->
+    let r' = act rho r in let u' = act rho u in let b' = act rho b in
+    if r == r' && u == u' && b == b' then v else unglue r' u' b'
   | VEmpty               -> VEmpty
   | VIndEmpty v          -> VIndEmpty (act rho v)
   | VUnit                -> VUnit
@@ -950,11 +972,22 @@ and act_internal rho v = match v with
   | VBase (s, a, x) -> VBase (act rho s, act rho a, act rho x)
   | VHub (s, a, f) -> VHub (act rho s, act rho a, act rho f)
   | VSpoke (s, a, f, x) -> VSpoke (act rho s, act rho a, act rho f, act rho x)
-  | VIndDisc (s, a, x, nc, nh, ns) -> VIndDisc (act rho s, act rho a, act rho x, act rho nc, act rho nh, act rho ns)
-  | VFla t               -> VFla (act rho t)
-  | VFlaUnit v           -> flaunit (act rho v)
-  | VFlaCounit v         -> flacounit (act rho v)
-  | VIndFla (a, b)       -> VIndFla (act rho a, act rho b)
+  | VIndDisc (s, a, x, nc, nh, ns) as v ->
+    let s' = act rho s in let a' = act rho a in let x' = act rho x in let nc' = act rho nc in let nh' = act rho nh in let ns' = act rho ns in
+    if s == s' && a == a' && x == x' && nc == nc' && nh == nh' && ns == ns' then v else VIndDisc (s', a', x', nc', nh', ns')
+  | VFla t as v          ->
+    let t' = act rho t in if t == t' then v else VFla t'
+  | VFlaUnit v as v'     ->
+    let v'' = act rho v in if v == v'' then v' else flaunit v''
+  | VFlaCounit v as v'   ->
+    let v'' = act rho v in if v == v'' then v' else flacounit v''
+  | VIndFla (a, b) as v  ->
+    let a' = act rho a in let b' = act rho b in
+    if a == a' && b == b' then v else VIndFla (a', b')
+
+and act_system rho ts =
+  let ts' = bimap (actVar rho) (fun mu -> upd mu >> act rho) ts in
+  if ts == ts' then ts else ts'
 
 
 and actVar rho i = match Env.find_opt i rho with

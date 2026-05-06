@@ -3,7 +3,6 @@
 
 module homotopy where
 import library/foundations/mltt/proto
-import library/mathematics/homotopy/suspension
 import library/mathematics/homotopy/S1
 import library/foundations/mltt/nat
 import library/mathematics/algebra/int
@@ -97,20 +96,5 @@ def loopS1equalsZ
   : Path U (Path S¹ baseS1 baseS1) Z
  := iso→Path (Path S¹ baseS1 baseS1) Z (encode baseS1) (decode baseS1) (λ (n : Z), <_> n) ?
 
--- Other Theorems
 
-def SuspBool→S¹ : 𝚺 𝟐 → S¹
- := 𝚺-rec 𝟐 S¹ baseS1 baseS1 (ind₂ (λ (_ : 𝟐), Path S¹ baseS1 baseS1) loopS1 (idp S¹ baseS1))
 
-def S¹→SuspBool : S¹ → 𝚺 𝟐
- := S1-ind (λ (_ : S¹), 𝚺 𝟐) (𝜎₁ 𝟐) (pcomp (𝚺 𝟐) (𝜎₁ 𝟐) (𝜎₂ 𝟐) (𝜎₁ 𝟐) (𝜎₃ 𝟐 0₂) (<i> 𝜎₃ 𝟐 1₂ @ -i))
-
-def S¹→SuspBool→S¹-loop
-  : PathP (<i> Path S¹ (SuspBool→S¹ (S¹→SuspBool (loopS1 @ i))) (loopS1 @ i)) (idp S¹ baseS1) (idp S¹ baseS1)
- := <i j> hfill S¹ (∂ i) (λ (k : I), 
-    [ (i = 0) → baseS1, 
-      (i = 1) → baseS1 ]) (inc S¹ (∂ i) (loopS1 @ i)) -j
-
-def S¹→SuspBool→S¹ (x : S¹) : Path S¹ (SuspBool→S¹ (S¹→SuspBool x)) x
- := S1-ind (λ (y : S¹), Path S¹ (SuspBool→S¹ (S¹→SuspBool y)) y) (idp S¹ baseS1)
-           S¹→SuspBool→S¹-loop x

@@ -7,7 +7,7 @@ open Term
 open Gen
 open Rbv
 
-let timeout = 10.0
+let timeout = 100.0
 let startTime = ref (Unix.gettimeofday ())
 let fuel = ref 10000000
 let conv_depth = ref 0

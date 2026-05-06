@@ -2,28 +2,60 @@
    Copyright (c) Groupoid Infinity, 2016-2026. -}
 
 module homotopy where
+import library/foundations/mltt/proto
 import library/mathematics/homotopy/S1
+import library/foundations/mltt/nat
 import library/mathematics/algebra/int
 import library/foundations/univalent/iso
-option irrelevance true
 
-def sucPathZ : Path U Z Z
-  := iso→Path Z Z sucZ predZ sucpredZ predsucZ
+-- Loops
 
--- Helix Family (Universal Cover)
-def helix (x : S¹) : U
-  := S1-ind (λ (_ : S¹), U) Z sucPathZ x
+def compS1' := pcomp S¹ baseS1 baseS1 baseS1
+def loopS1' : U := Path S¹ baseS1 baseS1
+def loop1 : loopS1' := loopS1
+def loop2 : loopS1' := compS1' loop1 loop1
+def loop3 : loopS1' := compS1' loop2 loop1
+def loop4 : loopS1' := compS1' loop3 loop1
 
-def encode (x : S¹) (p : Path S¹ baseS1 x) : helix x
-  := subst S¹ helix baseS1 x p zeroZ
+def invLoop    : loopS1'           := inv S¹ baseS1 baseS1 loop1
+def oneTurn    : loopS1' → loopS1' := \ (l: loopS1'), compS1' l loop1
+def oneTurnInv : loopS1' → loopS1' := \ (l: loopS1'), compS1' l invLoop
+
+def triv : loopS1' := idp S¹ baseS1
+def l0   : loopS1' := triv
+def l1   : loopS1' := oneTurn l0
+
+def loopPos (n : ℕ) : Path S¹ baseS1 baseS1
+ := ind-nat (λ (_ : ℕ), Path S¹ baseS1 baseS1) (idp S¹ baseS1)
+            (λ (_ : ℕ) (p : Path S¹ baseS1 baseS1), pcomp S¹ baseS1 baseS1 baseS1 p loopS1) n
+
+def loopNeg (n : ℕ) : Path S¹ baseS1 baseS1
+ := ind-nat (λ (_ : ℕ), Path S¹ baseS1 baseS1) (idp S¹ baseS1)
+            (λ (_ : ℕ) (p : Path S¹ baseS1 baseS1), pcomp S¹ baseS1 baseS1 baseS1 p (sym S¹ baseS1 baseS1 loopS1)) n
+
+def loopZ  (n : ℕ) : 𝟐 → loopS1' := ind₂ (\(_: 𝟐), Path S¹ baseS1 baseS1) (loopNeg n) (loopPos n)
+def turnZ (x : loopS1') : 𝟐 → loopS1' := ind₂ (\(_: 𝟐), Path S¹ baseS1 baseS1) (oneTurnInv x) (oneTurn x)
+
+def sucPathZ : Path U Z Z := iso→Path Z Z sucZ predZ sucpredZ predsucZ
+def helix (x : S¹) : U := S1-ind (λ (_ : S¹), U) Z sucPathZ x
+def encode (x : S¹) (p : Path S¹ baseS1 x) : helix x := subst S¹ helix baseS1 x p zeroZ
+
+def winding (p : loopS1') : Z := trans Z Z (<i> helix (p @ i)) zeroZ
+
+def loopZ1 : Z := winding loop1
+def loopZ2 : Z := winding loop2
+def loopZ3 : Z := winding loop3
+def loopZ4 : Z := winding loop4
 
 def loopN (n : ℕ) : Path S¹ baseS1 baseS1
- := ind-nat (λ (_ : ℕ), Path S¹ baseS1 baseS1) (idp S¹ baseS1) (λ (_ : ℕ) (p : Path S¹ baseS1 baseS1), pcomp S¹ baseS1 baseS1 baseS1 p loop) n
+ := ind-nat (λ (_ : ℕ), Path S¹ baseS1 baseS1) (idp S¹ baseS1)
+            (λ (_ : ℕ) (p : Path S¹ baseS1 baseS1), pcomp S¹ baseS1 baseS1 baseS1 p loopS1) n
 
 def invLoopN (n : ℕ) : Path S¹ baseS1 baseS1
- := ind-nat (λ (_ : ℕ), Path S¹ baseS1 baseS1) (idp S¹ baseS1) (λ (_ : ℕ) (p : Path S¹ baseS1 baseS1), pcomp S¹ baseS1 baseS1 baseS1 p (sym S¹ baseS1 baseS1 loop)) n
+ := ind-nat (λ (_ : ℕ), Path S¹ baseS1 baseS1) (idp S¹ baseS1)
+            (λ (_ : ℕ) (p : Path S¹ baseS1 baseS1), pcomp S¹ baseS1 baseS1 baseS1 p (sym S¹ baseS1 baseS1 loopS1)) n
 
-def decode_baseS1 (n : Z) : Path S¹ baseS1 baseS1
+def loopIt (n : Z) : Path S¹ baseS1 baseS1
  := +-ind ℕ ℕ (λ (_ : Z), Path S¹ baseS1 baseS1) (λ (n : ℕ), invLoopN (succ n)) loopN n
 
 def lemTransC (A : U) (a : A) : Path A (transp (<_> A) 0 a) a
@@ -32,22 +64,19 @@ def lemTransC (A : U) (a : A) : Path A (transp (<_> A) 0 a) a
 def corFib1 (A : U) (F G : A -> U) (a : A) (fa ga : Π (u : F a), G a) (p : Path A a a)
   (h : Π (u : F a), Path (G a) (subst A G a a p (fa u)) (ga (subst A F a a p u)))
   : PathP (<i> Π (u : F (p @ i)), G (p @ i)) fa ga
-  := J A a (λ (x y : A) (q : Path A x y), Π (fx : Π (u : F x), G x) (fy : Π (u : F y), G y), (Π (u : F x), Path (G y) (subst A G x y q (fx u)) (fy (subst A F x y q u))) → PathP (<i> Π (u : F (q @ i)), G (q @ i)) fx fy)
-       (λ (ga' ga'' : Π (u : F a), G a) (ha : Π (u : F a), Path (G a) (transp (<_> G a) 0 (ga' u)) (ga'' (transp (<_> F a) 0 u))), <i> λ (u : F a),
-         pcomp (G a) (ga' u) (ga'' (transp (<_> F a) 0 u)) (ga'' u)
-           (pcomp (G a) (ga' u) (transp (<_> G a) 0 (ga' u)) (ga'' (transp (<_> F a) 0 u)) (<i> lemTransC (G a) (ga' u) @ -i) (ha u))
-           (<i> ga'' (lemTransC (F a) u @ i)) @ i)
-       a p fa ga h
+  := J A a (λ (x y : A) (q : Path A x y), Π (fx : Π (u : F x), G x) (fy : Π (u : F y), G y),
+              (Π (u : F x), Path (G y) (subst A G x y q (fx u)) (fy (subst A F x y q u))) → PathP (<i> Π (u : F (q @ i)), G (q @ i)) fx fy)
+     (λ (ga' ga'' : Π (u : F a), G a) (ha : Π (u : F a), Path (G a) (transp (<_> G a) 0 (ga' u)) (ga'' (transp (<_> F a) 0 u))), <i> λ (u : F a),
+        pcomp (G a) (ga' u) (ga'' (transp (<_> F a) 0 u)) (ga'' u)
+        (pcomp (G a) (ga' u) (transp (<_> G a) 0 (ga' u)) (ga'' (transp (<_> F a) 0 u)) (<i> lemTransC (G a) (ga' u) @ -i) (ha u))
+        (<i> ga'' (lemTransC (F a) u @ i)) @ i) a p fa ga h
 
 def decode (x : S¹) (c : helix x) : Path S¹ baseS1 x
-  := S1-ind (λ (y : S¹), helix y → Path S¹ baseS1 y)
-       decode_baseS1
-       (corFib1 S¹ helix (λ (y : S¹), Path S¹ baseS1 y) baseS1 decode_baseS1 decode_baseS1 loop
-         (λ (u : Z), +-ind ℕ ℕ (λ (v : Z), Path (Path S¹ baseS1 baseS1) (pcomp S¹ baseS1 baseS1 baseS1 (decode_baseS1 v) loop) (decode_baseS1 (sucZ v)))
+ := S1-ind (λ (y : S¹), helix y → Path S¹ baseS1 y) loopIt
+       (corFib1 S¹ helix (λ (y : S¹), Path S¹ baseS1 y) baseS1 loopIt loopIt loop
+         (λ (u : Z), +-ind ℕ ℕ (λ (v : Z), Path (Path S¹ baseS1 baseS1) (pcomp S¹ baseS1 baseS1 baseS1 (loopIt v) loop) (loopIt (sucZ v)))
             (λ (n : ℕ), <_> invLoopN n)
-            (λ (n : ℕ), <_> loopN (succ n))
-            u))
-       x c
+            (λ (n : ℕ), <_> loopN (succ n)) u)) x c
 
 -- π₁(S¹) = ℤ
 def loopS1equalsZ

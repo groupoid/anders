@@ -25,7 +25,7 @@ def notEquiv : equiv 𝟐 𝟐 := (not, isoToEquiv 𝟐 𝟐 not not notK notK)
 def moebius : S¹ → U := S1-ind (λ (_ : S¹), U) 𝟐 (ua 𝟐 𝟐 notEquiv)
 
 -- 3. Hopf Fibration over S2 (Complex Fibration)
-def rot : Π (x : S¹), Path S¹ x x := S1-ind (λ (x : S¹), Path S¹ x x) loop (cs S¹ baseS1 loop)
+def rot : Π (x : S¹), Path S¹ x x := S1-ind (λ (x : S¹), Path S¹ x x) loopS1 (cs S¹ baseS1 loopS1)
 def mu : Π (x : S¹), equiv S¹ S¹
  := S1-ind (λ (x : S¹), equiv S¹ S¹ ) (idEquiv S¹)
            (equivPath S¹ S¹ (idEquiv S¹) (idEquiv S¹)

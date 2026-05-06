@@ -43,3 +43,12 @@ def 𝚺-η (A : U) (P : 𝚺 A → U) (h : Π (z : 𝚺 A), P z)
   : Path (Π (z : 𝚺 A), P z) h (𝚺-ind A P (h (𝜎₁ A)) (h (𝜎₂ A)) (λ (x : A), <i> h (𝜎₃ A x @ i)))
  := piext (𝚺 A) P h (𝚺-ind A P (h (𝜎₁ A)) (h (𝜎₂ A)) (λ (x : A), <i> h (𝜎₃ A x @ i)))
           (𝚺-η-pointwise A P h)
+
+-- suspFun : (A → B) → 𝚺 A → 𝚺 B
+def suspFun (A B : U) (f : A → B) : 𝚺 A → 𝚺 B
+ := 𝚺-rec A (𝚺 B) (𝜎₁ B) (𝜎₂ B) (λ (a : A), 𝜎₃ B (f a))
+
+-- suspFun↑ : (b : B) → (A → Path B b b) → 𝚺 A → B
+def suspFun↑ (A B : U) (b : B) (f : A → Path B b b) : 𝚺 A → B
+ := 𝚺-rec A B b b f
+

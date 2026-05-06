@@ -1,6 +1,7 @@
 {- n-Sphere: https://anders.groupoid.space/mathematics/homotopy/sphere/
 
    HoTT 6.4 Circles and Spheres
+   Cubical Agda HITs.Sn
 
    Copyright (c) Groupoid Infinity, 2016-2026. -}
 
@@ -8,6 +9,9 @@ module Sn where
 import library/foundations/mltt/nat
 import library/foundations/univalent/extensionality
 import library/mathematics/homotopy/suspension
+import library/mathematics/homotopy/S1
+import library/foundations/mltt/bool
+import library/foundations/univalent/path
 
 -- 1) Formation Rule
 def sphere : ℕ → U := ℕ-iter U 𝟐 𝚺
@@ -35,3 +39,69 @@ def Sn-β₂ (n : ℕ) (P : sphere (succ n) → U) (N : P (north n)) (S : P (sou
 def Sn-η (n : ℕ) (P : sphere (succ n) → U) (h : Π (z : sphere (succ n)), P z)
   : Path (Π (z : sphere (succ n)), P z) h (Sn-ind n P (h (north n)) (h (south n)) (λ (x : sphere n), <i> h (merid n x @ i)))
  := 𝚺-η (sphere n) P h
+
+-- Pointed Sn
+
+def S₊ (n : ℕ) : U
+ := ind-nat (λ (_ : ℕ), U) 𝟐
+      (λ (k : ℕ) (prev : U),
+        ind-nat (λ (_ : ℕ), U) S¹
+        (λ (_ : ℕ) (_ : U), 𝚺 prev) k) n
+
+def S⁻ (n : ℕ) : U
+ := ind-nat (λ (_ : ℕ), U) 𝟎 (λ (k : ℕ) (_ : U), S₊ k) n
+
+def ptSn (n : ℕ) : S₊ n
+ := ind-nat S₊ 1₂
+      (λ (k : ℕ) (prev : S₊ k),
+        ind-nat (λ (x : ℕ), S₊ (succ x))
+          baseS1
+          (λ (y : ℕ) (_ : S₊ (succ y)), 𝜎₁ (S₊ (succ y)))
+          k) n
+
+-- 7) Inversion on Spheres
+def invS1 : S¹ → S¹
+ := S1-ind (λ (_ : S¹), S¹) baseS1 (<i> loop @ -i)
+
+def invSusp (A : U) : 𝚺 A → 𝚺 A
+ := 𝚺-rec A (𝚺 A) (𝜎₂ A) (𝜎₁ A) (λ (a : A), <i> 𝜎₃ A a @ -i)
+
+def invSphere (n : ℕ) : S₊ n → S₊ n
+ := ind-nat (λ (k : ℕ), S₊ k → S₊ k)
+      not
+      (λ (k : ℕ) (prev : S₊ k → S₊ k),
+        ind-nat (λ (m : ℕ), S₊ (succ m) → S₊ (succ m))
+          invS1
+          (λ (y : ℕ) (_ : S₊ (succ y) → S₊ (succ y)), invSusp (S₊ (succ y)))
+          k) n
+
+-- 8) Path over Suspensions
+def toSusp (A : U) (pt : A) (x : A) : Path (𝚺 A) (𝜎₁ A) (𝜎₁ A)
+ := pcomp (𝚺 A) (𝜎₁ A) (𝜎₂ A) (𝜎₁ A) (𝜎₃ A x) (<i> 𝜎₃ A pt @ -i)
+
+def σSn (n : ℕ) : S₊ n → Path (S₊ (succ n)) (ptSn (succ n)) (ptSn (succ n))
+ := ind-nat (λ (k : ℕ), S₊ k → Path (S₊ (succ k)) (ptSn (succ k)) (ptSn (succ k)))
+      (ind₂ (λ (_ : 𝟐), Path S¹ baseS1 baseS1) loop (idp S¹ baseS1))
+      (λ (k : ℕ) (prev : S₊ k → Path (S₊ (succ k)) (ptSn (succ k)) (ptSn (succ k))),
+        ind-nat (λ (m : ℕ), S₊ (succ m) → Path (S₊ (succ (succ m))) (ptSn (succ (succ m))) (ptSn (succ (succ m))))
+          (toSusp S¹ baseS1)
+          (λ (y : ℕ) (_ : S₊ (succ y) → Path (S₊ (succ (succ y))) (ptSn (succ (succ y))) (ptSn (succ (succ y)))),
+            toSusp (S₊ (succ (succ y))) (ptSn (succ (succ y)))
+          ) k) n
+
+-- 9) Isomorphisms
+
+-- SuspBool→S¹ : Σ 𝟐 → S¹
+def SuspBool→S¹ : 𝚺 𝟐 → S¹
+ := 𝚺-rec 𝟐 S¹ baseS1 baseS1 (ind₂ (λ (_ : 𝟐), Path S¹ baseS1 baseS1) loop (idp S¹ baseS1))
+
+-- S¹→SuspBool : S¹ → Σ 𝟐
+def S¹→SuspBool : S¹ → 𝚺 𝟐
+ := S1-ind (λ (_ : S¹), 𝚺 𝟐) (𝜎₁ 𝟐) (pcomp (𝚺 𝟐) (𝜎₁ 𝟐) (𝜎₂ 𝟐) (𝜎₁ 𝟐) (𝜎₃ 𝟐 0₂) (<i> 𝜎₃ 𝟐 1₂ @ -i))
+
+def S¹→SuspBool→S¹-loop : PathP (<i> Path S¹ (SuspBool→S¹ (S¹→SuspBool (loop @ i))) (loop @ i)) (idp S¹ baseS1) (idp S¹ baseS1)
+ := <i j> hfill S¹ (∂ i) (λ (k : I), [ (i = 0) → baseS1, (i = 1) → baseS1 ]) (inc S¹ (∂ i) (loop @ i)) -j
+
+-- S¹→SuspBool→S¹ : (x : S¹) → Path S¹ (SuspBool→S¹ (S¹→SuspBool x)) x
+def S¹→SuspBool→S¹ (x : S¹) : Path S¹ (SuspBool→S¹ (S¹→SuspBool x)) x
+ := S1-ind (λ (y : S¹), Path S¹ (SuspBool→S¹ (S¹→SuspBool y)) y) (idp S¹ baseS1) S¹→SuspBool→S¹-loop x

@@ -41,16 +41,8 @@ def sucPathZ : Path U Z Z := iso→Path Z Z sucZ predZ sucpredZ predsucZ
 def helix (x : S¹) : U := S1-ind (λ (_ : S¹), U) Z sucPathZ x
 def encode (x : S¹) (p : Path S¹ baseS1 x) : helix x := subst S¹ helix baseS1 x p zeroZ
 
-def loopN (n : ℕ) : Path S¹ baseS1 baseS1
- := ind-nat (λ (_ : ℕ), Path S¹ baseS1 baseS1) (idp S¹ baseS1)
-            (λ (_ : ℕ) (p : Path S¹ baseS1 baseS1), pcomp S¹ baseS1 baseS1 baseS1 p loopS1) n
-
-def invLoopN (n : ℕ) : Path S¹ baseS1 baseS1
- := ind-nat (λ (_ : ℕ), Path S¹ baseS1 baseS1) (idp S¹ baseS1)
-            (λ (_ : ℕ) (p : Path S¹ baseS1 baseS1), pcomp S¹ baseS1 baseS1 baseS1 p (sym S¹ baseS1 baseS1 loopS1)) n
-
 def loopIt (n : Z) : Path S¹ baseS1 baseS1
- := +-ind ℕ ℕ (λ (_ : Z), Path S¹ baseS1 baseS1) (λ (n : ℕ), invLoopN (succ n)) loopN n
+ := +-ind ℕ ℕ (λ (_ : Z), Path S¹ baseS1 baseS1) (λ (n : ℕ), loopNeg (succ n)) loopPos n
 
 def lemTransC (A : U) (a : A) : Path A (transp (<_> A) 0 a) a
   := <j> transp (<_> A) j a

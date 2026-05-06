@@ -56,17 +56,17 @@ def loopIt (n : Z) : Path S¹ baseS1 baseS1
 -- Helix Path from Integer
 
 def encode (x : S¹) (p : Path S¹ baseS1 x) : helix x
-:= subst S¹ helix baseS1 x p zeroZ
+ := subst S¹ helix baseS1 x p zeroZ
 
 -- Transport Integers from Helix Paths
 
 def lemTransC (A : U) (a : A) : Path A (transp (<_> A) 0 a) a
-  := <j> transp (<_> A) j a
+ := <j> transp (<_> A) j a
 
 def corFib1 (A : U) (F G : A -> U) (a : A) (fa ga : Π (u : F a), G a) (p : Path A a a)
   (h : Π (u : F a), Path (G a) (subst A G a a p (fa u)) (ga (subst A F a a p u)))
   : PathP (<i> Π (u : F (p @ i)), G (p @ i)) fa ga
-  := J A a (λ (x y : A) (q : Path A x y), Π (fx : Π (u : F x), G x) (fy : Π (u : F y), G y),
+ := J A a (λ (x y : A) (q : Path A x y), Π (fx : Π (u : F x), G x) (fy : Π (u : F y), G y),
               (Π (u : F x), Path (G y) (subst A G x y q (fx u)) (fy (subst A F x y q u))) → PathP (<i> Π (u : F (q @ i)), G (q @ i)) fx fy)
      (λ (ga' ga'' : Π (u : F a), G a) (ha : Π (u : F a), Path (G a) (transp (<_> G a) 0 (ga' u)) (ga'' (transp (<_> F a) 0 u))), <i> λ (u : F a),
         pcomp (G a) (ga' u) (ga'' (transp (<_> F a) 0 u)) (ga'' u)

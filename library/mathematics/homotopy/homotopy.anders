@@ -3,6 +3,7 @@
 
 module homotopy where
 import library/foundations/mltt/proto
+import library/mathematics/homotopy/suspension
 import library/mathematics/homotopy/S1
 import library/foundations/mltt/nat
 import library/mathematics/algebra/int
@@ -40,13 +41,6 @@ def sucPathZ : Path U Z Z := iso→Path Z Z sucZ predZ sucpredZ predsucZ
 def helix (x : S¹) : U := S1-ind (λ (_ : S¹), U) Z sucPathZ x
 def encode (x : S¹) (p : Path S¹ baseS1 x) : helix x := subst S¹ helix baseS1 x p zeroZ
 
-def winding (p : loopS1') : Z := trans Z Z (<i> helix (p @ i)) zeroZ
-
-def loopZ1 : Z := winding loop1
-def loopZ2 : Z := winding loop2
-def loopZ3 : Z := winding loop3
-def loopZ4 : Z := winding loop4
-
 def loopN (n : ℕ) : Path S¹ baseS1 baseS1
  := ind-nat (λ (_ : ℕ), Path S¹ baseS1 baseS1) (idp S¹ baseS1)
             (λ (_ : ℕ) (p : Path S¹ baseS1 baseS1), pcomp S¹ baseS1 baseS1 baseS1 p loopS1) n
@@ -70,6 +64,27 @@ def corFib1 (A : U) (F G : A -> U) (a : A) (fa ga : Π (u : F a), G a) (p : Path
         pcomp (G a) (ga' u) (ga'' (transp (<_> F a) 0 u)) (ga'' u)
         (pcomp (G a) (ga' u) (transp (<_> G a) 0 (ga' u)) (ga'' (transp (<_> F a) 0 u)) (<i> lemTransC (G a) (ga' u) @ -i) (ha u))
         (<i> ga'' (lemTransC (F a) u @ i)) @ i) a p fa ga h
+
+def SuspBool→S¹ : 𝚺 𝟐 → S¹
+ := 𝚺-rec 𝟐 S¹ baseS1 baseS1 (ind₂ (λ (_ : 𝟐), Path S¹ baseS1 baseS1) loopS1 (idp S¹ baseS1))
+
+-- S¹→SuspBool : S¹ → 𝚺 𝟐
+def S¹→SuspBool : S¹ → 𝚺 𝟐
+ := S1-ind (λ (_ : S¹), 𝚺 𝟐) (𝜎₁ 𝟐) (pcomp (𝚺 𝟐) (𝜎₁ 𝟐) (𝜎₂ 𝟐) (𝜎₁ 𝟐) (𝜎₃ 𝟐 0₂) (<i> 𝜎₃ 𝟐 1₂ @ -i))
+
+def S¹→SuspBool→S¹-loop : PathP (<i> Path S¹ (SuspBool→S¹ (S¹→SuspBool (loopS1 @ i))) (loopS1 @ i)) (idp S¹ baseS1) (idp S¹ baseS1)
+ := <i j> hfill S¹ (∂ i) (λ (k : I), [ (i = 0) → baseS1, (i = 1) → baseS1 ]) (inc S¹ (∂ i) (loopS1 @ i)) -j
+
+-- S¹→SuspBool→S¹ : (x : S¹) → SuspBool→S¹ (S¹→SuspBool x) ≡ x
+def S¹→SuspBool→S¹ (x : S¹) : Path S¹ (SuspBool→S¹ (S¹→SuspBool x)) x
+ := S1-ind (λ (y : S¹), Path S¹ (SuspBool→S¹ (S¹→SuspBool y)) y) (idp S¹ baseS1) S¹→SuspBool→S¹-loop x
+
+def winding (p : loopS1') : Z := trans Z Z (<i> helix (p @ i)) zeroZ
+
+def loopZ1 : Z := winding loop1
+def loopZ2 : Z := winding loop2
+def loopZ3 : Z := winding loop3
+def loopZ4 : Z := winding loop4
 
 def decode (x : S¹) (c : helix x) : Path S¹ baseS1 x
  := S1-ind (λ (y : S¹), helix y → Path S¹ baseS1 y) loopIt

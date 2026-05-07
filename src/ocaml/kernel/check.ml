@@ -192,7 +192,7 @@ and transport_internal i p phi u0 = match p, phi, u0 with
   (* transpⁱ G ψ u₀ = glue [φ(i/1) ↦ t′₁] a′₁ : G(i/1), G = Glue [φ ↦ (T,w)] A *)
 
   | VApp (VApp (VGlue a, phi_glue), sys), phi, u0 ->
-  
+
     let is = match i with Ident (s, _) -> s | _ -> "" in
     let d0 = match phi with VDir d -> d | _ -> Zero in
     let e0 = ref None in
@@ -375,9 +375,11 @@ and transport_internal i p phi u0 = match p, phi, u0 with
   (* transpⁱ N φ u₀ = u₀ *)
 
   | VNat, _, _ -> u0
+  
   (* transpⁱ (♭ A) φ (♭-unit a) = ♭-unit (transpⁱ A φ a) *)
 
   | VFla t, _, VFlaUnit a -> VFlaUnit (transport i t phi a)
+  
   (* transpⁱ (Π (x : A), B) φ u₀ v = transpⁱ B(x/w) φ (u₀ w(i/0)), w = transp-Fill⁻ⁱ A φ v, v : A(i/1) *)
 
   | VPi (t, (x, b)), _, _ ->
@@ -390,6 +392,7 @@ and transport_internal i p phi u0 = match p, phi, u0 with
         let v = transFill j (act0 i (VNeg (dim j)) t) phi x in
         transport k (swap i k (b (v (VNeg (dim k)))))
           phi (app (u0, v vone))))
+  
   (* transpⁱ (Σ (x : A), B) φ u₀ = (transpⁱ A φ (u₀.1), transpⁱ B(x/v) φ(u₀.2)), v = transp-Fillⁱ A φ u₀.1 *)
 
   | VSig (t, (x, b)), _, _ ->
@@ -401,6 +404,7 @@ and transport_internal i p phi u0 = match p, phi, u0 with
       let v1 = transFill j (swap i j t) phi (vfst u0) in
       let v2 = transport k (swap i k (b (v1 (dim k)))) phi (vsnd u0) in
       VPair (ref None, v1 vone, v2)
+  
   (* transpⁱ (Pathʲ A v w) φ u₀ = 〈j〉 compⁱ A [φ ↦ u₀ j, (j=0) ↦ v, (j=1) ↦ w] (u₀ j) *)
 
   | VApp (VApp (VPathP p, v), w), _, _ ->
@@ -411,6 +415,7 @@ and transport_internal i p phi u0 = match p, phi, u0 with
         (VSystem (unionSystem (border (solve phi One) uj)
                  (unionSystem (border (solve j Zero) (swap i k v))
                                (border (solve j One)  (swap i k w))))) uj)))
+  
   (* transpⁱ (W (x : A), B) φ (sup a f) = sup (transpⁱ A φ a) (transpⁱ (B(v) → W) φ f), v = transp-Fillⁱ A φ a *)
 
   | W (t, (x, b)), _, VApp (VApp (VSup _, a), f) ->
@@ -421,6 +426,7 @@ and transport_internal i p phi u0 = match p, phi, u0 with
   | VApp (VApp (VId _, _), _), _, _ ->
     let j = freshName "ι" in
     comp (fun j -> act0 i j p) phi i (VSystem System.empty) u0
+  
   (* transpⁱ (ℑ A) φ (ℑ-unit a) = ℑ-unit (transpⁱ A φ a) *)
 
   | VIm t, _, VInf a -> inf (transport i t phi a)

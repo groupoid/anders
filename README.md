@@ -54,7 +54,6 @@ Anders is a HoTT proof assistant based on:
 We tend not to touch general recursive higher inductive schemes yet,
 instead we will try to express as much HIT as possible through W, Coequlizer and Hub Spokes Disc
 in the style of HoTT/Coq homotopy library and Three-HIT theorem.
-Also we do marginal research on right fiber systems.
 
 Features
 --------

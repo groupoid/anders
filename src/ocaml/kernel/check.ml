@@ -9,11 +9,11 @@ open Rbv
 
 let timeout = 6.0
 let startTime = ref (Unix.gettimeofday ())
-let fuel = ref 10000000
+let fuel = ref 1000000
 let conv_depth = ref 0
 let reset_conv_depth () = conv_depth := 0
 
-let conv_cache_size = 4194304
+let conv_cache_size = 1048576
 let conv_cache = Array.make conv_cache_size (VHole, VHole, false)
 let conv_cache_idx = ref 0
 
@@ -24,14 +24,18 @@ let act_cache_idx = ref 0
 let app_cache_size = 4194304
 let app_cache = Array.make app_cache_size (VHole, VHole, VHole)
 
-let transport_cache_size = 4194304
+let transport_cache_size = 1048576
 let transport_cache = Array.make transport_cache_size (VHole, VHole, VHole, VHole)
+let is_isContr_cache_size = 1048576
+let is_isContr_cache = Array.make is_isContr_cache_size (VHole, false)
 let app_hits = ref 0
 let app_misses = ref 0
 let trans_hits = ref 0
 let trans_misses = ref 0
 let conv_hits = ref 0
 let conv_misses = ref 0
+let idtoeqv_cache_size = 1048576
+let idtoeqv_cache = Array.make idtoeqv_cache_size (Ident ("", 0L), VHole, VHole)
 
 let print_stats () =
   if !Prefs.trace then
@@ -41,11 +45,10 @@ let print_stats () =
 let burn () =
   fuel := !fuel - 1;
   if !fuel <= 0 then (
-    fuel := 100000;
     print_stats ();
     if Unix.gettimeofday () -. !startTime > timeout then failwith "Termination limit reached"
   )
-let reset_fuel () = startTime := Unix.gettimeofday (); fuel := 100000
+let reset_fuel () = startTime := Unix.gettimeofday (); fuel := 500000
 
 let mem i v = IdentSet.mem i (get_support v)
 
@@ -56,8 +59,6 @@ let is_constant_clos (p, f) =
 let is_constant_motive = function
   | VLam (_, clos) -> is_constant_clos clos
   | _ -> false
-
-
 
 let rec eval ctx e0 = burn (); traceEval e0; match e0 with
   | EPre u               -> VPre u
@@ -85,9 +86,7 @@ let rec eval ctx e0 = burn (); traceEval e0; match e0 with
   | ENeg e               -> negFormula (eval ctx e)
   | ETransp (p, i)       -> VTransp (eval ctx p, eval ctx i)
   | EHComp (t, r, u, u0) -> hcomp (eval ctx t) (eval ctx r) (eval ctx u) (eval ctx u0)
-  | EPartial e           -> let (i, _, _) = freshDim () in
-    VLam (VI, (i, fun r -> let ts = mkSystem (List.map (fun mu ->
-      (mu, eval (faceEnv mu ctx) e)) (solve r One)) in VPartialP (VSystem ts, r)))
+  | EPartial e           -> let (i, _, _) = freshDim () in VLam (VI, (i, fun r -> let ts = mkSystem (List.map (fun mu -> (mu, eval (faceEnv mu ctx) e)) (solve r One)) in VPartialP (VSystem ts, r)))
   | EPartialP (t, r)     -> VPartialP (eval ctx t, eval ctx r)
   | ESystem xs           -> VSystem (evalSystem ctx xs)
   | ESub (a, i, u)       -> VSub (eval ctx a, eval ctx i, eval ctx u)
@@ -130,7 +129,6 @@ let rec eval ctx e0 = burn (); traceEval e0; match e0 with
   | ESpoke (s, a, f, x) -> VSpoke (eval ctx s, eval ctx a, eval ctx f, eval ctx x)
   | EIndDisc (s, a, x, nc, nh, ns') -> VIndDisc (eval ctx s, eval ctx a, eval ctx x, eval ctx nc, eval ctx nh, eval ctx ns')
 
-
 and appFormula v x = match v with
   | VPLam f -> app (f, x)
   | VResp (a, b, f, g, c) ->
@@ -148,7 +146,6 @@ and appFormula v x = match v with
       if orEq x vzero then u0 else if orEq x vone then u1 else VAppFormula (v, x)
     with _ -> VAppFormula (v, x)
     end
-
 
 and border xs v = mkSystem (List.map (fun mu -> (mu, upd mu v)) xs)
 
@@ -172,8 +169,9 @@ and unglue r u b = match r, u, b with
   | r, _, _ when orEq r vone -> app (vfst (vsnd (app (u, VRef vone))), b)
   | _, _, VGlueElem (_, _, a) -> ouc a
   | _, _, _ -> VUnglue (r, u, b)
+
 and transport i p phi u0 =
-  if not (mem i p) then u0 else
+  if not (mem i p) || orEq phi vone then u0 else
   let i_can = Ident ("$i", 0L) in
   let p_can = act (Env.add i (Var (i_can, VI)) Env.empty) p in
   let h = (Hashtbl.hash_param 10 100 (p_can, phi, u0)) land (transport_cache_size - 1) in
@@ -188,9 +186,6 @@ and transport i p phi u0 =
   end
 
 and transport_internal i p phi u0 = match p, phi, u0 with
-
-  (* transpⁱ G ψ u₀ = glue [φ(i/1) ↦ t′₁] a′₁ : G(i/1), G = Glue [φ ↦ (T,w)] A *)
-
   | VApp (VApp (VGlue a, phi_glue), sys), phi, u0 ->
 
     let is = match i with Ident (s, _) -> s | _ -> "" in
@@ -257,12 +252,35 @@ and transport_internal i p phi u0 = match p, phi, u0 with
     if a == a1 && b == b1 && f == f1 && g == g1 && v == v1 then u0 else
     VIota2 (a1, b1, f1, g1, v1)
 
-  | VCoequ (a, b, f, g), phi, (VAppFormula (VResp (_, _, _, _, v), j) as u0) ->
+  | VCoequ (a, b, f, g), phi, (VAppFormula (VResp (_, _, _, _, v), (Var (j_id, VI) as j)) as u0) ->
     let a1 = act0 i vone a in let b1 = act0 i vone b in
     let f1 = act0 i vone f in let g1 = act0 i vone g in
-    let v1 = transport i a phi v in
-    if a == a1 && b == b1 && f == f1 && g == g1 && v == v1 then u0 else
-    VAppFormula (VResp (a1, b1, f1, g1, v1), j)
+    if a == a1 && b == b1 && f == f1 && g == g1 then
+      let v1 = transport i a phi v in
+      if v == v1 then u0 else VAppFormula (VResp (a1, b1, f1, g1, v1), j)
+    else
+      let v1 = transport i a phi v in
+      let pc = VAppFormula (VResp (a1, b1, f1, g1, v1), j) in
+      let b0 = VIota2 (a1, b1, f1, g1, squeeze i b phi (app (f, v))) in
+      let b1_ = VIota2 (a1, b1, f1, g1, squeeze i b phi (app (g, v))) in
+      let uphi = mkSystem (List.map (fun mu -> (mu, u0)) (solve phi One)) in
+      let sys = unionSystem uphi (mkSystem [(Env.singleton j_id Zero, b0); (Env.singleton j_id One, b1_)]) in
+      hcomp (VCoequ (a1, b1, f1, g1)) (orFormula (phi, orFormula (dim j_id, negFormula (dim j_id))))
+        (VLam (VI, (freshName "k", fun k -> VSystem sys))) pc
+
+  | VApp (VIndNat (c, z, s), n), phi, u0 ->
+    let j = freshName "ι" in
+    let x0 = act0 i vzero n in
+    let x_fill j = transFill i n phi x0 j in
+    let tj j = app (c, x_fill j) in
+    comp tj phi i (VSystem System.empty) u0
+
+  | VApp (VIndCoequ (a, b, f, g, motive, i_base, p_loop), x), phi, u0 ->
+    let j = freshName "ι" in
+    let x0 = act0 i vzero x in
+    let x_fill j = transFill i x phi x0 j in
+    let tj j = app (motive, x_fill j) in
+    comp tj phi i (VSystem System.empty) u0
 
   | VDisc (s, a), phi, (VBase (_, _, v) as u0) ->
     let a1 = act0 i vone a in let s1 = act0 i vone s in
@@ -328,8 +346,6 @@ and transport_internal i p phi u0 = match p, phi, u0 with
   (* transpⁱ (hcomp t r sys u₀) φ a = ... *)
 
   | VHComp (VKan _, _, sys, u0), phi, a ->
-     print_string  "OK";
-     flush stdout;
      let u = match sys with VSystem s -> s | _ -> System.empty in
      let u' = System.map eta (forall i u) in
      let psi' = getFormulaV u' in
@@ -375,6 +391,10 @@ and transport_internal i p phi u0 = match p, phi, u0 with
   (* transpⁱ N φ u₀ = u₀ *)
 
   | VNat, _, _ -> u0
+
+  (* transpⁱ (ℑ A) φ (ℑ-unit a) = ℑ-unit (transpⁱ A φ a) *)
+
+  | VIm t, _, VInf a -> inf (transport i t phi a)
 
   (* transpⁱ (♭ A) φ (♭-unit a) = ♭-unit (transpⁱ A φ a) *)
 
@@ -422,14 +442,9 @@ and transport_internal i p phi u0 = match p, phi, u0 with
     let j = freshName "ι" in let k = freshName "κ" in let v1 = transFill j (swap i j t) phi a in
     let v2 = transport k (swap i k (implv (b (v1 (dim k))) (W (t, (x, b))))) phi f in let t' = act0 i vone t in
     VApp (VApp (VSup (t', VLam (t', (fresh x, b >> act0 i vone))), v1 vone), v2)
-  | VApp (VApp (VGlue _, _), _), _, _
   | VApp (VApp (VId _, _), _), _, _ ->
-    let j = freshName "ι" in
     comp (fun j -> act0 i j p) phi i (VSystem System.empty) u0
 
-  (* transpⁱ (ℑ A) φ (ℑ-unit a) = ℑ-unit (transpⁱ A φ a) *)
-
-  | VIm t, _, VInf a -> inf (transport i t phi a)
   | t, _, _ -> VApp (VTransp (VPLam (VLam (VI, (i, fun j -> act0 i j t))), phi), u0)
 
 and transFill i p phi u0 j =
@@ -437,6 +452,10 @@ and transFill i p phi u0 j =
   if j = vone then transport i p phi u0 else
   let (k, _, _) = freshDim () in
   transport k (act0 i (andFormula (dim k, j)) p) (orFormula (phi, negFormula j)) u0
+
+and squeeze i a phi u =
+  let j = freshName "ι" in
+  transport j (act0 i (orFormula (dim i, dim j)) a) (orFormula (phi, dim i)) u
 
 and hcomp t r u u0 = let i = freshName "ι" in homcom t r i (app (u, dim i)) u0
 
@@ -455,13 +474,61 @@ and idEquiv t =
                 appFormula p (andFormula (i, j)))))))))))))))
 
 and idtoeqv i e =
+  let h = (Hashtbl.hash_param 10 100 (i, e)) land (idtoeqv_cache_size - 1) in
+  let (i', e', r) = idtoeqv_cache.(h) in
+  if i == i' && e == e' then r else
+  let res =
+  burn ();
   if not (mem i e) then idEquiv e else
   let a = act0 i vzero e in
   match e with
-  | VApp (VApp (VGlue _, phi), VSystem sys) ->
-    (* Specialized idtoeqv for Glue types to avoid generic transport over equiv *)
-    transport i (equiv a e) vzero (idEquiv a) (* TODO: implement direct Glue equiv *)
+  | VApp (VApp (VGlue _, _), VSystem sys) ->
+    let e0 = ref None in
+    System.iter (fun mu v ->
+      match Env.find_opt i mu with
+      | Some Zero -> e0 := Some v
+      | _ -> ()
+    ) sys;
+    begin match !e0 with
+    | Some v -> vsnd v
+    | None -> transport i (equiv a e) vzero (idEquiv a)
+    end
+  | VApp (VApp (VPathP p, v), w) ->
+    let i_eq = idtoeqv i (VPLam (VLam (VI, (i, fun vi -> app (p, vi))))) in
+    pairv (VLam (act0 i vzero v, (freshName "p", fun p_v -> transport i (app (p, dim i)) vzero p_v)))
+          (VLam (act0 i vone v, (freshName "p", fun p_v -> transport i (app (p, dim i)) vone p_v)))
+  | VApp (f, x) ->
+    let v = app (f, x) in
+    if v == e then transport i (equiv a e) vzero (idEquiv a)
+    else idtoeqv i v
+  | VSig (t, (x, g)) ->
+    let i_eq_t = idtoeqv i (VPLam (VLam (VI, (i, fun vi -> act0 i vi t)))) in
+    let i_eq_g = idtoeqv i (VPLam (VLam (VI, (i, fun vi ->
+      let v = transFill i t vzero (Var (freshName "v", act0 i vzero t)) vi in
+      g v)))) in
+    pairv (VLam (VSig (act0 i vzero t, (x, fun x -> act0 i vzero (g x))), (fresh x, fun v ->
+      let v1 = vfst v in let v2 = vsnd v in
+      pairv (app (vfst i_eq_t, v1)) (app (vfst i_eq_g, v2)))))
+          (VLam (VSig (act0 i vone t, (x, fun x -> act0 i vone (g x))), (fresh x, fun v ->
+            let v1 = vfst v in let v2 = vsnd v in
+            let g_t x = vfst (vfst (app (vsnd i_eq_t, x))) in
+            let g_g x = vfst (vfst (app (vsnd i_eq_g, x))) in
+            pairv (g_t v1) (g_g v2))))
+  | VCoequ (a, b, f, g) ->
+    if not (mem i a) && not (mem i b) && not (mem i f) && not (mem i g) then idEquiv e
+    else transport i (equiv a e) vzero (idEquiv a)
+  | VPi (t, (x, g)) ->
+    if not (mem i t) then
+      let a = act0 i vzero t in
+      let f = idfun a in
+      let i_eq = idtoeqv i (VPLam (VLam (VI, (i, fun vi -> g (Var (Ident ("$x", 0L), a)))))) in
+      pairv (VLam (a, (fresh x, fun v -> vfst (app (i_eq, v)))))
+            (VLam (a, (fresh x, fun v -> vsnd (app (i_eq, v)))))
+    else transport i (equiv a e) vzero (idEquiv a)
   | _ -> transport i (equiv a e) vzero (idEquiv a)
+  in
+  idtoeqv_cache.(h) <- (i, e, res);
+  res
 
 and walk f r = function
   | VSystem ts -> System.mapi (fun mu -> f >> upd mu) ts
@@ -470,16 +537,19 @@ and walk f r = function
 
 and structural_homcom motive r_comp i u_comp u0_comp t =
   match app (motive, VRef vone) with
+
   | VPi (t', (p', b')) ->
     let walked = walk (fun v -> v) r_comp u_comp in
     VLam (t', (fresh p', fun y -> homcom (b' y) r_comp i
     (VSystem (System.map (fun v -> app (v, y)) walked)) (app (u0_comp, y))))
+
   | VSig (t', (_, b')) -> let k = freshName "κ" in
     let sys1 = walk (vfst >> act0 i (dim k)) r_comp u_comp in
     let v1 = hfill t' r_comp k (VSystem sys1) (vfst u0_comp) in
     let sys2 = walk vsnd r_comp u_comp in
     let v2 = comp (v1 >> b') r_comp i (VSystem sys2) (vsnd u0_comp) in
     VPair (ref None, v1 vone, v2)
+
   | VApp (VApp (VPathP t', v), w) ->
     let j = freshName "ι" in
     let walked = walk (fun v' -> v') r_comp u_comp in
@@ -489,6 +559,7 @@ and structural_homcom motive r_comp i u_comp u0_comp t =
                    (unionSystem (border (solve j One)  w)
                                 (border (solve j Zero) v))))
           (appFormula u0_comp j))))
+
   | _ -> VHComp (t, r_comp, VLam (VI, (i, fun j -> VSystem (walk (act0 i j) r_comp u_comp))), u0_comp)
 
 and homcom t r i u u0 =
@@ -603,35 +674,35 @@ and homcom t r i u u0 =
 
   (* hcompⁱ (ind-nat C z s n) φ u u₀ = ind-nat C′ z′ s′ n *)
 
-  | VApp (VIndNat (c, z, s), n), r_comp, u_comp, u0_comp ->
-    (match app (c, VRef vone) with
-    | VPre _ | VKan _ ->
-      let j = freshName "ι" in
-      let z' = homcom z r_comp i u_comp u0_comp in
-      let s' = VPLam (VLam (VI, (j, fun j -> homcom (app (s, j)) r_comp i u_comp u0_comp))) in
-      VApp (VIndNat (c, z', s'), n)
-    | _ -> structural_homcom c r_comp i u_comp u0_comp t)
+  | VApp (VIndNat (c, z, s), n), r, u, u0 ->
+    (match app (c, VRef vone) with VPre _ | VKan _ ->
+      let k = freshName "κ" in
+      let n_fill = hfill VNat r i u u0 in
+      let tj j = app (c, n_fill j) in
+      comp tj r k (VSystem (walk (fun u -> app (VIndNat (c, z, s), u)) r u)) (app (VIndNat (c, z, s), u0))
+    | _ -> structural_homcom c r i u u0 t)
 
   (* hcompⁱ (Coequ A B f g) [φ ↦ ι₂ u] (ι₂ u₀) = ι₂ (hcompⁱ B [φ ↦ u] u₀) *)
 
-  | VCoequ (a, b, f, g), _, VSystem u, VIota2 (_, _, _, _, u0) when System.for_all (fun _ v -> isIota2 v) u ->
-
-    VIota2 (a, b, f, g, homcom b r i (VSystem (System.map extIota2 u)) u0)
+  | VCoequ (a, b, f, g), _, VSystem u, VIota2 (_, _, _, _, u0) ->
+    let sys = System.map (fun v -> match v with VIota2 (_, _, _, _, b0) -> b0 | VAppFormula (VResp (_, _, _, _, a0), _) -> app (f, a0) | _ -> v) u in
+    VIota2 (a, b, f, g, homcom b r i (VSystem sys) u0)
 
   (* hcompⁱ (Coequ A B f g) [φ ↦ resp a j] (resp a₀ j) = resp (hcompⁱ A [φ ↦ a] a₀) j *)
 
-  | VCoequ (a, b, f, g), _, VSystem u, VAppFormula (VResp (_, _, _, _, u0), r) when System.for_all (fun _ v -> isRespFormula v) u -> VAppFormula (VResp (a, b, f, g, homcom a r i (VSystem (System.map extRespFormula u)) u0), r)
+  | VCoequ (a, b, f, g), _, VSystem u, VAppFormula (VResp (_, _, _, _, u0), r) when System.for_all (fun _ v -> isRespFormula v) u ->
+    VAppFormula (VResp (a, b, f, g, homcom a r i (VSystem (System.map extRespFormula u)) u0), r)
 
   (* hcompⁱ (ind-coequ A B f g motive i_base p_loop x) φ u u₀ = ind-coequ A B f g motive i′ p′ x *)
 
-  | VApp (VIndCoequ (a, b, f, g, motive, i_base, p_loop), x), r_comp, u_comp, u0_comp ->
-
+  | VApp (VIndCoequ (a, b, f, g, motive, i_base, p_loop), x), r, u, u0 ->
     (match app (motive, VRef vone) with VPre _ | VKan _ ->
       let j = freshName "ι" in
-      let i' = VPLam (VLam (VI, (j, fun j -> homcom (app (i_base, j)) r_comp i u_comp u0_comp))) in
-      let p' = VPLam (VLam (VI, (j, fun j -> homcom (app (p_loop, j)) r_comp i u_comp u0_comp))) in
-      VApp (VIndCoequ (a, b, f, g, motive, i', p'), x)
-    | _ -> structural_homcom motive r_comp i u_comp u0_comp t)
+      let k = freshName "κ" in
+      let x_fill = hfill (VCoequ (a, b, f, g)) r i u u0 in
+      let tj j = app (motive, x_fill j) in
+      comp tj r k (VSystem (walk (fun u -> app (VIndCoequ (a, b, f, g, motive, i_base, p_loop), u)) r u)) (app (VIndCoequ (a, b, f, g, motive, i_base, p_loop), u0))
+    | _ -> structural_homcom motive r i u u0 t)
 
   (* hcompⁱ (Disc S A) [φ ↦ base a] (base a₀) = base (hcompⁱ A [φ ↦ a] a₀) *)
 
@@ -662,7 +733,6 @@ and homcom t r i u u0 =
       let z' = VPLam (VLam (VI, (j, fun j -> homcom (app (z, j)) r_comp i u_comp u0_comp))) in
       VApp (VApp (VIndDisc (s, a, motive_lam, nc', nh', ns''), z'), x)
     | _ -> structural_homcom motive_lam r_comp i u_comp u0_comp t)
-
 
   | VApp (VIndEmpty c, n), r_comp, u_comp, u0_comp -> structural_homcom c r_comp i u_comp u0_comp t
 
@@ -782,7 +852,9 @@ and app (v, x) =
 
   (* coequ-ind A B f g X i rho (ι₂ b) ~> i b *)
 
-  | VIndCoequ (_, _, _, _, _, i, _), VIota2 (_, _, _, _, b) -> app (i, b)
+  | VIndCoequ (a, b, f, g, motive, i, _), VIota2 (_, _, _, _, b0) ->
+    if is_constant_motive motive then app (i, b0) else
+    app (i, b0)
 
   (* coequ-ind A B f g X i rho (resp a @ r) ~> rho a @ r *)
 
@@ -1185,9 +1257,11 @@ and conv_internal v1 v2 =
   ignore (v1, v2);
   begin
     match v1, v2 with
-    | VKan u, VKan v -> ieq u v
     | VPair (_, a, b), VPair (_, c, d) -> conv a c && conv b d
-    | VPair (_, a, b), v | v, VPair (_, a, b) -> conv (vfst v) a && conv (vsnd v) b
+    | VPair (_, a, b), v | v, VPair (_, a, b) ->
+      let v1' = vfst v in let v2' = vsnd v in
+      conv a v1' && conv b v2'
+    | VKan u, VKan v -> ieq u v
     | VPi  (a, (p, f)), VPi  (b, (_, g))
     | VSig (a, (p, f)), VSig (b, (_, g))
     | W    (a, (p, f)), W    (b, (_, g)) ->
@@ -1232,6 +1306,7 @@ and conv_internal v1 v2 =
     | VIndBool u, VIndBool v -> conv u v
     | VNat, VNat | VZero, VZero -> true
     | VSucc u, VSucc v -> conv u v
+    | VOuc v1, VOuc v2 -> conv v1 v2
     | VIndNat (c1, z1, s1), VIndNat (c2, z2, s2) -> conv c1 c2 && conv z1 z2 && conv s1 s2
     | VSup (a1, b1), VSup (a2, b2) -> (a1 == a2 || conv a1 a2) && (b1 == b2 || conv b1 b2)
     | VIndW (a1, b1, c1), VIndW (a2, b2, c2) -> (a1 == a2 || conv a1 a2) && (b1 == b2 || conv b1 b2) && (c1 == c2 || conv c1 c2)
@@ -1269,7 +1344,7 @@ and convProofIrrel v1 v2 =
     | VEmpty, VEmpty -> !Prefs.irrelevance
     | VUnit, VUnit -> !Prefs.irrelevance
     | _, _ -> false
-  with Internal _ -> false
+  with _ -> false
 
 and eqNf v1 v2 : unit = traceEqNF v1 v2;
   if conv v1 v2 then () else raise (Internal (Ineq (rbV v1, rbV v2)))

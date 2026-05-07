@@ -66,6 +66,7 @@ def hcomp-Glue' (A : U) (φ : I)
     (u₀ : (Glue A φ [(φ = 1) → e 1=1])[ψ ↦ u 0]) : Glue A φ [(φ = 1) → e 1=1]
  := hcomp (Glue A φ [(φ = 1) → e 1=1]) ψ
           (λ (i : I), [(ψ = 1) → u i 1=1]) (ouc u₀)
+
 --- def Glue-computation
 --- def Glue-uniqueness
 

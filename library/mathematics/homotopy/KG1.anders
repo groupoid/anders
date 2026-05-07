@@ -34,6 +34,7 @@ def K1-loop  (G : group) (g : G.1.1) : Path (K1 G) (K1-point G) (K1-point G)
  := <i> trunc₁ (2-quot 𝟏 (R-K1 G) (Q-K1 G)) two (2-quot₂ 𝟏 (R-K1 G) (Q-K1 G) ★ ★ g @ i)
 
 {-
+
 def K1-ind (G : group) (P : K1 G → U)
     (pPoint : P (K1-point G))
     (pPath  : Π (g : G.1.1), PathP (<i> P (K1-loop G g @ i)) pPoint pPoint)
@@ -50,7 +51,7 @@ def K1-ind (G : group) (P : K1 G → U)
       (λ (u v:𝟏) (g:G.1.1), ind₁ (λ (x : 𝟏), Π (y : 𝟏) (g : G.1.1), PathP (<i> P (trunc₁ (2-quot 𝟏 (R-K1 G) (Q-K1 G)) two (2-quot₂ 𝟏 (R-K1 G) (Q-K1 G) x y g @ i))) (ind₁ (λ (w:𝟏), P (trunc₁ (2-quot 𝟏 (R-K1 G) (Q-K1 G)) two (2-quot₁ 𝟏 (R-K1 G) (Q-K1 G) w))) pPoint x) (ind₁ (λ (w:𝟏), P (trunc₁ (2-quot 𝟏 (R-K1 G) (Q-K1 G)) two (2-quot₁ 𝟏 (R-K1 G) (Q-K1 G) w))) pPoint y)) (λ (y:𝟏), ind₁ (λ (y:𝟏), Π (g:G.1.1), PathP (<i> P (trunc₁ (2-quot 𝟏 (R-K1 G) (Q-K1 G)) two (2-quot₂ 𝟏 (R-K1 G) (Q-K1 G) ★ y g @ i))) pPoint (ind₁ (λ (w:𝟏), P (trunc₁ (2-quot 𝟏 (R-K1 G) (Q-K1 G)) two (2-quot₁ 𝟏 (R-K1 G) (Q-K1 G) w))) pPoint y)) (λ (g:G.1.1), pPath g) y) u v g)
       (λ (x y : 𝟏) (r1 r2 : R¯ 𝟏 (R-K1 G) x y) (q : Q-K1 G x y r1 r2), pCoher x y r1 r2 q))
      nHub nSpoke z
- 
+
 --  def K1-β₁ (G : group) (P : K1 G → U)
 --        (pPoint : P (K1-point G))
 --        (pPath  : Π (g : G.1.1), PathP (<i> P (K1-loop G g @ i)) pPoint pPoint)
@@ -64,4 +65,5 @@ def K1-ind (G : group) (P : K1 G → U)
 --                    PathP (<i> P (trunc₃ (2-quot 𝟏 (R-K1 G) (Q-K1 G)) two f s @ i)) (nHub f nF) (nF s))
 --      : Path (P (K1-point G)) (K1-ind G P pPoint pPath pCoher nHub nSpoke (K1-point G)) pPoint
 --     := idp (P (K1-point G)) pPoint
+
 -}

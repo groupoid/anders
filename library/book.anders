@@ -10,6 +10,7 @@ import library/foundations/mltt/natw
 import library/foundations/mltt/list
 import library/foundations/mltt/fin
 import library/foundations/mltt/vec
+import library/foundations/univalent/cartesian
 import library/foundations/univalent/path
 import library/foundations/univalent/prop
 import library/foundations/univalent/hedberg

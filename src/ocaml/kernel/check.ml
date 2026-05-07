@@ -7,7 +7,7 @@ open Term
 open Gen
 open Rbv
 
-let timeout = 5.0
+let timeout = 6.0
 let startTime = ref (Unix.gettimeofday ())
 let fuel = ref 10000000
 let conv_depth = ref 0
@@ -210,7 +210,7 @@ and transport_internal i p phi u0 = match p, phi, u0 with
       ) s
     | _ -> ()
     end;
-    
+
     let res = match !e0, !e1 with
       | Some f0, Some f1 ->
         let (_, ei0) = eta f0 in let (f0, _) = eta ei0 in
@@ -224,7 +224,7 @@ and transport_internal i p phi u0 = match p, phi, u0 with
         Some (vfst (vfst (app (w1, u0))))
       | None, None -> None
     in
-    
+
     begin match res with
     | Some v -> v
     | None ->
@@ -249,7 +249,7 @@ and transport_internal i p phi u0 = match p, phi, u0 with
     glue chi (VSystem (System.map (fun p -> let (t, w, u) = p in
       pairv t (pairv w (vfst u))) fib')) a1'
     end
-  
+
   | VCoequ (a, b, f, g), phi, (VIota2 (_, _, _, _, v) as u0) ->
     let a1 = act0 i vone a in let b1 = act0 i vone b in
     let f1 = act0 i vone f in let g1 = act0 i vone g in
@@ -355,7 +355,7 @@ and transport_internal i p phi u0 = match p, phi, u0 with
          appFormula (vsnd p) (dim i)) fib') (border phi1 a1))) a1 in
      glue chi (VSystem (System.map (fun p -> let (t, w, u) = p in
        pairv t (pairv w (vfst u))) fib')) a1'
-  
+
   (* transpⁱ U φ A = A *)
 
   | VKan _, _, _ -> u0
@@ -375,11 +375,11 @@ and transport_internal i p phi u0 = match p, phi, u0 with
   (* transpⁱ N φ u₀ = u₀ *)
 
   | VNat, _, _ -> u0
-  
+
   (* transpⁱ (♭ A) φ (♭-unit a) = ♭-unit (transpⁱ A φ a) *)
 
   | VFla t, _, VFlaUnit a -> VFlaUnit (transport i t phi a)
-  
+
   (* transpⁱ (Π (x : A), B) φ u₀ v = transpⁱ B(x/w) φ (u₀ w(i/0)), w = transp-Fill⁻ⁱ A φ v, v : A(i/1) *)
 
   | VPi (t, (x, b)), _, _ ->
@@ -392,7 +392,7 @@ and transport_internal i p phi u0 = match p, phi, u0 with
         let v = transFill j (act0 i (VNeg (dim j)) t) phi x in
         transport k (swap i k (b (v (VNeg (dim k)))))
           phi (app (u0, v vone))))
-  
+
   (* transpⁱ (Σ (x : A), B) φ u₀ = (transpⁱ A φ (u₀.1), transpⁱ B(x/v) φ(u₀.2)), v = transp-Fillⁱ A φ u₀.1 *)
 
   | VSig (t, (x, b)), _, _ ->
@@ -404,7 +404,7 @@ and transport_internal i p phi u0 = match p, phi, u0 with
       let v1 = transFill j (swap i j t) phi (vfst u0) in
       let v2 = transport k (swap i k (b (v1 (dim k)))) phi (vsnd u0) in
       VPair (ref None, v1 vone, v2)
-  
+
   (* transpⁱ (Pathʲ A v w) φ u₀ = 〈j〉 compⁱ A [φ ↦ u₀ j, (j=0) ↦ v, (j=1) ↦ w] (u₀ j) *)
 
   | VApp (VApp (VPathP p, v), w), _, _ ->
@@ -415,7 +415,7 @@ and transport_internal i p phi u0 = match p, phi, u0 with
         (VSystem (unionSystem (border (solve phi One) uj)
                  (unionSystem (border (solve j Zero) (swap i k v))
                                (border (solve j One)  (swap i k w))))) uj)))
-  
+
   (* transpⁱ (W (x : A), B) φ (sup a f) = sup (transpⁱ A φ a) (transpⁱ (B(v) → W) φ f), v = transp-Fillⁱ A φ a *)
 
   | W (t, (x, b)), _, VApp (VApp (VSup _, a), f) ->
@@ -426,7 +426,7 @@ and transport_internal i p phi u0 = match p, phi, u0 with
   | VApp (VApp (VId _, _), _), _, _ ->
     let j = freshName "ι" in
     comp (fun j -> act0 i j p) phi i (VSystem System.empty) u0
-  
+
   (* transpⁱ (ℑ A) φ (ℑ-unit a) = ℑ-unit (transpⁱ A φ a) *)
 
   | VIm t, _, VInf a -> inf (transport i t phi a)
@@ -713,31 +713,48 @@ and app (v, x) =
     incr app_misses;
     burn ();
     match v, x with
+
   (* J A C a φ a (ref a) ~> φ *)
+
   | VApp (VApp (VApp (VApp (VJ _, _), _), f), _), VRef _ -> f
+
   (* Glue A 1 u ~> (u 1=1).1 *)
+
   | VApp (VGlue _, phi), u when orEq phi vone -> vfst (app (u, VRef vone))
   | VTransp (p, i), u0 -> transp p i u0
   | VSystem ts, x -> reduceSystem ts x
   | VLam (_, (_, f)), v -> f v
   | VInc (t, r), v -> inc t r v
+
   (* ind₁ C x ★ ~> x *)
+
   | VApp (VIndUnit _, x), VStar -> x
+
   (* ind₂ C a b 0₂ ~> a *)
+
   | VApp (VApp (VIndBool _, a), _), VFalse -> a
+
   (* ind₂ C a b 1₂ ~> b *)
+
   | VApp (VApp (VIndBool _, _), b), VTrue -> b
+
   (* indᵂ A B C g (sup A B x f) ~> g x f (λ (b : B x), indᵂ A B C g (f b)) *)
+
   | VApp (VIndW (a, b, c), g), VApp (VApp (VSup (_, _), x), f) ->
     app (app (app (g, x), f),
       VLam (app (b, x), (freshName "b", fun y ->
         app (VApp (VIndW (a, b, c), g), app (f, y)))))
+
   (* ind-nat C z s 0 ~> z *)
-  (* ind-nat C z s 0 ~> z *)
+
   | VIndNat (_, z, _), VZero -> z
+
   (* ind-nat C z s (succ n) ~> s n (app (VIndNat (c, z, s), n)) *)
+
   | VIndNat (c, z, s), VSucc n -> app (app (s, n), app (VIndNat (c, z, s), n))
+
   (* ind-ℑ A B f (ℑ-unit a) ~> f a *)
+
   | VApp (VIndIm _, f), VInf a -> app (f, a)
   | VApp (VIndFla _, f), VFlaUnit a -> app (f, a)
   | VApp (VIndIm (a, b), f), VHComp (_, r, u, u0) ->
@@ -745,12 +762,16 @@ and app (v, x) =
     let i = freshName "ι" in let k = freshName "κ" in
     comp (fun j -> VIm (app (b, hfill (VIm a) r i (app (u, dim i)) u0 j))) r k
       (VSystem (walk g r (app (u, dim k)))) (g u0)
+
   (* ind-ℑ A B (λ _, b) x ~> b *)
+
   | VApp (VIndIm (a, b), VLam (t, (x, g))), v -> let u = g (Var (x, t)) in
     if mem x u then VApp (VApp (VIndIm (a, b), VLam (t, (x, g))), v) else u
   | VApp (VIndFla (a, b), VLam (t, (x, g))), v -> let u = g (Var (x, t)) in
     if mem x u then VApp (VApp (VIndFla (a, b), VLam (t, (x, g))), v) else u
+
   (* ind-nat C z s (hcomp Nat r u u0) ~> ... *)
+
   | VIndNat (c, _, _) as ind, VHComp (t, r, sys, u0) ->
     let g_ind v = app (ind, v) in
     let iota = freshName "iota" in
@@ -760,13 +781,18 @@ and app (v, x) =
     comp tj r kappa (VSystem (walk g_ind r (app (sys, dim kappa)))) (g_ind u0)
 
   (* coequ-ind A B f g X i rho (ι₂ b) ~> i b *)
+
   | VIndCoequ (_, _, _, _, _, i, _), VIota2 (_, _, _, _, b) -> app (i, b)
+
   (* coequ-ind A B f g X i rho (resp a @ r) ~> rho a @ r *)
+
   | VIndCoequ (_, _, _, _, _, _, rho), VAppFormula (VResp (_, _, _, _, a), r) ->
     appFormula (app (rho, a)) r
   | VIndCoequ (_, _, _, _, _, _, rho), VResp (_, _, _, _, a) ->
     app (rho, a)
+
   (* coequ-ind A B f g X i rho (hcomp A' r u u0) ~> ... *)
+
   | VIndCoequ (_, _, _, _, x, _, _) as ind, VHComp (t, r, sys, u0) ->
     let g_ind v = app (ind, v) in
     let iota = freshName "iota" in
@@ -774,16 +800,21 @@ and app (v, x) =
     let tj = if is_constant_motive x then let v = app (x, VHole) in fun _ -> v
              else fun j -> app (x, hfill t r iota (app (sys, dim iota)) u0 j) in
     comp tj r kappa (VSystem (walk g_ind r (app (sys, dim kappa)))) (g_ind u0)
+
   | VIndDisc (s, a, x, nc, nh, ns), VBase (_, _, v) -> app (nc, v)
+
   | VIndDisc (s, a, x, nc, nh, ns), VHub (_, _, f) ->
     let nF = VLam (s, (freshName "s", fun v -> app (VIndDisc (s, a, x, nc, nh, ns), app (f, v)))) in
     app (app (nh, f), nF)
+
   | VIndDisc (s, a, x, nc, nh, ns), VAppFormula (VSpoke (_, _, f, y), r) ->
     let nF = VLam (s, (freshName "s", fun v -> app (VIndDisc (s, a, x, nc, nh, ns), app (f, v)))) in
     appFormula (app (app (app (ns, f), nF), y)) r
+
   | VIndDisc (s, a, x, nc, nh, ns), VSpoke (_, _, f, y) ->
     let nF = VLam (s, (freshName "s", fun v -> app (VIndDisc (s, a, x, nc, nh, ns), app (f, v)))) in
     app (app (ns, f), nF)
+
   | VIndDisc (s, a, x', nc, nh, ns) as ind, VHComp (t, r, sys, u0) ->
     let g_ind v = app (ind, v) in
     let iota = freshName "iota" in
@@ -791,9 +822,8 @@ and app (v, x) =
     let tj = if is_constant_motive x' then let v = app (x', VHole) in fun _ -> v
              else fun j -> app (x', hfill t r iota (app (sys, dim iota)) u0 j) in
     comp tj r kappa (VSystem (walk g_ind r (app (sys, dim kappa)))) (g_ind u0)
-  | f, x -> VApp (f, x) end in
-  app_cache.(h) <- (v, x, res);
-  res
+
+  | f, x -> VApp (f, x) end in app_cache.(h) <- (v, x, res); res
 
 and evalSystem ctx = bimap (getRho ctx) (fun mu t -> eval (faceEnv mu ctx) t)
 
@@ -804,7 +834,6 @@ and getRho ctx x = match Env.find_opt x ctx with
 
 and appFormulaE ctx e i = eval ctx (EAppFormula (e, i))
 
-(* This is part of evaluator, not type checker *)
 and inferV v = traceInferV v; match v with
   | VPi (t, (x, f)) -> inferVTele (if !Prefs.impredicativity then impred else imax) t x f
   | VSig (t, (x, f)) | W (t, (x, f)) -> inferVTele imax t x f

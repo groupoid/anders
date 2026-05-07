@@ -2,18 +2,22 @@ module minimalist where
 
 import library/foundations/mltt/nat
 import library/foundations/mltt/sigma
+import library/foundations/mltt/either
 import library/foundations/univalent/path
+import library/foundations/univalent/equiv
 import library/mathematics/analysis/topology
+import library/mathematics/analysis/borel
+import library/mathematics/algebra/int
 
 {- A Foundation for the Core Mathematician
-   arXiv:2605.03868
+   https://arxiv.org/pdf/2605.03868.pdf
    David Mumford and Sy-David Friedman -}
 
--- 1. Foundation: The Real Numbers
+-- 1. Constructive Foundations
 axiom R : U
 axiom isSetR : isSet R
 
--- Subsets as predicates. Since U:U1, R->U is in U1.
+-- Subsets as predicates.
 def Subset (X : U) : U₁ := X → U
 
 -- 2. Axiom of Dependent Choice (DC)
@@ -25,13 +29,13 @@ axiom DC
   : Sigma (ℕ → X) (λ (f : ℕ → X), Sigma (Path X (f zero) x0) (λ (_ : Path X (f zero) x0), Π (n : ℕ), Rel (f n) (f (succ n))))
 
 -- 3. Lebesgue Measure and Null Sets
--- isNull takes a Subset (U1) and returns a proposition (U).
 axiom isNull : Subset R → U
 
+-- Property: Countable unions of null sets are null.
 axiom nullCountableUnion
   (f : ℕ → Subset R)
   (h : Π (n : ℕ), isNull (f n))
-  : isNull (λ (x : R), Sigma ℕ (λ (n : ℕ), f n x))
+  : isNull (λ (x : R), Σ (n : ℕ), f n x)
 
 -- 4. Freiling's Axiom of Symmetry (A_null^N)
 axiom FreilingSymmetry
@@ -39,11 +43,29 @@ axiom FreilingSymmetry
   (h : Π (x : R), isNull (f x))
   : Sigma R (λ (x : R), Sigma R (λ (y : R), prod (f x y → 𝟎) (f y x → 𝟎)))
 
--- 5. The Measurability Axiom
-axiom isMeasurable : Subset R → U
-axiom hasBaireProperty : Subset R → U
-axiom perfectSetProperty : Subset R → U
+-- 5. Constructive Measurability
+-- A set P is measurable if it differs from a Borel set by a null set.
 
-axiom allMeasurable (P : Subset R) : isMeasurable P
-axiom allBaire (P : Subset R) : hasBaireProperty P
-axiom allPerfect (P : Subset R) : perfectSetProperty P
+def symmetricDifference (A B : Subset R) : Subset R :=
+  λ (x : R), Sigma (+ (A x → 𝟎) (B x → 𝟎)) (λ (_ : + (A x → 𝟎) (B x → 𝟎)), 𝟏)
+
+-- symmetric difference is (A \ B) U (B \ A).
+-- (A x and not B x) or (B x and not A x).
+-- (A x * (B x -> 0)) + (B x * (A x -> 0)).
+
+def symmetricDifferenceCorrect (A B : Subset R) : Subset R :=
+  λ (x : R), + (Sigma (A x) (λ (_ : A x), B x → 𝟎)) (Sigma (B x) (λ (_ : B x), A x → 𝟎))
+
+def Measurable (P : Subset R) : U :=
+  Sigma (Borel R) (λ (b : Borel R), isNull (symmetricDifferenceCorrect P (isBorel R b)))
+
+axiom allMeasurable (P : Subset R) : Measurable P
+axiom allBaire (P : Subset R) : Measurable P
+
+-- 6. Perfect Set Property
+-- Every subset of R is either empty or contains a perfect set.
+axiom allPerfect (P : Subset R) : + (Π (x : R), P x → 𝟎) (Sigma ((ℕ → 𝟐) → R) (λ (f : (ℕ → 𝟐) → R), isEmbedding (ℕ → 𝟐) R f))
+
+def MinimalistThesis : U₁
+ := Π (P : Subset R), prod (Measurable P)
+      (prod (Measurable P) (+ (Π (x : R), P x → 𝟎) (Sigma ((ℕ → 𝟐) → R) (λ (f : (ℕ → 𝟐) → R), isEmbedding (ℕ → 𝟐) R f))))

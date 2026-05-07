@@ -21,7 +21,9 @@ def ℕ-ind (C : ℕ → U) (z : C zero) (s : Π (n : ℕ), C n → C (succ n)) 
 
 -- 5) Computation Rules (Judgmental)
 -- These are judgmental in the kernel, so idp is a valid witness.
-def ℕ-βz (C : ℕ → U) (z : C zero) (s : Π (n : ℕ), C n → C (succ n)) : Path (C zero) (ℕ-ind C z s zero) z := <i> z
+def ℕ-βz (C : ℕ → U) (z : C zero) (s : Π (n : ℕ), C n → C (succ n))
+  : Path (C zero) (ℕ-ind C z s zero) z
+ := <i> z
 
 def ℕ-βs (C : ℕ → U) (z : C zero) (s : Π (n : ℕ), C n → C (succ n)) (n : ℕ)
   : Path (C (succ n)) (ℕ-ind C z s (succ n)) (s n (ℕ-ind C z s n))
@@ -54,7 +56,6 @@ def eight : ℕ := succ seven
 def nine  : ℕ := succ eight
 def ten   : ℕ := succ nine
 
-
 def isZero (k : ℕ) : 𝟐 := ind-nat (λ (_ : ℕ), 𝟐) 1₂ (λ (_ : ℕ) (_ : 𝟐), 0₂) k
 def isSucc (k : ℕ) : 𝟐 := ind-nat (λ (_ : ℕ), 𝟐) 0₂ (λ (_ : ℕ) (_ : 𝟐), 1₂) k
 
@@ -76,18 +77,19 @@ def trans-ℕ′ (u₀ : ℕ) : ℕ
  := u₀
 
 def trans-ℕ-is-correct (u₀ : ℕ)
- : Path ℕ (trans-ℕ u₀) (trans-ℕ′ u₀) := <_> trans-ℕ u₀
+  : Path ℕ (trans-ℕ u₀) (trans-ℕ′ u₀)
+ := <_> trans-ℕ u₀
 
 def hcomp-ℕ-zero (r : I) : ℕ
  := zero
 
 def hcomp-ℕ-zero-is-correct (r : I)
- : Path ℕ (hcomp ℕ r (λ (k : I), [(r = 1) → zero]) zero) (hcomp-ℕ-zero r)
+  : Path ℕ (hcomp ℕ r (λ (k : I), [(r = 1) → zero]) zero) (hcomp-ℕ-zero r)
  := <_> zero
 
 def hcomp-ℕ-succ (r : I) (u : I → Partial ℕ r) (u₀ : ℕ [r ↦ u 0]) : ℕ
  := succ (hcomp ℕ r u (ouc u₀))
 
 def hcomp-ℕ-succ-is-correct (r : I) (u : I → Partial ℕ r) (u₀ : ℕ [r ↦ u 0])
- : Path ℕ (hcomp ℕ r (λ (k : I), [(r = 1) → succ (u k 1=1)]) (succ (ouc u₀))) (hcomp-ℕ-succ r u u₀)
+  : Path ℕ (hcomp ℕ r (λ (k : I), [(r = 1) → succ (u k 1=1)]) (succ (ouc u₀))) (hcomp-ℕ-succ r u u₀)
  := <_> hcomp-ℕ-succ r u u₀

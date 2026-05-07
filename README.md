@@ -6,6 +6,20 @@
 
 <img src="https://tonpa.guru/stream/2019/img/Anders%20M%C3%B6rtberg.jpeg" width=600>
 
+Setup
+-----
+
+```shell
+$ opam install anders
+```
+
+```shell
+$ anders check library/book.anders
+```
+
+Syntax
+------
+
 Modal Homotopy Type System.
 
 ```OCaml
@@ -67,13 +81,6 @@ Features
 * Groupoid Infinity CCHM Homotopy Library: https://anders.groupoid.space/library/
 * Pure basis best suited for academic papers on W-types and well ordered type checking
 
-Setup
--------------
-
-```shell
-$ opam install anders
-```
-
 Samples
 -------
 
@@ -94,10 +101,6 @@ def comp (A : I → U) (r : I) (u : Π (i : I), Partial (A i) r) (u₀ : (A 0)[r
 
 def ghcomp (A : U) (r : I) (u : I → Partial A r) (u₀ : A[r ↦ u 0]) : A
  := hcomp A (∂ r) (λ (j : I), [(r = 1) → u j 1=1, (r = 0) → ouc u₀]) (ouc u₀)
-```
-
-```shell
-$ anders check library/book.anders
 ```
 
 Canonical Equations

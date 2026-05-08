@@ -10,7 +10,7 @@ import library/foundations/univalent/iso
 
 -- Intermediary Type that carries number of turns of a path along the circle
 -- This type is used to define the loop space of S¹ and
--- its higher-dimensional analogues  
+-- its higher-dimensional analogues
 
 def sucPathZ : Path U Z Z := iso→Path Z Z sucZ predZ sucpredZ predsucZ
 def helix (x : S¹) : U := S1-ind (λ (_ : S¹), U) Z sucPathZ x

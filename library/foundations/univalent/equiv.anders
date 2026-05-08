@@ -56,10 +56,12 @@ def univ-computation (A B : U) (p : PathP (<_> U) A B)
 --- Glue Primitive [CCHM] 2016
 
 def Glue' (A : U) (φ : I) (e : Partial (Σ (T : U), equiv T A) φ) : U := Glue A φ e
-def glue' (A : U) (φ : I) (u : Partial (Σ (T : U), equiv T A × T) φ)
-    (a : A[φ ↦ [(φ = 1) → (u 1=1).2.1.1 (u 1=1).2.2]]) := glue φ u (ouc a)
-def unglue' (A : U) (φ : I) (e : Partial (Σ (T : U), equiv T A) φ)
-    (a : Glue A φ e) : A := unglue φ e a
+def glue' (A : U) (φ : I) (u : Partial (Σ (T : U), equiv T A × T) φ) (a : A[φ ↦ [(φ = 1) → (u 1=1).2.1.1 (u 1=1).2.2]])
+ := glue φ u (ouc a)
+
+def unglue' (A : U) (φ : I) (e : Partial (Σ (T : U), equiv T A) φ) (a : Glue A φ e) : A
+ := unglue φ e a
+
 def hcomp-Glue' (A : U) (φ : I)
     (e : Partial (Σ (T : U), equiv T A) φ)
     (ψ : I) (u : I → Partial (Glue A φ [(φ = 1) → e 1=1]) ψ)
@@ -78,6 +80,18 @@ def ua' (A B : U) : PathP (<_> U) A B -> equiv A B := \ (p: PathP (<_>U) A B), u
 def ua-β (A B : U) (e : equiv A B) : Path (A → B) (trans A B (ua A B e)) e.1
  := <i> λ (x : A), (idfun=idfun″ B @ -i) ((idfun=idfun″ B @ -i) ((idfun=idfun′ B @ -i) (e.1 x)))
 def ua'-IsEquiv (A B: U) := isEquiv (PathP (<_>U) A B) (equiv A B) (ua' A B)
+
+--- J-equiv
+
+def isContr1 (A: U₁) : U₁ := Σ (x: A), Π (y: A), PathP (<_> A) x y
+def isContr→isProp (A: U) (w: isContr A) (a b : A) : Path A a b
+ := <i> hcomp A (∂ i) (λ (j : I), [(i = 0) → a, (i = 1) → (w.2 b) @ j]) ((<i4> w.2 a @ -i) @ i)
+def subst1 (A : U₁) (P : A -> U) (a b : A) (p : PathP (<_> A) a b) (e : P a) : P b := transp (<i> P (p @ i)) 0 e
+def contrEquiv (A B : U) (e : equiv A B) : PathP (<i> Σ (X : U), equiv A X) (A, idEquiv A) (B, e)
+ := <i> (ua A B e @ i, transp (<j> equiv A (ua A B e @ (i ∧ j))) 0 (idEquiv A))
+def EquivIsContr (A: U) : isContr1 (single A) := ((A, idEquiv A), λ (z : single A), contrEquiv A z.1 z.2)
+def J-equiv (A B: U) (P: Π (A B: U), equiv A B → U) (r: P A A (idEquiv A)) (e: equiv A B) : P A B e
+ := subst1 (single A) (\ (z: single A), P A z.1 z.2) (A, idEquiv A) (B, e) (contrEquiv A B e) r
 
 --- The Half-adjoint equivalence from Homotopy Theory
 --- as if f anf g are adjoint functors.

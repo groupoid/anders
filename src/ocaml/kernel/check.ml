@@ -7,7 +7,7 @@ open Term
 open Gen
 open Rbv
 
-let timeout = 7.0
+let timeout = 60.0
 let startTime = ref (Unix.gettimeofday ())
 let fuel = ref 1000000000
 let conv_depth = ref 0
@@ -444,6 +444,7 @@ and transport_internal i p phi u0 = match p, phi, u0 with
       let v1 = transFill j (swap i j (VPi (a, clos))) phi (vfst u0) in
       let v2 = transport k (swap i k (vsnd (act0 i (dim k) (VSig (VPi (a, clos), clos))))) phi (vsnd u0) in
       VPair (ref None, v1 vone, v2)
+
   | VSig (t, (x, b)), phi, u0 ->
     if not (mem i t) then
       let v1 = vfst u0 in

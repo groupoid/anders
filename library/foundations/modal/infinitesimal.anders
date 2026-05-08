@@ -29,31 +29,31 @@ def trans-ℑ-is-correct (A : I → U) (a : A 0) : Path (ℑ (A 1)) (trans-ℑ A
 
 def hcomp-ℑ (A : U) (r : I) (u : I → Partial A r) (u₀ : A[r ↦ u 0]) : ℑ A
  := ℑ-unit (hcomp A r u (ouc u₀))
+
 def hcomp-ℑ′ (A : U) (r : I) (u : I → Partial A r) (u₀ : A[r ↦ u 0]) : ℑ A
  := hcomp (ℑ A) r (λ (i : I), [(r = 1) → ℑ-unit (u i 1=1)]) (ℑ-unit (ouc u₀))
+
 def hcomp-ℑ-is-correct (A : U) (r : I) (u : I → Partial A r) (u₀ : A[r ↦ u 0])
   : Path (ℑ A) (hcomp-ℑ A r u u₀) (hcomp-ℑ′ A r u u₀)
  := <_> hcomp-ℑ A r u u₀
 
-def ind-hcomp-ℑ (A : U) (B : ℑ A → U) (φ : Π (a : A), ℑ (B (ℑ-unit a))) (r : I)
-  (u : I → Partial (ℑ A) r) (u₀ : (ℑ A)[r ↦ u 0]) : ℑ (B (hcomp (ℑ A) r u (ouc u₀))) :=
-comp (λ (i : I), ℑ (B (hfill (ℑ A) r u u₀ i))) r
-  (λ (i : I), [(r = 1) → ind-ℑ A B φ (u i 1=1)])
-  (inc (ℑ (B (ouc u₀))) r (ind-ℑ A B φ (ouc u₀)))
+def ind-hcomp-ℑ (A : U) (B : ℑ A → U) (φ : Π (a : A), ℑ (B (ℑ-unit a))) (r : I) (u : I → Partial (ℑ A) r) (u₀ : (ℑ A)[r ↦ u 0]) : ℑ (B (hcomp (ℑ A) r u (ouc u₀)))
+ := comp (λ (i : I), ℑ (B (hfill (ℑ A) r u u₀ i))) r (λ (i : I), [(r = 1) → ind-ℑ A B φ (u i 1=1)])
+         (inc (ℑ (B (ouc u₀))) r (ind-ℑ A B φ (ouc u₀)))
 
-def ind-hcomp-ℑ′ (A : U) (B : ℑ A → U) (φ : Π (a : A), ℑ (B (ℑ-unit a))) (r : I)
-  (u : I → Partial (ℑ A) r) (u₀ : (ℑ A)[r ↦ u 0]) : ℑ (B (hcomp (ℑ A) r u (ouc u₀))) :=
-ind-ℑ A B φ (hcomp (ℑ A) r u (ouc u₀))
+def ind-hcomp-ℑ′ (A : U) (B : ℑ A → U) (φ : Π (a : A), ℑ (B (ℑ-unit a))) (r : I) (u : I → Partial (ℑ A) r) (u₀ : (ℑ A)[r ↦ u 0])
+  : ℑ (B (hcomp (ℑ A) r u (ouc u₀)))
+ := ind-ℑ A B φ (hcomp (ℑ A) r u (ouc u₀))
 
-def ind-hcomp-ℑ-is-correct (A : U) (B : ℑ A → U) (φ : Π (a : A), ℑ (B (ℑ-unit a))) (r : I)
-  (u : I → Partial (ℑ A) r) (u₀ : (ℑ A)[r ↦ u 0]) :
-  Path (ℑ (B (hcomp (ℑ A) r u (ouc u₀)))) (ind-hcomp-ℑ A B φ r u u₀) (ind-hcomp-ℑ′ A B φ r u u₀) :=
-<_> ind-hcomp-ℑ A B φ r u u₀
+def ind-hcomp-ℑ-is-correct (A : U) (B : ℑ A → U) (φ : Π (a : A), ℑ (B (ℑ-unit a))) (r : I) (u : I → Partial (ℑ A) r) (u₀ : (ℑ A)[r ↦ u 0])
+  : Path (ℑ (B (hcomp (ℑ A) r u (ouc u₀)))) (ind-hcomp-ℑ A B φ r u u₀) (ind-hcomp-ℑ′ A B φ r u u₀)
+ := <_> ind-hcomp-ℑ A B φ r u u₀
 
 -- Induction Principle #1
 
 def ℑ-ind (A : U) (B : ℑ A → U) (c : Π (a : ℑ A), is-coreduced (B a)) (f : Π (a : A), B (ι A a)) (a : ℑ A) : B a
  := (c a (ind-ℑ A B (λ (x : A), ι (B (ι A x)) (f x)) a)).1.1
+
 def ℑ-indβ (A : U) (B : ℑ A → U) (c : Π (a : ℑ A), is-coreduced (B a)) (f : Π (a : A), B (ι A a)) (a : A)
   : Path (B (ι A a)) (f a) ((ℑ-ind A B c f) (ι A a))
  := <i> sec-equiv (B (ι A a)) (ℑ (B (ι A a))) (ι (B (ι A a)), c (ι A a)) (f a) @ -i
@@ -97,10 +97,11 @@ def ℑ-path-coreduced (A : U) (a b : ℑ A)
 
 def ℑ-idfun (A : U) : ℑ A → ℑ A := ℑ-rec′ A A (ι A)
 
-def ℑ-idfun=idfun (A : U) : Π (x : ℑ A), Path (ℑ A) (ℑ-idfun A x) x :=
-ℑ-ind A (λ (x : ℑ A), Path (ℑ A) (ℑ-idfun A x) x)
-        (λ (x : ℑ A), ℑ-path-coreduced A (ℑ-idfun A x) x)
-        (λ (a : A), <_> ℑ-unit a)
+def ℑ-idfun=idfun (A : U)
+  : Π (x : ℑ A), Path (ℑ A) (ℑ-idfun A x) x
+ := ℑ-ind A (λ (x : ℑ A), Path (ℑ A) (ℑ-idfun A x) x)
+            (λ (x : ℑ A), ℑ-path-coreduced A (ℑ-idfun A x) x)
+            (λ (a : A), <_> ℑ-unit a)
 
 def ℑ-app-comp (A B C : U) (f : B → C) (g : A → B)
   : Π (x : ℑ A), Path (ℑ C) (ℑ-app A C (∘ A B C f g) x) (ℑ-app B C f (ℑ-app A B g x))

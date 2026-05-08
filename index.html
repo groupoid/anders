@@ -40,10 +40,11 @@ https://homotopy.dev/library/
   invocation = anders | anders list
         list = [] | command list
 
-     command = check &lt;filename>      | lex &lt;filename>
-             | parse &lt;filename>      | girard
-             | trace                    | verbose
-             | repl                     | help
+     command = check &lt;filename>    | lex &lt;filename>
+             | parse &lt;filename>    | girard
+             | trace               | verbose
+             | preeval             | irrelevance
+             | repl                | help
 </code><br></section><section><h1>SYNTAX</h1><p>The syntax resembles original syntax of the reference CCHM type checker
 cubicaltt, is slightly compatible with <b>Lean</b> syntax
 and contains the full set of Cubical&nbsp;Agda [10]

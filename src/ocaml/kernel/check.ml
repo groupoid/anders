@@ -48,7 +48,7 @@ let burn () =
     print_stats ();
     if Unix.gettimeofday () -. !startTime > timeout then failwith "Termination limit reached"
   )
-let reset_fuel () = startTime := Unix.gettimeofday (); fuel := 500000
+let reset_fuel () = startTime := Unix.gettimeofday (); fuel := 50000000
 
 let mem i v = IdentSet.mem i (get_support v)
 

@@ -1,7 +1,7 @@
 \documentclass[a4paper,UKenglish,cleveref, autoref, thm-restate]{lipics-v2021}
 \bibliographystyle{plainurl}
 \title{Anders: Modal Homotopy Type System for Computable Modal Homotopy Type Theory and Differential Geometry}
-\titlerunning{Anders 1.3.0}
+\titlerunning{Anders 5.5.0}
 \author{Maksym Sokhatskyi}{Groupoid Infinity}{maxim@synrc.com}{https://orcid.org/0000-0001-7127-8796}{}
 \authorrunning{Maksym Sokhatskyi}
 \Copyright{Maksym Sokhatskyi}
@@ -663,8 +663,11 @@ Basic data types like List, Nat, Fin, Vec are implemented as W-types in base lib
 
 \subsection{Higher Inductive Types}
 
-As for higher inductive types Anders has Three-HIT foundation (Coequalizer, Path Coequalizer and Colimit)
-to express other HITs. Also there are other foundations to consider motivated by typical tasks in homotopy (type) theory:
+As for higher inductive types Anders is inspired by Three-HIT foundation (Coequalizer, Path Coequalizer and Colimit)
+but contains only modal extensions Flat and Infinitesimal, Hub Spoke Disc for direct truncations encoding, and
+Coequalizer for computable $S^1$, $S^n$, $K(G,n)$, Colimits.
+
+Also there are other foundations to consider motivated by typical tasks in homotopy (type) theory:
 
 \begin{itemize}
 \item Coequalizer, Path Coequalizer and Colimit (van der Weide)
@@ -736,6 +739,68 @@ one second — using a syntax of Lean and semantics of cubicaltt and Cubical Agd
 As a practical refinement of cubicaltt, Anders serves as an accessible
 tool for homotopy type theory, with potential for incremental
 enhancements like a tactic language.
+
+\newpage
+\appendix
+\section{Application A. HoTT Mathematics}
+\label{sec:hott-applications}
+
+Mathematics in Homotopy Type Theory has seen substantial formalization efforts across multiple proof assistants (including Anders, Cubical Agda, Lean, Coq, etc.). Below is a (non-exhaustive) list of notable results that have been mechanized.
+
+\subsection{Formalized Results}
+
+\begin{itemize}
+\item Symmetry: A book project about group theory from the univalent point of view~\cite{SymmetryBook}.
+\item Modalities and reflective subuniverses~\cite{RijkeModalities}.
+\item Higher Groups ($k$-symmetric $n$-groups)~\cite{BuchholtzHigherGroups}.
+\item $\lVert \Sigma A \rVert_2$ is a 1-type for all sets $A$~\cite{KrausFreeHigherGroups}.
+\item Localization and $L$-separated types~\cite{ChristensenLocalization}.
+\item The James construction and $\pi_4(S^3)$~\cite{BrunerieJames}.
+\item The Cayley--Dickson construction and the H-space structure on $S^3$~\cite{BuchholtzCayleyDickson}.
+\item The join construction~\cite{RijkeJoin}.
+\item Cellular cohomology~\cite{BuchholtzCellular}.
+\item Real projective spaces $\mathbb{R}P^n$~\cite{BuchholtzRPn}.
+\item Homology theory~\cite{GrahamSyntheticHomology}.
+\item Blakers--Massey connectivity theorem~\cite{FavoniaBlakersMassey}.
+\item Seifert--van Kampen theorem~\cite{FavoniaSeifertVanKampen}.
+\item Nilpotent types and fracture squares~\cite{ScoccolaNilpotent}.
+\item Eilenberg--MacLane spaces $K(G,n)$~\cite{LicataEilenbergMacLane}.
+\item Spectral sequences~\cite{vanDoornSpectral}.
+\item Long exact sequence of homotopy $n$-groups~\cite{BuchholtzLongExact}.
+\item Brouwer’s fixed-point theorem in real-cohesion~\cite{ShulmanBrouwer}.
+\item Cartan Geometry using a modality~\cite{CherubiniCartan}.
+\item Synthetic Cohomology Theory in Cubical Agda~\cite{BrunerieSyntheticCohomology}.
+\item Computing Cohomology Rings in Cubical Agda~\cite{LamiauxCohomologyRings}.
+\end{itemize}
+
+\subsection{Open Problems}
+
+Some notable open problems and challenges in the formalization of homotopy theory include:
+
+\begin{itemize}
+\item Do more “ordinary” ($\leq 2$-truncated) mathematics: Is univalence a practical advantage for formalizing scheme or manifold theory?
+\item Prove Freyd’s Adjoint Functor Theorem constructively.
+\item Calculate more homotopy groups of spheres.
+\item Is $\Sigma A$ a 1-type for all sets $A$?
+\item Prove that all spheres $S^n$ are $\infty$-truncated.
+\item Define the type $\mathrm{BSU}(2)$ (a delooping of $S^3$); then define $\mathrm{BSU}(n)$, $\mathrm{BSO}(n)$, etc.
+\item Define the type of $U$-small semi-simplicial types.
+\item For which $0$- or $1$-categories $D$ can we define the type of diagrams $\mathrm{Fun}(D,U)$?
+\item Define the type of $(\infty,1)$-categories and develop $(\infty,1)$-category theory.
+\item Define the localization type of a $1$-category $C$: the universal type with a functor from $C$.
+\item Give a general theory of $\infty$-quotients.
+\item Formalize the meta-theory of type theory in itself.
+\end{itemize}
+
+\subsection{Discussion}
+
+\begin{itemize}
+\item What is a good foundational framework for mathematics? Which criteria are essential, and which are “nice to have”?
+\item How does set theory fare according to these criteria?
+\item How does (homotopy) type theory fare?
+\end{itemize}
+
+Anders aims to provide an efficient and educational environment for exploring and extending these formalizations, particularly through its modal and infinitesimal primitives that support synthetic differential geometry and higher categorical constructions.
 
 \newpage
 \begin{thebibliography}{20}
@@ -832,6 +897,124 @@ Martin Hofmann.
 Andrej Bauer and Niels van der Weide.
 \newblock The Three-HITs Theorem.
 \newblock DOI:10.4230/LIPIcs.CVIT.2016.23, \url{https://5ht.co/three.pdf}.
+
+% ==================== HoTT Mathematics ====================
+
+\bibitem{SymmetryBook}
+Marc Bezem, Ulrik Buchholtz, Bjorn Dundas, Dan Grayson, et al.
+\newblock Symmetry: A book project about group theory from the univalent point of view.
+\newblock 2020. \url{https://github.com/UniMath/SymmetryBook}.
+
+\bibitem{BrunerieJames}
+Guillaume Brunerie.
+\newblock The James Construction and $\pi_4(S^3)$ in Homotopy Type Theory.
+\newblock \emph{Journal of Automated Reasoning}, 63.2, pp. 255--284, 2019.
+\newblock DOI: \url{https://doi.org/10.1007/s10817-018-9468-2}, arXiv:1710.10307.
+
+\bibitem{BuchholtzHigherGroups}
+Ulrik Buchholtz, Floris van Doorn, and Egbert Rijke.
+\newblock Higher Groups in Homotopy Type Theory.
+\newblock In \emph{Proceedings of the 33rd Annual ACM/IEEE Symposium on Logic in Computer Science (LICS '18)}, pp. 205--214, 2018.
+\newblock DOI: \url{https://doi.org/10.1145/3209108.3209150}, arXiv:1802.04315.
+
+\bibitem{BuchholtzCellular}
+Ulrik Buchholtz and Favonia.
+\newblock Cellular Cohomology in Homotopy Type Theory.
+\newblock In \emph{Proceedings of the 33rd Annual ACM/IEEE Symposium on Logic in Computer Science (LICS '18)}, pp. 521--529, 2018.
+\newblock DOI: \url{https://doi.org/10.1145/3209108.3209188}, arXiv:1802.02191.
+
+\bibitem{BuchholtzCayleyDickson}
+Ulrik Buchholtz and Egbert Rijke.
+\newblock The Cayley--Dickson construction in homotopy type theory.
+\newblock \emph{Higher Structures} 2.1, pp. 30--41, 2018.
+\newblock arXiv:1610.01134.
+
+\bibitem{BuchholtzLongExact}
+Ulrik Buchholtz and Egbert Rijke.
+\newblock The long exact sequence of homotopy $n$-groups.
+\newblock 2019. arXiv:1912.08696.
+
+\bibitem{BuchholtzRPn}
+Ulrik Buchholtz and Egbert Rijke.
+\newblock The real projective spaces in homotopy type theory.
+\newblock In \emph{32nd Annual ACM/IEEE Symposium on Logic in Computer Science (LICS)}, pp. 1--8, 2017.
+\newblock DOI: \url{https://doi.org/10.1109/LICS.2017.8005146}, arXiv:1704.05770.
+
+\bibitem{ChristensenLocalization}
+J. Daniel Christensen, Morgan Opie, Egbert Rijke, and Luis Scoccola.
+\newblock Localization in Homotopy Type Theory.
+\newblock 2018. arXiv:1807.04155.
+
+\bibitem{vanDoornSpectral}
+Floris van Doorn, Jeremy Avigad, Steve Awodey, Ulrik Buchholtz, Egbert Rijke, and Michael Shulman.
+\newblock Spectral Sequences in Homotopy Type Theory.
+\newblock 2019. \url{https://github.com/cmu-phil/Spectral}.
+
+\bibitem{FavoniaBlakersMassey}
+Favonia, Eric Finster, Daniel R. Licata, and Peter L. Lumsdaine.
+\newblock A Mechanization of the Blakers--Massey Connectivity Theorem in Homotopy Type Theory.
+\newblock In \emph{31st Annual ACM/IEEE Symposium on Logic in Computer Science (LICS)}, pp. 1--10, 2016.
+\newblock arXiv:1605.03227.
+
+\bibitem{FavoniaSeifertVanKampen}
+Favonia and Michael Shulman.
+\newblock The Seifert--van Kampen Theorem in Homotopy Type Theory.
+\newblock In \emph{25th EACSL Annual Conference on Computer Science Logic (CSL 2016)}, LIPIcs vol. 62, pp. 22:1--22:16, 2016.
+\newblock DOI: \url{https://doi.org/10.4230/LIPIcs.CSL.2016.22}.
+
+\bibitem{GrahamSyntheticHomology}
+Robert Graham.
+\newblock Synthetic Homology in Homotopy Type Theory.
+\newblock 2017. arXiv:1706.01540.
+
+\bibitem{KrausFreeHigherGroups}
+Nicolai Kraus and Thorsten Altenkirch.
+\newblock Free Higher Groups in Homotopy Type Theory.
+\newblock In \emph{Proceedings of the 33rd Annual ACM/IEEE Symposium on Logic in Computer Science (LICS '18)}, pp. 599--608, 2018.
+\newblock DOI: \url{https://doi.org/10.1145/3209108.3209183}, arXiv:1805.02069.
+
+\bibitem{LicataEilenbergMacLane}
+Daniel R. Licata and Eric Finster.
+\newblock Eilenberg--MacLane Spaces in Homotopy Type Theory.
+\newblock In \emph{CSL-LICS '14}, 2014.
+\newblock DOI: \url{https://doi.org/10.1145/2603088.2603153}.
+
+\bibitem{RijkeJoin}
+Egbert Rijke.
+\newblock The join construction.
+\newblock 2017. arXiv:1701.07538.
+
+\bibitem{RijkeModalities}
+Egbert Rijke, Michael Shulman, and Bas Spitters.
+\newblock Modalities in homotopy type theory.
+\newblock \emph{Logical Methods in Computer Science} 16.1, 2020.
+\newblock arXiv:1706.07526, \url{https://lmcs.episciences.org/6015}.
+
+\bibitem{ScoccolaNilpotent}
+Luis Scoccola.
+\newblock Nilpotent Types and Fracture Squares in Homotopy Type Theory.
+\newblock 2019. arXiv:1903.03245.
+
+\bibitem{ShulmanBrouwer}
+Michael Shulman.
+\newblock Brouwer’s fixed-point theorem in real-cohesive homotopy type theory.
+\newblock \emph{Mathematical Structures in Computer Science} 28.6, pp. 856--941, 2018.
+\newblock DOI: \url{https://doi.org/10.1017/S0960129517000147}, arXiv:1509.07584.
+
+\bibitem{CherubiniCartan}
+Felix Wellen (Cherubini).
+\newblock Cartan Geometry in Modal Homotopy Type Theory.
+\newblock 2018. arXiv:1806.05966.
+
+\bibitem{BrunerieSyntheticCohomology}
+Guillaume Brunerie, Axel Ljungström, and Anders Mörtberg.
+\newblock Synthetic Cohomology Theory in Cubical Agda.
+\newblock \url{https://staff.math.su.se/anders.mortberg/papers/zcohomology.pdf}.
+
+\bibitem{LamiauxCohomologyRings}
+Thomas Lamiaux, Axel Ljungström, and Anders Mörtberg.
+\newblock Computing Cohomology Rings in Cubical Agda.
+\newblock arXiv:2212.04182, \url{https://hott-uf.github.io/2023/slides/Lamiaux.pdf}.
 
 \end{thebibliography}
 

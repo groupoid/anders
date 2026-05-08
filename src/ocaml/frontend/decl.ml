@@ -44,7 +44,7 @@ let rec checkLine fs : line -> Files.t = function
   | Option (opt, value) ->
     begin match opt with
       | "girard"   | "irrelevance"
-      | "pre-eval" | "impredicativity" -> set opt value
+      | "preeval"  | "impredicativity" -> set opt value
       | "verbose" -> Prefs.verbose := getBoolVal opt value
       | _         -> raise (UnknownOption opt)
     end; fs

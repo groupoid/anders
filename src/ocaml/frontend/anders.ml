@@ -23,7 +23,6 @@ let help =
              | indices               | silent
              | repl                  | help "
 
-
 let cmd : cmdline -> unit = function
   | Check     filename -> Repl.check filename
   | Lex       filename -> Reader.lex filename

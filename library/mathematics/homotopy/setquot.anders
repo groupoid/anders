@@ -1,0 +1,12 @@
+module setquot where
+import library/foundations/univalent/path
+import library/foundations/univalent/prop
+
+postulate setQuot (A : U) (R : A → A → U) : U
+postulate quotient (A : U) (R : A → A → U) (a : A) : setQuot A R
+postulate setQuotId (A : U) (R : A → A → U) (a b : A) (r : R a b) : Path (setQuot A R) (quotient A R a) (quotient A R b)
+postulate setQuotIsSet (A : U) (R : A → A → U) : isSet (setQuot A R)
+postulate setQuotIndProp (A : U) (R : A → A → U) (P : setQuot A R → U) (f : Π (a : A), P (quotient A R a)) (pP : Π (x : setQuot A R), isProp (P x)) : Π (z : setQuot A R), P z
+postulate setQuotLift (A B : U) (R : A → A → U) (pB : isSet B) (f : A → B) (p : Π (a b : A), R a b → Path B (f a) (f b)) : setQuot A R → B
+postulate setQuotLift2' (A B C : U) (X : A → A → U) (Y : B → B → U) (h : isSet C) (f : A → B → C) (p : Π (a1 b1 : A) (a2 b2 : B), X a1 b1 → Y a2 b2 → Path C (f a1 a2) (f b1 b2)) : setQuot A X → setQuot B Y → C
+

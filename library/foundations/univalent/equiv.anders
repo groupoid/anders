@@ -93,6 +93,11 @@ def EquivIsContr (A: U) : isContr1 (single A) := ((A, idEquiv A), λ (z : single
 def J-equiv (A B: U) (P: Π (A B: U), equiv A B → U) (r: P A A (idEquiv A)) (e: equiv A B) : P A B e
  := subst1 (single A) (\ (z: single A), P A z.1 z.2) (A, idEquiv A) (B, e) (contrEquiv A B e) r
 
+postulate compute-Equiv (A : U)
+    (C : Π (A B: U), equiv A B → U)
+    (d: C A A (idEquiv A))
+  : Path (C A A (idEquiv A)) d (J-equiv A A C d (idEquiv A))
+
 --- The Half-adjoint equivalence from Homotopy Theory
 --- as if f anf g are adjoint functors.
 

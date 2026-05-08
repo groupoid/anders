@@ -95,7 +95,7 @@ def 2-quot₂ (A : U) (R : A → A → U) (Q : Π (x y : A), R¯ A R x y → R¯
   : Path (2-quot A R Q) (2-quot₁ A R Q x) (2-quot₁ A R Q y)
  := <i> ι₂ (TotalSpokes A R Q) (PreHIT A R Q) (LHS_Stage2 A R Q) (RHS_Stage2 A R Q) (r_pre A R Q x y r @ i)
 
-axiom 2-quot₃ (A : U) (R : A → A → U) (Q : Π (x y : A), R¯ A R x y → R¯ A R x y → U) (x y : A) (r1 r2 : R¯ A R x y) (q : Q x y r1 r2)
+postulate 2-quot₃ (A : U) (R : A → A → U) (Q : Π (x y : A), R¯ A R x y → R¯ A R x y → U) (x y : A) (r1 r2 : R¯ A R x y) (q : Q x y r1 r2)
   : PathP (<i> Path (2-quot A R Q) (2-quot₁ A R Q x) (2-quot₁ A R Q y))
           (<i> ι₂ (TotalSpokes A R Q) (PreHIT A R Q) (LHS_Stage2 A R Q) (RHS_Stage2 A R Q) (map_quot_PreHIT A R Q (r1 @ i)))
           (<i> ι₂ (TotalSpokes A R Q) (PreHIT A R Q) (LHS_Stage2 A R Q) (RHS_Stage2 A R Q) (map_quot_PreHIT A R Q (r2 @ i)))

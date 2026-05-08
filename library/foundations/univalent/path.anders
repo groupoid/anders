@@ -104,8 +104,7 @@ def ∧-1 (i j : I) (p : 1= (i ∧ j)) : 1= i := ∧-split i j p
 def ∧-1′ (i j : I) (p : 1= (i ∧ j)) : 1= i := cong-Id I I (λ (k : I), k ∨ i) 1 (i ∧ j) p
 def ∧-min-left  (i j : I) : ≤ (i ∧ j) i := ref (i ∧ j)
 def ∧-min-right (i j : I) : ≤ (i ∧ j) j := ref (i ∧ j)
-def ∧-to-∨ (i j : I) (p : Id I (i ∧ j) i) : Id I (i ∨ j) j
- := rev I j (i ∨ j) (cong-Id I I (λ (k : I), k ∨ j) (i ∧ j) i p)
+def ∧-to-∨ (i j : I) (p : Id I (i ∧ j) i) : Id I (i ∨ j) j := rev I j (i ∨ j) (cong-Id I I (λ (k : I), k ∨ j) (i ∧ j) i p)
 def φ (i : I) : Partial U₁ (i ∨ -i) := [(i = 0) → U, (i = 1) → U → U]
 def φ′ (i : I) : Partial U₁ (i ∨ -i) := [(i = 1) → U → U, (i = 0) → U]
 def ψ (i j : I) : Partial U₁ (-i ∨ i ∨ (i ∧ j)) := [(i = 1) → U, (i = 1) (j = 1) → U, (i = 0) → U → U]

@@ -1,6 +1,8 @@
 module algebra where
 import library/foundations/mltt/sigma
 import library/foundations/univalent/path
+import library/foundations/univalent/prop
+import library/mathematics/homotopy/setquot
 
 def isComm   (M : U) (op : M -> M -> M) : U := Π (x y : M), Path M (op x y) (op y x)
 def isAssoc  (M : U) (op : M -> M -> M) : U := Π (a b c : M), Path M (op a (op b c)) (op (op a b) c)
@@ -29,6 +31,112 @@ def abgroup : U₁ := Σ (X : SET), isAbGroup X
 def ring    : U₁ := Σ (X : SET), isRing X
 def abring  : U₁ := Σ (X : SET), isAbRing X
 def dgroup  : U₁ := Σ (X : SET), isDiffGroup X
+
+-- Accessors
+
+def opGroup  (G : group) : G.1.1 -> G.1.1 -> G.1.1 := G.2.1.1
+def idGroup  (G : group) : G.1.1 := G.2.1.2.2.1
+def invGroup (G : group) : G.1.1 -> G.1.1 := G.2.2.1
+def hasIdGroup (G : group) : hasId G.1.1 (opGroup G) (idGroup G) := G.2.1.2.2.2
+def hasInvGroup (G : group) : hasInv G.1.1 (opGroup G) (idGroup G) (invGroup G) := G.2.2.2
+def opCGroup  (G : abgroup) : G.1.1 -> G.1.1 -> G.1.1 := G.2.1.1.1
+def idCGroup  (G : abgroup) : G.1.1 := G.2.1.1.2.2.1
+def invCGroup (G : abgroup) : G.1.1 -> G.1.1 := G.2.1.2.1
+def isCommCGroup (G : abgroup) : isComm G.1.1 (opCGroup G) := G.2.2
+def isAssocCGroup (G : abgroup) : isAssoc G.1.1 (opCGroup G) := G.2.1.1.2.1
+def hasIdCGroup (G : abgroup) : hasId G.1.1 (opCGroup G) (idCGroup G) := G.2.1.1.2.2.2
+def hasInvCGroup (G : abgroup) : hasInv G.1.1 (opCGroup G) (idCGroup G) (invCGroup G) := G.2.1.2.2
+def abgroup' (G : abgroup) : group := (G.1, G.2.1)
+
+-- Homomorphisms
+
+def isGroupHom (G H: group) (f: G.1.1 -> H.1.1): U
+ := Π (g1 g2: G.1.1), Path H.1.1 (f (opGroup G g1 g2)) (opGroup H (f g1) (f g2))
+
+def grouphom (G H: group) : U := Σ (f: G.1.1 -> H.1.1), isGroupHom G H f
+
+def isAbGroupHom (G H: abgroup) (f: G.1.1 -> H.1.1): U
+ := isGroupHom (abgroup' G) (abgroup' H) f
+
+def abgrouphom (G H: abgroup) : U := Σ (f: G.1.1 -> H.1.1), isAbGroupHom G H f
+
+-- Subgroups
+
+def subgroupProp (G : group) : U₁
+ := Σ (prop : G.1.1 -> U)
+      (level : Π (x : G.1.1), isProp (prop x))
+      (ident : prop (idGroup G))
+      (inv : Π (x : G.1.1), prop x -> prop (invGroup G x))
+      (op : Π (x y : G.1.1), prop x -> prop y -> prop (opGroup G x y)), 𝟏
+
+def subEl (G : group) (P : subgroupProp G) : U := Σ (x : G.1.1), P.1 x
+
+axiom subgroupIsSet (G : group) (P : subgroupProp G) : isSet (subEl G P)
+
+def subgroupOp (G : group) (P : subgroupProp G) (u v : subEl G P) : subEl G P
+ := (opGroup G u.1 v.1, P.2.2.2.2.1 u.1 v.1 u.2 v.2)
+
+def subgroupId (G : group) (P : subgroupProp G) : subEl G P
+ := (idGroup G, P.2.2.1)
+
+def subgroupInv (G : group) (P : subgroupProp G) (u : subEl G P) : subEl G P
+ := (invGroup G u.1, P.2.2.2.1 u.1 u.2)
+
+def subgroupAssoc (G : group) (P : subgroupProp G) (u v w : subEl G P) : Path (subEl G P) (subgroupOp G P u (subgroupOp G P v w)) (subgroupOp G P (subgroupOp G P u v) w)
+ := <i> (G.2.1.2.1 u.1 v.1 w.1 @ i, P.2.1 (G.2.1.2.1 u.1 v.1 w.1 @ i) (comp (λ (j : I), P.1 (G.2.1.2.1 u.1 v.1 w.1 @ (i /\ j))) -i (\(k : I), [ (i = 0) -> (subgroupOp G P u (subgroupOp G P v w)).2 ]) (inc (P.1 (subgroupOp G P u (subgroupOp G P v w)).1) -i (subgroupOp G P u (subgroupOp G P v w)).2)) (comp (λ (j : I), P.1 (G.2.1.2.1 u.1 v.1 w.1 @ (i \/ -j))) i (\(k : I), [ (i = 1) -> (subgroupOp G P (subgroupOp G P u v) w).2 ]) (inc (P.1 (subgroupOp G P (subgroupOp G P u v) w).1) i (subgroupOp G P (subgroupOp G P u v) w).2)) @ i)
+
+def subgroupLId (G : group) (P : subgroupProp G) (u : subEl G P) : Path (subEl G P) (subgroupOp G P (subgroupId G P) u) u
+ := <i> (G.2.1.2.2.2.1 u.1 @ i, P.2.1 (G.2.1.2.2.2.1 u.1 @ i) (comp (λ (j : I), P.1 (G.2.1.2.2.2.1 u.1 @ (i /\ j))) -i (\(k : I), [ (i = 0) -> (subgroupOp G P (subgroupId G P) u).2 ]) (inc (P.1 (subgroupOp G P (subgroupId G P) u).1) -i (subgroupOp G P (subgroupId G P) u).2)) (comp (λ (j : I), P.1 (G.2.1.2.2.2.1 u.1 @ (i \/ -j))) i (\(k : I), [ (i = 1) -> u.2 ]) (inc (P.1 u.1) i u.2)) @ i)
+
+def subgroupRId (G : group) (P : subgroupProp G) (u : subEl G P) : Path (subEl G P) (subgroupOp G P u (subgroupId G P)) u
+ := <i> (G.2.1.2.2.2.2 u.1 @ i, P.2.1 (G.2.1.2.2.2.2 u.1 @ i) (comp (λ (j : I), P.1 (G.2.1.2.2.2.2 u.1 @ (i /\ j))) -i (\(k : I), [ (i = 0) -> (subgroupOp G P u (subgroupId G P)).2 ]) (inc (P.1 (subgroupOp G P u (subgroupId G P)).1) -i (subgroupOp G P u (subgroupId G P)).2)) (comp (λ (j : I), P.1 (G.2.1.2.2.2.2 u.1 @ (i \/ -j))) i (\(k : I), [ (i = 1) -> u.2 ]) (inc (P.1 u.1) i u.2)) @ i)
+
+def subgroupLInv (G : group) (P : subgroupProp G) (u : subEl G P) : Path (subEl G P) (subgroupOp G P (subgroupInv G P u) u) (subgroupId G P)
+ := <i> (G.2.2.2.1 u.1 @ i, P.2.1 (G.2.2.2.1 u.1 @ i) (comp (λ (j : I), P.1 (G.2.2.2.1 u.1 @ (i /\ j))) -i (\(k : I), [ (i = 0) -> (subgroupOp G P (subgroupInv G P u) u).2 ]) (inc (P.1 (subgroupOp G P (subgroupInv G P u) u).1) -i (subgroupOp G P (subgroupInv G P u) u).2)) (comp (λ (j : I), P.1 (G.2.2.2.1 u.1 @ (i \/ -j))) i (\(k : I), [ (i = 1) -> (subgroupId G P).2 ]) (inc (P.1 (subgroupId G P).1) i (subgroupId G P).2)) @ i)
+
+def subgroupRInv (G : group) (P : subgroupProp G) (u : subEl G P) : Path (subEl G P) (subgroupOp G P u (subgroupInv G P u)) (subgroupId G P)
+ := <i> (G.2.2.2.2 u.1 @ i, P.2.1 (G.2.2.2.2 u.1 @ i) (comp (λ (j : I), P.1 (G.2.2.2.2 u.1 @ (i /\ j))) -i (\(k : I), [ (i = 0) -> (subgroupOp G P u (subgroupInv G P u)).2 ]) (inc (P.1 (subgroupOp G P u (subgroupInv G P u)).1) -i (subgroupOp G P u (subgroupInv G P u)).2)) (comp (λ (j : I), P.1 (G.2.2.2.2 u.1 @ (i \/ -j))) i (\(k : I), [ (i = 1) -> (subgroupId G P).2 ]) (inc (P.1 (subgroupId G P).1) i (subgroupId G P).2)) @ i)
+
+def subgroup (G : group) (P : subgroupProp G) : group
+ := ( (subEl G P, subgroupIsSet G P)
+     , ( ( (subgroupOp G P, subgroupAssoc G P, subgroupId G P, (subgroupLId G P, subgroupRId G P)) )
+       , ( subgroupInv G P, (subgroupLInv G P, subgroupRInv G P) )
+       )
+     )
+
+-- Normal Subgroups
+
+def conjugateG (G : group) (g1 g2 : G.1.1) : G.1.1
+ := opGroup G (opGroup G g1 g2) (invGroup G g1)
+
+def isNormal (G : group) (P : subgroupProp G) : U
+ := Π (g1 g2 : G.1.1), P.1 g2 -> P.1 (conjugateG G g1 g2)
+
+def normalSubgroupProp (G : group) : U₁
+ := Σ (P : subgroupProp G), isNormal G P
+
+-- Factor Groups (using quotient)
+
+def rdiv (G : group) (x y : G.1.1) : G.1.1 := opGroup G x (invGroup G y)
+
+def relFactor (G : group) (P : normalSubgroupProp G) (x y : G.1.1) : U
+ := P.1.1 (rdiv G x y)
+
+def subgroupSubgroup (G : group) (P Q : subgroupProp G) : subgroupProp (subgroup G Q)
+ := (λ (x : subEl G Q), P.1 x.1, (λ (x : subEl G Q), P.2.1 x.1, (P.2.2.1, (λ (x : subEl G Q), P.2.2.2.1 x.1, (λ (g1 g2 : subEl G Q), P.2.2.2.2.1 g1.1 g2.1, ★)))))
+
+axiom abelianNormalProp (a : abgroup) (P : subgroupProp (abgroup' a)) (g1 g2 : a.1.1) : P.1 g2 -> P.1 (conjugateG (abgroup' a) g1 g2)
+
+def abelianSubgroupIsNormal (a : abgroup) (P : subgroupProp (abgroup' a))
+  : normalSubgroupProp (abgroup' a)
+ := (P, λ (g1 g2 : a.1.1), abelianNormalProp a P g1 g2)
+
+def abelianSubgroupIsAbelian (a : abgroup) (P : subgroupProp (abgroup' a)) : abgroup
+ := ( (subEl (abgroup' a) P, subgroupIsSet (abgroup' a) P)
+     , ( (subgroup (abgroup' a) P).2
+       , λ (u v : subEl (abgroup' a) P), <i> (isCommCGroup a u.1 v.1 @ i, P.2.1 (isCommCGroup a u.1 v.1 @ i) (comp (λ (j : I), P.1 (isCommCGroup a u.1 v.1 @ (i /\ j))) -i (\(k : I), [ (i = 0) -> (subgroupOp (abgroup' a) P u v).2 ]) (inc (P.1 (subgroupOp (abgroup' a) P u v).1) -i (subgroupOp (abgroup' a) P u v).2)) (comp (λ (j : I), P.1 (isCommCGroup a u.1 v.1 @ (i \/ -j))) i (\(k : I), [ (i = 1) -> (subgroupOp (abgroup' a) P v u).2 ]) (inc (P.1 (subgroupOp (abgroup' a) P v u).1) i (subgroupOp (abgroup' a) P v u).2)) @ i)
+       )
+     )
 
 -- https://arxiv.org/pdf/2302.01834.pdf
 
@@ -66,3 +174,51 @@ def ConvFull (C R F: U) (H: HopfAlg C R F): U
 
 def instance (C R F: U) (H: HopfAlg C R F) (f g: BiAlg C R) : ConvFull C R F H
  := (gconv C R F H f g, Coherence-proof C R F H)
+
+def subgroupHomo (G : group) (P : subgroupProp G) : grouphom (subgroup G P) G
+ := (λ (u : subEl G P), u.1, λ (u v : subEl G P), <_> opGroup G u.1 v.1)
+
+-- Factor Groups
+
+def factorProp (G : group) (P : normalSubgroupProp G) (x y : G.1.1) : U
+ := P.1.1 (rdiv G x y)
+
+def factor (G : group) (P : normalSubgroupProp G) : U
+ := setQuot G.1.1 (factorProp G P)
+
+def factorIsSet (G : group) (P : normalSubgroupProp G) : isSet (factor G P)
+ := setQuotIsSet G.1.1 (factorProp G P)
+
+def idFactor (G : group) (P : normalSubgroupProp G) : factor G P
+ := quotient G.1.1 (factorProp G P) (idGroup G)
+
+axiom normalSubgroupOp (G : group) (P : normalSubgroupProp G) (a1 b1 a2 b2 : G.1.1)
+  (r1 : P.1.1 (rdiv G a1 b1)) (r2 : P.1.1 (rdiv G a2 b2)) : P.1.1 (rdiv G (opGroup G a1 a2) (opGroup G b1 b2))
+
+def opFactor (G : group) (P : normalSubgroupProp G) : factor G P -> factor G P -> factor G P
+ := setQuotLift2' G.1.1 G.1.1 (factor G P) (factorProp G P) (factorProp G P) (factorIsSet G P)
+    (λ (x y : G.1.1), quotient G.1.1 (factorProp G P) (opGroup G x y))
+    (λ (a1 b1 a2 b2 : G.1.1) (r1 : factorProp G P a1 b1) (r2 : factorProp G P a2 b2),
+        setQuotId G.1.1 (factorProp G P) (opGroup G a1 a2) (opGroup G b1 b2)
+          (normalSubgroupOp G P a1 b1 a2 b2 r1 r2))
+
+postulate isAssocFactor (G : group) (P : normalSubgroupProp G) : isAssoc (factor G P) (opFactor G P)
+postulate hasLeftIdFactor (G : group) (P : normalSubgroupProp G) : hasLId (factor G P) (opFactor G P) (idFactor G P)
+postulate hasRightIdFactor (G : group) (P : normalSubgroupProp G) : hasRId (factor G P) (opFactor G P) (idFactor G P)
+
+axiom normalSubgroupInv (G : group) (P : normalSubgroupProp G) (x y : G.1.1) (r : P.1.1 (rdiv G x y))
+  : P.1.1 (rdiv G (invGroup G x) (invGroup G y))
+
+def invFactor (G : group) (P : normalSubgroupProp G) : factor G P -> factor G P
+ := setQuotLift G.1.1 (factor G P) (factorProp G P) (factorIsSet G P)
+    (λ (x : G.1.1), quotient G.1.1 (factorProp G P) (invGroup G x))
+    (λ (x y : G.1.1) (r : factorProp G P x y), setQuotId G.1.1 (factorProp G P) (invGroup G x) (invGroup G y) (normalSubgroupInv G P x y r))
+
+postulate hasLeftInverseFactor (G : group) (P : normalSubgroupProp G) : hasLInv (factor G P) (opFactor G P) (idFactor G P) (invFactor G P)
+postulate hasRightInverseFactor (G : group) (P : normalSubgroupProp G) : hasRInv (factor G P) (opFactor G P) (idFactor G P) (invFactor G P)
+
+def factorGroup (G : group) (P : normalSubgroupProp G) : group
+ := ( (factor G P, factorIsSet G P)
+    , ((opFactor G P, isAssocFactor G P, idFactor G P, (hasLeftIdFactor G P, hasRightIdFactor G P)))
+    , (invFactor G P, (hasLeftInverseFactor G P, hasRightInverseFactor G P))
+    )

@@ -37,4 +37,3 @@ def isSet-ℙ (X: U₁)
   : isSet₁ (ℙ X)
  := isSetPi₁ X (λ (x: X), Prop) (λ (x: X), isSetPi₁' U (λ (_: U), 𝟐) (λ (_: U), boolset))
 
-axiom specify (X: U₁) : (X → Prop) → ℙ X

@@ -1,4 +1,4 @@
-{- Integers: https://anders.groupoid.space/mathematics/algebra/int
+{- Integers: https://anders.groupoid.space/mathematics/algebra/int/
    Copyright (c) Groupoid Infinity, 2016-2026. -}
 
 module int where
@@ -20,32 +20,32 @@ def inlNotinr (A B : U) (a : A) (b : B) (p : Path (+ A B) (inl A B a) (inr A B b
 def inrNotinl (A B : U) (a : A) (b : B) (p : Path (+ A B) (inr A B b) (inl A B a)) : 𝟎
  := transp (<i> ind₂ (λ (x : 𝟐), U) 𝟎 𝟏 (p @ i).1) 0 star
 
-def Z : U := + ℕ ℕ
-def zeroZ : Z := inr ℕ ℕ zero
+def ℤ : U := + ℕ ℕ
+def zeroZ : ℤ := inr ℕ ℕ zero
 
-def auxsucZ (n : ℕ) : Z := ind-nat (λ (_ : ℕ), Z) (inr ℕ ℕ zero) (λ (n : ℕ) (_ : Z), inl ℕ ℕ n) n
-def sucZ (x : Z) : Z := +-rec ℕ ℕ Z auxsucZ (λ (v : ℕ), inr ℕ ℕ (succ v)) x
+def auxsucZ (n : ℕ) : ℤ := ind-nat (λ (_ : ℕ), ℤ) (inr ℕ ℕ zero) (λ (n : ℕ) (_ : ℤ), inl ℕ ℕ n) n
+def sucZ (x : ℤ) : ℤ := +-rec ℕ ℕ ℤ auxsucZ (λ (v : ℕ), inr ℕ ℕ (succ v)) x
 
-def auxpredZ (n : ℕ) : Z := ind-nat (λ (_ : ℕ), Z) (inl ℕ ℕ zero) (λ (n : ℕ) (_ : Z), inr ℕ ℕ n) n
-def predZ (x : Z) : Z := +-rec ℕ ℕ Z (λ (u : ℕ), inl ℕ ℕ (succ u)) auxpredZ x
+def auxpredZ (n : ℕ) : ℤ := ind-nat (λ (_ : ℕ), ℤ) (inl ℕ ℕ zero) (λ (n : ℕ) (_ : ℤ), inr ℕ ℕ n) n
+def predZ (x : ℤ) : ℤ := +-rec ℕ ℕ ℤ (λ (u : ℕ), inl ℕ ℕ (succ u)) auxpredZ x
 
-def sucpredZ (x : Z) : Path Z (sucZ (predZ x)) x
-  := +-ind ℕ ℕ (λ (z : Z), Path Z (sucZ (predZ z)) z)
+def sucpredZ (x : ℤ) : Path ℤ (sucZ (predZ x)) x
+  := +-ind ℕ ℕ (λ (z : ℤ), Path ℤ (sucZ (predZ z)) z)
      (λ (u : ℕ), <_> inl ℕ ℕ u)
-     (ℕ-ind (λ (v : ℕ), Path Z (sucZ (predZ (inr ℕ ℕ v))) (inr ℕ ℕ v))
+     (ℕ-ind (λ (v : ℕ), Path ℤ (sucZ (predZ (inr ℕ ℕ v))) (inr ℕ ℕ v))
             (<_> inr ℕ ℕ zero)
-            (λ (n : ℕ) (prev : Path Z (sucZ (predZ (inr ℕ ℕ n))) (inr ℕ ℕ n)), <_> inr ℕ ℕ (succ n))) x
+            (λ (n : ℕ) (prev : Path ℤ (sucZ (predZ (inr ℕ ℕ n))) (inr ℕ ℕ n)), <_> inr ℕ ℕ (succ n))) x
 
-def predsucZ (x : Z) : Path Z (predZ (sucZ x)) x
-  := +-ind ℕ ℕ (λ (z : Z), Path Z (predZ (sucZ z)) z)
-     (ℕ-ind (λ (u : ℕ), Path Z (predZ (sucZ (inl ℕ ℕ u))) (inl ℕ ℕ u))
+def predsucZ (x : ℤ) : Path ℤ (predZ (sucZ x)) x
+  := +-ind ℕ ℕ (λ (z : ℤ), Path ℤ (predZ (sucZ z)) z)
+     (ℕ-ind (λ (u : ℕ), Path ℤ (predZ (sucZ (inl ℕ ℕ u))) (inl ℕ ℕ u))
             (<_> inl ℕ ℕ zero)
-            (λ (n : ℕ) (prev : Path Z (predZ (sucZ (inl ℕ ℕ n))) (inl ℕ ℕ n)), <_> inl ℕ ℕ (succ n)))
+            (λ (n : ℕ) (prev : Path ℤ (predZ (sucZ (inl ℕ ℕ n))) (inl ℕ ℕ n)), <_> inl ℕ ℕ (succ n)))
      (λ (v : ℕ), <_> inr ℕ ℕ v) x
 
-def sucIsEquivZ : isEquiv Z Z sucZ := isoToEquiv Z Z sucZ predZ sucpredZ predsucZ
-def sucEquivZ : equiv Z Z := (sucZ, sucIsEquivZ)
-def idEquivZ : equiv Z Z := (idfun Z, idIsEquiv Z)
+def sucIsEquivZ : isEquiv ℤ ℤ sucZ := isoToEquiv ℤ ℤ sucZ predZ sucpredZ predsucZ
+def sucEquivZ : equiv ℤ ℤ := (sucZ, sucIsEquivZ)
+def idEquivZ : equiv ℤ ℤ := (idfun ℤ, idIsEquiv ℤ)
 
 def natDec : discrete ℕ
   := λ (n m : ℕ),
@@ -73,5 +73,5 @@ def orDisc (A B : U) (dA : discrete A) (dB : discrete B) (z z1 : + A B) : dec (P
                     (λ (p : Path B b b1), inl (Path (+ A B) (inr A B b) (inr A B b1)) (Path (+ A B) (inr A B b) (inr A B b1) → 𝟎) (<i> inr A B (p @ i)))
                     (λ (np : Path B b b1 → 𝟎), inr (Path (+ A B) (inr A B b) (inr A B b1)) (Path (+ A B) (inr A B b) (inr A B b1) → 𝟎) (λ (p : Path (+ A B) (inr A B b) (inr A B b1)), np (inr-inj A B b b1 p))) (dB b b1)) z1) z
 
-def ZSet : isSet Z := hedberg Z (orDisc ℕ ℕ natDec natDec)
+def ZSet : isSet ℤ := hedberg ℤ (orDisc ℕ ℕ natDec natDec)
 

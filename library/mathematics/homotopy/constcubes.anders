@@ -49,7 +49,7 @@ def Fd (A : U) (a b c : A) (p : Path A a b) (q : Path A b c) : Square A a b b c 
                         (j = 1) -> q @ k /\ i ])
           (p @ i \/ j)
 
-def B (A : U) (a b c d : A) (p : Path A a b) (q : Path A b c) (r : Path A c d)
+def B' (A : U) (a b c d : A) (p : Path A a b) (q : Path A b c) (r : Path A c d)
   : Cube A b b b b b c c d (<_> b) (<_> b) (<_> b) (<_> b) q r q r (<_> <_> b)
     (Fd A b c d q r) (<_> b) q q (<i> (Fd A b c d q r @ i @ i))
     (<i j> q @ i /\ j) (<i j> ((Fd A b c d q r) @ i @ j /\ i))

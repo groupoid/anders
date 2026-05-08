@@ -12,8 +12,8 @@ import library/foundations/univalent/iso
 -- This type is used to define the loop space of S¹ and
 -- its higher-dimensional analogues
 
-def sucPathZ : Path U Z Z := iso→Path Z Z sucZ predZ sucpredZ predsucZ
-def helix (x : S¹) : U := S1-ind (λ (_ : S¹), U) Z sucPathZ x
+def sucPathZ : Path U ℤ ℤ := iso→Path ℤ ℤ sucZ predZ sucpredZ predsucZ
+def helix (x : S¹) : U := S1-ind (λ (_ : S¹), U) ℤ sucPathZ x
 
 -- Transport Helix Paths from Integers
 
@@ -26,7 +26,7 @@ def loopNeg (n : ℕ) : Path S¹ baseS1 baseS1
             (λ (_ : ℕ) (p : Path S¹ baseS1 baseS1), pcomp S¹ baseS1 baseS1 baseS1 p (sym S¹ baseS1 baseS1 loopS1)) n
 
 -- Encoding a path along S¹ as an element of helix
--- This is done by transporting an element of Z along S¹ using the path p
+-- This is done by transporting an element of ℤ along S¹ using the path p
 -- The result is an element of helix x, which is a path
 -- along S¹ that starts at baseS1 and ends at x
 
@@ -48,10 +48,10 @@ def l0   : loopS1' := triv
 def l1   : loopS1' := oneTurn l0
 
 def loopZ  (n : ℕ) : 𝟐 → loopS1' := ind₂ (\(_: 𝟐), Path S¹ baseS1 baseS1) (loopNeg n) (loopPos n)
-def turnZ (x : loopS1') : 𝟐 → loopS1' := ind₂ (\(_: 𝟐), Path S¹ baseS1 baseS1) (oneTurnInv x) (oneTurn x)
+def turnℤ (x : loopS1') : 𝟐 → loopS1' := ind₂ (\(_: 𝟐), Path S¹ baseS1 baseS1) (oneTurnInv x) (oneTurn x)
 
-def loopIt (n : Z) : Path S¹ baseS1 baseS1
- := +-ind ℕ ℕ (λ (_ : Z), Path S¹ baseS1 baseS1) (λ (n : ℕ), loopNeg (succ n)) loopPos n
+def loopIt (n : ℤ) : Path S¹ baseS1 baseS1
+ := +-ind ℕ ℕ (λ (_ : ℤ), Path S¹ baseS1 baseS1) (λ (n : ℕ), loopNeg (succ n)) loopPos n
 
 -- Helix Path from Integer
 
@@ -75,26 +75,26 @@ def corFib1 (A : U) (F G : A -> U) (a : A) (fa ga : Π (u : F a), G a) (p : Path
 
 -- Windings
 
-def winding (p : loopS1') : Z := trans Z Z (<i> helix (p @ i)) zeroZ
+def winding (p : loopS1') : ℤ := trans ℤ ℤ (<i> helix (p @ i)) zeroZ
 
-def loopZ1 : Z := winding loop1
-def loopZ2 : Z := winding loop2
-def loopZ3 : Z := winding loop3
-def loopZ4 : Z := winding loop4
+def loopZ1 : ℤ := winding loop1
+def loopZ2 : ℤ := winding loop2
+def loopZ3 : ℤ := winding loop3
+def loopZ4 : ℤ := winding loop4
 
 -- Integer from Helix Path
 
- def decode (x : S¹) (c : helix x) : Path S¹ baseS1 x
+def decode (x : S¹) (c : helix x) : Path S¹ baseS1 x
  := S1-ind (λ (y : S¹), helix y → Path S¹ baseS1 y) loopIt
        (corFib1 S¹ helix (λ (y : S¹), Path S¹ baseS1 y) baseS1 loopIt loopIt loopS1
-         (λ (u : Z), +-ind ℕ ℕ (λ (v : Z), Path (Path S¹ baseS1 baseS1) (pcomp S¹ baseS1 baseS1 baseS1 (loopIt v) loopS1) (loopIt (sucZ v)))
+         (λ (u : ℤ), +-ind ℕ ℕ (λ (v : ℤ), Path (Path S¹ baseS1 baseS1) (pcomp S¹ baseS1 baseS1 baseS1 (loopIt v) loopS1) (loopIt (sucℤ v)))
             (λ (n : ℕ), <j i> hcomp S¹ (∂ i ∨ j) (λ (k : I), [(i = 0) → baseS1, (i = 1) → loopS1 @ -k ∧ -j, (j = 1) → baseS1]) (loopS1 @ i ∧ -j))
             (λ (n : ℕ), <_> loopPos (succ n)) u)) x c
 
 -- π₁(S¹) = ℤ
-def loopS1equalsZ
-  : Path U (Path S¹ baseS1 baseS1) Z
- := iso→Path (Path S¹ baseS1 baseS1) Z (encode baseS1) (decode baseS1) (λ (n : Z), <_> n) (λ (p : Path S¹ baseS1 baseS1), <_> p)
+def loopS1'=Z
+  : Path U loopS1' ℤ
+ := iso→Path (Path S¹ baseS1 baseS1) ℤ (encode baseS1) (decode baseS1) (λ (n : ℤ), <_> n) (λ (p : Path S¹ baseS1 baseS1), <_> p)
 
 
 

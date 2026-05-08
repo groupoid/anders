@@ -23,6 +23,7 @@ import library/foundations/modal/sharp
 import library/foundations/modal/flat
 import library/mathematics/algebra/algebra
 import library/mathematics/algebra/int
+import library/mathematics/algebra/homology
 import library/mathematics/analysis/real
 import library/mathematics/analysis/borel
 import library/mathematics/analysis/topology

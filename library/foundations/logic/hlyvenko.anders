@@ -1,7 +1,7 @@
 {- Hlyvenko Theorem.
    - Translation from implicational propositional calculus to classical logic
    https://uk.wikipedia.org/wiki/Гливенко_Валерій_Іванович
-   Copyright (c) Groupoid Infinity, 2014-2022. -}
+   Copyright (c) Groupoid Infinity, 2016-2026. -}
 
 module hlyvenko where
 import library/foundations/mltt/proto

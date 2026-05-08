@@ -6,21 +6,16 @@
   let ident x = Ident (x, 0L)
 
   let getVar x =
-    let xs = [(!intervalPrim, EI);
-              (!zeroPrim, EDir Zero);
-              (!onePrim, EDir One);
-              ("𝟎", EEmpty);     ("empty", EEmpty);
-              ("𝟏", EUnit);      ("unit", EUnit);
-              ("𝟐", EBool);      ("bool", EBool);
-              ("★", EStar);      ("star", EStar);
-              ("false", EFalse); ("0₂", EFalse);
-              ("true", ETrue);   ("1₂", ETrue);
-              ("__nat", ENat);   ("__zero", EZero);
-              ("__succ", ELam (ENat, (ident "n", ESucc (EVar (ident "n")))));
-              ("__ind_nat", ELam (ePi (ident "x") ENat (EKan Z.zero), (ident "C",
-                            ELam (EApp (EVar (ident "C"), EZero), (ident "z",
-                            ELam (ePi (ident "n") ENat (impl (EApp (EVar (ident "C"), EVar (ident "n"))) (EApp (EVar (ident "C"), ESucc (EVar (ident "n"))))), (ident "s",
-                            ELam (ENat, (ident "n", EApp (EIndNat (EVar (ident "C"), EVar (ident "z"), EVar (ident "s")), EVar (ident "n"))))))))))) ] in
+    let xs = [
+        ("I", EI); ("0", EDir Zero); ("1", EDir One);
+        ("𝟎", EEmpty); ("empty", EEmpty);
+        ("𝟏", EUnit); ("unit", EUnit); ("★", EStar); ("star", EStar);
+        ("𝟐", EBool); ("bool", EBool); ("0₂", EFalse); ("1₂", ETrue); ("false", EFalse); ("true", ETrue);
+        ("__nat", ENat);   ("__zero", EZero); ("__succ", ELam (ENat, (ident "n", ESucc (EVar (ident "n")))));
+        ("__ind_nat", ELam (ePi (ident "x") ENat (EKan Z.zero), (ident "C",
+              ELam (EApp (EVar (ident "C"), EZero), (ident "z",
+              ELam (ePi (ident "n") ENat (impl (EApp (EVar (ident "C"), EVar (ident "n"))) (EApp (EVar (ident "C"), ESucc (EVar (ident "n"))))), (ident "s",
+              ELam (ENat, (ident "n", EApp (EIndNat (EVar (ident "C"), EVar (ident "z"), EVar (ident "s")), EVar (ident "n"))))))))))) ] in
     match List.assoc_opt x xs with Some e -> e | None -> decl x
 
   let rec telescope ctor e : tele list -> exp = function

@@ -3,13 +3,13 @@ open Language.Spec
 open Prefs
 
 exception ExpectedDir of string
-let getDir x = if x = !zeroPrim then Zero else if x = !onePrim then One else raise (ExpectedDir x)
+let getDir x = if x = "0" then Zero else if x = "1" then One else raise (ExpectedDir x)
 
 let showIdent : ident -> string = function
   | Irrefutable -> "_"
   | Ident (p, n) -> if !indices then p ^ "#" ^ Int64.to_string n else p
 
-let showDir : dir -> string = function | Zero -> !zeroPrim | One -> !onePrim
+let showDir : dir -> string = function | Zero -> "0" | One -> "1"
 
 let showFace phi =
   if Env.is_empty phi then "(1 = 1)"
@@ -42,7 +42,7 @@ let rec ppExp paren e = let x = match e with
   | EAppFormula (f, x) -> Printf.sprintf "%s @ %s" (ppExp true f) (ppExp true x)
   | ESystem x -> Printf.sprintf "[%s]" (showSystem showExp x)
   | ESub (a, i, u) -> Printf.sprintf "%s[%s ↦ %s]" (ppExp true a) (showExp i) (showExp u)
-  | EI -> !intervalPrim | EDir d -> showDir d
+  | EI -> "I" | EDir d -> showDir d
   | EAnd (a, b) -> Printf.sprintf "%s ∧ %s" (ppExp true a) (ppExp true b)
   | EOr (a, b) -> Printf.sprintf "%s ∨ %s" (ppExp true a) (ppExp true b)
   | ENeg a -> Printf.sprintf "-%s" (ppExp paren a)

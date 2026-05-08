@@ -51,7 +51,7 @@ let prettyPrintExn : exn -> unit = function
   | ExtractionError s                  -> Printf.printf "Error occured during extraction:\n  %s\n" s
   | UnknownPrimitive x                 -> Printf.printf "Unknown primitive “%s”\n" x
   | InvalidModuleName (name, filename) -> Printf.printf "Module “%s” does not match name of its file: %s\n" name filename
-  | ExpectedDir s                      -> Printf.printf "“%s” expected to be “%s” or “%s”" s !zeroPrim !onePrim
+  | ExpectedDir s                      -> Printf.printf "“%s” expected to be “%s” or “%s”" s "0" "1"
   | Sys_error s                        -> print_endline s
   | ProtocolViolation                  -> Printf.printf "Protocol violation\n"
   | Restart                            -> raise Restart

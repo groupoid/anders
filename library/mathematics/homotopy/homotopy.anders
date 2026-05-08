@@ -84,17 +84,17 @@ def loopZ4 : Z := winding loop4
 
 -- Integer from Helix Path
 
-def decode (x : S¹) (c : helix x) : Path S¹ baseS1 x
+ def decode (x : S¹) (c : helix x) : Path S¹ baseS1 x
  := S1-ind (λ (y : S¹), helix y → Path S¹ baseS1 y) loopIt
-       (corFib1 S¹ helix (λ (y : S¹), Path S¹ baseS1 y) baseS1 loopIt loopIt loop
-         (λ (u : Z), +-ind ℕ ℕ (λ (v : Z), Path (Path S¹ baseS1 baseS1) (pcomp S¹ baseS1 baseS1 baseS1 (loopIt v) loop) (loopIt (sucZ v)))
-            (λ (n : ℕ), <_> loopNeg n)
+       (corFib1 S¹ helix (λ (y : S¹), Path S¹ baseS1 y) baseS1 loopIt loopIt loopS1
+         (λ (u : Z), +-ind ℕ ℕ (λ (v : Z), Path (Path S¹ baseS1 baseS1) (pcomp S¹ baseS1 baseS1 baseS1 (loopIt v) loopS1) (loopIt (sucZ v)))
+            (λ (n : ℕ), <j i> hcomp S¹ (∂ i ∨ j) (λ (k : I), [(i = 0) → baseS1, (i = 1) → loopS1 @ -k ∧ -j, (j = 1) → baseS1]) (loopS1 @ i ∧ -j))
             (λ (n : ℕ), <_> loopPos (succ n)) u)) x c
 
 -- π₁(S¹) = ℤ
 def loopS1equalsZ
   : Path U (Path S¹ baseS1 baseS1) Z
- := iso→Path (Path S¹ baseS1 baseS1) Z (encode baseS1) (decode baseS1) (λ (n : Z), <_> n) ?
+ := iso→Path (Path S¹ baseS1 baseS1) Z (encode baseS1) (decode baseS1) (λ (n : Z), <_> n) (λ (p : Path S¹ baseS1 baseS1), <_> p)
 
 
 

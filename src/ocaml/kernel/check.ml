@@ -158,6 +158,7 @@ and transp p phi u0 = match phi with
   | _ ->
   match p with
   | VPLam (VLam (VI, (i, g))) -> transport i (g (Var (i, VI))) phi u0
+  | VRef _ -> u0
   | _ -> VApp (VTransp (p, phi), u0)
 
 and glue r u a = match r, a with
@@ -464,14 +465,14 @@ and contr t p r ts = let i = freshName "ι" in let g = vsnd p in
   homcom t r i (VSystem ts') (vfst p)
 
 and idEquiv t =
-  pairv (idfun t) (VLam (t, (freshName "x", fun x ->
-    pairv (pairv x (idp x))
-      (VLam (VSig (t, (freshName "y", pathv (idp t) x)),
-        (freshName "u", fun u ->
-          VPLam (VLam (VI, (freshName "i", fun i ->
-            let p = vsnd u in pairv (appFormula p i)
-              (VPLam (VLam (VI, (freshName "j", fun j ->
-                appFormula p (andFormula (i, j)))))))))))))))
+  pairv (idfun t) (VLam (t, (freshName "y", fun y ->
+    pairv (pairv y (idp y))
+      (VLam (fiber t t (idfun t) y, (freshName "u", fun u ->
+        let (x, p) = eta u in
+        VPLam (VLam (VI, (freshName "i", fun i ->
+          pairv (appFormula p (VNeg i))
+            (VPLam (VLam (VI, (freshName "j", fun j ->
+              appFormula p (VOr (VNeg i, j)))))))))))))))
 
 and idtoeqv i e =
   let h = (Hashtbl.hash_param 10 100 (i, e)) land (idtoeqv_cache_size - 1) in
@@ -493,37 +494,8 @@ and idtoeqv i e =
     | Some v -> vsnd v
     | None -> transport i (equiv a e) vzero (idEquiv a)
     end
-  | VApp (VApp (VPathP p, v), w) ->
-    let i_eq = idtoeqv i (VPLam (VLam (VI, (i, fun vi -> app (p, vi))))) in
-    pairv (VLam (act0 i vzero v, (freshName "p", fun p_v -> transport i (app (p, dim i)) vzero p_v)))
-          (VLam (act0 i vone v, (freshName "p", fun p_v -> transport i (app (p, dim i)) vone p_v)))
-  | VApp (f, x) ->
-    let v = app (f, x) in
-    if v == e then transport i (equiv a e) vzero (idEquiv a)
-    else idtoeqv i v
-  | VSig (t, (x, g)) ->
-    let i_eq_t = idtoeqv i (VPLam (VLam (VI, (i, fun vi -> act0 i vi t)))) in
-    let i_eq_g = idtoeqv i (VPLam (VLam (VI, (i, fun vi ->
-      let v = transFill i t vzero (Var (freshName "v", act0 i vzero t)) vi in
-      g v)))) in
-    pairv (VLam (VSig (act0 i vzero t, (x, fun x -> act0 i vzero (g x))), (fresh x, fun v ->
-      let v1 = vfst v in let v2 = vsnd v in
-      pairv (app (vfst i_eq_t, v1)) (app (vfst i_eq_g, v2)))))
-          (VLam (VSig (act0 i vone t, (x, fun x -> act0 i vone (g x))), (fresh x, fun v ->
-            let v1 = vfst v in let v2 = vsnd v in
-            let g_t x = vfst (vfst (app (vsnd i_eq_t, x))) in
-            let g_g x = vfst (vfst (app (vsnd i_eq_g, x))) in
-            pairv (g_t v1) (g_g v2))))
   | VCoequ (a, b, f, g) ->
     if not (mem i a) && not (mem i b) && not (mem i f) && not (mem i g) then idEquiv e
-    else transport i (equiv a e) vzero (idEquiv a)
-  | VPi (t, (x, g)) ->
-    if not (mem i t) then
-      let a = act0 i vzero t in
-      let f = idfun a in
-      let i_eq = idtoeqv i (VPLam (VLam (VI, (i, fun vi -> g (Var (Ident ("$x", 0L), a)))))) in
-      pairv (VLam (a, (fresh x, fun v -> vfst (app (i_eq, v)))))
-            (VLam (a, (fresh x, fun v -> vsnd (app (i_eq, v)))))
     else transport i (equiv a e) vzero (idEquiv a)
   | _ -> transport i (equiv a e) vzero (idEquiv a)
   in
@@ -736,6 +708,9 @@ and homcom t r i u u0 =
 
   | VApp (VIndEmpty c, n), r_comp, u_comp, u0_comp -> structural_homcom c r_comp i u_comp u0_comp t
 
+  (* hcompⁱ A [φ ↦ u₀] u₀ = u₀ *)
+  | _, _, VSystem u, _ when System.for_all (fun mu v -> conv (upd mu u0) v) u -> u0
+
   (* hcompⁱ 𝟎 [φ ↦ u] u₀ = u₀ *)
 
   | VEmpty, _, _, _ -> u0
@@ -757,11 +732,11 @@ and hfill t r i u u0 j = let k = freshName "κ" in
       (border (solve j Zero) u0))) u0
 
 and ouc v = match v, inferV v with
-  | _, VSub (_, VDir One, u) -> app (u, VRef vone)
+  | _, VSub (_, phi, u) when orEq phi vone -> app (u, VRef vone)
   | VApp (VInc _, v), _ -> v
-  | _, _ -> VOuc v
+  | _, t -> match t with VSub _ -> VOuc v | _ -> v
 
-and fiber t1 t2 f y = VSig (t1, (freshName "a", fun x -> pathv (idp t2) y (app (f, x)))) (* right fiber *)
+and fiber t1 t2 f y = VSig (t1, (freshName "a", fun x -> pathv (idp t2) (app (f, x)) y)) (* left fiber *)
 
 and isContr t = let x = freshName "x" in let y = freshName "y" in VSig (t, (x, fun x -> VPi (t, (y, fun y -> pathv (idp t) x y))))
 and isEquiv t1 t2 f = VPi (t2, (freshName "b", isContr << fiber t1 t2 f))
@@ -1105,7 +1080,12 @@ and act_internal rho v = match v with
   | VPre u               -> VPre u
   | VPLam f              -> VPLam (act rho f)
   | Var (i, VI)          -> actVar rho i
-  | Var (x, t) as v'     -> let t' = act rho t in if t == t' then v' else Var (x, t')
+  | Var (x, t) as v'     ->
+    let t' = act rho t in
+    begin match t' with
+    | VSub (_, phi, u) when orEq phi vone -> app (u, VRef vone)
+    | _ -> if t == t' then v' else Var (x, t')
+    end
   | VApp (f, x) as v'    ->
     let f' = act rho f in let x' = act rho x in
     if f == f' && x == x' then v' else app (f', x')
@@ -1279,7 +1259,12 @@ and conv_internal v1 v2 =
     | VPathP v, VPathP u -> v == u || conv v u
     | VPartialP (t1, r1), VPartialP (t2, r2) -> (t1 == t2 || conv t1 t2) && (r1 == r2 || conv r1 r2)
     | VAppFormula (f, x), VAppFormula (g, y) -> (f == g || conv f g) && (x == y || conv x y)
-    | VSystem xs, VSystem ys -> xs == ys || System.equal conv xs ys
+    | VSystem xs, VSystem ys ->
+      xs == ys || (System.cardinal xs = System.cardinal ys &&
+      System.for_all (fun alpha v1 ->
+        match System.find_opt alpha ys with
+        | Some v2 -> conv (upd alpha v1) (upd alpha v2)
+        | None -> false) xs)
     | VSystem xs, x | x, VSystem xs -> System.for_all (fun alpha y -> conv (app (upd alpha x, VRef vone)) y) xs
     | VTransp (p, i), VTransp (q, j) -> (p == q || conv p q) && (i == j || conv i j)
     | VHComp (t1, r1, u1, v1), VHComp (t2, r2, u2, v2) -> (t1 == t2 || conv t1 t2) && (r1 == r2 || conv r1 r2) && (u1 == u2 || conv u1 u2) && (v1 == v2 || conv v1 v2)
@@ -1386,7 +1371,15 @@ and check ctx (e0 : exp) (t0 : value) = traceCheck e0 t0;
       check (faceEnv alpha ctx) e
         (app (upd alpha u, VRef vone))) ts;
     checkOverlapping ctx ts
-  | e, t -> eqNf (infer ctx e) t
+  | e, VSub (t, phi, u) ->
+    check ctx e t;
+    List.iter (fun mu -> eqNf (eval (faceEnv mu ctx) e) (app (upd mu u, VRef vone))) (solve phi One)
+  | e, t ->
+    let t' = infer ctx e in
+    if conv t t' then () else
+    match t' with
+    | VSub (t_base, _, _) when conv t t_base -> ()
+    | _ -> eqNf t' t
   with exc -> let (err, es) = extTraceback (extErr exc) in raise (Internal (Traceback (err, (e0, rbV t0) :: es)))
 
 and checkOverlapping ctx ts =

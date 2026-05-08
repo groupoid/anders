@@ -25,18 +25,18 @@ def Ωⁿ (A : U) (a : A) (n : nat) : U := (Omega-Pointed A a n).1
 def reflⁿ (A : U) (a : A) (n : nat) : Ωⁿ A a n := (Omega-Pointed A a n).2
 
 def Ω-ind (A : U) (a₀ : A) (P : Π (x : A) (γ : Path A a₀ x), U) (p₀ : P a₀ (Ω-refl A a₀)) (x : A) (γ : Path A a₀ x) : P x γ
- := subst (singl A a₀) (λ (z : singl A a₀), P z.1 z.2) (eta A a₀) (x, γ) (contr A a₀ x γ) p₀
+ := subst (singl A a₀) (λ (z : singl A a₀), P z.1 (sym A z.1 a₀ z.2)) (eta A a₀) (x, sym A a₀ x γ) (contr A a₀ x (sym A a₀ x γ)) p₀
 
 def Ω-comp (A : U) (a₀ : A) (P : Π (x : A) (γ : Path A a₀ x), U) (p₀ : P a₀ (Ω-refl A a₀))
   : PathP (<_> P a₀ (Ω-refl A a₀)) (Ω-ind A a₀ P p₀ a₀ (Ω-refl A a₀)) p₀
- := <i> subst-comp (singl A a₀) (λ (z : singl A a₀), P z.1 z.2) (eta A a₀) p₀ @ -i
+ := <i> subst-comp (singl A a₀) (λ (z : singl A a₀), P z.1 (sym A z.1 a₀ z.2)) (eta A a₀) p₀ @ -i
 
 def Ω-uniq (A : U) (a₀ : A) (P : Π (x : A) (γ : Path A a₀ x), U) (f : Π (x : A) (γ : Path A a₀ x), P x γ)
     (h-comp : PathP (<_> P a₀ (Ω-refl A a₀)) (f a₀ (Ω-refl A a₀)) (Ω-ind A a₀ P (f a₀ (Ω-refl A a₀)) a₀ (Ω-refl A a₀)))
   : PathP (<_> Π (x : A) (γ : Path A a₀ x), P x γ) f (Ω-ind A a₀ P (f a₀ (Ω-refl A a₀)))
- := <i> λ (x : A) (γ : Path A a₀ x), subst (singl A a₀)
-          (λ (z : singl A a₀), PathP (<_> P z.1 z.2) (f z.1 z.2) (Ω-ind A a₀ P (f a₀ (Ω-refl A a₀)) z.1 z.2))
-          (eta A a₀) (x, γ) (contr A a₀ x γ) h-comp @ i
+ := <i> λ (x : A), λ (γ : Path A a₀ x), subst (singl A a₀)
+          (λ (z : singl A a₀), PathP (<_> P z.1 (sym A z.1 a₀ z.2)) (f z.1 (sym A z.1 a₀ z.2)) (Ω-ind A a₀ P (f a₀ (Ω-refl A a₀)) z.1 (sym A z.1 a₀ z.2)))
+          (eta A a₀) (x, sym A a₀ x γ) (contr A a₀ x (sym A a₀ x γ)) h-comp @ i
 
 -- Loop space induction step: Ωⁿ A ≃ Ωⁿ⁺¹ Σ A
 def susp-Ω-motive (A : U) (a : A) (k : nat) (prev : PointedMap (Omega-Pointed A a k) (Omega-Pointed (𝚺 A) (𝜎₁ A) (succ k)))

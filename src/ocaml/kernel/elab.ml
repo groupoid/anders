@@ -3,6 +3,7 @@ open Language.Spec
 open Term
 open Gen
 open Rbv
+open Formula
 
 let extPiG : value -> value * clos = function
   | VPi (t, g) -> (t, g)
@@ -144,7 +145,9 @@ let isFlaUnit : value -> bool = function
 let isFlaCounit : value -> bool = function
   | VFlaCounit _ -> true | _ -> false
 
-let inc t r = function
+let inc t r v =
+  if orEq r vone then v else
+  match v with
   | VOuc v -> v
   | v      -> VApp (VInc (t, r), v)
 

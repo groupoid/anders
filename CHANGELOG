@@ -1,7 +1,7 @@
 Changelog
 =========
 
-14 MAY 2026 Version 5.5.0 Modalities and Differential Geometry:
+24 MAY 2026 Version 5.5.0 Modalities and Differential Geometry:
 
 * Flat Modality
 * Sharp Modality (derived through Flat)
@@ -10,6 +10,7 @@ Changelog
 * Formal Disc Bundle
 * Hopf Fibration
 * Homotopy Colimits
+* Left Fibers and J-equiv
 * Homotopy Groups
 
 2 MAY 2026 Version 5.1.0 Tesseract and K(G,n)-η:

@@ -13,7 +13,6 @@ let help =
 
   invocation = anders | anders list
         list = [] | command list
-   primitive = zero | one | interval
 
      command = check <filename>      | lex <filename>
              | parse <filename>      | girard

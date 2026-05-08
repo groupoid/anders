@@ -107,37 +107,35 @@ def relKerIm (G H : group) (phi : grouphom' G H) (x y : H.1.1) : U
 -- Chain Complexes
 
 def abgrouphomcomp (G H K : abgroup) (f : abgrouphom G H) (g : abgrouphom H K) : abgrouphom G K
-  := (λ (x : G.1.1), g.1 (f.1 x), λ (x y : G.1.1), comp-Path K.1.1 (g.1 (f.1 (opGroup (abgroup' G) x y))) (g.1 (opGroup (abgroup' H) (f.1 x) (f.1 y))) (opGroup (abgroup' K) (g.1 (f.1 x)) (g.1 (f.1 y))) (<i> g.1 (f.2 x y @ i)) (g.2 (f.1 x) (f.1 y)))
+ := (λ (x : G.1.1), g.1 (f.1 x), λ (x y : G.1.1), comp-Path K.1.1 (g.1 (f.1 (opGroup (abgroup' G) x y)))
+    (g.1 (opGroup (abgroup' H) (f.1 x) (f.1 y))) (opGroup (abgroup' K) (g.1 (f.1 x)) (g.1 (f.1 y))) (<i> g.1 (f.2 x y @ i)) (g.2 (f.1 x) (f.1 y)))
 
 def trivabgrouphom (G H : abgroup) : abgrouphom G H
-  := (λ (_ : G.1.1), idCGroup H, λ (x y : G.1.1), <i> (hasIdGroup (abgroup' H)).1 (idCGroup H) @ -i)
+ := (λ (_ : G.1.1), idCGroup H, λ (x y : G.1.1), <i> (hasIdGroup (abgroup' H)).1 (idCGroup H) @ -i)
 
 def succ2 (n : ℕ) : ℕ := succ (succ n)
 
 def chainComplex : U
-  := Σ (K : ℕ -> abgroup)
-     (hom : Π (n : ℕ), abgrouphom (K (succ n)) (K n)),
-     Π (n : ℕ), Path (abgrouphom (K (succ2 n)) (K n))
-       (abgrouphomcomp (K (succ2 n)) (K (succ n)) (K n) (hom (succ n)) (hom n))
-       (trivabgrouphom (K (succ2 n)) (K n))
+ := Σ (K : ℕ -> abgroup) (hom : Π (n : ℕ), abgrouphom (K (succ n)) (K n)),
+    Π (n : ℕ), Path (abgrouphom (K (succ2 n)) (K n))
+      (abgrouphomcomp (K (succ2 n)) (K (succ n)) (K n) (hom (succ n)) (hom n))
+      (trivabgrouphom (K (succ2 n)) (K n))
 
 def CC_K (C : chainComplex) (n : ℕ) : abgroup := C.1 n
 def CC_K' (C : chainComplex) (n : ℕ) : group := abgroup' (CC_K C n)
-
 def CC_hom (C : chainComplex) (n : ℕ) : abgrouphom (CC_K C (succ n)) (CC_K C n) := C.2.1 n
-
 def CC_hom' (C : chainComplex) (n : ℕ) : grouphom' (CC_K' C (succ n)) (CC_K' C n)
-  := ( (CC_hom C n).1, ( (CC_hom C n).2, lem_abgrouphom_id (CC_K C (succ n)) (CC_K C n) (CC_hom C n) ) )
+ := ((CC_hom C n).1, ((CC_hom C n).2, lem_abgrouphom_id (CC_K C (succ n)) (CC_K C n) (CC_hom C n)))
 
 def propZ (C : chainComplex) (n : ℕ) : subgroupProp (CC_K' C (succ n))
-  := kerProp' (CC_K' C (succ n)) (CC_K' C n) (CC_hom' C n)
+ := kerProp' (CC_K' C (succ n)) (CC_K' C n) (CC_hom' C n)
 
 def Z (C : chainComplex) (n : ℕ) : group := subgroup (CC_K' C (succ n)) (propZ C n)
 
 def B (C : chainComplex) (n : ℕ) : normalSubgroupProp (Z C n)
-  := abelianSubgroupIsNormal (abelianSubgroupIsAbelian (CC_K C (succ n)) (propZ C n))
-      (subgroupSubgroup (CC_K' C (succ n))
-        (imProp (CC_K' C (succ (succ n))) (CC_K' C (succ n)) (CC_hom' C (succ n))) (propZ C n))
+ := abelianSubgroupIsNormal (abelianSubgroupIsAbelian (CC_K C (succ n)) (propZ C n))
+    (subgroupSubgroup (CC_K' C (succ n)) (imProp (CC_K' C (succ (succ n))) (CC_K' C (succ n)) (CC_hom' C (succ n))) (propZ C n))
 
--- Final definition of homology group
-def Homology (C : chainComplex) (n : ℕ) : group := factorGroup (Z C n) (B C n)
+def Homology (C : chainComplex) (n : ℕ)
+  : group
+ := factorGroup (Z C n) (B C n)

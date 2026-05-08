@@ -1,6 +1,6 @@
 \documentclass[a4paper,UKenglish,cleveref, autoref, thm-restate]{lipics-v2021}
 \bibliographystyle{plainurl}
-\title{Anders: Modal Homotopy Type System for Theorems Mechanization of Differential Geometry and Homotopy Type Theory}
+\title{Anders: Modal Homotopy Type System for Computable Modal Homotopy Type Theory and Differential Geometry}
 \titlerunning{Anders 1.3.0}
 \author{Maksym Sokhatskyi}{Groupoid Infinity}{maxim@synrc.com}{https://orcid.org/0000-0001-7127-8796}{}
 \authorrunning{Maksym Sokhatskyi}
@@ -17,7 +17,7 @@
 \end{CCSXML}
 
 \ccsdesc[300]{Theory of computation~Lambda calculus}
-\keywords{Homotopy Type Theory, Differential Geometry}
+\keywords{Homotopy Type Theory, Differential Geometry, Modal Type Theory, Cohesive Type Theory}
 
 \nolinenumbers
 \hideLIPIcs
@@ -64,8 +64,8 @@ and \textbf{repl} (to enter the proof shell).
 \end{tabular}
 \end{table}
 
-Anders is fast, idiomatic and educational (think of optimized Mini-TT). We carefully draw the favourite Lean-compatible
-syntax to fit 200 LOC in Menhir. The CHM kernel is 1K LOC. Whole Anders compiles under 3
+Anders is fast, idiomatic and educational. We carefully draw the favourite Lean-compatible
+syntax to fit 300 LOC in Menhir. The CHM kernel is 2K LOC. Whole Anders compiles under 3
 seconds and checks all the base library under 1 minute [i5-12400]. Anders proof assistant
 as Homotopy Type System comes with its own Homotopy Library\footnote{\url{https://anders.groupoid.space/library/}}.
 
@@ -669,7 +669,7 @@ to express other HITs. Also there are other foundations to consider motivated by
 \begin{itemize}
 \item Coequalizer, Path Coequalizer and Colimit (van der Weide)
 \item Coequalizer, Hub Spoke Disc, and W, 0, 1, 2 types (Groupoid Infinity)
-\item General Schemes of Higher Inductive Types (Cubical Agda)
+\item General Schemes of Higher Inductive Types (Cubical Agda, cubicaltt)
 \end{itemize}
 
 \subsection{Simplicial Types}

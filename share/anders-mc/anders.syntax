@@ -78,6 +78,8 @@ context default
     keyword whole inductive cyan
     keyword whole do cyan
     keyword whole option cyan
+    keyword whole postulate cyan
+    keyword whole lemma cyan
     keyword whole true cyan
     keyword whole false cyan
     keyword whole module cyan

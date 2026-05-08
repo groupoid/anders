@@ -29,4 +29,4 @@ jobs:
       - name: Install package
         run: opam install .
       - name: Run tests / checks
-        run: opam exec -- dune exec anders silent check library/book.anders
+        run: opam exec -- dune exec anders preeval check library/book.anders

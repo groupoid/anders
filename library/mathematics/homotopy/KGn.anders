@@ -14,7 +14,8 @@ import library/mathematics/homotopy/KG1
 -- For k=0 (n=1), we use the K(G,1) construction from KG1.
 def K-step (G : abgroup) (k : nat) (prev : Pointed) : Pointed
  := ind-nat (λ (_ : nat), Pointed)
-    (K1 (G.1, G.2.1), K1-point (G.1, G.2.1)) -- place unit here istead to understand how fast raw type checking is
+--    (K1 (G.1, G.2.1), K1-point (G.1, G.2.1)) -- place unit here istead to understand how fast raw type checking is
+    (K1 (G.1, G.2.1), unit) -- place unit here istead to understand how fast raw type checking is
     (λ (m : nat) (_ : Pointed),
        (trunc (𝚺 prev.1) (plus (succ (succ zero)) (succ m)),
         trunc₁ (𝚺 prev.1) (plus (succ (succ zero)) (succ m)) (𝜎₁ prev.1))) k

@@ -9,7 +9,7 @@ open Rbv
 
 let timeout = 7.0
 let startTime = ref (Unix.gettimeofday ())
-let fuel = ref 100000000
+let fuel = ref 1000000000
 let conv_depth = ref 0
 let reset_conv_depth () = conv_depth := 0
 
@@ -28,6 +28,8 @@ let transport_cache_size = 1048576
 let transport_cache = Array.make transport_cache_size (VHole, VHole, VHole, VHole)
 let is_isContr_cache_size = 1048576
 let is_isContr_cache = Array.make is_isContr_cache_size (VHole, false)
+let is_idfun_cache_size = 1048576
+let is_idfun_cache = Array.make is_idfun_cache_size (VHole, false)
 let app_hits = ref 0
 let app_misses = ref 0
 let trans_hits = ref 0
@@ -50,17 +52,30 @@ let burn () =
   )
 let reset_fuel () = startTime := Unix.gettimeofday (); fuel := 50000000
 
+let is_constant_path i v = match v with
+  | VAppFormula (f, Var (j, VI)) when i = j -> not (mem i f)
+  | VApp (f, Var (j, VI)) when i = j -> not (mem i f)
+  | _ -> not (mem i v)
+
 let mem i v = IdentSet.mem i (get_support v)
 
 let is_constant_clos (p, f) =
   let v = f (Var (p, VI)) in
   not (IdentSet.mem p (get_support v))
 
+let is_isContr_cache_size = 1048576
+let is_isContr_cache = Array.make is_isContr_cache_size (VHole, false)
+
 let is_constant_motive = function
   | VLam (_, clos) -> is_constant_clos clos
   | _ -> false
 
-let rec eval ctx e0 = burn (); traceEval e0; match e0 with
+let rec getRho ctx x = match Env.find_opt x ctx with
+  | Some (_, _, Value v) -> v
+  | Some (_, _, Exp e)   -> eval ctx e
+  | None                 -> Var (x, VHole)
+
+and eval ctx e0 = burn (); traceEval e0; match e0 with
   | EPre u               -> VPre u
   | EKan u               -> VKan u
   | EVar x               -> getRho ctx x
@@ -403,7 +418,10 @@ and transport_internal i p phi u0 = match p, phi, u0 with
 
   (* transpⁱ (Π (x : A), B) φ u₀ v = transpⁱ B(x/w) φ (u₀ w(i/0)), w = transp-Fill⁻ⁱ A φ v, v : A(i/1) *)
 
-  | VPi (t, (x, b)), _, _ ->
+  | VPi (t, (x, b)), phi, u0 ->
+    if orEq phi vzero && not (mem i t) && is_idfun t u0 then
+       vfst (idtoeqv i (b (Var (freshName "x", t))))
+    else
     if not (mem i t) then
       VLam (t, (x, fun x -> transport i (b x) phi (app (u0, x))))
     else
@@ -414,9 +432,19 @@ and transport_internal i p phi u0 = match p, phi, u0 with
         transport k (swap i k (b (v (VNeg (dim k)))))
           phi (app (u0, v vone))))
 
-  (* transpⁱ (Σ (x : A), B) φ u₀ = (transpⁱ A φ (u₀.1), transpⁱ B(x/v) φ(u₀.2)), v = transp-Fillⁱ A φ u₀.1 *)
-
-  | VSig (t, (x, b)), _, _ ->
+  | VSig (VPi (a, (_, b_pi)), clos), phi, u0 ->
+    if orEq phi vzero && not (mem i a) && is_idEquiv a u0 then
+       idtoeqv i (b_pi (Var (freshName "x", a)))
+    else
+      if not (mem i (VPi (a, clos))) then
+      let v1 = vfst u0 in
+      VPair (ref None, v1, transport i (act0 i vone (vsnd (act0 i vzero (VSig (VPi (a, clos), clos))))) phi (vsnd u0))
+    else
+      let j = freshName "ι" in let k = freshName "κ" in
+      let v1 = transFill j (swap i j (VPi (a, clos))) phi (vfst u0) in
+      let v2 = transport k (swap i k (vsnd (act0 i (dim k) (VSig (VPi (a, clos), clos))))) phi (vsnd u0) in
+      VPair (ref None, v1 vone, v2)
+  | VSig (t, (x, b)), phi, u0 ->
     if not (mem i t) then
       let v1 = vfst u0 in
       VPair (ref None, v1, transport i (b v1) phi (vsnd u0))
@@ -481,26 +509,50 @@ and idtoeqv i e =
   let res =
   burn ();
   if not (mem i e) then idEquiv e else
-  let a = act0 i vzero e in
+  let a_base = act0 i vzero e in
   match e with
-  | VApp (VApp (VGlue _, _), VSystem sys) ->
+  | VPLam (VLam (_, (_, f))) -> idtoeqv i (f (Var (i, VI)))
+  | VAppFormula (f, _) -> idtoeqv i f
+  | VGlue _ | VApp (VApp (VGlue _, _), VSystem _) ->
+  begin
+    let sys = match e with VApp (VApp (VGlue _, _), VSystem sys) -> sys | _ -> System.empty in
     let e0 = ref None in
     System.iter (fun mu v ->
       match Env.find_opt i mu with
       | Some Zero -> e0 := Some v
       | _ -> ()
     ) sys;
-    begin match !e0 with
+    match !e0 with
     | Some v -> vsnd v
-    | None -> transport i (equiv a e) vzero (idEquiv a)
-    end
+    | None -> transport i (equiv a_base e) vzero (idEquiv a_base)
+  end
+  | VKan _ -> idEquiv e
   | VCoequ (a, b, f, g) ->
     if not (mem i a) && not (mem i b) && not (mem i f) && not (mem i g) then idEquiv e
-    else transport i (equiv a e) vzero (idEquiv a)
-  | _ -> transport i (equiv a e) vzero (idEquiv a)
+    else transport i (equiv a_base e) vzero (idEquiv a_base)
+  | _ -> transport i (equiv a_base e) vzero (idEquiv a_base)
   in
   idtoeqv_cache.(h) <- (i, e, res);
   res
+
+and is_idfun t v =
+  let h = (Hashtbl.hash_param 10 100 v) land (is_idfun_cache_size - 1) in
+  let (v', r) = is_idfun_cache.(h) in
+  if v == v' then r else
+  let res = match v with
+  | VLam (_, (p, f)) ->
+    let x = Var (p, t) in
+    begin match f x with
+    | Var (q, _) when p = q -> true
+    | _ -> false
+    end
+  | VApp (f, _) -> is_idfun t f
+  | _ -> false
+  in
+  is_idfun_cache.(h) <- (v, res);
+  res
+
+and is_idEquiv t v = is_idfun t (vfst v)
 
 and walk f r = function
   | VSystem ts -> System.mapi (fun mu -> f >> upd mu) ts
@@ -580,9 +632,17 @@ and homcom t r i u u0 =
 
   (* hcomp U φ E A ~> Glue A φ [(φ = 1) → (E 1 1=1, idtoeqvⁱ (E -i 1=1))] *)
 
-  | VKan _, _, _, _ ->
+  | VKan _, r, _, u0 when orEq r vzero -> u0
+  | VKan _, r, u, _ when orEq r vone ->
+    begin match u with
+    | VSystem ts -> (match System.choose_opt ts with Some (_, v) -> v | None -> VKan Z.zero)
+    | _ -> app (u, VRef vone)
+    end
+  | VKan _, r, u, u0 ->
+    if is_constant_path i u then u0 else
     app (VApp (VGlue u0, r), VSystem (walk (fun e ->
-      pairv (act0 i vone e) (idtoeqv i (act0 i (VNeg (dim i)) e))) r u))
+      if is_constant_path i e then pairv e (idEquiv e)
+      else pairv (act0 i vone e) (idtoeqv i (act0 i (VNeg (dim i)) e))) r u))
 
   (* hcompⁱ Glue [ψ ↦ u] u₀ = glue [φ ↦ t₁] a₁ : G, G = Glue [φ ↦ (T,w)] A, t₁ = u(i/1) : T, a₁ = unglue u(i/1) : A, glue [φ ↦ t₁] a1 = t₁ : T *)
 
@@ -736,6 +796,8 @@ and ouc v = match v, inferV v with
   | VApp (VInc _, v), _ -> v
   | _, t -> match t with VSub _ -> VOuc v | _ -> v
 
+
+
 and fiber t1 t2 f y = VSig (t1, (freshName "a", fun x -> pathv (idp t2) (app (f, x)) y)) (* left fiber *)
 
 and isContr t = let x = freshName "x" in let y = freshName "y" in VSig (t, (x, fun x -> VPi (t, (y, fun y -> pathv (idp t) x y))))
@@ -874,10 +936,7 @@ and app (v, x) =
 
 and evalSystem ctx = bimap (getRho ctx) (fun mu t -> eval (faceEnv mu ctx) t)
 
-and getRho ctx x = match Env.find_opt x ctx with
-  | Some (_, _, Value v) -> v
-  | Some (_, _, Exp e)   -> eval ctx e
-  | None                 -> raise (Internal (VariableNotFound x))
+
 
 and appFormulaE ctx e i = eval ctx (EAppFormula (e, i))
 
@@ -1234,7 +1293,7 @@ and conv v1 v2 = traceConv v1 v2;
 
 and conv_internal v1 v2 =
   burn ();
-  ignore (v1, v2);
+  if convProofIrrel v1 v2 || convWithSystem (v1, v2) then true else
   begin
     match v1, v2 with
     | VPair (_, a, b), VPair (_, c, d) -> conv a c && conv b d
@@ -1278,8 +1337,9 @@ and conv_internal v1 v2 =
     | VInc (t1, r1), VInc (t2, r2) -> (t1 == t2 || conv t1 t2) && (r1 == r2 || conv r1 r2)
     | VOuc u, VOuc v -> u == v || conv u v
     | VGlue v, VGlue u -> u == v || conv u v
-    | VGlueElem (r1, u1, a1), VGlueElem (r2, u2, a2) -> (r1 == r2 || conv r1 r2) && (u1 == u2 || conv u1 u2) && (a1 == a2 || conv a1 a2)
-    | VUnglue (r1, u1, b1), VUnglue (r2, u2, b2) -> (r1 == r2 || conv r1 r2) && (u1 == u2 || conv u1 u2) && (b1 == b2 || conv b1 b2)
+    | VGlueElem (r1, u1, a1), VGlueElem (r2, u2, a2) -> (r1 == r2 || r1 = r2) && (u1 == u2 || conv u1 u2) && (a1 == a2 || conv a1 a2)
+    | VUnglue (r1, u1, a1), VUnglue (r2, u2, a2) -> (r1 == r2 || r1 = r2) && (u1 == u2 || conv u1 u2) && (a1 == a2 || conv a1 a2)
+
     | VEmpty, VEmpty -> true
     | VIndEmpty u, VIndEmpty v -> conv u v
     | VUnit, VUnit -> true
@@ -1314,8 +1374,9 @@ and conv_internal v1 v2 =
     | VIndDisc (s1, a1, x1, nc1, nh1, ns1), VIndDisc (s2, a2, x2, nc2, nh2, ns2) ->
       (s1 == s2 || conv s1 s2) && (a1 == a2 || conv a1 a2) && (x1 == x2 || conv x1 x2) && (nc1 == nc2 || conv nc1 nc2) && (nh1 == nh2 || conv nh1 nh2) && (ns1 == ns2 || conv ns1 ns2)
     | VKan _, _ | _, VKan _ -> true
+    | VGlueElem (r, u, a), v | v, VGlueElem (r, u, a) -> conv a (unglue r u v)
     | _, _ -> false
-  end || convWithSystem (v1, v2) || convProofIrrel v1 v2
+  end
 
 and convWithSystem = function
   | v, VApp (VSystem ts, _) | VApp (VSystem ts, _), v ->
@@ -1328,7 +1389,6 @@ and convProofIrrel v1 v2 =
     | VApp (VApp (VId t1, a1), b1), VApp (VApp (VId t2, a2), b2) -> conv t1 t2 && conv a1 a2 && conv b1 b2
     | VEmpty, VEmpty -> !Prefs.irrelevance
     | VUnit, VUnit -> !Prefs.irrelevance
-    | _, _ -> false
   with _ -> false
 
 and eqNf v1 v2 : unit = traceEqNF v1 v2;

@@ -65,6 +65,7 @@ Features
 * Partial Elements
 * Cubical Subtypes
 * Glue types
+* Left Fibered Equivalence
 * Strict Equality on pretypes
 * Coequalizer
 * Hub Spokes Disc

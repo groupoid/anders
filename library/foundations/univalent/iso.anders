@@ -5,7 +5,7 @@ module iso where
 import library/foundations/univalent/path
 import library/foundations/univalent/equiv
 
--- lemIso as one liners
+-- [Cohen, Coquand, Huber, Mörtberg, Joyal] 2016
 
 def lemIso_rem0 (A B : U) (f : A -> B) (g : B -> A) (t : Π (x : A), Path A (g (f x)) x) (y : B) (x0 : A) (p0 : Path B (f x0) y) (i : I) : A
  := hcomp A (∂ i) (λ (k : I), [ (i = 0) → t x0 @ k, (i = 1) → g y ]) (g (p0 @ i))
@@ -34,26 +34,31 @@ def lemIso_sq1 (A B : U) (f : A -> B) (g : B -> A) (s : Π (y : B), Path B (f (g
 def lemIso (A B : U) (f : A -> B) (g : B -> A) (s : Π (y : B), Path B (f (g y)) y) (t : Π (x : A), Path A (g (f x)) x) (y : B) (z : fiber A B f y) : Path (fiber A B f y) (g y, s y) z
  := <i> (lemIso_p A B f g t y (g y) z.1 (s y) z.2 i, <j> lemIso_sq1 A B f g s t y (g y) z.1 (s y) z.2 i j)
 
-def isoToEquiv (A B : U) (f : A -> B) (g : B -> A) (s : Π (y : B), Path B (f (g y)) y) (t : Π (x : A), Path A (g (f x)) x) : isEquiv A B f
- := λ (y : B), ((g y, s y), λ (z : fiber A B f y), lemIso A B f g s t y z)
-
--- [Cohen, Coquand, Huber, Mörtberg, Joyal] 2016
-
-def ua'' (A B : U) (e : equiv A B) : Path U A B := <i> Glue B (∂ i) [(i = 0) → (A, e), (i = 1) → (B, idEquiv B)]
-
-def iso→Path (A B : U) (f : A → B) (g : B → A) (s : Π (y : B), Path B (f (g y)) y) (t : Π (x : A), Path A (g (f x)) x) : Path U A B
- := ua A B (f, isoToEquiv A B f g s t)
-
 -- [Shulman, Lumsdaine, Warren, Licata] 2010
 
-def isIso (A B: U) (f: A → B) : U := Σ (g : B → A) (s : section A B f g ) (t : retract A B f g ), 𝟏
-def isBiInv (A B: U) (f: A → B) : U := Σ (g₁ g₂ : B → A) (s : section A B f g₁) (t : retract A B f g₂) , 𝟏
+def isIso   (A B: U) (f: A → B) : U := Σ (g : B → A)     (s : section A B f g ) (t : retract A B f g ), 𝟏
+def isBiInv (A B: U) (f: A → B) : U := Σ (g₁ g₂ : B → A) (s : section A B f g₁) (t : retract A B f g₂), 𝟏
 
-def iso (A B: U) : U := Σ (f : A → B), isIso A B f
-def biinv (A B: U) : U := Σ (f : A → B), isBiInv A B f
+def iso     (A B: U) : U := Σ (f : A → B), isIso A B f
+def biinv   (A B: U) : U := Σ (f : A → B), isBiInv A B f
 
---- Iso as [Right] Identity System [Sokhatsky]
+-- gradLemma from cubicaltt
 
+def isoToEquiv (A B : U)
+    (f : A -> B)
+    (g : B -> A)
+    (s : Π (y : B), Path B (f (g y)) y)
+    (t : Π (x : A), Path A (g (f x)) x)
+  : isEquiv A B f
+ := λ (y : B), ((g y, s y), λ (z : fiber A B f y), lemIso A B f g s t y z)
+
+def iso→Path (A B : U)
+    (f : A → B)
+    (g : B → A)
+    (s : Π (y : B), Path B (f (g y)) y)
+    (t : Π (x : A), Path A (g (f x)) x)
+  : Path U A B
+ := ua A B (f, isoToEquiv A B f g s t)
 
 -- Unimorphism Type (Iso -> Path)
 
@@ -74,13 +79,14 @@ def mini-Form (A B : U) : U := iso A B -> equiv A B
 def mini-Intro (A B : U) : mini-Form A B := λ (x : iso A B), univ-elim A B (iso→Path A B x.1 x.2.1 x.2.2.1 x.2.2.2.1)
 def mini-Elim (A B : U) : equiv A B -> iso A B := λ (x : equiv A B), ( x.1, inv-equiv A B x, ret-equiv A B x, sec-equiv A B x, ★)
 
-def invEquiv (A B : U) (e : equiv A B) : equiv B A
+def invEquiv (A B : U) (e : equiv A B)
+  : equiv B A
  := ((mini-Elim A B e).2.1, isoToEquiv B A (mini-Elim A B e).2.1 (mini-Elim A B e).1 (mini-Elim A B e).2.2.2.1 (mini-Elim A B e).2.2.1)
 
--- Constructive J-iso eliminators
+-- Iso as Identity System [Sokhatsky]
 -- Computable induction principle based on J-equiv in the style of Paulin-Mohring
 
-def iso-intro (A: U) : iso A A := ( id A, id A, (λ (x:A), <_>x), (λ (x:A), <_>x), ★)
-def J-iso (A B: U)  (P: Π (X: U) (i: iso A X), U) (r: P A (iso-intro A)) (z: iso A B) : P B (mini-Elim A B (mini-Intro A B z))
+def iso-single (A: U) : iso A A := ( id A, id A, (λ (x:A), <_>x), (λ (x:A), <_>x), ★)
+def J-iso (A B: U)  (P: Π (X: U) (i: iso A X), U) (r: P A (iso-single A)) (z: iso A B) : P B (mini-Elim A B (mini-Intro A B z))
  := subst (Σ (X : U), equiv A X) (λ (w : Σ (X : U), equiv A X), P w.1 (mini-Elim A w.1 w.2))
           (A, idEquiv A) (B, mini-Intro A B z) (contrEquiv A B (mini-Intro A B z)) r

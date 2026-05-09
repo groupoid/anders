@@ -9,7 +9,7 @@ module S1 where
 import library/foundations/mltt/bool
 import library/mathematics/homotopy/coequalizer
 
--- [Shulman] 2015
+--- [Shulman] 2015
 
 def S¹ : U := coeq 𝟏 𝟏 (id 𝟏) (id 𝟏)
 def baseS1 : S¹ := iota 𝟏 𝟏 (id 𝟏) (id 𝟏) ★
@@ -24,7 +24,7 @@ def S1-β₁ (X : S¹ → U) (nBase : X baseS1) (nLoop : PathP (<i> X (loopS1 @ 
 def S1-β₂ (X : S¹ → U) (nBase : X baseS1) (nLoop : PathP (<i> X (loopS1 @ i)) nBase nBase) := idp (PathP (<i> X (loopS1 @ i)) nBase nBase) nLoop
 def S1-η  (X : S¹ → U) (h : Π (z : S¹), X z)                                               := idp (Π (z : S¹), X z) h
 
--- [Sokhatsky] 2022
+--- [Sokhatsky] 2022
 
 def Loop₀ : U := PathP (<_>𝟐) false false
 def Rec : 𝟐 -> U := 2-rec U 𝟎 Loop₀

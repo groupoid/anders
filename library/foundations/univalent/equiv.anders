@@ -31,7 +31,6 @@ def equiv (A B : U) : U := Σ (f : A → B), isEquiv A B f
 def contrSingl (A : U) (a b : A) (p : Path A b a) : Path (singl A a) (b, p) (a, idp A a) := <i> (p @ i, <j> p @ (i ∨ j))
 def idIsEquiv (A : U) : isEquiv A A (id A) := λ (a : A), ((a, idp A a), λ (z : fiber A A (id A) a), <i> (z.2 @ -i, <j> z.2 @ (-i ∨ j)))
 def idEquiv (A : U) : equiv A A := (id A, idIsEquiv A)
-
 def isInjective (A B : U) (f : A → B) : U := Π (x y : A), Path B (f x) (f y) → Path A x y
 def isInjective' (A B : U) (f : A → B) : U := Π (b : B), isProp (fiber A B f b)
 def injective (A B : U) : U := Σ (f : A → B), isInjective A B f
@@ -94,11 +93,14 @@ def EquivIsContr (A: U) : isContr1 (single A) := ((A, idEquiv A), λ (z : single
 def J-equiv (A B: U) (P: Π (A B: U), equiv A B → U) (r: P A A (idEquiv A)) (e: equiv A B) : P A B e
   := subst1 (single A) (\ (z: single A), P A z.1 z.2) (A, idEquiv A) (B, e) (contrEquiv A B e) r
 
+-- Sokhatsky [2026]
+
 def compute-Equiv (A : U)
     (C : Π (A B: U), equiv A B → U)
     (d: C A A (idEquiv A))
   : Path (C A A (idEquiv A)) d (J-equiv A A C d (idEquiv A))
- := <i> transp (<j> C A (univ-computation A A (<_> A) @ -i @ j) (transp (<k> equiv A (univ-computation A A (<_> A) @ -i @ j ∧ k)) 0 (idEquiv A))) 0 d
+ := <i> transp (<j> C A (univ-computation A A (<_> A) @ -i @ j)
+    (transp (<k> equiv A (univ-computation A A (<_> A) @ -i @ j ∧ k)) 0 (idEquiv A))) 0 d
 
 --- The Half-adjoint equivalence from Homotopy Theory
 --- as if f anf g are adjoint functors.
@@ -113,22 +115,21 @@ def ν (A B : U) (f : A → B) (g : B → A)
     (ε: Path (idᵀ B) (∘ B A B f g) (id B)) : U
  := Π (y : B), Path A (g ((ε @ 0) y)) ((η @ 0) (g y))
 
-def isHae (A B : U) (f : A → B): U :=
-  Σ (g : B → A)
-    (η: Path (idᵀ A) (∘ A B A g f) (id A))
-    (ε: Path (idᵀ B) (∘ B A B f g) (id B)), τ A B f g η ε
+def isHae (A B : U) (f : A → B): U
+ := Σ (g : B → A)
+      (η: Path (idᵀ A) (∘ A B A g f) (id A))
+      (ε: Path (idᵀ B) (∘ B A B f g) (id B)), τ A B f g η ε
 
-def isHae' (A B : U) (f : A → B): U :=
-  Σ (g : B → A)
-    (η: Path (idᵀ A) (∘ A B A g f) (id A))
-    (ε: Path (idᵀ B) (∘ B A B f g) (id B)), ν A B f g η ε
+def isHae' (A B : U) (f : A → B): U
+ := Σ (g : B → A)
+      (η: Path (idᵀ A) (∘ A B A g f) (id A))
+      (ε: Path (idᵀ B) (∘ B A B f g) (id B)), ν A B f g η ε
 
-def isHae'' (A B : U) (f : A → B) : U :=
-  Σ (g : B → A)
-    (linv : Π (a : A), Path A a (g (f a)))
-    (rinv : Π (b : B), Path B b (f (g b))),
-  Π (a: A), Path B (cong A B f a (g (f a)) (linv a) @ 0) (rinv (f a) @ 0)
+def isHae'' (A B : U) (f : A → B) : U
+ := Σ (g : B → A)
+      (linv : Π (a : A), Path A a (g (f a)))
+      (rinv : Π (b : B), Path B b (f (g b))),
+    Π (a: A), Path B (cong A B f a (g (f a)) (linv a) @ 0) (rinv (f a) @ 0)
 
 def isHae=isHae' (A B : U) (f : A → B) : U := Path U (isHae A B f) (isHae' A B f)
-
 def hae (A B : U) : U := Σ (f : A → B), isHae A B f

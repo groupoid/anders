@@ -1,4 +1,5 @@
-{- Equivalence: https://anders.groupoid.space/foundations/univalent/equiv
+{- Equivalence: https://anders.groupoid.space/foundations/univalent/equiv/
+
    — Fibers;
    — Contractability of Fibers and Singletons;
    — Equivalence;
@@ -81,7 +82,7 @@ def ua-β (A B : U) (e : equiv A B) : Path (A → B) (trans A B (ua A B e)) e.1
  := <i> λ (x : A), (idfun=idfun″ B @ -i) ((idfun=idfun″ B @ -i) ((idfun=idfun′ B @ -i) (e.1 x)))
 def ua'-IsEquiv (A B: U) := isEquiv (PathP (<_>U) A B) (equiv A B) (ua' A B)
 
---- J-equiv
+--- Escardo J-equiv [2014]
 
 def isContr1 (A: U₁) : U₁ := Σ (x: A), Π (y: A), PathP (<_> A) x y
 def isContr→isProp (A: U) (w: isContr A) (a b : A) : Path A a b

@@ -801,19 +801,6 @@ and ouc v = match v, inferV v with
 and fiber t1 t2 f y = VSig (t1, (freshName "a", fun x -> pathv (idp t2) (app (f, x)) y)) (* left fiber *)
 
 and isContr t = let x = freshName "x" in let y = freshName "y" in VSig (t, (x, fun x -> VPi (t, (y, fun y -> pathv (idp t) x y))))
-and is_isContr_type = function
-  | VSig (t, (_, f)) ->
-    let x = freshName "x" in
-    begin match f (Var (x, t)) with
-    | VPi (t', (_, g)) when (match t, t' with VKan u1, VKan u2 -> Z.equal u1 u2 | _ -> t == t' || conv t t') ->
-      let y = freshName "y" in
-      begin match g (Var (y, t')) with
-      | VApp (VApp (VPathP _, _), _) -> true
-      | _ -> false
-      end
-    | _ -> false
-    end
-  | _ -> false
 and isEquiv t1 t2 f = VPi (t2, (freshName "b", isContr << fiber t1 t2 f))
 and equiv t1 t2 = VSig (implv t1 t2, (freshName "f", isEquiv t1 t2))
 and equivSingl t0 = VSig (inferV t0, (freshName "T", fun t -> equiv t t0))
@@ -1401,7 +1388,6 @@ and convProofIrrel v1 v2 =
     | VApp (VApp (VId t1, a1), b1), VApp (VApp (VId t2, a2), b2) -> conv t1 t2 && conv a1 a2 && conv b1 b2
     | VEmpty, VEmpty -> !Prefs.irrelevance
     | VUnit, VUnit -> !Prefs.irrelevance
-    | t1, t2 when is_isContr_type t1 && conv t1 t2 -> true
   with _ -> false
 
 and eqNf v1 v2 : unit = traceEqNF v1 v2;

@@ -32,7 +32,7 @@ let main : command -> unit = function
 let check filename = loaded := handleErrors (checkFile !loaded) filename !loaded
 
 let repl () =
-  print_endline ("\n" ^ banner ^ "\n\nFor help type ‘:h’.\n");
+  print_endline (banner ^ "\n\nFor help type ‘:h’.\n");
   try while true do
     print_string "> "; let line = read_line () in
     handleErrors (fun x -> main (Reader.parseErr Parser.repl

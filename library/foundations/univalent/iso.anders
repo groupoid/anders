@@ -47,34 +47,19 @@ def iso→Path (A B : U) (f : A → B) (g : B → A) (s : Π (y : B), Path B (f 
 -- [Shulman, Lumsdaine, Warren, Licata] 2010
 
 def isIso (A B: U) (f: A → B) : U := Σ (g : B → A) (s : section A B f g ) (t : retract A B f g ), 𝟏
-def isBiInv (A B: U) (f: A → B) : U := Σ (g₁ g₂ : B → A) (s : section A B f g₁) (t : retract A B f g₂), 𝟏
+def isBiInv (A B: U) (f: A → B) : U := Σ (g₁ g₂ : B → A) (s : section A B f g₁) (t : retract A B f g₂) , 𝟏
 
 def iso (A B: U) : U := Σ (f : A → B), isIso A B f
 def biinv (A B: U) : U := Σ (f : A → B), isBiInv A B f
 
 --- Iso as [Right] Identity System [Sokhatsky]
 
-def iso-intro (A: U) : iso A A := ( id A, id A, (\(x:A), <_>x), (\(x:A), <_>x), ★)
-def iso-single (A B : U) : U := Σ (A: U), iso A B
-
-def iso-center (B : U) : iso-single B B := (B, iso-intro B)
-
-postulate iso-EquivIsContr (A B : U) : isContr (iso-single A B)
-
-def iso-isContr→isProp (A: U) (w: isContr A) (a b : A) : Path A a b
- := <i> hcomp A (∂ i) (λ (j : I), [(i = 0) → a, (i = 1) → (w.2 b) @ j]) ((<i4> w.2 a @ -i) @ i)
-def iso-contrSinglEquiv (A B : U) (e : iso A B)
-  : Path (iso-single A B) (B,iso-intro B) (A,e)
- := iso-isContr→isProp (iso-single A B) (iso-EquivIsContr A B) (B,iso-intro B) (A,e)
-def iso-J (A B: U) (P: Π (A B: U), iso A B → U) (r: P B B (iso-intro B))
-  : Π (e: iso A B), P A B e
- := λ (e: iso A B), subst (iso-single A B) (\ (z: iso-single A B), P z.1 B z.2)
-                          (B,iso-intro B) (A,e) (iso-contrSinglEquiv A B e) r
+def iso-intro (A: U) : iso A A := ( id A, id A, (λ (x:A), <_>x), (λ (x:A), <_>x), ★)
 
 -- Unimorphism Type (Iso -> Path)
 
 def uni-Form (A B: U) : U₁ := iso A B -> PathP (<_>U) A B
-def uni-Intro (A B: U) : uni-Form A B := \ (x : iso A B), iso→Path A B x.f x.g x.s x.t
+def uni-Intro (A B: U) : uni-Form A B := λ (x : iso A B), iso→Path A B x.1 x.2.1 x.2.2.1 x.2.2.2.1
 def uni-Elim (A B : U) : PathP (<_> U) A B -> iso A B
  := λ (p : PathP (<_> U) A B),
       ( coerce A B p,
@@ -84,12 +69,17 @@ def uni-Elim (A B : U) : PathP (<_> U) A B -> iso A B
         ★
       )
 
--- The notion of Minivalence as forth-back map between fibrational equivalence
--- and section/retract-based isomorphism is mentioned in Cubical Agda sources.
-
 -- Minivalence Type (Iso -> Equiv)
 
 def mini-Form (A B : U) : U := iso A B -> equiv A B
-def mini-Intro (A B : U) : mini-Form A B := \ (x : iso A B), univ-elim A B (iso→Path A B x.f x.g x.s x.t)
-def mini-Elim (A B : U) : equiv A B -> iso A B := \ (x : equiv A B), ( x.f, inv-equiv A B x, ret-equiv A B x, sec-equiv A B x, star)
+def mini-Intro (A B : U) : mini-Form A B := λ (x : iso A B), univ-elim A B (iso→Path A B x.1 x.2.1 x.2.2.1 x.2.2.2.1)
+def mini-Elim (A B : U) : equiv A B -> iso A B := λ (x : equiv A B), ( x.1, inv-equiv A B x, ret-equiv A B x, sec-equiv A B x, ★)
 
+def invEquiv (A B : U) (e : equiv A B) : equiv B A
+ := ((mini-Elim A B e).2.1, isoToEquiv B A (mini-Elim A B e).2.1 (mini-Elim A B e).1 (mini-Elim A B e).2.2.2.1 (mini-Elim A B e).2.2.1)
+
+-- Constructive J-iso eliminators
+-- Fully computable induction principle based on J-equiv (without let)
+
+def J-iso (A B: U) (z: iso A B) (P: Π (X: U) (i: iso A X), U) (r: P A (iso-intro A)) : P B (mini-Elim A B (mini-Intro A B z))
+ := subst (Σ (X : U), equiv A X) (λ (w : Σ (X : U), equiv A X), P w.1 (mini-Elim A w.1 w.2)) (A, idEquiv A) (B, mini-Intro A B z) (contrEquiv A B (mini-Intro A B z)) r

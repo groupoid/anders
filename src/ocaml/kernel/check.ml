@@ -599,7 +599,6 @@ and homcom t r i u u0 =
   (* hcomp (Π (x : A), B x) φ u u₀ ~> λ (x : A), hcomp (B x) φ (λ (i : I), [φ → u i 1=1 x]) (u₀ x) *)
 
   | VPi (t, (x, b)), _, _, _ ->
-
     let sys = walk (fun v -> v) r u in
 
     VLam (t, (fresh x, fun y -> homcom (b y) r i (VSystem (System.map (fun v -> app (v, y)) sys)) (app (u0, y))))
@@ -802,6 +801,19 @@ and ouc v = match v, inferV v with
 and fiber t1 t2 f y = VSig (t1, (freshName "a", fun x -> pathv (idp t2) (app (f, x)) y)) (* left fiber *)
 
 and isContr t = let x = freshName "x" in let y = freshName "y" in VSig (t, (x, fun x -> VPi (t, (y, fun y -> pathv (idp t) x y))))
+and is_isContr_type = function
+  | VSig (t, (_, f)) ->
+    let x = freshName "x" in
+    begin match f (Var (x, t)) with
+    | VPi (t', (_, g)) when (match t, t' with VKan u1, VKan u2 -> Z.equal u1 u2 | _ -> t == t' || conv t t') ->
+      let y = freshName "y" in
+      begin match g (Var (y, t')) with
+      | VApp (VApp (VPathP _, _), _) -> true
+      | _ -> false
+      end
+    | _ -> false
+    end
+  | _ -> false
 and isEquiv t1 t2 f = VPi (t2, (freshName "b", isContr << fiber t1 t2 f))
 and equiv t1 t2 = VSig (implv t1 t2, (freshName "f", isEquiv t1 t2))
 and equivSingl t0 = VSig (inferV t0, (freshName "T", fun t -> equiv t t0))
@@ -1374,7 +1386,6 @@ and conv_internal v1 v2 =
     | VSpoke (s1, a1, f1, x1), VSpoke (s2, a2, f2, x2) -> (s1 == s2 || conv s1 s2) && (a1 == a2 || conv a1 a2) && (f1 == f2 || conv f1 f2) && (x1 == x2 || conv x1 x2)
     | VIndDisc (s1, a1, x1, nc1, nh1, ns1), VIndDisc (s2, a2, x2, nc2, nh2, ns2) ->
       (s1 == s2 || conv s1 s2) && (a1 == a2 || conv a1 a2) && (x1 == x2 || conv x1 x2) && (nc1 == nc2 || conv nc1 nc2) && (nh1 == nh2 || conv nh1 nh2) && (ns1 == ns2 || conv ns1 ns2)
-    | VKan _, _ | _, VKan _ -> true
     | VGlueElem (r, u, a), v | v, VGlueElem (r, u, a) -> conv a (unglue r u v)
     | _, _ -> false
   end
@@ -1390,6 +1401,7 @@ and convProofIrrel v1 v2 =
     | VApp (VApp (VId t1, a1), b1), VApp (VApp (VId t2, a2), b2) -> conv t1 t2 && conv a1 a2 && conv b1 b2
     | VEmpty, VEmpty -> !Prefs.irrelevance
     | VUnit, VUnit -> !Prefs.irrelevance
+    | t1, t2 when is_isContr_type t1 && conv t1 t2 -> true
   with _ -> false
 
 and eqNf v1 v2 : unit = traceEqNF v1 v2;

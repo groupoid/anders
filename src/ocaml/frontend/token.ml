@@ -12,6 +12,7 @@ let tokenToString : token -> string = function
   | LAM        -> "LAM"         | PROD       -> "PROD"
   | OPTION     -> "OPTION"      | AXIOM      -> "AXIOM"
   | IRREF      -> "IRREF"       | EOF        -> "EOF"
+  | OPAQUE     -> "OPAQUE"
   | DEFEQ      -> "DEFEQ"       | COMMA      -> "COMMA"
   | COLON      -> "COLON"       | ARROW      -> "ARROW"
   | WHERE      -> "WHERE"       | MODULE     -> "MODULE"

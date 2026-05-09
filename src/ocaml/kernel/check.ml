@@ -7,28 +7,41 @@ open Term
 open Gen
 open Rbv
 
-let timeout = 60.0
+let timeout = 6.0
 let startTime = ref (Unix.gettimeofday ())
 let fuel = ref 1000000000
 let conv_depth = ref 0
+let ctx : ctx ref = ref Env.empty
+
+let unfold_opaque = function
+  | Var (u, _) ->
+    begin match Env.find_opt u !ctx with
+    | Some (Opaque, _, Value v0) -> Some v0
+    | _ -> None end
+  | VApp (Var (u, _), a) ->
+    begin match Env.find_opt u !ctx with
+    | Some (Opaque, _, Value (VLam (_, (_, f)))) -> Some (f a)
+    | _ -> None end
+  | _ -> None
+
 let reset_conv_depth () = conv_depth := 0
 
-let conv_cache_size = 1048576
+let conv_cache_size = 65536
 let conv_cache = Array.make conv_cache_size (VHole, VHole, false)
 let conv_cache_idx = ref 0
 
-let act_cache_size = 4194304
+let act_cache_size = 65536
 let act_cache = Array.make act_cache_size (Env.empty, VHole, VHole)
 let act_cache_idx = ref 0
 
-let app_cache_size = 4194304
+let app_cache_size = 65536
 let app_cache = Array.make app_cache_size (VHole, VHole, VHole)
 
-let transport_cache_size = 1048576
+let transport_cache_size = 65536
 let transport_cache = Array.make transport_cache_size (VHole, VHole, VHole, VHole)
 let is_isContr_cache_size = 1048576
 let is_isContr_cache = Array.make is_isContr_cache_size (VHole, false)
-let is_idfun_cache_size = 1048576
+let is_idfun_cache_size = 65536
 let is_idfun_cache = Array.make is_idfun_cache_size (VHole, false)
 let app_hits = ref 0
 let app_misses = ref 0
@@ -36,7 +49,7 @@ let trans_hits = ref 0
 let trans_misses = ref 0
 let conv_hits = ref 0
 let conv_misses = ref 0
-let idtoeqv_cache_size = 1048576
+let idtoeqv_cache_size = 65536
 let idtoeqv_cache = Array.make idtoeqv_cache_size (Ident ("", 0L), VHole, VHole)
 
 let print_stats () =
@@ -46,11 +59,10 @@ let print_stats () =
 
 let burn () =
   fuel := !fuel - 1;
-  if !fuel <= 0 then (
-    print_stats ();
-    if Unix.gettimeofday () -. !startTime > timeout then failwith "Termination limit reached"
-  )
-let reset_fuel () = startTime := Unix.gettimeofday (); fuel := 50000000
+  if !fuel <= 0 then failwith "Termination limit reached";
+  if !fuel mod 1000 = 0 && Unix.gettimeofday () -. !startTime > timeout then
+    failwith "Termination limit reached"
+let reset_fuel () = startTime := Unix.gettimeofday (); fuel := 1000000000
 
 let is_constant_path i v = match v with
   | VAppFormula (f, Var (j, VI)) when i = j -> not (mem i f)
@@ -66,11 +78,16 @@ let is_constant_clos (p, f) =
 let is_isContr_cache_size = 1048576
 let is_isContr_cache = Array.make is_isContr_cache_size (VHole, false)
 
-let is_constant_motive = function
+let rec is_constant_motive = function
   | VLam (_, clos) -> is_constant_clos clos
-  | _ -> false
+  | VApp (f, _) -> is_constant_motive f
+  | VIndCoequ (_, _, _, _, m, _, _) -> is_constant_motive m
+  | VIndNat (c, _, _) -> is_constant_motive c
+  | VKan _ | VNat | VBool | VUnit | VEmpty -> true
+  | v -> (match unfold_opaque v with Some v' -> is_constant_motive v' | None -> false)
 
 let rec getRho ctx x = match Env.find_opt x ctx with
+  | Some (Opaque, _, _)  -> Var (x, VHole)
   | Some (_, _, Value v) -> v
   | Some (_, _, Exp e)   -> eval ctx e
   | None                 -> Var (x, VHole)
@@ -284,15 +301,15 @@ and transport_internal i p phi u0 = match p, phi, u0 with
       hcomp (VCoequ (a1, b1, f1, g1)) (orFormula (phi, orFormula (dim j_id, negFormula (dim j_id))))
         (VLam (VI, (freshName "k", fun k -> VSystem sys))) pc
 
+  | VApp (VIndNat (c, _, _), _), _, u0 when is_constant_motive c -> u0
   | VApp (VIndNat (c, z, s), n), phi, u0 ->
-    let j = freshName "ι" in
     let x0 = act0 i vzero n in
     let x_fill j = transFill i n phi x0 j in
     let tj j = app (c, x_fill j) in
     comp tj phi i (VSystem System.empty) u0
 
+  | VApp (VIndCoequ (_, _, _, _, motive, _, _), _), _, u0 when is_constant_motive motive -> u0
   | VApp (VIndCoequ (a, b, f, g, motive, i_base, p_loop), x), phi, u0 ->
-    let j = freshName "ι" in
     let x0 = act0 i vzero x in
     let x_fill j = transFill i x phi x0 j in
     let tj j = app (motive, x_fill j) in
@@ -516,7 +533,11 @@ and idtoeqv i e =
   | VAppFormula (f, _) -> idtoeqv i f
   | VGlue _ | VApp (VApp (VGlue _, _), VSystem _) ->
   begin
-    let sys = match e with VApp (VApp (VGlue _, _), VSystem sys) -> sys | _ -> System.empty in
+    let (a, sys) = match e with
+      | VApp (VApp (VGlue a, _), VSystem sys) -> (a, sys)
+      | VApp (VGlue a, _) -> (a, System.empty)
+      | VGlue a -> (a, System.empty)
+      | _ -> (e, System.empty) in
     let e0 = ref None in
     System.iter (fun mu v ->
       match Env.find_opt i mu with
@@ -525,12 +546,23 @@ and idtoeqv i e =
     ) sys;
     match !e0 with
     | Some v -> vsnd v
-    | None -> transport i (equiv a_base e) vzero (idEquiv a_base)
+    | None -> idtoeqv i a
   end
-  | VKan _ -> idEquiv e
+  | VKan _ | VNat | VBool | VUnit | VEmpty -> idEquiv e
   | VCoequ (a, b, f, g) ->
     if not (mem i a) && not (mem i b) && not (mem i f) && not (mem i g) then idEquiv e
     else transport i (equiv a_base e) vzero (idEquiv a_base)
+  | VSig (a, (x, f)) ->
+    if not (mem i a) && is_constant_motive (VLam (a, (x, f))) then idEquiv e
+    else transport i (equiv a_base e) vzero (idEquiv a_base)
+  | VPi (a, (x, f)) ->
+    if not (mem i a) && is_constant_motive (VLam (a, (x, f))) then idEquiv e
+    else transport i (equiv a_base e) vzero (idEquiv a_base)
+  | VPathP (VPLam (VLam (_, (j, f)))) ->
+    if not (mem i (f vzero)) && not (mem i (f vone)) then idEquiv e
+    else transport i (equiv a_base e) vzero (idEquiv a_base)
+  | VApp (VIndNat (c, _, _), _) when is_constant_motive c -> idEquiv a_base
+  | VApp (VIndCoequ (_, _, _, _, motive, _, _), _) when is_constant_motive motive -> idEquiv a_base
   | _ -> transport i (equiv a_base e) vzero (idEquiv a_base)
   in
   idtoeqv_cache.(h) <- (i, e, res);
@@ -778,6 +810,38 @@ and homcom t r i u u0 =
   (* Fallback: return a stuck VHComp if no specific reduction rule matches.
      This represents a composition that cannot be simplified further at this stage. *)
   | _, _, _, _ -> VHComp (t, r, VLam (VI, (i, fun j -> VSystem (walk (act0 i j) r u))), u0)
+
+and hforce v = match v with
+  | Var (u, _) ->
+    begin match Env.find_opt u !ctx with
+    | Some (Opaque, _, Value v0) -> hforce v0
+    | _ -> v end
+  | VApp (VTransp (p, phi), u0) ->
+    let p' = hforce p in
+    if p' == p then v else
+    begin match p' with
+    | VPLam (VLam (VI, (i, f))) ->
+      let i' = fresh i in
+      hforce (transport_internal i' (f (Var (i', VI))) phi u0)
+    | _ -> VApp (VTransp (p', phi), u0)
+    end
+  | VHComp (t, r, u, u0) ->
+    let u' = hforce u in
+    if u' == u then v else
+    begin match u' with
+    | VLam (_, (i, f)) ->
+      let i' = fresh i in
+      hforce (homcom (hforce t) r i' (f (Var (i', VI))) u0)
+    | _ -> v
+    end
+  | VApp (f, x) ->
+    let f' = hforce f in
+    if f' == f then v else
+    begin match f' with
+    | VLam (_, (_, f'')) -> hforce (f'' x)
+    | _ -> VApp (f', x)
+    end
+  | _ -> v
 
 and comp t r i u u0 =
   let j = freshName "ι" in
@@ -1312,7 +1376,9 @@ and conv_internal v1 v2 =
     | VPre u, VPre v -> ieq u v
     | VPLam f, VPLam g -> (incr conv_depth; let i = Var (Ident ("__conv_dim__", Int64.of_int !conv_depth), VI) in let r = conv (app (f, i)) (app (g, i)) in decr conv_depth; r)
     | VPLam f, v | v, VPLam f -> (incr conv_depth; let i = Var (Ident ("__conv_dim__", Int64.of_int !conv_depth), VI) in let r = conv (appFormula v i) (app (f, i)) in decr conv_depth; r)
-    | Var (u, _), Var (v, _) -> u = v
+    | Var (u, _), Var (v, _) when u = v -> true
+    | VApp (Var (u, _), a), VApp (Var (v, _), b) when u = v && conv a b -> true
+
     | VApp (f, a), VApp (g, b) -> (f == g || conv f g) && (a == b || conv a b)
     | VFst x, VFst y | VSnd x, VSnd y -> x == y || conv x y
     | VPathP v, VPathP u -> v == u || conv v u
@@ -1374,7 +1440,10 @@ and conv_internal v1 v2 =
     | VIndDisc (s1, a1, x1, nc1, nh1, ns1), VIndDisc (s2, a2, x2, nc2, nh2, ns2) ->
       (s1 == s2 || conv s1 s2) && (a1 == a2 || conv a1 a2) && (x1 == x2 || conv x1 x2) && (nc1 == nc2 || conv nc1 nc2) && (nh1 == nh2 || conv nh1 nh2) && (ns1 == ns2 || conv ns1 ns2)
     | VGlueElem (r, u, a), v | v, VGlueElem (r, u, a) -> conv a (unglue r u v)
-    | _, _ -> false
+    | v1, v2 ->
+      let v1' = hforce v1 in
+      let v2' = hforce v2 in
+      if v1' == v1 && v2' == v2 then false else conv v1' v2'
   end
 
 and convWithSystem = function

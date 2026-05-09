@@ -6,7 +6,7 @@ open Elab
 open Term
 open Rbv
 
-let ctx : ctx ref = ref Env.empty
+
 
 let getUnitVal opt = function
   | "tt" | "true" -> true
@@ -19,6 +19,7 @@ let getBoolVal opt = function
 
 let getTerm e = if !Prefs.preeval then Value (eval !ctx e) else Exp e
 let assign x t e = ctx := Env.add (ident x) (Global, Value t, getTerm e) !ctx
+let assign_opaque x t e = ctx := Env.add (ident x) (Opaque, Value t, getTerm e) !ctx
 
 let promote fn = try fn () with exc -> Error (extErr exc)
 
@@ -34,6 +35,15 @@ let proto : req -> resp = function
     else (let t = freshExp t0 in let e = freshExp e0 in
       ignore (extSet (infer !ctx t)); let t' = eval !ctx t in
       check !ctx e t'; assign x t' e; OK))
+  | Opaque (x, t0, e0) -> promote (fun () -> reset_fuel ();
+    if Env.mem (ident x) !ctx then Error (AlreadyDeclared x)
+    else (let t = freshExp t0 in let e = freshExp e0 in
+      ignore (extSet (infer !ctx t)); let t' = eval !ctx t in
+      check !ctx e t'; assign_opaque x t' e; OK))
+  | AssignOpaque (x, t0, e0) -> promote (fun () -> reset_fuel ();
+    if Env.mem (ident x) !ctx then Error (AlreadyDeclared x)
+    else (let t = freshExp t0 in ignore (extSet (infer !ctx t));
+          assign_opaque x (eval !ctx t) (freshExp e0); OK))
   | Assign (x, t0, e0) -> promote (fun () -> reset_fuel ();
     if Env.mem (ident x) !ctx then Error (AlreadyDeclared x)
     else (let t = freshExp t0 in ignore (extSet (infer !ctx t));

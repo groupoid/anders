@@ -1,6 +1,6 @@
 open Language.Spec
 
-type scope = Local | Global
+type scope = Local | Global | Opaque
 
 (* Intermediate type checker values *)
 

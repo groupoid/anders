@@ -12,7 +12,7 @@ type plug = string -> exp -> string -> exp
 let plugin : (plug option) ref = ref None
 
 let getDeclName = function
-  | Def (p, _, _) | Ext (p, _, _) | Axiom (p, _) -> p
+  | Def (p, _, _) | Ext (p, _, _) | Axiom (p, _) | Opaque (p, _, _) -> p
 
 let rec checkDecl d =
   match d with
@@ -23,6 +23,8 @@ let rec checkDecl d =
     | None -> failwith "external plugin isn’t loaded"
   end
   | Axiom (p, t) -> assume p t
+  | Opaque (p, Some t, e) -> opaque p t e
+  | Opaque (p, None, e) -> assign_opaque p (infer e) e
 
 let getBoolVal opt = function
   | "tt" | "true"  -> true

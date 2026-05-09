@@ -117,6 +117,7 @@ rule main = parse
   | "theorem"                | "lemma"
   | "corollary"              | "proposition"     -> DEF
   | "axiom"                  | "postulate"       -> AXIOM
+  | "opaque"                                     -> OPAQUE
   | "Id"         -> ID       | "ref"             -> REF
   | "idJ"        -> IDJ      | _                 -> IDENT s
 }

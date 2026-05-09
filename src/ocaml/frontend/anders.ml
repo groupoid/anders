@@ -9,17 +9,18 @@ type cmdline =
   | Indices | Girard | Silent | Irrelevance
 
 let help =
-"\nhttps://homotopy.dev/library/
+"
+ Home: https://homotopy.dev/
+ Use:
 
-  invocation = anders | anders list
-        list = [] | command list
-
-     command = check <filename>      | lex <filename>
-             | parse <filename>      | girard
-             | trace                 | receive
-             | indices               | silent
-             | preeval               | irrelevance
-             | repl                  | help "
+    exec := anders | anders list
+    list := []     | comm list
+    comm := check <filename> | silent
+          | parse <filename> | trace
+          | lex <filename>   | girard
+          | preeval          | irrelevance
+          | repl             | help
+"
 
 let cmd : cmdline -> unit = function
   | Check     filename -> Repl.check filename
@@ -29,10 +30,9 @@ let cmd : cmdline -> unit = function
   | Help         -> print_endline Repl.banner; print_endline help
   | Trace        -> Prefs.indices := true; Radio.set "trace" "true"
   | Receive      -> Radio.receive ()
-  | Indices      -> Prefs.indices := true
   | Silent       -> Prefs.verbose := false
-  | Preeval      -> Radio.set "preeval" "true"
-  | Girard       -> Radio.set "girard" "true"
+  | Preeval      -> Radio.set "preeval"     "true"
+  | Girard       -> Radio.set "girard"      "true"
   | Irrelevance  -> Radio.set "irrelevance" "true"
 
 let rec parseArgs : string list -> cmdline list = function
@@ -46,9 +46,7 @@ let rec parseArgs : string list -> cmdline list = function
   | "trace"       :: rest             -> Trace       :: parseArgs rest
   | "preeval"     :: rest             -> Preeval     :: parseArgs rest
   | "silent"      :: rest             -> Silent      :: parseArgs rest
-  | "indices"     :: rest             -> Indices     :: parseArgs rest
   | "irrelevance" :: rest             -> Irrelevance :: parseArgs rest
-  | "receive"     :: rest             -> Receive     :: parseArgs rest
   | x :: xs -> Printf.printf "Unknown command “%s”\n" x; parseArgs xs
 
 let defaults = function

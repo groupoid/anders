@@ -22,7 +22,7 @@ let loaded : Files.t ref = ref Files.empty
 
 let main : command -> unit = function
   | Eval e -> let (t, v) = (infer e, eval e) in
-    Printf.printf "TYPE: %s\nEVAL: %s\n" (showExp t) (showExp v)
+    Printf.printf "TYPE: %s\nNORM: %s\n" (showExp t) (showExp v)
   | Action "q" -> exit 0
   | Action "r" -> loaded := Files.empty; raise Restart
   | Action "h" -> print_endline help

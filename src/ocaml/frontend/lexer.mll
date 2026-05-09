@@ -79,12 +79,12 @@ rule main = parse
 | eof           { EOF }
 | ident as s    {
   match s with
-  | "/\\"                    | "\xE2\x88\xA7"    -> AND    (* ∧ *)
-  | "\\/"                    | "\xE2\x88\xA8"    -> OR     (* ∨ *)
-  | "forall"                 | "\xCE\xA0" | "П"  -> PI     (* Π *)
-  | "summa"                  | "\xCE\xA3"        -> SIGMA  (* Σ *)
-  | "\\"                     | "\xCE\xBB"        -> LAM    (* λ *)
-  | "ind-W"                  | "ind\xE1\xB5\x82" -> INDW   (* indᵂ *)
+  | "/\\"                    | "\xE2\x88\xA7"    -> AND       (* ∧ *)
+  | "\\/"                    | "\xE2\x88\xA8"    -> OR        (* ∨ *)
+  | "forall"                 | "\xCE\xA0" | "П"  -> PI        (* Π *)
+  | "summa"                  | "\xCE\xA3"        -> SIGMA     (* Σ *)
+  | "\\"                     | "\xCE\xBB"        -> LAM       (* λ *)
+  | "ind-W"                  | "ind\xE1\xB5\x82" -> INDW      (* indᵂ *)
   | "module"     -> MODULE   | "where"           -> WHERE
   | "import"     -> IMPORT   | "option"          -> OPTION
   | "PathP"      -> PATHP    | "transp"          -> TRANSP
@@ -100,19 +100,19 @@ rule main = parse
   | "disc"       -> DISC     | "base"            -> BASE
   | "hub"        -> HUB      | "spoke"           -> SPOKE
   | "disc-ind"   -> INDDISC
-  | "__nat"        -> NAT      | "__zero"            -> ZERO
-  | "__succ"       -> SUCC     | "__ind_nat"         -> INDNAT
-  | "\xE2\x99\xAD"           -> FLA      (* ♭ *)
-  | "\xE2\x99\xAD-unit"      -> FLAUNIT  (* ♭-unit *)
-  | "\xE2\x99\xAD-counit"    -> FLACOUNIT(* ♭-counit *)
-  | "ind-\xE2\x99\xAD"       -> INDFLA   (* ind-♭ *)
-  | "\xE2\x84\x91"           -> IM       (* ℑ *)
-  | "\xE2\x84\x91-unit"      -> INF      (* ℑ-unit *)
-  | "\xE2\x84\x91-join"      -> JOIN     (* ℑ-join *)
-  | "ind-\xE2\x84\x91"       -> INDIM    (* ind-ℑ *)
-  | "ind-empty" | "ind\xE2\x82\x80" -> INDEMPTY
-  | "ind-unit"  | "ind\xE2\x82\x81" -> INDUNIT
-  | "ind-bool"  | "ind\xE2\x82\x82" -> INDBOOL
+  | "__nat"      -> NAT      | "__zero"          -> ZERO
+  | "__succ"     -> SUCC     | "__ind_nat"       -> INDNAT
+  | "\xE2\x99\xAD"                               -> FLA       (* ♭ *)
+  | "\xE2\x99\xAD-unit"                          -> FLAUNIT   (* ♭-unit *)
+  | "\xE2\x99\xAD-counit"                        -> FLACOUNIT (* ♭-counit *)
+  | "ind-\xE2\x99\xAD"                           -> INDFLA    (* ind-♭ *)
+  | "\xE2\x84\x91"                               -> IM        (* ℑ *)
+  | "\xE2\x84\x91-unit"                          -> INF       (* ℑ-unit *)
+  | "\xE2\x84\x91-join"                          -> JOIN      (* ℑ-join *)
+  | "ind-\xE2\x84\x91"                           -> INDIM     (* ind-ℑ *)
+  | "ind-empty"              | "ind\xE2\x82\x80" -> INDEMPTY
+  | "ind-unit"               | "ind\xE2\x82\x81" -> INDUNIT
+  | "ind-bool"               | "ind\xE2\x82\x82" -> INDBOOL
   | "definition"             | "def"
   | "theorem"                | "lemma"
   | "corollary"              | "proposition"     -> DEF

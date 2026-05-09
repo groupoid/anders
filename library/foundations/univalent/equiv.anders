@@ -91,12 +91,13 @@ def contrEquiv (A B : U) (e : equiv A B) : PathP (<i> Σ (X : U), equiv A X) (A,
  := <i> (ua A B e @ i, transp (<j> equiv A (ua A B e @ (i ∧ j))) 0 (idEquiv A))
 def EquivIsContr (A: U) : isContr1 (single A) := ((A, idEquiv A), λ (z : single A), contrEquiv A z.1 z.2)
 def J-equiv (A B: U) (P: Π (A B: U), equiv A B → U) (r: P A A (idEquiv A)) (e: equiv A B) : P A B e
- := subst1 (single A) (\ (z: single A), P A z.1 z.2) (A, idEquiv A) (B, e) (contrEquiv A B e) r
+  := subst1 (single A) (\ (z: single A), P A z.1 z.2) (A, idEquiv A) (B, e) (contrEquiv A B e) r
 
-postulate compute-Equiv (A : U)
+def compute-Equiv (A : U)
     (C : Π (A B: U), equiv A B → U)
     (d: C A A (idEquiv A))
   : Path (C A A (idEquiv A)) d (J-equiv A A C d (idEquiv A))
+ := <i> transp (<j> C A (univ-computation A A (<_> A) @ -i @ j) (transp (<k> equiv A (univ-computation A A (<_> A) @ -i @ j ∧ k)) 0 (idEquiv A))) 0 d
 
 --- The Half-adjoint equivalence from Homotopy Theory
 --- as if f anf g are adjoint functors.

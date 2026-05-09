@@ -54,7 +54,6 @@ def biinv (A B: U) : U := Σ (f : A → B), isBiInv A B f
 
 --- Iso as [Right] Identity System [Sokhatsky]
 
-def iso-intro (A: U) : iso A A := ( id A, id A, (λ (x:A), <_>x), (λ (x:A), <_>x), ★)
 
 -- Unimorphism Type (Iso -> Path)
 
@@ -79,7 +78,9 @@ def invEquiv (A B : U) (e : equiv A B) : equiv B A
  := ((mini-Elim A B e).2.1, isoToEquiv B A (mini-Elim A B e).2.1 (mini-Elim A B e).1 (mini-Elim A B e).2.2.2.1 (mini-Elim A B e).2.2.1)
 
 -- Constructive J-iso eliminators
--- Fully computable induction principle based on J-equiv (without let)
+-- Computable induction principle based on J-equiv in the style of Paulin-Mohring
 
-def J-iso (A B: U) (z: iso A B) (P: Π (X: U) (i: iso A X), U) (r: P A (iso-intro A)) : P B (mini-Elim A B (mini-Intro A B z))
- := subst (Σ (X : U), equiv A X) (λ (w : Σ (X : U), equiv A X), P w.1 (mini-Elim A w.1 w.2)) (A, idEquiv A) (B, mini-Intro A B z) (contrEquiv A B (mini-Intro A B z)) r
+def iso-intro (A: U) : iso A A := ( id A, id A, (λ (x:A), <_>x), (λ (x:A), <_>x), ★)
+def J-iso (A B: U)  (P: Π (X: U) (i: iso A X), U) (r: P A (iso-intro A)) (z: iso A B) : P B (mini-Elim A B (mini-Intro A B z))
+ := subst (Σ (X : U), equiv A X) (λ (w : Σ (X : U), equiv A X), P w.1 (mini-Elim A w.1 w.2))
+          (A, idEquiv A) (B, mini-Intro A B z) (contrEquiv A B (mini-Intro A B z)) r

@@ -7,15 +7,27 @@
 
   let getVar x =
     let xs = [
-        ("I", EI); ("0", EDir Zero); ("1", EDir One);
-        ("𝟎", EEmpty); ("empty", EEmpty);
-        ("𝟏", EUnit); ("unit", EUnit); ("★", EStar); ("star", EStar);
-        ("𝟐", EBool); ("bool", EBool); ("0₂", EFalse); ("1₂", ETrue); ("false", EFalse); ("true", ETrue);
-        ("__nat", ENat);   ("__zero", EZero); ("__succ", ELam (ENat, (ident "n", ESucc (EVar (ident "n")))));
-        ("__ind_nat", ELam (ePi (ident "x") ENat (EKan Z.zero), (ident "C",
-              ELam (EApp (EVar (ident "C"), EZero), (ident "z",
-              ELam (ePi (ident "n") ENat (impl (EApp (EVar (ident "C"), EVar (ident "n"))) (EApp (EVar (ident "C"), ESucc (EVar (ident "n"))))), (ident "s",
-              ELam (ENat, (ident "n", EApp (EIndNat (EVar (ident "C"), EVar (ident "z"), EVar (ident "s")), EVar (ident "n"))))))))))) ] in
+        ("I",         EI);
+        ("0",         EDir Zero);
+        ("1",         EDir One);
+        ("𝟎",         EEmpty);
+        ("empty",     EEmpty);
+        ("𝟏",         EUnit);
+        ("unit",      EUnit);
+        ("★",         EStar);
+        ("star",      EStar);
+        ("𝟐",         EBool);
+        ("bool",      EBool);
+        ("0₂",        EFalse);
+        ("1₂",        ETrue);
+        ("false",     EFalse);
+        ("true",      ETrue);
+        ("__nat",     ENat);
+        ("__zero",    EZero);
+        ("__succ",    ELam (ENat, (ident "n", ESucc (EVar (ident "n")))));
+        ("__ind_nat", ELam (ePi (ident "x") ENat (EKan Z.zero), (ident "C", ELam (EApp (EVar (ident "C"), EZero), (ident "z",
+                      ELam (ePi (ident "n") ENat (impl (EApp (EVar (ident "C"), EVar (ident "n"))) (EApp (EVar (ident "C"), ESucc (EVar (ident "n"))))), (ident "s",
+                      ELam (ENat, (ident "n", EApp (EIndNat (EVar (ident "C"), EVar (ident "z"), EVar (ident "s")), EVar (ident "n"))))))))))) ] in
     match List.assoc_opt x xs with Some e -> e | None -> decl x
 
   let rec telescope ctor e : tele list -> exp = function
@@ -67,9 +79,6 @@
 %token COEQU IOTA2 RESP INDCOEQU DISC BASE HUB SPOKE INDDISC
 %token NAT ZERO SUCC INDNAT
 
-
-
-
 %left APPFORMULA
 %left OR
 %left AND
@@ -109,7 +118,6 @@ telescope : lense telescope { List.append $1 $2 } | lense { $1 }
 params : telescope { $1 } | { [] }
 path : IDENT { getPath $1 }
 face : LPARENS IDENT IDENT IDENT RPARENS { face $2 $3 $4 }
-
 part : face+ ARROW exp2 { ($1, $3) }
 file : MODULE any_ident WHERE line* EOF { ($2, $4) }
 line : IMPORT path+ { Import $2 } | PLUGIN path { Plugin $2 } | OPTION any_ident any_ident { Option ($2, $3) } | declarations { Decl $1 }
@@ -170,9 +178,6 @@ exp4 :
   | SPOKE exp6 exp6 exp6 exp6 { ESpoke ($2, $3, $4, $5) }
   | INDDISC exp6 exp6 exp6 exp6 exp6 exp6 { EIndDisc ($2, $3, $4, $5, $6, $7) }
   | exp5 { $1 }
-
-
-
 
 exp5:
   | exp6 LSQ exp2 MAP exp2 RSQ { ESub ($1, $3, $5) }

@@ -50,18 +50,17 @@ let rec checkLine fs : line -> Files.t = function
     end; fs
   | Import xs -> List.fold_left (fun fs x -> let path = ext x in
     if Files.mem path fs then fs else checkFile fs path) fs xs
+
 and checkFile fs path =
   let filename = Filename.basename path in
-
   let chan = open_in path in
   let (name, con) = Reader.parseErr Parser.file (Lexing.from_channel chan) path in
   close_in chan; if !Prefs.verbose then begin
     Printf.printf "Parsed “%s” successfully.\n" filename; flush_all ()
   end;
-
   if ext name = filename then ()
   else raise (InvalidModuleName (name, filename));
-
   let res = checkContent (Files.add path fs) con in
   print_endline ("File “" ^ filename ^ "” checked."); res
+
 and checkContent fs xs = List.fold_left checkLine fs xs

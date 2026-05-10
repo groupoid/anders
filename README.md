@@ -15,9 +15,9 @@ $ opam install anders
 
 ```shell
 $ anders help preeval check library/book.anders help repl
+...
 File “KGn.anders” checked.
 File “book.anders” checked.
-
 Anders Proof Assistant version 5.5.0
 Copyright © 2016–2026 Groupoid Infinity.
 

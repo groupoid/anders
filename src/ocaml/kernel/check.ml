@@ -7,7 +7,7 @@ open Term
 open Gen
 open Rbv
 
-let timeout = 60.0
+let timeout = 6.0
 let startTime = ref (Unix.gettimeofday ())
 let fuel = ref 1000000000
 let conv_depth = ref 0
@@ -63,17 +63,15 @@ let is_constant_clos (p, f) =
   let v = f (Var (p, VI)) in
   not (IdentSet.mem p (get_support v))
 
-let is_isContr_cache_size = 1048576
-let is_isContr_cache = Array.make is_isContr_cache_size (VHole, false)
 
 let is_constant_motive = function
   | VLam (_, clos) -> is_constant_clos clos
   | _ -> false
 
 let rec getRho ctx x = match Env.find_opt x ctx with
-  | Some (_, _, Value v) -> v
-  | Some (_, _, Exp e)   -> eval ctx e
-  | None                 -> Var (x, VHole)
+  | Some (_, _, _, Value v) -> v
+  | Some (_, _, _, Exp e)   -> eval ctx e
+  | None                    -> Var (x, VHole)
 
 and eval ctx e0 = burn (); traceEval e0; match e0 with
   | EPre u               -> VPre u
@@ -353,11 +351,11 @@ and transport_internal i p phi u0 = match p, phi, u0 with
      VIndBool (act0 i vone c)
   (* transpⁱ (ind-unit c) φ u₀ = ind-unit c′ *)
 
-  | VIndUnit c as p, phi, u0  -> VIndUnit (act0 i vone c)
+  | VIndUnit c as p, _, _  -> VIndUnit (act0 i vone c)
 
   (* transpⁱ (ind-empty c) φ u₀ = ind-empty c′ *)
 
-  | VIndEmpty c as p, phi, u0 -> VIndEmpty (act0 i vone c)
+  | VIndEmpty c, _, _ -> VIndEmpty (act0 i vone c)
 
   (* transpⁱ (hcomp t r sys u₀) φ a = ... *)
 
@@ -445,7 +443,7 @@ and transport_internal i p phi u0 = match p, phi, u0 with
       let v2 = transport k (swap i k (vsnd (act0 i (dim k) (VSig (VPi (a, clos), clos))))) phi (vsnd u0) in
       VPair (ref None, v1 vone, v2)
 
-  | VSig (t, (x, b)), phi, u0 ->
+  | VSig (t, (_, b)), phi, u0 ->
     if not (mem i t) then
       let v1 = vfst u0 in
       VPair (ref None, v1, transport i (b v1) phi (vsnd u0))
@@ -497,7 +495,7 @@ and idEquiv t =
   pairv (idfun t) (VLam (t, (freshName "y", fun y ->
     pairv (pairv y (idp y))
       (VLam (fiber t t (idfun t) y, (freshName "u", fun u ->
-        let (x, p) = eta u in
+        let (_, p) = eta u in
         VPLam (VLam (VI, (freshName "i", fun i ->
           pairv (appFormula p (VNeg i))
             (VPLam (VLam (VI, (freshName "j", fun j ->
@@ -706,7 +704,7 @@ and homcom t r i u u0 =
 
   (* hcompⁱ (ind-nat C z s n) φ u u₀ = ind-nat C′ z′ s′ n *)
 
-  | VApp (VIndNat (c, z, s), n), r, u, u0 ->
+  | VApp (VIndNat (c, z, s), _), r, u, u0 ->
     (match app (c, VRef vone) with VPre _ | VKan _ ->
       let k = freshName "κ" in
       let n_fill = hfill VNat r i u u0 in
@@ -727,7 +725,7 @@ and homcom t r i u u0 =
 
   (* hcompⁱ (ind-coequ A B f g motive i_base p_loop x) φ u u₀ = ind-coequ A B f g motive i′ p′ x *)
 
-  | VApp (VIndCoequ (a, b, f, g, motive, i_base, p_loop), x), r, u, u0 ->
+  | VApp (VIndCoequ (a, b, f, g, motive, i_base, p_loop), _), r, u, u0 ->
     (match app (motive, VRef vone) with VPre _ | VKan _ ->
       let j = freshName "ι" in
       let k = freshName "κ" in
@@ -755,18 +753,21 @@ and homcom t r i u u0 =
 
   | VApp (VApp (VIndDisc (s, a, motive, nc, nh, ns'), z), x), r_comp, u_comp, u0_comp ->
 
-    let (VLam (_, (_, g')) as motive_lam) = motive in
-    (match g' (VRef vone) with
-    | VPre _ | VKan _ ->
-      let j = freshName "ι" in
-      let nc' = VPLam (VLam (VI, (j, fun j -> homcom (app (nc, j)) r_comp i u_comp u0_comp))) in
-      let nh' = VPLam (VLam (VI, (j, fun j -> homcom (app (nh, j)) r_comp i u_comp u0_comp))) in
-      let ns'' = VPLam (VLam (VI, (j, fun j -> homcom (app (ns', j)) r_comp i u_comp u0_comp))) in
-      let z' = VPLam (VLam (VI, (j, fun j -> homcom (app (z, j)) r_comp i u_comp u0_comp))) in
-      VApp (VApp (VIndDisc (s, a, motive_lam, nc', nh', ns''), z'), x)
-    | _ -> structural_homcom motive_lam r_comp i u_comp u0_comp t)
+    begin match motive with
+    | VLam (_, (_, g')) as motive_lam ->
+      (match g' (VRef vone) with
+      | VPre _ | VKan _ ->
+        let j = freshName "ι" in
+        let nc' = VPLam (VLam (VI, (j, fun j -> homcom (app (nc, j)) r_comp i u_comp u0_comp))) in
+        let nh' = VPLam (VLam (VI, (j, fun j -> homcom (app (nh, j)) r_comp i u_comp u0_comp))) in
+        let ns'' = VPLam (VLam (VI, (j, fun j -> homcom (app (ns', j)) r_comp i u_comp u0_comp))) in
+        let z' = VPLam (VLam (VI, (j, fun j -> homcom (app (z, j)) r_comp i u_comp u0_comp))) in
+        VApp (VApp (VIndDisc (s, a, motive_lam, nc', nh', ns''), z'), x)
+      | _ -> structural_homcom motive_lam r_comp i u_comp u0_comp t)
+    | _ -> structural_homcom motive r_comp i u_comp u0_comp t
+    end
 
-  | VApp (VIndEmpty c, n), r_comp, u_comp, u0_comp -> structural_homcom c r_comp i u_comp u0_comp t
+  | VApp (VIndEmpty c, _), r_comp, u_comp, u0_comp -> structural_homcom c r_comp i u_comp u0_comp t
 
   (* hcompⁱ A [φ ↦ u₀] u₀ = u₀ *)
   | _, _, VSystem u, _ when System.for_all (fun mu v -> conv (upd mu u0) v) u -> u0
@@ -902,7 +903,7 @@ and app (v, x) =
 
   (* coequ-ind A B f g X i rho (ι₂ b) ~> i b *)
 
-  | VIndCoequ (a, b, f, g, motive, i, _), VIota2 (_, _, _, _, b0) ->
+  | VIndCoequ (_, _, _, _, motive, i, _), VIota2 (_, _, _, _, b0) ->
     if is_constant_motive motive then app (i, b0) else
     app (i, b0)
 
@@ -923,7 +924,7 @@ and app (v, x) =
              else fun j -> app (x, hfill t r iota (app (sys, dim iota)) u0 j) in
     comp tj r kappa (VSystem (walk g_ind r (app (sys, dim kappa)))) (g_ind u0)
 
-  | VIndDisc (s, a, x, nc, nh, ns), VBase (_, _, v) -> app (nc, v)
+  | VIndDisc (_, _, _, nc, _, _), VBase (_, _, v) -> app (nc, v)
 
   | VIndDisc (s, a, x, nc, nh, ns), VHub (_, _, f) ->
     let nF = VLam (s, (freshName "s", fun v -> app (VIndDisc (s, a, x, nc, nh, ns), app (f, v)))) in
@@ -933,11 +934,11 @@ and app (v, x) =
     let nF = VLam (s, (freshName "s", fun v -> app (VIndDisc (s, a, x, nc, nh, ns), app (f, v)))) in
     appFormula (app (app (app (ns, f), nF), y)) r
 
-  | VIndDisc (s, a, x, nc, nh, ns), VSpoke (_, _, f, y) ->
+  | VIndDisc (s, a, x, nc, nh, ns), VSpoke (_, _, f, _) ->
     let nF = VLam (s, (freshName "s", fun v -> app (VIndDisc (s, a, x, nc, nh, ns), app (f, v)))) in
-    app (app (ns, f), nF)
+    app (app (nh, f), nF)
 
-  | VIndDisc (s, a, x', nc, nh, ns) as ind, VHComp (t, r, sys, u0) ->
+  | VIndDisc (_, _, x', _, _, _) as ind, VHComp (t, r, sys, u0) ->
     let g_ind v = app (ind, v) in
     let iota = freshName "iota" in
     let kappa = freshName "kappa" in
@@ -1036,7 +1037,7 @@ and inferV v = traceInferV v; match v with
     let t = VDisc (s, a) in
     let p = VPLam (VLam (VI, (freshName "i", fun _ -> t))) in
     VApp (VApp (VPathP p, VHub (s, a, f)), app (f, y))
-  | VIndDisc (s, a, x, nc, nh, ns) -> VPi (VDisc (s, a), (freshName "z", fun z -> app (x, z)))
+  | VIndDisc (s, a, x, _, _, _) -> VPi (VDisc (s, a), (freshName "z", fun z -> app (x, z)))
   | VPLam _ | VPair _ | VHole -> raise (Internal (InferError (rbV v)))
 
 
@@ -1104,8 +1105,8 @@ and updTerm alpha = function
   | Value v -> Value (upd alpha v)
 
 and faceEnv alpha ctx =
-  Env.map (fun (p, t, v) -> if p = Local then (p, updTerm alpha t, updTerm alpha v) else (p, t, v)) ctx
-  |> Env.fold (fun p dir -> Env.add p (Local, Value VI, Value (VDir dir))) alpha
+  Env.map (fun (p, te, t, v) -> if p = Local then (p, updTerm alpha te, updTerm alpha t, updTerm alpha v) else (p, te, t, v)) ctx
+  |> Env.fold (fun p dir -> Env.add p (Local, Exp EHole, Value VI, Value (VDir dir))) alpha
 
 
 
@@ -1314,13 +1315,13 @@ and conv_internal v1 v2 =
       let v1' = vfst v in let v2' = vsnd v in
       conv a v1' && conv b v2'
     | VKan u, VKan v -> ieq u v
-    | VPi  (a, (p, f)), VPi  (b, (_, g))
-    | VSig (a, (p, f)), VSig (b, (_, g))
-    | W    (a, (p, f)), W    (b, (_, g)) ->
+    | VPi  (a, (_, f)), VPi  (b, (_, g))
+    | VSig (a, (_, f)), VSig (b, (_, g))
+    | W    (a, (_, f)), W    (b, (_, g)) ->
       conv a b && (f == g || (incr conv_depth; let x = Var (Ident ("__conv__", Int64.of_int !conv_depth), a) in let r = conv (f x) (g x) in decr conv_depth; r))
-    | VLam (a, (p, f)), VLam (b, (_, g)) ->
+    | VLam (a, (_, f)), VLam (b, (_, g)) ->
       conv a b && (f == g || conv a VEmpty || (incr conv_depth; let x = Var (Ident ("__conv__", Int64.of_int !conv_depth), a) in let r = conv (f x) (g x) in decr conv_depth; r))
-    | VLam (a, (p, f)), b | b, VLam (a, (p, f)) ->
+    | VLam (a, (_, f)), b | b, VLam (a, (_, f)) ->
       conv a VEmpty || (incr conv_depth; let x = Var (Ident ("__conv__", Int64.of_int !conv_depth), a) in let r = conv (app (b, x)) (f x) in decr conv_depth; r)
     | VPre u, VPre v -> ieq u v
     | VPLam f, VPLam g -> (incr conv_depth; let i = Var (Ident ("__conv_dim__", Int64.of_int !conv_depth), VI) in let r = conv (app (f, i)) (app (g, i)) in decr conv_depth; r)
@@ -1364,7 +1365,6 @@ and conv_internal v1 v2 =
     | VIndBool u, VIndBool v -> conv u v
     | VNat, VNat | VZero, VZero -> true
     | VSucc u, VSucc v -> conv u v
-    | VOuc v1, VOuc v2 -> conv v1 v2
     | VIndNat (c1, z1, s1), VIndNat (c2, z2, s2) -> conv c1 c2 && conv z1 z2 && conv s1 s2
     | VSup (a1, b1), VSup (a2, b2) -> (a1 == a2 || conv a1 a2) && (b1 == b2 || conv b1 b2)
     | VIndW (a1, b1, c1), VIndW (a2, b2, c2) -> (a1 == a2 || conv a1 a2) && (b1 == b2 || conv b1 b2) && (c1 == c2 || conv c1 c2)
@@ -1402,6 +1402,7 @@ and convProofIrrel v1 v2 =
     | VEmpty, VEmpty -> !Prefs.irrelevance
     | VUnit, VUnit -> !Prefs.irrelevance
     | t1, t2 when is_isContr_type t1 && conv t1 t2 -> true
+    | _, _ -> false
   with _ -> false
 
 and eqNf v1 v2 : unit = traceEqNF v1 v2;
@@ -1409,9 +1410,9 @@ and eqNf v1 v2 : unit = traceEqNF v1 v2;
 
 (* Type checker itself *)
 and lookup ctx x = match Env.find_opt x ctx with
-  | Some (_, Value v, _) -> v
-  | Some (_, Exp e, _)   -> eval ctx e
-  | None                 -> raise (Internal (VariableNotFound x))
+  | Some (_, _, Value v, _) -> v
+  | Some (_, _, Exp e, _)   -> eval ctx e
+  | None                    -> raise (Internal (VariableNotFound x))
 
 and check ctx (e0 : exp) (t0 : value) = traceCheck e0 t0;
   try match e0, t0 with
@@ -1603,8 +1604,8 @@ and infer ctx e : value = traceInfer e; match e with
       VApp (VApp (VPathP p, u0), u1))));
     VPi (t, (freshName "z", fun z -> app (tx, z)))
   | EDisc (s, a) ->
-    let ts = eval ctx s in ignore (extSet (infer ctx s));
-    let ta = eval ctx a in ignore (extSet (infer ctx a));
+    ignore (eval ctx s); ignore (extSet (infer ctx s));
+    ignore (eval ctx a); ignore (extSet (infer ctx a));
     VKan (extSet (infer ctx a))
   | EBase (s, a, v) ->
     let ts = eval ctx s in ignore (extSet (infer ctx s));
@@ -1629,7 +1630,7 @@ and infer ctx e : value = traceInfer e; match e with
     let tx = eval ctx x in
     check ctx x (implv (VDisc (ts, ta)) (VKan Z.zero));
     check ctx nc (VPi (ta, (freshName "a", fun v -> app (tx, VBase (ts, ta, v)))));
-    let tnc = eval ctx nc in
+    let _tnc = eval ctx nc in
     check ctx nh (VPi (implv ts (VDisc (ts, ta)), (freshName "f", fun f ->
       VPi (VPi (ts, (freshName "s", fun v -> app (tx, app (f, v)))), (freshName "nF", fun _ ->
         app (tx, VHub (ts, ta, f)))))));

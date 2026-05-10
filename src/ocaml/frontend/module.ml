@@ -7,6 +7,9 @@ type command =
   | Eval    of exp
   | Action  of string
   | Command of string * exp
+  | Save    of string * exp
+  | Load    of string
+  | Norm    of exp
 
 type decl =
   | Def of string * exp option * exp

@@ -371,3 +371,27 @@ let extErr = function
 let extTraceback = function
   | Traceback (err, es) -> (err, es)
   | err                 -> (err, [])
+let rec exp_support acc = function
+  | EVar x               -> IdentSet.add x acc
+  | ELam (a, (p, b))     -> exp_support (exp_support acc a) b
+  | EPi (a, (p, b))      -> exp_support (exp_support acc a) b
+  | ESig (a, (p, b))     -> exp_support (exp_support acc a) b
+  | EPair (_, a, b)      -> exp_support (exp_support acc a) b
+  | EFst e | ESnd e | EField (e, _) | EId e | ERef e | EJ e | EPathP e | EPLam e
+  | EPartial e | EOuc e | EGlue e | EIndEmpty e | EIndUnit e | EIndBool e | ESucc e
+  | EIm e | EInf e | EJoin e | EFla e | EFlaUnit e | EFlaCounit e -> exp_support acc e
+  | EApp (f, x) | EAppFormula (f, x) | ETransp (f, x) | EPartialP (f, x)
+  | EInc (f, x) | ESup (f, x) | EIndIm (f, x) | EIndFla (f, x) -> exp_support (exp_support acc f) x
+  | EHComp (t, r, u, u0) -> exp_support (exp_support (exp_support (exp_support acc t) r) u) u0
+  | ESub (a, i, u) | EGlueElem (a, i, u) | EUnglue (a, i, u) | EIndW (a, i, u)
+  | EIndNat (a, i, u) -> exp_support (exp_support (exp_support acc a) i) u
+  | ESystem xs           -> System.fold (fun _ e acc -> exp_support acc e) xs acc
+  | ECoequ (a, b, f, g)  -> exp_support (exp_support (exp_support (exp_support acc a) b) f) g
+  | EIota2 (a, b, f, g, c) | EResp (a, b, f, g, c) -> exp_support (exp_support (exp_support (exp_support (exp_support acc a) b) f) g) c
+  | EIndCoequ (a, b, f, g, x, i, rho) -> exp_support (exp_support (exp_support (exp_support (exp_support (exp_support (exp_support acc a) b) f) g) x) i) rho
+  | EDisc (s, a) -> exp_support (exp_support acc s) a
+  | EBase (s, a, x) -> exp_support (exp_support (exp_support acc s) a) x
+  | EHub (s, a, f) -> exp_support (exp_support (exp_support acc s) a) f
+  | ESpoke (s, a, f, x) -> exp_support (exp_support (exp_support (exp_support acc s) a) f) x
+  | EIndDisc (s, a, x, nc, nh, ns') -> exp_support (exp_support (exp_support (exp_support (exp_support (exp_support acc s) a) x) nc) nh) ns'
+  | _ -> acc

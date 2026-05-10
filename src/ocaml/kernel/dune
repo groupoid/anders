@@ -1,1 +1,1 @@
-(executable (name chm) (libraries language zarith unix) (public_name chm))
+(library (name kernel) (libraries language zarith unix))

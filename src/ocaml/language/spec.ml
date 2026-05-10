@@ -93,6 +93,8 @@ type req =
   | Infer  of exp
   | Eval   of exp
   | Conv   of exp * exp
+  | Rollup of exp
+  | Bundle of string * exp
   (* context *)
   | Def    of string * exp * exp
   | Assign of string * exp * exp
@@ -137,5 +139,6 @@ type resp =
   | Error   of error
   | Bool    of bool
   | Term    of exp
+  | Bundle  of (string * exp * exp) list
   | Pong
   | OK

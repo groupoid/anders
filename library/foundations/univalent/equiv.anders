@@ -74,8 +74,8 @@ def hcomp-Glue' (A : U) (φ : I)
 
 --- [Pitts] 2016
 
-def single (A : U) : U := Σ (B: U), equiv A B
-def ua (A B : U) (e : equiv A B) : Path U A B := <i> Glue B (∂ i) [(i = 0) → (A, e), (i = 1) → (B, idEquiv B)]
+def single (A : U) : U₁ := Σ (B: U), equiv A B
+def ua (A B : U₁) (e : equiv A B) : Path U A B := <i> Glue B (∂ i) [(i = 0) → (A, e), (i = 1) → (B, idEquiv B)]
 def ua' (A B : U) : PathP (<_> U) A B -> equiv A B := \ (p: PathP (<_>U) A B), univ-elim A B p
 def ua-β (A B : U) (e : equiv A B) : Path (A → B) (trans A B (ua A B e)) e.1
  := <i> λ (x : A), (idfun=idfun″ B @ -i) ((idfun=idfun″ B @ -i) ((idfun=idfun′ B @ -i) (e.1 x)))

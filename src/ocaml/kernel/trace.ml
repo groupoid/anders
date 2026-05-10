@@ -1,19 +1,20 @@
-open Language.Encode
 open Language.Spec
 open Term
 open Rbv
+
+let callback = ref (fun (_ : resp) -> ())
 
 let traceHole v ctx =
   let gma =
     Env.bindings ctx
     |> List.filter_map
         (fun (p, x) -> match x with
-          | Local, Value v, _ -> Some (p, rbV v)
-          | Local, Exp e, _   -> Some (p, e)
-          | _, _, _           -> None) in
-  Serialize.resp (Hole (rbV v, gma)); flush_all ()
+          | Local, _, Value v, _ -> Some (p, rbV v)
+          | Local, _, Exp e, _   -> Some (p, e)
+          | _                    -> None) in
+  !callback (Hole (rbV v, gma))
 
-let trace x xs = Serialize.resp (Trace (x, xs)); flush_all ()
+let trace x xs = !callback (Trace (x, xs))
 
 let traceCheck e t  = if !Prefs.trace then trace "CHECK" [e; rbV t]
 let traceInfer e    = if !Prefs.trace then trace "INFER" [e]

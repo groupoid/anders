@@ -30,7 +30,7 @@ and clos = ident * (value -> value)
 
 type term = Exp of exp | Value of value
 
-and record = scope * term * term
+and record = scope * term * term * term
 
 and ctx = record Env.t
 
@@ -45,10 +45,10 @@ let isOne i = VApp (VApp (VId VI, VDir One), i)
 let extFace x e = e (List.map (fun (p, v) -> Var (p, isOne v)) x)
 
 let upVar p x ctx = match p with Irrefutable -> ctx | _ -> Env.add p x ctx
-let upLocal ctx p t v = upVar p (Local, Value t, Value v) ctx
-let upGlobal ctx p t v = upVar p (Global, Value t, Value v) ctx
+let upLocal ctx p t v = upVar p (Local, Exp EHole, Value t, Value v) ctx
+let upGlobal ctx p t v = upVar p (Global, Exp EHole, Value t, Value v) ctx
 
-let isGlobal : record -> bool = function Global, _, _ -> false | Local, _, _ -> true
+let isGlobal : record -> bool = function Global, _, _, _ -> false | Local, _, _, _ -> true
 let freshVar ns n = match Env.find_opt n ns with Some x -> x | None -> n
 let mapFace fn phi = Env.fold (fun p d -> Env.add (fn p) d) phi Env.empty
 let freshFace ns = mapFace (freshVar ns)

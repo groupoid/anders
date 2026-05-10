@@ -10,9 +10,11 @@ let help =
   <statement>    infer type and normalize statement
   :q             quit
   :r             restart
+  :save <file>   save term to file <file>.bin
+  :load <file>   load term from file <file>.bin
   :h             display this message
 
-Information about command line options can be found at ‘anders help’."
+Information about shell commands can be found at ‘:h’."
 
 let banner =
   Printf.sprintf "Anders Proof Assistant version %Ld.%Ld.%Ld
@@ -21,8 +23,17 @@ Copyright © 2016–2026 Groupoid Infinity." 5L 5L 0L
 let loaded : Files.t ref = ref Files.empty
 
 let main : command -> unit = function
-  | Eval e -> let (t, v) = (infer e, eval e) in
+  | Eval e | Norm e | Command ("norm", e) ->
+    let (t, v) = (infer e, eval e) in
     Printf.printf "TYPE: %s\nNORM: %s\n" (showExp t) (showExp v)
+  | Save (f, e) | Command ("save", EApp (EVar (Ident (f, _)), e)) ->
+    save (f ^ ".bin") f e; Printf.printf "Saved to %s.bin\n" f
+  | Command ("save", e) ->
+    let f = match e with EVar (Ident (x, _)) -> x | _ -> "term" in
+    save (f ^ ".bin") f e; Printf.printf "Saved to %s.bin\n" f
+  | Load f | Command ("load", EVar (Ident (f, _))) ->
+    let (e, t) = load (f ^ ".bin") in
+    Printf.printf "LOADED %s FROM %s.bin\nTYPE: %s\nNORM: %s\n" f f (showExp t) (showExp e)
   | Action "q" -> exit 0
   | Action "r" -> loaded := Files.empty; raise Restart
   | Action "h" -> print_endline help

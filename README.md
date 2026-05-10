@@ -14,7 +14,7 @@ $ opam install anders
 ```
 
 ```shell
-$ anders help preeval check library/book.anders help repl
+$ anders preeval check library/book.anders help repl
 ...
 File “KGn.anders” checked.
 File “book.anders” checked.

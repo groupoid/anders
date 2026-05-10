@@ -432,7 +432,7 @@ and transport_internal i p phi u0 = match p, phi, u0 with
 
   | VSig (VPi (a, (_, b_pi)), clos), phi, u0 ->
     if orEq phi vzero && not (mem i a) && is_idEquiv a u0 then
-       idtoeqv i (b_pi (Var (freshName "x", a)))
+       idtoeqv i (b_pi (Var (freshName "x", a))) (* needed for univ-computation in equiv.anders *)
     else
       if not (mem i (VPi (a, clos))) then
       let v1 = vfst u0 in
@@ -1040,8 +1040,6 @@ and inferV v = traceInferV v; match v with
   | VIndDisc (s, a, x, _, _, _) -> VPi (VDisc (s, a), (freshName "z", fun z -> app (x, z)))
   | VPLam _ | VPair _ | VHole -> raise (Internal (InferError (rbV v)))
 
-
-
 and inferVTele g t x f = g (inferV t) (inferV (f (Var (x, t))))
 
 and recUnit t = let x = freshName "x" in
@@ -1107,8 +1105,6 @@ and updTerm alpha = function
 and faceEnv alpha ctx =
   Env.map (fun (p, te, t, v) -> if p = Local then (p, updTerm alpha te, updTerm alpha t, updTerm alpha v) else (p, te, t, v)) ctx
   |> Env.fold (fun p dir -> Env.add p (Local, Exp EHole, Value VI, Value (VDir dir))) alpha
-
-
 
 and act rho v =
   if Env.is_empty rho then v else
@@ -1288,7 +1284,6 @@ and act_system rho ts =
   let ts' = bimap (actVar rho) (fun mu -> upd mu >> act rho) ts in
   if ts == ts' then ts else ts'
 
-
 and actVar rho i = match Env.find_opt i rho with
   | Some v -> v
   | None   -> Var (i, VI)
@@ -1409,6 +1404,7 @@ and eqNf v1 v2 : unit = traceEqNF v1 v2;
   if conv v1 v2 then () else raise (Internal (Ineq (rbV v1, rbV v2)))
 
 (* Type checker itself *)
+
 and lookup ctx x = match Env.find_opt x ctx with
   | Some (_, _, Value v, _) -> v
   | Some (_, _, Exp e, _)   -> eval ctx e
@@ -1463,7 +1459,6 @@ and checkOverlapping ctx ts =
         let ctx' = faceEnv (meet alpha beta) ctx in
         eqNf (eval ctx' e1) (eval ctx' e2)
       else ()) ts) ts
-
 
 and infer ctx e : value = traceInfer e; match e with
   | EVar x -> lookup ctx x
@@ -1665,8 +1660,7 @@ and inferLam ctx p a e =
 
 and inferPath ctx p =
   let (_, t0, t1) = extPathP (infer ctx p) in
-  (* path cannot connect different universes,
-     so if one endpoint is in U, then so other *)
+  (* path cannot connect different universes, so if one endpoint is in U, then so other *)
   let k = extSet (inferV t0) in implv t0 (implv t1 (VKan k))
 
 and inferTransport ctx p i =

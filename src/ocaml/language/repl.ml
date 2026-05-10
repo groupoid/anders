@@ -7,13 +7,13 @@ open Serial
 
 let help =
 "Available commands:
-  <statement>    infer type and normalize statement
-  :q             quit
-  :r             restart
-  :save <file>   save term to file <file>.bin
+  <statement> infer type and normalize statement
+  :q quit
+  :r restart
+  :save <file> save term to file <file>.bin
+  :load <file> load term from file <file>.bin
   :bundle <pkg> <term1> ... <termN>  bundle multiple terms to <pkg>.bin
-  :load <file>   load term from file <file>.bin
-  :h             display this message
+  :h display this message
 
 Information about shell commands can be found at ‘:h’."
 

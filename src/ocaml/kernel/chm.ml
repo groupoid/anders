@@ -1,5 +1,4 @@
-open Language.Encode
-open Language.Decode
+open Language.Prelude
 open Language.Spec
 open Check
 open Elab
@@ -7,6 +6,7 @@ open Term
 open Rbv
 
 let ctx : ctx ref = ref Env.empty
+let history : string list ref = ref []
 
 let getUnitVal opt = function
   | "tt" | "true" -> true
@@ -17,14 +17,18 @@ let getBoolVal opt = function
   | "ff" | "false" -> false
   | value -> raise (Internal (InvalidOptValue (opt, value)))
 
-let showIdent = function Ident (s, _) -> s | Irrefutable -> "_"
+let showIdent = function
+  | Irrefutable -> "_"
+  | Ident (xs, 0L) -> xs
+  | Ident (xs, n) -> xs ^ showSubscript (Z.of_int64 n)
+
 let rollup ctx e = rbV (eval ctx e)
 let getTerm e = if !Prefs.preeval then Value (eval !ctx e) else Exp e
-let assign x te t e = ctx := Env.add (ident x) (Global, Exp te, Value t, getTerm e) !ctx
+let assign x te t e =
+  if not (List.mem x !history) then history := x :: !history;
+  ctx := Env.add (ident x) (Global, Exp te, Value t, getTerm e) !ctx
 
-let get_bundle ctx x e =
-  let v = eval ctx e in
-  let t = infer ctx e in
+let get_bundle ctx targets =
   let seen = ref IdentSet.empty in
   let bundle = ref [] in
   let rec collect x =
@@ -35,26 +39,57 @@ let get_bundle ctx x e =
       | Some (Global, Exp te, Value _, Exp e) ->
         let deps = IdentSet.union (exp_support IdentSet.empty te) (exp_support IdentSet.empty e) in
         IdentSet.iter collect deps;
-        bundle := (showIdent x, te, e) :: !bundle
+        bundle := Def (showIdent x, te, e) :: !bundle
+      | Some (Global, Exp te, Value _, Value (Var (y, _))) when x = y ->
+        let deps = exp_support IdentSet.empty te in
+        IdentSet.iter collect deps;
+        bundle := Assume (showIdent x, te) :: !bundle
       | Some (Global, Exp te, Value _, Value v) ->
         let e = rbV v in
         let deps = IdentSet.union (exp_support IdentSet.empty te) (exp_support IdentSet.empty e) in
         IdentSet.iter collect deps;
-        bundle := (showIdent x, te, e) :: !bundle
+        bundle := Def (showIdent x, te, e) :: !bundle
       | _ -> ()
     end
   in
-  let final_e = match e with
-    | EVar i -> (match Env.find_opt i ctx with Some (_, _, _, Exp e) -> e | _ -> rbV v)
-    | _ -> rbV v
+  List.iter (fun r ->
+    let x = match r with Def (x, _, _) | Assume (x, _) | Assign (x, _, _) -> x | _ -> failwith "Invalid bundle target" in
+    let e = match r with Def (_, _, e) -> e | Assume (x, _) -> EVar (ident x) | _ -> failwith "Invalid bundle target" in
+    let v = eval ctx e in
+    let t = infer ctx e in
+    let final_e = match e with
+      | EVar i -> (match Env.find_opt i ctx with Some (_, _, _, Exp e) -> e | _ -> rbV v)
+      | _ -> rbV v
+    in
+    let deps = IdentSet.union (exp_support IdentSet.empty (rbV t)) (exp_support IdentSet.empty final_e) in
+    IdentSet.iter collect deps;
+    let i = ident x in
+    if not (IdentSet.mem i !seen) then (
+      seen := IdentSet.add i !seen;
+      bundle := (match r with Assume _ -> Assume (x, rbV t) | _ -> Def (x, rbV t, final_e)) :: !bundle
+    )
+  ) targets;
+  let res = List.rev !bundle in
+  let pos x =
+    let rec find i = function
+      | [] -> 1000000 (* not in history, put at end *)
+      | y :: ys -> if (match x with Def (n, _, _) | Assume (n, _) | Assign (n, _, _) -> n = y | _ -> false) then i else find (i + 1) ys
+    in find 0 (List.rev !history)
   in
-  let deps = IdentSet.union (exp_support IdentSet.empty (rbV t)) (exp_support IdentSet.empty final_e) in
-  IdentSet.iter collect deps;
-  List.rev !bundle @ [(x, rbV t, final_e)]
+  let sorted = List.sort (fun x y -> compare (pos x) (pos y)) res in
+  let config = [
+    Set ("girard", if !Prefs.girard then "tt" else "ff");
+    Set ("preeval", if !Prefs.preeval then "true" else "false");
+    Set ("irrelevance", if !Prefs.irrelevance then "tt" else "ff");
+    Set ("impredicativity", if !Prefs.impredicativity then "tt" else "ff");
+    Set ("gidx", Int64.to_string !Gen.gidx)
+  ] in
+  config @ sorted
+
 
 let promote fn = try fn () with exc -> Error (extErr exc)
 
-let proto : req -> resp = function
+let rec proto : req -> resp = function
   | Check (e0, t0)     -> promote (fun () -> reset_fuel (); let t = freshExp t0 in
     ignore (extSet (infer !ctx t)); check !ctx (freshExp e0) (eval !ctx t); OK)
   | Infer e            -> promote (fun () -> Term (rbV (infer !ctx (freshExp e))))
@@ -62,7 +97,8 @@ let proto : req -> resp = function
   | Conv (e1, e2)      -> promote (fun () -> Bool (conv (eval !ctx (freshExp e1))
                                                          (eval !ctx (freshExp e2))))
   | Rollup e           -> promote (fun () -> Term (rollup !ctx (freshExp e)))
-  | Bundle (x, e)      -> promote (fun () -> Bundle (get_bundle !ctx x (freshExp e)))
+  | Bundle xs          -> List.iter (fun r -> ignore (proto r)) xs; OK
+  | GetBundle xs       -> promote (fun () -> Bundle (get_bundle !ctx xs))
   | Def (x, t0, e0)    -> promote (fun () -> reset_fuel ();
     if Env.mem (ident x) !ctx then Error (AlreadyDeclared x)
     else (let t = freshExp t0 in let e = freshExp e0 in
@@ -74,10 +110,11 @@ let proto : req -> resp = function
           assign x t0 (eval !ctx t) (freshExp e0); OK))
   | Assume (x, t0)     -> promote (fun () -> reset_fuel (); let t = freshExp t0 in
     let y = ident x in if Env.mem y !ctx then Error (AlreadyDeclared x)
-    else (ignore (extSet (infer !ctx t)); let t' = eval !ctx t in
+    else (if not (List.mem x !history) then history := x :: !history;
+          ignore (extSet (infer !ctx t)); let t' = eval !ctx t in
           ctx := Env.add y (Global, Exp t0, Value t', Value (Var (y, t'))) !ctx; OK))
-  | Erase x            -> ctx := Env.remove (ident x) !ctx; OK
-  | Wipe               -> ctx := Env.empty; OK
+  | Erase x            -> history := List.filter ((<>) x) !history; ctx := Env.remove (ident x) !ctx; OK
+  | Wipe               -> history := []; ctx := Env.empty; OK
   | Set (p, x)         ->
   begin match p with
     | "trace"           -> promote (fun () -> Prefs.trace           := getBoolVal p x; OK)
@@ -85,6 +122,7 @@ let proto : req -> resp = function
     | "girard"          -> promote (fun () -> Prefs.girard          := getUnitVal p x; OK)
     | "irrelevance"     -> promote (fun () -> Prefs.irrelevance     := getUnitVal p x; OK)
     | "impredicativity" -> promote (fun () -> Prefs.impredicativity := getUnitVal p x; OK)
+    | "gidx"            -> promote (fun () -> Gen.gidx := max !Gen.gidx (Int64.of_string x); OK)
     | _                 -> Error (InvalidOpt p)
   end
   | Version            -> Version (1L, 3L, 0L)

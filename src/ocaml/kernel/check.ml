@@ -12,6 +12,7 @@ let startTime = ref (Unix.gettimeofday ())
 let fuel = ref 0
 let conv_depth = ref 0
 let reset_conv_depth () = conv_depth := 0
+let reset_fuel () = startTime := Unix.gettimeofday (); fuel := 50000000
 
 let conv_cache_size = 1048576
 let conv_cache = Array.make conv_cache_size (VHole, VHole, false)
@@ -30,15 +31,15 @@ let is_isContr_cache_size = 1048576
 let is_isContr_cache = Array.make is_isContr_cache_size (VHole, false)
 let is_idfun_cache_size = 1048576
 let is_idfun_cache = Array.make is_idfun_cache_size (VHole, false)
+let idtoeqv_cache_size = 1048576
+let idtoeqv_cache = Array.make idtoeqv_cache_size (Ident ("", 0L), VHole, VHole)
+
 let app_hits = ref 0
 let app_misses = ref 0
 let trans_hits = ref 0
 let trans_misses = ref 0
 let conv_hits = ref 0
 let conv_misses = ref 0
-let idtoeqv_cache_size = 1048576
-let idtoeqv_cache = Array.make idtoeqv_cache_size (Ident ("", 0L), VHole, VHole)
-
 let print_stats () =
   if !Options.trace then
     Printf.printf "App Cache: %d hits, %d misses | Trans Cache: %d hits, %d misses | Conv Cache: %d hits, %d misses\n%!"
@@ -50,8 +51,6 @@ let burn () =
     print_stats ();
     if Unix.gettimeofday () -. !startTime > timeout then failwith "Termination limit reached"
   )
-
-let reset_fuel () = startTime := Unix.gettimeofday (); fuel := 50000000
 
 let is_constant_path i v = match v with
   | VAppFormula (f, Var (j, VI)) when i = j -> not (mem i f)

@@ -209,16 +209,16 @@ Infinitesimal Modality was added for direct support of Synthetic Differential Ge
 Benchmarks
 ----------
 
-Intel i5-12400 or M4: Compilation in 3 seconds, full library checks in 5 sec with K(G,n)-η.
+Intel i5-12400 or M4: Compilation in 5 seconds, full library checks in 5 sec with K(G,n)-η.
 
 ```
-% dune build
-3.19s user 2.64s system 135% cpu 4.297 total
+% time dune build
+3.15s user 2.54s system 121% cpu 4.693 total
 ```
 
 ```
-% dune exec anders profile check library/book.anders
-0.06s user 0.05s system 8% cpu 1.188 total
+% time dune exec anders preeval check library/book.anders
+3.21s user 0.13s system 86% cpu 3.848 total
 ```
 
 # Anders: Homotopy Library

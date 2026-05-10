@@ -34,3 +34,6 @@ def mu : Π (x : S¹), equiv S¹ S¹
 def H1 : Π (x : 𝚺 S¹), U := 𝚺-ind S¹ (λ (_ : 𝚺 S¹), U) S¹ S¹ (λ (x : S¹), ua S¹ S¹ (mu x))
 def TH1 : U := Σ (c : 𝚺 S¹), H1 c
 
+def test_mu_base : equiv S¹ S¹ := mu baseS1
+def test_H1_base : U := H1 (𝜎₁ S¹)
+def test_mu_loop (i : I) : equiv S¹ S¹ := mu (loopS1 @ i)

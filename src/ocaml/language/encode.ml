@@ -123,8 +123,6 @@ struct
     | Eval e           -> W.put '\x12'; exp e
     | Conv (e1, e2)    -> W.put '\x13'; exp2 e1 e2
     | Def (x, t, e)    -> W.put '\x20'; string x; exp2 t e
-    | Opaque (x, t, e) -> W.put '\x25'; string x; exp2 t e
-    | AssignOpaque (x, t, e) -> W.put '\x26'; string x; exp2 t e
     | Assign (x, t, e) -> W.put '\x21'; string x; exp2 t e
     | Assume (x, t)    -> W.put '\x22'; string x; exp t
     | Erase x          -> W.put '\x23'; string x

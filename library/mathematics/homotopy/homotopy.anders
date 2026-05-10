@@ -13,7 +13,7 @@ import library/foundations/univalent/iso
 -- its higher-dimensional analogues
 
 def sucPathZ : Path U ℤ ℤ := iso→Path ℤ ℤ sucZ predZ sucpredZ predsucZ
-opaque helix (x : S¹) : U := S1-ind (λ (_ : S¹), U) ℤ sucPathZ x
+def helix (x : S¹) : U := S1-ind (λ (_ : S¹), U) ℤ sucPathZ x
 
 -- Transport Helix Paths from Integers
 
@@ -84,18 +84,17 @@ def loopZ4 : ℤ := winding loop4
 
 -- Integer from Helix Path
 
-{-
-
 def decode (x : S¹) (c : helix x) : Path S¹ baseS1 x
  := S1-ind (λ (y : S¹), helix y → Path S¹ baseS1 y) loopIt
        (corFib1 S¹ helix (λ (y : S¹), Path S¹ baseS1 y) baseS1 loopIt loopIt loopS1
-         (λ (u : ℤ), +-ind ℕ ℕ (λ (v : ℤ), Path (Path S¹ baseS1 baseS1) (pcomp S¹ baseS1 baseS1 baseS1 (loopIt v) loopS1) (loopIt (sucZ v)))
-            (λ (n : ℕ), <j i> hcomp S¹ (∂ i ∨ j) (λ (k : I), [(i = 0) → baseS1, (i = 1) → loopS1 @ (k ∧ -j), (j = 1) → loopNeg n @ i]) (loopNeg (succ n) @ i))
+         (λ (u : ℤ), +-ind ℕ ℕ (λ (v : ℤ), Path (Path S¹ baseS1 baseS1) (pcomp S¹ baseS1 baseS1 baseS1 (loopIt v) loopS1) (loopIt (sucℤ v)))
+            (λ (n : ℕ), <j i> hcomp S¹ (∂ i ∨ j) (λ (k : I), [(i = 0) → baseS1, (i = 1) → loopS1 @ -k ∧ -j, (j = 1) → baseS1]) (loopS1 @ i ∧ -j))
             (λ (n : ℕ), <_> loopPos (succ n)) u)) x c
 
 -- π₁(S¹) = ℤ
-theorem loopS1'=Z
+def loopS1'=Z
   : Path U loopS1' ℤ
  := iso→Path (Path S¹ baseS1 baseS1) ℤ (encode baseS1) (decode baseS1) (λ (n : ℤ), <_> n) (λ (p : Path S¹ baseS1 baseS1), <_> p)
 
--}
+
+

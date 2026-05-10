@@ -12,7 +12,6 @@ type decl =
   | Def of string * exp option * exp
   | Ext of string * exp * string
   | Axiom of string * exp
-  | Opaque of string * exp option * exp
 
 type line =
   | Import of string list
@@ -31,8 +30,6 @@ let showDecl : decl -> string = function
   | Def (p, None, exp) -> Printf.sprintf "def %s := %s" p (showExp exp)
   | Ext (p, t, v) -> Printf.sprintf "def %s : %s :=\nbegin%send" p (showExp t) v
   | Axiom (p, exp) -> Printf.sprintf "axiom %s : %s" p (showExp exp)
-  | Opaque (p, Some exp1, exp2) -> Printf.sprintf "opaque %s : %s := %s" p (showExp exp1) (showExp exp2)
-  | Opaque (p, None, exp) -> Printf.sprintf "opaque %s := %s" p (showExp exp)
 
 let showLine : line -> string = function
   | Import p -> Printf.sprintf "import %s" (String.concat " " p)

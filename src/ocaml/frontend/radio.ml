@@ -74,8 +74,6 @@ let infer e = Request.req (Infer e); flush Kernel.stdin; recvTerm ()
 let def p t e = Request.req (Def (p, t, e)); flush Kernel.stdin; over ()
 let assign p t e = Request.req (Assign (p, t, e)); flush Kernel.stdin; over ()
 let assume p t = Request.req (Assume (p, t)); flush Kernel.stdin; over ()
-let opaque p t e = Request.req (Opaque (p, t, e)); flush Kernel.stdin; over ()
-let assign_opaque p t e = Request.req (AssignOpaque (p, t, e)); flush Kernel.stdin; over ()
 
 let set p x = Request.req (Set (p, x)); flush Kernel.stdin; over ()
 

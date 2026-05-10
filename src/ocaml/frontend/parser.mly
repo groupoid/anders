@@ -53,7 +53,7 @@
 %token LPARENS RPARENS LSQ RSQ
 %token COMMA COLON IRREF EOF HOLE
 %token DEFEQ PROD ARROW DOT LAM
-%token MODULE WHERE IMPORT DEF AXIOM OPAQUE
+%token MODULE WHERE IMPORT DEF AXIOM
 %token SIGMA PI OPTION PLUGIN LT GT
 %token APPFORMULA PATHP TRANSP HCOMP
 %token PARTIAL PARTIALP MAP INC OUC
@@ -193,8 +193,6 @@ exp6:
   | IDENT { getVar $1 }
 
 declarations:
-  | OPAQUE any_ident params COLON exp2 DEFEQ exp2 { Opaque ($2, Some (telescope ePi $5 $3), telescope eLam $7 $3) }
-  | OPAQUE any_ident params DEFEQ exp2 { Opaque ($2, None, telescope eLam $5 $3) }
   | DEF any_ident params COLON exp2 DEFEQ exp2 { Def ($2, Some (telescope ePi $5 $3), telescope eLam $7 $3) }
   | DEF any_ident params COLON exp2 DEFEQ EXT { Ext ($2, telescope ePi $5 $3, $7) }
   | DEF any_ident params DEFEQ exp2 { Def ($2, None, telescope eLam $5 $3) }

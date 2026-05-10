@@ -132,8 +132,6 @@ struct
     | '\x12' -> Eval (exp ())
     | '\x13' -> let (e1, e2) = exp2 () in Conv (e1, e2)
     | '\x20' -> let x = string () in let (t, e) = exp2 () in Def (x, t, e)
-    | '\x25' -> let x = string () in let (t, e) = exp2 () in Opaque (x, t, e)
-    | '\x26' -> let x = string () in let (t, e) = exp2 () in AssignOpaque (x, t, e)
     | '\x21' -> let x = string () in let (t, e) = exp2 () in Assign (x, t, e)
     | '\x22' -> let x = string () in let t = exp () in Assume (x, t)
     | '\x23' -> Erase (string ())

@@ -95,8 +95,6 @@ type req =
   | Conv   of exp * exp
   (* context *)
   | Def    of string * exp * exp
-  | Opaque of string * exp * exp
-  | AssignOpaque of string * exp * exp
   | Assign of string * exp * exp
   | Assume of string * exp
   | Erase  of string

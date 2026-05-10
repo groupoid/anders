@@ -86,7 +86,23 @@ def invEquiv (A B : U) (e : equiv A B)
 -- Iso as Identity System [Sokhatsky]
 -- Computable induction principle based on J-equiv in the style of Paulin-Mohring
 
+def iso-intro (A: U)
+  : iso A A
+ := ( id A,
+      id A,
+      (\(x:A), <_>x),
+      (\(x:A), <_>x),
+      star
+    )
+
 def iso-single (A: U) : iso A A := ( id A, id A, (λ (x:A), <_>x), (λ (x:A), <_>x), ★)
 def J-iso (A B: U)  (P: Π (X: U) (i: iso A X), U) (r: P A (iso-single A)) (z: iso A B) : P B (mini-Elim A B (mini-Intro A B z))
  := subst (Σ (X : U), equiv A X) (λ (w : Σ (X : U), equiv A X), P w.1 (mini-Elim A w.1 w.2))
           (A, idEquiv A) (B, mini-Intro A B z) (contrEquiv A B (mini-Intro A B z)) r
+
+def ind-Iso (A B: U)
+    (C: Π (A B: U), iso A B → U)
+    (d: C A A (iso-intro A))
+  : Π (e: iso A B), C A B e
+ := ?
+ 

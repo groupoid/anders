@@ -77,7 +77,7 @@ block content
                      := Σ (x: A), Π (y: A), Path A x y
 
                     def fiber (A B: U) (f: A → B) (y: B): U
-                     := Σ (x: A), Path B y (f x)
+                     := Σ (x: A), Path B (f x) y
 
                     def isEquiv (A B: U) (f: A → B): U
                      := Π (y: B), isContr (fiber A B f y)

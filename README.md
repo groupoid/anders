@@ -12,6 +12,8 @@ Setup
 ```shell
 $ opam install anders
 ```
+Usage
+-----
 
 ```shell
 $ anders preeval check library/book.anders help repl
@@ -293,21 +295,6 @@ anders.groupoid.space/mathematics/
     ├── quotient2/
     ├── suspension/
     └── truncation/
-```
-
-## Usage
-
-The main purpose of Anders is doing Homotopy Theory:
-
-```
-$ dune exec anders repl
-
-Anders Proof Assistant version 5.5.0
-Copyright © 2016–2026 Groupoid Infinity.
-
-For help type ‘:h’.
-
->
 ```
 
 Mentions

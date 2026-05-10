@@ -5,8 +5,8 @@ open Error
 let trace x xs = Printf.printf "%s: [%s]\n" x (String.concat "; " (List.map showExp xs)); flush_all ()
 
 let traceHole e gma = print_string "\nHole:\n\n";
-  List.iter (fun (i, e') -> Printf.printf "%s : %s\n" (showIdent i) (showExp e')) gma;
-  print_string ("\n" ^ String.make 80 '-' ^ "\n" ^ showExp e ^ "\n\n")
+    List.iter (fun (i, e') -> Printf.printf "%s : %s\n" (showIdent i) (showExp e')) gma;
+    print_string ("\n" ^ String.make 80 '-' ^ "\n" ^ showExp e ^ "\n\n")
 
 let showResp = function
   | Version (i, j, k) -> Printf.printf "Version (%Ld, %Ld, %Ld)\n" i j k
@@ -16,7 +16,7 @@ let showResp = function
   | Bool false        -> print_string "false\n"
   | Bool true         -> print_string "true\n"
   | Term e            -> Printf.printf "%s\n" (showExp e)
-  | RestoreBundle _          -> ()
+  | RestoreBundle _   -> ()
   | Pong              -> print_string "pong\n"
   | OK                -> print_string "OK\n"
 
@@ -32,15 +32,13 @@ let recvTerm = function
   | Error err     -> raise (Kernel err)
   | r             -> showResp r; raise ProtocolViolation
 
-let eval e  = recvTerm (Kernel.Protocol.proto (Eval e))
-let infer e = recvTerm (Kernel.Protocol.proto (Infer e))
-
-let def p t e = over (Kernel.Protocol.proto (Def (p, t, e)))
-let assign p t e = over (Kernel.Protocol.proto (Assign (p, t, e)))
-let assume p t = over (Kernel.Protocol.proto (Assume (p, t)))
-
-let set p x = over (Kernel.Protocol.proto (Set (p, x)))
-let wipe () = over (Kernel.Protocol.proto Wipe)
+let eval e        = recvTerm (Kernel.Protocol.proto (Eval e))
+let infer e       = recvTerm (Kernel.Protocol.proto (Infer e))
+let def p t e     = over (Kernel.Protocol.proto (Def (p, t, e)))
+let assign p t e  = over (Kernel.Protocol.proto (Assign (p, t, e)))
+let assume p t    = over (Kernel.Protocol.proto (Assume (p, t)))
+let set p x       = over (Kernel.Protocol.proto (Set (p, x)))
+let wipe ()       = over (Kernel.Protocol.proto Wipe)
 
 let save filename targets =
   let b = match Kernel.Protocol.proto (SaveBundle (List.map (fun (x, e) -> Def (x, EHole, e)) targets)) with

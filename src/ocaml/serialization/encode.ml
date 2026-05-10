@@ -99,11 +99,10 @@ struct
     | EHub (s, a, f) -> W.put '\x5A'; exp s; exp a; exp f
     | ESpoke (s, a, f, x) -> W.put '\x5B'; exp s; exp a; exp f; exp x
     | EIndDisc (s, a, x, nc, nh, ns') -> W.put '\x5C'; exp6 s a x nc nh ns'
-  | EFla e               -> W.put '\x60'; exp e
-  | EFlaUnit e           -> W.put '\x61'; exp e
-  | EFlaCounit e         -> W.put '\x62'; exp e
-  | EIndFla (t, f)        -> W.put '\x63'; exp2 t f
-
+    | EFla e               -> W.put '\x60'; exp e
+    | EFlaUnit e           -> W.put '\x61'; exp e
+    | EFlaCounit e         -> W.put '\x62'; exp e
+    | EIndFla (t, f)       -> W.put '\x63'; exp2 t f
 
   and exp2 a b = exp a; exp b
   and exp3 a b c = exp a; exp b; exp c

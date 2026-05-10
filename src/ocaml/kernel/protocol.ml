@@ -87,7 +87,6 @@ let get_bundle ctx targets =
   ] in
   config @ sorted
 
-
 let promote fn = try fn () with exc -> Error (extErr exc)
 
 let rec proto : req -> resp = function

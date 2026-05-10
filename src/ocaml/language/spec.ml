@@ -94,8 +94,8 @@ type req =
   | Eval   of exp
   | Conv   of exp * exp
   | Rollup of exp
-  | Bundle of req list
-  | GetBundle of req list
+  | RestoreBundle of req list
+  | SaveBundle of req list
   (* context *)
   | Def    of string * exp * exp
   | Assign of string * exp * exp
@@ -140,6 +140,6 @@ type resp =
   | Error   of error
   | Bool    of bool
   | Term    of exp
-  | Bundle  of req list
+  | RestoreBundle of req list
   | Pong
   | OK

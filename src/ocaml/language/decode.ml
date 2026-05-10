@@ -132,8 +132,8 @@ struct
     | '\x12' -> Eval (exp ())
     | '\x13' -> let (e1, e2) = exp2 () in Conv (e1, e2)
     | '\x14' -> Rollup (exp ())
-    | '\x15' -> Bundle (let n = int () in List.init n (fun _ -> req ()))
-    | '\x16' -> GetBundle (let n = int () in List.init n (fun _ -> req ()))
+    | '\x15' -> let n = int () in RestoreBundle (List.init n (fun _ -> req ()))
+    | '\x16' -> let n = int () in SaveBundle (List.init n (fun _ -> req ()))
     | '\x20' -> let x = string () in let (t, e) = exp2 () in Def (x, t, e)
     | '\x21' -> let x = string () in let (t, e) = exp2 () in Assign (x, t, e)
     | '\x22' -> let x = string () in let t = exp () in Assume (x, t)
@@ -183,7 +183,7 @@ struct
     | '\x20' -> Bool false
     | '\x21' -> Bool true
     | '\x22' -> Term (exp ())
-    | '\x23' -> let n = int () in Bundle (List.init n (fun _ -> req ()))
+    | '\x23' -> let n = int () in RestoreBundle (List.init n (fun _ -> req ()))
     | '\xF0' -> Pong
     | '\x00' -> OK
     | _      -> failwith "Resp?"

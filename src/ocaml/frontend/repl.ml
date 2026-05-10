@@ -1,9 +1,9 @@
-open Prettyprinter
+open Printer
 open Module
 open Error
 open Decl
 open Language.Spec
-open Radio
+open Serial
 
 let help =
 "Available commands:

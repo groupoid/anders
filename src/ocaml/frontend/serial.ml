@@ -1,5 +1,5 @@
 open Language.Spec
-open Prettyprinter
+open Printer
 open Error
 
 let trace x xs = Printf.printf "%s: [%s]\n" x (String.concat "; " (List.map showExp xs)); flush_all ()
@@ -16,7 +16,7 @@ let showResp = function
   | Bool false        -> print_string "false\n"
   | Bool true         -> print_string "true\n"
   | Term e            -> Printf.printf "%s\n" (showExp e)
-  | Bundle _          -> ()
+  | RestoreBundle _          -> ()
   | Pong              -> print_string "pong\n"
   | OK                -> print_string "OK\n"
 
@@ -43,15 +43,15 @@ let set p x = over (Kernel.Chm.proto (Set (p, x)))
 let wipe () = over (Kernel.Chm.proto Wipe)
 
 let save filename targets =
-  let b = match Kernel.Chm.proto (GetBundle (List.map (fun (x, e) -> Def (x, EHole, e)) targets)) with
-    | Bundle b -> b | Error err -> raise (Kernel err) | _ -> raise ProtocolViolation
+  let b = match Kernel.Chm.proto (SaveBundle (List.map (fun (x, e) -> Def (x, EHole, e)) targets)) with
+    | RestoreBundle b -> b | Error err -> raise (Kernel err) | _ -> raise ProtocolViolation
   in
   let oc = open_out_bin filename in
   let module W = Language.Encode.Encode(struct
     let put c = output_char oc c
     let puts s = output_string oc s
   end) in
-  W.req (Bundle b);
+  W.req (RestoreBundle b);
   close_out oc
 
 let load filename =
@@ -63,7 +63,7 @@ let load filename =
   let b = R.req () in close_in ic;
   over (Kernel.Chm.proto b);
   match b with
-  | Bundle xs ->
+  | RestoreBundle xs ->
     let rec find = function
       | [] -> (EHole, EHole)
       | Def (_, t, e) :: [] -> (e, t)

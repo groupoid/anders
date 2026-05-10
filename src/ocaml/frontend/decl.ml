@@ -1,7 +1,7 @@
 open Language.Spec
 open Module
 open Error
-open Radio
+open Serial
 
 module Files = Set.Make(String)
 

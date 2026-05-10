@@ -70,11 +70,12 @@ let get_bundle ctx targets =
     )
   ) targets;
   let res = List.rev !bundle in
+  let h_rev = List.rev !history in
   let pos x =
     let rec find i = function
       | [] -> 1000000 (* not in history, put at end *)
       | y :: ys -> if (match x with Def (n, _, _) | Assume (n, _) | Assign (n, _, _) -> n = y | _ -> false) then i else find (i + 1) ys
-    in find 0 (List.rev !history)
+    in find 0 h_rev
   in
   let sorted = List.sort (fun x y -> compare (pos x) (pos y)) res in
   let config = [
@@ -97,8 +98,8 @@ let rec proto : req -> resp = function
   | Conv (e1, e2)      -> promote (fun () -> Bool (conv (eval !ctx (freshExp e1))
                                                          (eval !ctx (freshExp e2))))
   | Rollup e           -> promote (fun () -> Term (rollup !ctx (freshExp e)))
-  | Bundle xs          -> List.iter (fun r -> ignore (proto r)) xs; OK
-  | GetBundle xs       -> promote (fun () -> Bundle (get_bundle !ctx xs))
+  | RestoreBundle xs   -> List.iter (fun r -> ignore (proto r)) xs; OK
+  | SaveBundle xs      -> promote (fun () -> RestoreBundle (get_bundle !ctx xs))
   | Def (x, t0, e0)    -> promote (fun () -> reset_fuel ();
     if Env.mem (ident x) !ctx then Error (AlreadyDeclared x)
     else (let t = freshExp t0 in let e = freshExp e0 in

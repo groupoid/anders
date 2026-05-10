@@ -1,5 +1,5 @@
 %{ open Language.Spec
-   open Prettyprinter
+   open Printer
    open Module
    open Prefs
 

@@ -1,6 +1,6 @@
 open Language.Prelude
 open Language.Spec
-open Prettyprinter
+open Printer
 
 type command =
   | Nope

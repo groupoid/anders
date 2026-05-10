@@ -123,8 +123,8 @@ struct
     | Eval e           -> W.put '\x12'; exp e
     | Conv (e1, e2)    -> W.put '\x13'; exp2 e1 e2
     | Rollup e        -> W.put '\x14'; exp e
-    | Bundle xs       -> W.put '\x15'; int (List.length xs); List.iter req xs
-    | GetBundle xs    -> W.put '\x16'; int (List.length xs); List.iter req xs
+    | RestoreBundle xs -> W.put '\x15'; int (List.length xs); List.iter req xs
+    | SaveBundle xs    -> W.put '\x16'; int (List.length xs); List.iter req xs
     | Def (x, t, e)    -> W.put '\x20'; string x; exp2 t e
     | Assign (x, t, e) -> W.put '\x21'; string x; exp2 t e
     | Assume (x, t)    -> W.put '\x22'; string x; exp t
@@ -168,7 +168,7 @@ struct
     | Bool false        -> W.put '\x20'
     | Bool true         -> W.put '\x21'
     | Term e            -> W.put '\x22'; exp e
-    | Bundle b          -> W.put '\x23'; int (List.length b); List.iter req b
+    | RestoreBundle b   -> W.put '\x23'; int (List.length b); List.iter req b
     | Pong              -> W.put '\xF0'
     | OK                -> W.put '\x00'
 end

@@ -289,8 +289,8 @@ and saltTele ctor ns p a b =
 
 let freshExp = salt Env.empty
 
-(* https://github.com/mortberg/cubicaltt/blob/hcomptrans/Eval.hs#L129
-   >This increases efficiency as it won’t trigger computation. *)
+(* Mörtberg: This increases efficiency as it won’t trigger computation. *)
+
 let rec swap i j = function
   | VLam (t, (x, g))     -> VLam (swap i j t, (x, g >> swap i j))
   | VPair (r, u, v)      -> VPair (r, swap i j u, swap i j v)
@@ -370,6 +370,7 @@ let extErr = function
 let extTraceback = function
   | Traceback (err, es) -> (err, es)
   | err                 -> (err, [])
+
 let rec exp_support acc = function
   | EVar x               -> IdentSet.add x acc
   | ELam (a, (p, b))     -> exp_support (exp_support acc a) b

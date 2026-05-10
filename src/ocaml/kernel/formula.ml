@@ -9,8 +9,7 @@ type conjunction = dir Conjunction.t
 
 module Disjunction = Set.Make(struct
   type t = conjunction
-  let compare = Conjunction.compare Dir.compare
-end)
+  let compare = Conjunction.compare Dir.compare end)
 type disjunction = Disjunction.t
 
 let negDir : dir -> dir = function

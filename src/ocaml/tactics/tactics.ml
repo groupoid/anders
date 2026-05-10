@@ -1,1 +1,0 @@
-let () = Decl.plugin := Some (fun p t v -> Expr.EKan Z.zero)

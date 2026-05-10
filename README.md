@@ -6,6 +6,8 @@
 
 <img src="https://tonpa.guru/stream/2019/img/Anders%20M%C3%B6rtberg.jpeg" width=600>
 
+Anders is a reincarnation of cubicaltt type checker in another basis.
+
 Setup
 -----
 

@@ -95,14 +95,28 @@ def iso-intro (A: U)
       star
     )
 
-def iso-single (A: U) : iso A A := ( id A, id A, (λ (x:A), <_>x), (λ (x:A), <_>x), ★)
-def J-iso (A B: U)  (P: Π (X: U) (i: iso A X), U) (r: P A (iso-single A)) (z: iso A B) : P B (mini-Elim A B (mini-Intro A B z))
+def J-iso (A B: U)  (P: Π (X: U) (i: iso A X), U) (r: P A (iso-intro A)) (z: iso A B) : P B (mini-Elim A B (mini-Intro A B z))
  := subst (Σ (X : U), equiv A X) (λ (w : Σ (X : U), equiv A X), P w.1 (mini-Elim A w.1 w.2))
           (A, idEquiv A) (B, mini-Intro A B z) (contrEquiv A B (mini-Intro A B z)) r
+
+{-
 
 def ind-Iso (A B: U)
     (C: Π (A B: U), iso A B → U)
     (d: C A A (iso-intro A))
   : Π (e: iso A B), C A B e
- := ?
+ := λ (e : iso A B),
+    (λ (w : Σ (X : U), equiv A X) (p : Path (Σ (X : U), equiv A X) (A, idEquiv A) w),
+       subst (Σ (X : U), iso A X) (λ (z : Σ (X : U), iso A X), C A z.1 z.2)
+         (A, iso-intro A) (B, e)
+         (<i> ( (p @ i).1,
+                comp (λ (j : I), iso A (p @ (i ∧ j) .1)) i
+                  (λ (j : I), [ (i = 0) → iso-intro A, (i = 1) → e ])
+                  (mini-Elim A (p @ i .1) (p @ i .2))
+              ))
+         d
+    ) (B, mini-Intro A B e) (contrEquiv A B (mini-Intro A B e))
+
+-}
+
  

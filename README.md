@@ -14,7 +14,41 @@ $ opam install anders
 ```
 
 ```shell
-$ anders check library/book.anders
+$ anders help preeval check library/book.anders help repl
+File “KGn.anders” checked.
+File “book.anders” checked.
+
+Anders Proof Assistant version 5.5.0
+Copyright © 2016–2026 Groupoid Infinity.
+
+ Home: https://homotopy.dev/
+ Use:
+
+    exec := anders | anders list
+    list := []     | comm list
+    comm := check <filename> | silent
+          | parse <filename> | trace
+          | lex <filename>   | girard
+          | preeval          | irrelevance
+          | repl             | help
+
+Anders Proof Assistant version 5.5.0
+Copyright © 2016–2026 Groupoid Infinity.
+
+For help type ‘:h’.
+
+> :h
+Available commands:
+  <statement> infer type and normalize statement
+  :q quit
+  :r restart
+  :save <file> save term to file <file>.bin
+  :load <file> load term from file <file>.bin
+  :bundle <pkg> <term1> ... <termN>  bundle multiple terms to <pkg>.bin
+  :h display this message
+
+Information about shell commands can be found at ‘:h’.
+>
 ```
 
 Syntax

@@ -1,7 +1,7 @@
 open Language.Prelude
 open Language.Spec
 open Term
-open Gen
+open Sequence
 open Rbv
 open Formula
 
@@ -187,7 +187,7 @@ let pathv v a b = VApp (VApp (VPathP v, a), b)
 
 let hcompval u = EApp (EApp (u, ezero), ERef eone)
 
-let ieq u v : bool = !Prefs.girard || u = v
+let ieq u v : bool = !Options.girard || u = v
 let freshDim () = let i = freshName "ι" in (i, EVar i, Var (i, VI))
 
 let vfst : value -> value = function
@@ -358,7 +358,6 @@ let rec swap i j = function
   | VSpoke (s, a, f, x) -> VSpoke (swap i j s, swap i j a, swap i j f, swap i j x)
   | VIndDisc (s, a, x, nc, nh, ns') -> VIndDisc (swap i j s, swap i j a, swap i j x, swap i j nc, swap i j nh, swap i j ns')
   | VJoin v              -> VJoin (swap i j v)
-
 
 and swapVar i j k = if i = k then j else k
 

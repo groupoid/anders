@@ -9,7 +9,7 @@ end
 
 module Encode (W : Writer) =
 struct
-  (* I think there should be more efficient way to do this *)
+
   let int64 n =
     for i = 0 to 7 do
       Int64.shift_right n (i * 8)

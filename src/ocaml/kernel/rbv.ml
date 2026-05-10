@@ -1,7 +1,6 @@
 open Language.Spec
 open Term
 
-(* Readback *)
 let rec rbV v = (*traceRbV v;*) match v with
   | VLam (t, g)          -> rbVTele eLam t g
   | VPair (r, u, v)      -> EPair (r, rbV u, rbV v)

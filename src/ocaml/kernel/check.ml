@@ -4,7 +4,7 @@ open Formula
 open Trace
 open Elab
 open Term
-open Gen
+open Sequence
 open Rbv
 
 let timeout = 6.0
@@ -40,7 +40,7 @@ let idtoeqv_cache_size = 1048576
 let idtoeqv_cache = Array.make idtoeqv_cache_size (Ident ("", 0L), VHole, VHole)
 
 let print_stats () =
-  if !Prefs.trace then
+  if !Options.trace then
     Printf.printf "App Cache: %d hits, %d misses | Trans Cache: %d hits, %d misses | Conv Cache: %d hits, %d misses\n%!"
       !app_hits !app_misses !trans_hits !trans_misses !conv_hits !conv_misses
 
@@ -62,7 +62,6 @@ let mem i v = IdentSet.mem i (get_support v)
 let is_constant_clos (p, f) =
   let v = f (Var (p, VI)) in
   not (IdentSet.mem p (get_support v))
-
 
 let is_constant_motive = function
   | VLam (_, clos) -> is_constant_clos clos
@@ -955,7 +954,7 @@ and evalSystem ctx = bimap (getRho ctx) (fun mu t -> eval (faceEnv mu ctx) t)
 and appFormulaE ctx e i = eval ctx (EAppFormula (e, i))
 
 and inferV v = traceInferV v; match v with
-  | VPi (t, (x, f)) -> inferVTele (if !Prefs.impredicativity then impred else imax) t x f
+  | VPi (t, (x, f)) -> inferVTele (if !Options.impredicativity then impred else imax) t x f
   | VSig (t, (x, f)) | W (t, (x, f)) -> inferVTele imax t x f
   | VLam (t, (x, f)) -> VPi (t, (x, fun x -> inferV (f x)))
   | VPLam (VLam (VI, (_, g))) -> let t = VLam (VI, (freshName "ι", g >> inferV)) in
@@ -1107,8 +1106,6 @@ and updTerm alpha = function
 and faceEnv alpha ctx =
   Env.map (fun (p, te, t, v) -> if p = Local then (p, updTerm alpha te, updTerm alpha t, updTerm alpha v) else (p, te, t, v)) ctx
   |> Env.fold (fun p dir -> Env.add p (Local, Exp EHole, Value VI, Value (VDir dir))) alpha
-
-
 
 and act rho v =
   if Env.is_empty rho then v else
@@ -1288,7 +1285,6 @@ and act_system rho ts =
   let ts' = bimap (actVar rho) (fun mu -> upd mu >> act rho) ts in
   if ts == ts' then ts else ts'
 
-
 and actVar rho i = match Env.find_opt i rho with
   | Some v -> v
   | None   -> Var (i, VI)
@@ -1399,8 +1395,8 @@ and convProofIrrel v1 v2 =
   try match inferV v1, inferV v2 with
     (* Id A a b is proof-irrelevant *)
     | VApp (VApp (VId t1, a1), b1), VApp (VApp (VId t2, a2), b2) -> conv t1 t2 && conv a1 a2 && conv b1 b2
-    | VEmpty, VEmpty -> !Prefs.irrelevance
-    | VUnit, VUnit -> !Prefs.irrelevance
+    | VEmpty, VEmpty -> !Options.irrelevance
+    | VUnit, VUnit -> !Options.irrelevance
     | t1, t2 when is_isContr_type t1 && conv t1 t2 -> true
     | _, _ -> false
   with _ -> false
@@ -1468,7 +1464,7 @@ and checkOverlapping ctx ts =
 and infer ctx e : value = traceInfer e; match e with
   | EVar x -> lookup ctx x
   | EKan u -> VKan (Z.succ u)
-  | EPi (a, (p, b)) -> inferTele ctx (if !Prefs.impredicativity then impred else imax) p a b
+  | EPi (a, (p, b)) -> inferTele ctx (if !Options.impredicativity then impred else imax) p a b
   | ESig (a, (p, b)) | EW (a, (p, b)) -> inferTele ctx imax p a b
   | ELam (a, (p, b)) -> inferLam ctx p a b
   | EPLam (ELam (EI, (i, e))) ->
@@ -1665,8 +1661,7 @@ and inferLam ctx p a e =
 
 and inferPath ctx p =
   let (_, t0, t1) = extPathP (infer ctx p) in
-  (* path cannot connect different universes,
-     so if one endpoint is in U, then so other *)
+  (* path cannot connect different universes, so if one endpoint is in U, then so other *)
   let k = extSet (inferV t0) in implv t0 (implv t1 (VKan k))
 
 and inferTransport ctx p i =

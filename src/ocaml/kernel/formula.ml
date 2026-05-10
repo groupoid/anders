@@ -2,7 +2,7 @@ open Language.Prelude
 open Language.Spec
 open Term
 open Rbv
-open Gen
+open Sequence
 
 module Conjunction = Env
 type conjunction = dir Conjunction.t

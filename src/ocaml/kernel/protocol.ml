@@ -23,7 +23,7 @@ let showIdent = function
   | Ident (xs, n) -> xs ^ showSubscript (Z.of_int64 n)
 
 let rollup ctx e = rbV (eval ctx e)
-let getTerm e = if !Prefs.preeval then Value (eval !ctx e) else Exp e
+let getTerm e = if !Options.preeval then Value (eval !ctx e) else Exp e
 let assign x te t e =
   if not (List.mem x !history) then history := x :: !history;
   ctx := Env.add (ident x) (Global, Exp te, Value t, getTerm e) !ctx
@@ -79,11 +79,11 @@ let get_bundle ctx targets =
   in
   let sorted = List.sort (fun x y -> compare (pos x) (pos y)) res in
   let config = [
-    Set ("girard", if !Prefs.girard then "tt" else "ff");
-    Set ("preeval", if !Prefs.preeval then "true" else "false");
-    Set ("irrelevance", if !Prefs.irrelevance then "tt" else "ff");
-    Set ("impredicativity", if !Prefs.impredicativity then "tt" else "ff");
-    Set ("gidx", Int64.to_string !Gen.gidx)
+    Set ("girard", if !Options.girard then "tt" else "ff");
+    Set ("preeval", if !Options.preeval then "true" else "false");
+    Set ("irrelevance", if !Options.irrelevance then "tt" else "ff");
+    Set ("impredicativity", if !Options.impredicativity then "tt" else "ff");
+    Set ("gidx", Int64.to_string !Sequence.gidx)
   ] in
   config @ sorted
 
@@ -95,8 +95,7 @@ let rec proto : req -> resp = function
     ignore (extSet (infer !ctx t)); check !ctx (freshExp e0) (eval !ctx t); OK)
   | Infer e            -> promote (fun () -> Term (rbV (infer !ctx (freshExp e))))
   | Eval e             -> promote (fun () -> Term (rbV (eval !ctx (freshExp e))))
-  | Conv (e1, e2)      -> promote (fun () -> Bool (conv (eval !ctx (freshExp e1))
-                                                         (eval !ctx (freshExp e2))))
+  | Conv (e1, e2)      -> promote (fun () -> Bool (conv (eval !ctx (freshExp e1)) (eval !ctx (freshExp e2))))
   | Rollup e           -> promote (fun () -> Term (rollup !ctx (freshExp e)))
   | RestoreBundle xs   -> List.iter (fun r -> ignore (proto r)) xs; OK
   | SaveBundle xs      -> promote (fun () -> RestoreBundle (get_bundle !ctx xs))
@@ -118,12 +117,12 @@ let rec proto : req -> resp = function
   | Wipe               -> history := []; ctx := Env.empty; OK
   | Set (p, x)         ->
   begin match p with
-    | "trace"           -> promote (fun () -> Prefs.trace           := getBoolVal p x; OK)
-    | "preeval"         -> promote (fun () -> Prefs.preeval         := getBoolVal p x; OK)
-    | "girard"          -> promote (fun () -> Prefs.girard          := getUnitVal p x; OK)
-    | "irrelevance"     -> promote (fun () -> Prefs.irrelevance     := getUnitVal p x; OK)
-    | "impredicativity" -> promote (fun () -> Prefs.impredicativity := getUnitVal p x; OK)
-    | "gidx"            -> promote (fun () -> Gen.gidx := max !Gen.gidx (Int64.of_string x); OK)
+    | "trace"           -> promote (fun () -> Options.trace           := getBoolVal p x; OK)
+    | "preeval"         -> promote (fun () -> Options.preeval         := getBoolVal p x; OK)
+    | "girard"          -> promote (fun () -> Options.girard          := getUnitVal p x; OK)
+    | "irrelevance"     -> promote (fun () -> Options.irrelevance     := getUnitVal p x; OK)
+    | "impredicativity" -> promote (fun () -> Options.impredicativity := getUnitVal p x; OK)
+    | "gidx"            -> promote (fun () -> Sequence.gidx := max !Sequence.gidx (Int64.of_string x); OK)
     | _                 -> Error (InvalidOpt p)
   end
   | Version            -> Version (1L, 3L, 0L)

@@ -42,8 +42,6 @@ module System = Map.Make(Face)
 
 type tag = (string option) ref
 
-(* Language Expressions *)
-
 type exp =
   | EPre of Z.t | EKan of Z.t                                                          (* cosmos *)
   | EVar of ident | EHole                                                           (* variables *)
@@ -89,57 +87,57 @@ let prod a b = ESig (a, (Irrefutable, b))
 
 type req =
   (* checker & evaluator *)
-  | Check  of exp * exp
-  | Infer  of exp
-  | Eval   of exp
-  | Conv   of exp * exp
-  | Rollup of exp
-  | RestoreBundle of req list
-  | SaveBundle of req list
+  | Check             of exp * exp
+  | Infer             of exp
+  | Eval              of exp
+  | Conv              of exp * exp
+  | Rollup            of exp
+  | RestoreBundle     of req list
+  | SaveBundle        of req list
   (* context *)
-  | Def    of string * exp * exp
-  | Assign of string * exp * exp
-  | Assume of string * exp
-  | Erase  of string
+  | Def               of string * exp * exp
+  | Assign            of string * exp * exp
+  | Assume            of string * exp
+  | Erase             of string
   | Wipe
   (* configuration *)
-  | Set    of string * string
+  | Set               of string * string
   | Version
   | Ping
 
 type error =
-  | Unknown          of string
-  | Ineq             of exp * exp
-  | ExpectedPi       of exp
-  | ExpectedSig      of exp
-  | ExpectedType     of exp
-  | ExpectedKan      of exp
-  | ExpectedPath     of exp
-  | ExpectedSubtype  of exp
-  | ExpectedSystem   of exp
-  | ExpectedConj     of exp
-  | ExpectedIm       of exp
-  | ExpectedInf      of exp
-  | ExpectedFla      of exp
-  | ExpectedFlaUnit  of exp
+  | Unknown           of string
+  | Ineq              of exp * exp
+  | ExpectedPi        of exp
+  | ExpectedSig       of exp
+  | ExpectedType      of exp
+  | ExpectedKan       of exp
+  | ExpectedPath      of exp
+  | ExpectedSubtype   of exp
+  | ExpectedSystem    of exp
+  | ExpectedConj      of exp
+  | ExpectedIm        of exp
+  | ExpectedInf       of exp
+  | ExpectedFla       of exp
+  | ExpectedFlaUnit   of exp
   | ExpectedFlaCounit of exp
-  | ExpectedGlue     of exp
-  | ExpectedSup      of exp
-  | DNFSolverError   of exp * dir
-  | AlreadyDeclared  of string
-  | VariableNotFound of ident
-  | InferError       of exp
-  | Traceback        of error * (exp * exp) list
-  | InvalidOpt       of string
-  | InvalidOptValue  of string * string
+  | ExpectedGlue      of exp
+  | ExpectedSup       of exp
+  | DNFSolverError    of exp * dir
+  | AlreadyDeclared   of string
+  | VariableNotFound  of ident
+  | InferError        of exp
+  | Traceback         of error * (exp * exp) list
+  | InvalidOpt        of string
+  | InvalidOptValue   of string * string
 
 type resp =
-  | Version of int64 * int64 * int64
-  | Trace   of string * exp list
-  | Hole    of exp * (ident * exp) list
-  | Error   of error
-  | Bool    of bool
-  | Term    of exp
-  | RestoreBundle of req list
+  | Version           of int64 * int64 * int64
+  | Trace             of string * exp list
+  | Hole              of exp * (ident * exp) list
+  | Error             of error
+  | Bool              of bool
+  | Term              of exp
+  | RestoreBundle     of req list
   | Pong
   | OK

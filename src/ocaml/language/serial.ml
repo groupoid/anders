@@ -32,18 +32,18 @@ let recvTerm = function
   | Error err     -> raise (Kernel err)
   | r             -> showResp r; raise ProtocolViolation
 
-let eval e  = recvTerm (Kernel.Chm.proto (Eval e))
-let infer e = recvTerm (Kernel.Chm.proto (Infer e))
+let eval e  = recvTerm (Kernel.Protocol.proto (Eval e))
+let infer e = recvTerm (Kernel.Protocol.proto (Infer e))
 
-let def p t e = over (Kernel.Chm.proto (Def (p, t, e)))
-let assign p t e = over (Kernel.Chm.proto (Assign (p, t, e)))
-let assume p t = over (Kernel.Chm.proto (Assume (p, t)))
+let def p t e = over (Kernel.Protocol.proto (Def (p, t, e)))
+let assign p t e = over (Kernel.Protocol.proto (Assign (p, t, e)))
+let assume p t = over (Kernel.Protocol.proto (Assume (p, t)))
 
-let set p x = over (Kernel.Chm.proto (Set (p, x)))
-let wipe () = over (Kernel.Chm.proto Wipe)
+let set p x = over (Kernel.Protocol.proto (Set (p, x)))
+let wipe () = over (Kernel.Protocol.proto Wipe)
 
 let save filename targets =
-  let b = match Kernel.Chm.proto (SaveBundle (List.map (fun (x, e) -> Def (x, EHole, e)) targets)) with
+  let b = match Kernel.Protocol.proto (SaveBundle (List.map (fun (x, e) -> Def (x, EHole, e)) targets)) with
     | RestoreBundle b -> b | Error err -> raise (Kernel err) | _ -> raise ProtocolViolation
   in
   let oc = open_out_bin filename in
@@ -61,7 +61,7 @@ let load filename =
     let getn n = really_input_string ic (Int64.to_int n)
   end) in
   let b = R.req () in close_in ic;
-  over (Kernel.Chm.proto b);
+  over (Kernel.Protocol.proto b);
   match b with
   | RestoreBundle xs ->
     let rec find = function

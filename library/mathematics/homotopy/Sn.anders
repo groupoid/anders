@@ -99,8 +99,8 @@ def S¹→SuspBool : S¹ → 𝚺 𝟐
 
 def S¹→SuspBool→S¹-loop
   : PathP (<i> Path S¹ (SuspBool→S¹ (S¹→SuspBool (loopS1 @ i))) (loopS1 @ i)) (idp S¹ baseS1) (idp S¹ baseS1)
- := <i j> hfill S¹ (∂ i) (λ (k : I), 
-    [ (i = 0) → baseS1, 
+ := <i j> hfill S¹ (∂ i) (λ (k : I),
+    [ (i = 0) → baseS1,
       (i = 1) → baseS1 ]) (inc S¹ (∂ i) (loopS1 @ i)) -j
 
 def S¹→SuspBool→S¹ (x : S¹) : Path S¹ (SuspBool→S¹ (S¹→SuspBool x)) x

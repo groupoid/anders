@@ -18,7 +18,5 @@ def pair-second (A B : U) (X : pair A B) : B := X.second
 def not : 𝟐 → 𝟐 := ind₂ (λ (_ : 𝟐), 𝟐) 1₂ 0₂
 def and : 𝟐 → 𝟐 → 𝟐 := ind₂ (λ (_ : 𝟐), 𝟐 → 𝟐) (const 𝟐 𝟐 false) (idfun 𝟐)
 def or : 𝟐 → 𝟐 → 𝟐 := ind₂ (λ (_ : 𝟐), 𝟐 → 𝟐) (idfun 𝟐) (const 𝟐 𝟐 true)
-
 def zarith : U₈₈₈₈₈₈₈₈₈₈₈₈₈₈₁₈₄₄₆₇₄₄₀₇₃₇₀₉₅₅₁₆₁₅ := U₈₈₈₈₈₈₈₈₈₈₈₈₈₈₁₈₄₄₆₇₄₄₀₇₃₇₀₉₅₅₁₆₁₄
-
 def hole (A B C X Y Z : U) (a : A) (b : B) (x : X) : Y := ?

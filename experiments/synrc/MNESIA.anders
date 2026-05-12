@@ -1,5 +1,7 @@
+-- https://mnesia.n2o.dev
+
 module MNESIA where
-import experiments/BASE
+import experiments/synrc/BASE
 
 axiom all : IO (List TableId)
 axiom browse : IO String

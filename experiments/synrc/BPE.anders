@@ -1,5 +1,7 @@
+-- https://bpe.n2o.dev
+
 module BPE where
-import experiments/BASE
+import experiments/synrc/BASE
 
 axiom start : Proc -> IO Sup
 axiom stop : String -> IO Sup

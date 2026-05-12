@@ -1,5 +1,7 @@
+-- https://nitro.n2o.dev
+
 module NITRO where
-import experiments/BASE
+import experiments/synrc/BASE
 
 axiom q : Π (k: U), Atom -> k
 axiom qc : Π (k: U), Atom -> k

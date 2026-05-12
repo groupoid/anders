@@ -93,3 +93,15 @@ def hcomp-ℕ-succ (r : I) (u : I → Partial ℕ r) (u₀ : ℕ [r ↦ u 0]) : 
 def hcomp-ℕ-succ-is-correct (r : I) (u : I → Partial ℕ r) (u₀ : ℕ [r ↦ u 0])
   : Path ℕ (hcomp ℕ r (λ (k : I), [(r = 1) → succ (u k 1=1)]) (succ (ouc u₀))) (hcomp-ℕ-succ r u u₀)
  := <_> hcomp-ℕ-succ r u u₀
+
+definition N0 : ℕ := zero
+definition N1 : ℕ := succ N0
+definition N2 : ℕ := succ N1
+definition N3 : ℕ := succ N2
+definition N4 : ℕ := succ N3
+definition N5 : ℕ := succ N4
+definition N6 : ℕ := succ N5
+definition N7 : ℕ := succ N6
+definition N8 : ℕ := succ N7
+definition N9 : ℕ := succ N8
+definition N10 : ℕ := succ N9

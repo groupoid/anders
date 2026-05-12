@@ -5,6 +5,8 @@ import library/foundations/univalent/equiv
 import library/foundations/univalent/extensionality
 
 {-
+   Axiomatic Definition of Sharp Modality ♯
+
    References:
      [Shulman 2015]  Brouwer's fixed-point theorem in real-cohesive HoTT
                      https://arxiv.org/abs/1509.07584
@@ -28,10 +30,10 @@ axiom sharp-β (A : U) (B : sharp A → U) (Bm : Π (x : sharp A), is-sharp-moda
 -- uniqueness
 axiom sharp-path-modal (B : U) (Bm : is-sharp-modal B) (b0 b1 : B) : is-sharp-modal (Path B b0 b1)
 def sharp-unique-ptwise (A B : U) (Bm : is-sharp-modal B) (g h : sharp A → B)
-  (e : Π (a : A), Path B (g (sharp-unit A a)) (h (sharp-unit A a))) : Π (x : sharp A), Path B (g x) (h x)
+    (e : Π (a : A), Path B (g (sharp-unit A a)) (h (sharp-unit A a))) : Π (x : sharp A), Path B (g x) (h x)
  := sharp-ind A (λ (x : sharp A), Path B (g x) (h x)) (λ (x : sharp A), sharp-path-modal B Bm (g x) (h x)) e
 def sharp-η (A B : U) (Bm : is-sharp-modal B) (g h : sharp A → B)
-  (e : Π (a : A), Path B (g (sharp-unit A a)) (h (sharp-unit A a))) : Path (sharp A → B) g h
+    (e : Π (a : A), Path B (g (sharp-unit A a)) (h (sharp-unit A a))) : Path (sharp A → B) g h
  := piext (sharp A) (λ (_ : sharp A), B) g h (sharp-unique-ptwise A B Bm g h e)
 
 -- structural properties

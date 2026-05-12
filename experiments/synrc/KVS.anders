@@ -1,5 +1,7 @@
+-- https://kvs.n2o.dev
+
 module KVS where
-import experiments/BASE
+import experiments/synrc/BASE
 
 axiom get : Π (f k v: U), f -> k -> IO (Maybe v)
 axiom put : Π (r: U), r -> IO StoreResult

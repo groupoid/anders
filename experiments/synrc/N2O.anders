@@ -1,5 +1,7 @@
+-- https://ws.n2o.dev
+
 module N2O where
-import experiments/BASE
+import experiments/synrc/BASE
 
 axiom pickle : Binary -> Binary
 axiom depickle : Binary -> Binary

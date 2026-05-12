@@ -12,9 +12,11 @@ def quot (A : U) (R : A → A → U) : U
  := coeq (Σ (x y : A), R x y) A (λ (p : Σ (x y : A), R x y), p.1) (λ (p : Σ (x y : A), R x y), p.2.1)
 
 def quot₁ (A : U) (R : A → A → U) (a : A)
+  : coeq (Σ (x y : A), R x y) A (λ (p : Σ (x y : A), R x y), p.1) (λ (p : Σ (x y : A), R x y), p.2.1)
  := iota (Σ (x y : A), R x y) A (λ (p : Σ (x y : A), R x y), p.1) (λ (p : Σ (x y : A), R x y), p.2.1) a
 
 def quot₂ (A : U) (R : A → A → U) (x y : A) (r : R x y)
+  : Path (quot A R) (quot₁ A R x) (quot₁ A R y)
  := <i> resp′ (Σ (x y : A), R x y) A (λ (p : Σ (x y : A), R x y), p.1) (λ (p : Σ (x y : A), R x y), p.2.1) (x, (y, r)) @ i
 
 def quot-ind (A : U) (R : A → A → U) (X : quot A R → U) (nPoint : Π (a : A), X (quot₁ A R a))
@@ -24,12 +26,13 @@ def quot-ind (A : U) (R : A → A → U) (X : quot A R → U) (nPoint : Π (a : 
 
 def quot-β₁ (A : U) (R : A → A → U) (X : quot A R → U) (nPoint : Π (a : A), X (quot₁ A R a))
     (nPath : Π (x y : A) (r : R x y), PathP (<i> X (quot₂ A R x y r @ i)) (nPoint x) (nPoint y)) (a : A)
+  : Path (X (quot₁ A R a)) (nPoint a) (nPoint a)
  := idp (X (quot₁ A R a)) (nPoint a)
 
-def quot-β₂ (A : U) (R : A → A → U) (X : quot A R → U)
-      (nPoint : Π (a : A), X (quot₁ A R a))
-      (nPath : Π (x y : A) (r : R x y), PathP (<i> X (quot₂ A R x y r @ i)) (nPoint x) (nPoint y)) (x y : A) (r : R x y)
- := idp (PathP (<i> X (quot₂ A R x y r @ i)) (nPoint x) (nPoint y)) (nPath x y r)
+def quot-β₂ (A : U) (R : A → A → U) (X : quot A R → U) (nPoint : Π (a : A), X (quot₁ A R a))
+    (nPath : Π (x y : A) (r : R x y), PathP (<i> X (quot₂ A R x y r @ i)) (nPoint x) (nPoint y)) (x y : A) (r : R x y)
+  : Path (PathP (<i> X (quot₂ A R x y r @ i)) (nPoint x) (nPoint y)) (nPath x y r) (nPath x y r)
+ := idp  (PathP (<i> X (quot₂ A R x y r @ i)) (nPoint x) (nPoint y)) (nPath x y r)
 
 def quot-η (A : U) (R : A → A → U) (X : quot A R → U) (h : Π (z : quot A R), X z)
  := idp (Π (z : quot A R), X z) h

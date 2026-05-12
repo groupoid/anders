@@ -131,15 +131,15 @@ and eval ctx e0 = burn (); traceEval e0; match e0 with
   | EFlaUnit e           -> flaunit (eval ctx e)
   | EFlaCounit e         -> flacounit (eval ctx e)
   | EIndFla (a, b)       -> VIndFla (eval ctx a, eval ctx b)
-  | ECoequ (a, b, f, g)  -> VCoequ (eval ctx a, eval ctx b, eval ctx f, eval ctx g)
-  | EIota2 (a, b, f, g, c) -> VIota2 (eval ctx a, eval ctx b, eval ctx f, eval ctx g, eval ctx c)
-  | EResp (a, b, f, g, c) -> VResp (eval ctx a, eval ctx b, eval ctx f, eval ctx g, eval ctx c)
-  | EIndCoequ (a, b, f, g, x, i, rho) -> VIndCoequ (eval ctx a, eval ctx b, eval ctx f, eval ctx g, eval ctx x, eval ctx i, eval ctx rho)
-  | EDisc (s, a) -> VDisc (eval ctx s, eval ctx a)
-  | EBase (s, a, x) -> VBase (eval ctx s, eval ctx a, eval ctx x)
-  | EHub (s, a, f) -> VHub (eval ctx s, eval ctx a, eval ctx f)
-  | ESpoke (s, a, f, x) -> VSpoke (eval ctx s, eval ctx a, eval ctx f, eval ctx x)
-  | EIndDisc (s, a, x, nc, nh, ns') -> VIndDisc (eval ctx s, eval ctx a, eval ctx x, eval ctx nc, eval ctx nh, eval ctx ns')
+  | ECoequ (a, b, f, g)                -> VCoequ (eval ctx a, eval ctx b, eval ctx f, eval ctx g)
+  | EIota2 (a, b, f, g, c)             -> VIota2 (eval ctx a, eval ctx b, eval ctx f, eval ctx g, eval ctx c)
+  | EResp (a, b, f, g, c)              -> VResp (eval ctx a, eval ctx b, eval ctx f, eval ctx g, eval ctx c)
+  | EIndCoequ (a, b, f, g, x, i, rho)  -> VIndCoequ (eval ctx a, eval ctx b, eval ctx f, eval ctx g, eval ctx x, eval ctx i, eval ctx rho)
+  | EDisc (s, a)                       -> VDisc (eval ctx s, eval ctx a)
+  | EBase (s, a, x)                    -> VBase (eval ctx s, eval ctx a, eval ctx x)
+  | EHub (s, a, f)                     -> VHub (eval ctx s, eval ctx a, eval ctx f)
+  | ESpoke (s, a, f, x)                -> VSpoke (eval ctx s, eval ctx a, eval ctx f, eval ctx x)
+  | EIndDisc (s, a, x, nc, nh, ns')    -> VIndDisc (eval ctx s, eval ctx a, eval ctx x, eval ctx nc, eval ctx nh, eval ctx ns')
 
 and appFormula v x = match v with
   | VPLam f -> app (f, x)
@@ -1302,7 +1302,6 @@ and conv_internal v1 v2 =
     | VGlue v, VGlue u -> u == v || conv u v
     | VGlueElem (r1, u1, a1), VGlueElem (r2, u2, a2) -> (r1 == r2 || r1 = r2) && (u1 == u2 || conv u1 u2) && (a1 == a2 || conv a1 a2)
     | VUnglue (r1, u1, a1), VUnglue (r2, u2, a2) -> (r1 == r2 || r1 = r2) && (u1 == u2 || conv u1 u2) && (a1 == a2 || conv a1 a2)
-
     | VEmpty, VEmpty -> true
     | VIndEmpty u, VIndEmpty v -> conv u v
     | VUnit, VUnit -> true

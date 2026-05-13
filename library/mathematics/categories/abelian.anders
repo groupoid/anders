@@ -5,6 +5,8 @@ module abelian where
 import library/mathematics/categories/category
 import library/mathematics/homotopy/truncation
 
+option girard true
+
 -- David Elinder Master Thesis
 -- Investigating Abelian categories in univalent type theory
 -- Supervisor: Thierry Coquand
@@ -79,3 +81,5 @@ def isAbelian (C: precategory): U₁
       Π (B S: C.1.1) (k: C.1.2 B S),
       ‖_‖₋₁ (Σ (A: C.1.1) (f: C.1.2 A B),
                isCokernel C zero A B S f k)
+
+option girard false

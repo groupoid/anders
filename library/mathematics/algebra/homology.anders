@@ -115,7 +115,7 @@ def trivabgrouphom (G H : abgroup) : abgrouphom G H
 
 def succ2 (n : ℕ) : ℕ := succ (succ n)
 
-def chainComplex : U
+def chainComplex : U₁
  := Σ (K : ℕ -> abgroup) (hom : Π (n : ℕ), abgrouphom (K (succ n)) (K n)),
     Π (n : ℕ), Path (abgrouphom (K (succ2 n)) (K n))
       (abgrouphomcomp (K (succ2 n)) (K (succ n)) (K n) (hom (succ n)) (hom n))

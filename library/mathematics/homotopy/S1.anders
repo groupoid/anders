@@ -26,6 +26,8 @@ def S1-η  (X : S¹ → U) (h : Π (z : S¹), X z)                              
 
 --- [Sokhatsky] 2022
 
+option girard true
+
 def Loop₀ : U := PathP (<_>𝟐) false false
 def Rec : 𝟐 -> U := 2-rec U 𝟎 Loop₀
 def WS¹ : U := W (x : 𝟐), Rec x
@@ -48,3 +50,6 @@ def WS¹-rec (C : U) (b : C) (l : WS¹ → C → C) : WS¹ → C                
 def WS¹-β₁  (C : WS¹ → U) (b : C Wbase) (l : Π (w : WS¹), C w → C (Wloop w))               := idp (C Wbase) b
 def WS¹-β₂  (C : WS¹ → U) (b : C Wbase) (l : Π (w : WS¹), C w → C (Wloop w)) (w : WS¹)     := idp (C (Wloop w)) (l w (WS¹-ind C b l w))
 def WS¹-η   (C : WS¹ → U) (h : Π (w : WS¹), C w)                                           := idp (Π (w : WS¹), C w) h
+
+option girard false
+

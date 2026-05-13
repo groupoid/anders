@@ -12,6 +12,8 @@ import library/mathematics/homotopy/S1
 import library/mathematics/homotopy/suspension
 import library/mathematics/homotopy/constcubes
 
+option girard true
+
 -- 1. Prerequisites (Prop Is Equiv and Equiv Path)
 def propIsEquiv (A B : U) (f : A → B) : isProp (isEquiv A B f)
  := propPi B (λ (y : B), isContr (fiber A B f y)) (λ (y : B), propIsContr (fiber A B f y))
@@ -37,3 +39,5 @@ def TH1 : U := Σ (c : 𝚺 S¹), H1 c
 def test_mu_base : equiv S¹ S¹ := mu baseS1
 def test_H1_base : U := H1 (𝜎₁ S¹)
 def test_mu_loop (i : I) : equiv S¹ S¹ := mu (loopS1 @ i)
+
+option girard false

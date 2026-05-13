@@ -13,6 +13,8 @@ import library/mathematics/homotopy/S1
 import library/foundations/mltt/bool
 import library/foundations/univalent/path
 
+option girard true
+
 -- 1) Formation Rule
 def sphere : ℕ → U := ℕ-iter U 𝟐 𝚺
 def Sn (n : ℕ) : U := sphere n
@@ -106,3 +108,5 @@ def S¹→SuspBool→S¹-loop
 def S¹→SuspBool→S¹ (x : S¹) : Path S¹ (SuspBool→S¹ (S¹→SuspBool x)) x
  := S1-ind (λ (y : S¹), Path S¹ (SuspBool→S¹ (S¹→SuspBool y)) y) (idp S¹ baseS1)
            S¹→SuspBool→S¹-loop x
+
+option girard false

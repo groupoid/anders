@@ -1,4 +1,14 @@
 module book where
+
+-- library default clean setup
+
+option girard false
+option impredicativity false
+option irrelevance false
+
+import library/foundations/logic/favonia
+import library/foundations/logic/kraus
+import library/foundations/logic/awodey
 import library/foundations/mltt/pi
 import library/foundations/mltt/sigma
 import library/foundations/mltt/inductive
@@ -21,9 +31,6 @@ import library/foundations/modal/infinitesimal
 import library/foundations/modal/modality
 import library/foundations/modal/sharp
 import library/foundations/modal/flat
-import library/foundations/logic/favonia
-import library/foundations/logic/kraus
-import library/foundations/logic/awodey
 import library/mathematics/algebra/algebra
 import library/mathematics/algebra/int
 import library/mathematics/algebra/homology

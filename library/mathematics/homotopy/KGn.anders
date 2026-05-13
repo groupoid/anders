@@ -10,6 +10,8 @@ import library/mathematics/homotopy/Sn
 import library/mathematics/homotopy/loop
 import library/mathematics/homotopy/KG1
 
+option girard true
+
 --- K-step: K(G, n+1) = || Σ K(G, n) ||_{n+1}
 --- For k=0 (n=1), we use the K(G,1) construction from KG1.
 def K-step (G : abgroup) (k : nat) (prev : Pointed) : Pointed
@@ -44,3 +46,5 @@ def K-η (G : abgroup) (n : nat) (P : Π (k : nat), K G k → U) (h : Π (k : na
   : Path (Π (z : K G n), P n z) (h n) (λ (z : K G n), K-ind G n P (λ (g : G.1.1), h zero g) (λ (k : nat) (prev : Π (y : K G k), P k y) (y : K G (succ k)), h (succ k) y) z)
  := ind-nat (λ (k : nat), Path (Π (z : K G k), P k z) (h k) (λ (z : K G k), K-ind G k P (λ (g : G.1.1), h zero g) (λ (m : nat) (pr : Π (y : K G m), P m y) (y : K G (succ m)), h (succ m) y) z)) (<_> (h zero))
     (λ (k : nat) (prev : Path (Π (z : K G k), P k z) (h k) (λ (z : K G k), K-ind G k P (λ (g : G.1.1), h zero g) (λ (m : nat) (pr : Π (y : K G m), P m y) (y : K G (succ m)), h (succ m) y) z)), <_> (h (succ k))) n
+
+option girard false

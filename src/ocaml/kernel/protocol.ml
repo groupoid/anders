@@ -118,9 +118,9 @@ let rec proto : req -> resp = function
   begin match p with
     | "trace"           -> promote (fun () -> Options.trace           := getBoolVal p x; OK)
     | "preeval"         -> promote (fun () -> Options.preeval         := getBoolVal p x; OK)
-    | "girard"          -> promote (fun () -> Options.girard          := getUnitVal p x; OK)
+    | "girard"          -> promote (fun () -> Options.girard          := getBoolVal p x; OK)
     | "irrelevance"     -> promote (fun () -> Options.irrelevance     := getBoolVal p x; OK)
-    | "impredicativity" -> promote (fun () -> Options.impredicativity := getUnitVal p x; OK)
+    | "impredicativity" -> promote (fun () -> Options.impredicativity := getBoolVal p x; OK)
     | "gidx"            -> promote (fun () -> Sequence.gidx := max !Sequence.gidx (Int64.of_string x); OK)
     | _                 -> Error (InvalidOpt p)
   end

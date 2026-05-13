@@ -42,22 +42,29 @@ def Bundle=Pi (B : U) (F : B → U) (y : B)
 
 -- [Cherubini] 2018 Four Fiber Bundles
 
--- Definition (1) Dependent
-def isFBundle1 (B: U) (p: B → U) (F: U): U₁
- := Σ (_: Π (b: B), isContr (PathP (<_>U) (p b) F)), (Π (x: Sigma B p), B)
+-- Definition (1) Non-Dependent
+def isFBundle1 (E B: U) (p: E → B) (F: U): U₁
+ := Σ (X: U) (v: surjective X B) (v': prod X F → E), pullbackSq (prod X F) E X B p v.1 v' (λ (x: prod X F), x.1)
 
--- Definition (2) Dependent
-def isFBundle2 (B: U) (p: B → U) (F: U): U
- := Σ (v: U) (w: surjective v B), (Π (x: v), PathP (<_>U) (p (w.1 x)) F)
+option girard true
 
--- Definition (3) Non-Dependent
+-- Definition (2) Non-Dependent
 def im₁ (A B: U) (f: A → B): U := Σ (b: B), ‖_‖₋₁ (Π (a : A), Path B (f a) b)
 def BAut (F: U): U := im₁ 𝟏 U (λ (x: 𝟏), F)
 def 𝟏-Im₁ (A B: U) (f: A → B): im₁ A B f → B := λ (x : im₁ A B f), x.1
 def 𝟏-BAut (F: U): BAut F → U := 𝟏-Im₁ 𝟏 U (λ (x: 𝟏), F)
 def classify (E: U) (A' A: U) (E': A' → U) (E: A → U) (f: A' → A): U := Π(x: A'), Path U (E'(x)) (E(f(x)))
-def isFBundle3 (E B: U) (p: E → B) (F: U): U₁ := Σ (X: B → BAut F), classify E B (BAut F) (λ (b: B), fiber E B p b) (𝟏-BAut F) X
+def isFBundle2 (E B: U) (p: E → B) (F: U): U₁ := Σ (X: B → BAut F), classify E B (BAut F) (λ (b: B), fiber E B p b) (𝟏-BAut F) X
 
--- Definition (4) Non-Dependent
-def isFBundle4 (E B: U) (p: E → B) (F: U): U₁
- := Σ (X: U) (v: surjective X B) (v': prod X F → E), pullbackSq (prod X F) E X B p v.1 v' (λ (x: prod X F), x.1)
+-- Definition (3) Dependent
+def isFBundle3 (B: U) (p: B → U) (F: U): U₁
+ := Σ (_: Π (b: B), isContr (PathP (<_>U) (p b) F)), (Π (x: Sigma B p), B)
+
+-- Definition (4) Dependent
+def isFBundle4 (B: U) (p: B → U) (F: U): U
+ := Σ (v: U) (w: surjective v B), (Π (x: v), PathP (<_>U) (p (w.1 x)) F)
+
+
+option girard false
+
+

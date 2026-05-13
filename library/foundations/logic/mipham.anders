@@ -1,6 +1,7 @@
 module mipham where
 import library/foundations/mltt/vec
-option irrelevance true
+
+option girard true
 
 --- Формальна філософія
 --- Theories Index

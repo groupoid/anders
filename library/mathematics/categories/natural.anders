@@ -32,3 +32,11 @@ def natiso (C D: precategory) (F G: catfunctor C D) : U
       (inv: nattrans C D G F)
       (idL: Π (x: C.C.ob), Path (D.C.hom (F.ob x) (F.ob x)) (D.P.∘ (F.ob x) (G.ob x) (F.ob x) (η.η x) (inv.η x)) (D.P.id (F.ob x)))
       (idR: Π (x: C.C.ob), Path (D.C.hom (G.ob x) (G.ob x)) (D.P.∘ (G.ob x) (F.ob x) (G.ob x) (inv.η x) (η.η x)) (D.P.id (G.ob x))), unit
+
+def opNatTrans (C D: precategory) (F G: catfunctor C D) (α: nattrans C D F G)
+  : nattrans (catᵒᵖ C) (catᵒᵖ D) (catᵒᵖF C D G) (catᵒᵖF C D F)
+ := (α.η, λ (x y: C.C.ob) (h: C.C.hom y x), <i> α.commute y x h @ -i, star)
+
+def opNatIso (C D: precategory) (F G: catfunctor C D) (α: natiso C D F G)
+  : natiso (catᵒᵖ C) (catᵒᵖ D) (catᵒᵖF C D G) (catᵒᵖF C D F)
+ := (opNatTrans C D F G α.1, opNatTrans C D G F α.2.1, α.2.2.2.1, α.2.2.1, star)

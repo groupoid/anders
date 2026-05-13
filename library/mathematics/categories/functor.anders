@@ -40,3 +40,9 @@ def compFunctor (A B C: precategory) (F: catfunctor A B) (G: catfunctor B C): ca
        (G.fcomp (F.ob x) (F.ob y) (F.ob z) (F.mor x y f) (F.mor y z g)), star)
 
 def compFunctor' (A B C: precategory) (F: catfunctor B C) (G: catfunctor A B): catfunctor A C := compFunctor A B C G F
+
+def catᵒᵖF (A B: precategory) (F: catfunctor A B) : catfunctor (catᵒᵖ A) (catᵒᵖ B)
+ := (F.ob,
+     λ (x y: A.C.ob) (h: A.C.hom y x), F.mor y x h,
+     λ (x: A.C.ob), F.id x,
+     λ (x y z: A.C.ob) (f: A.C.hom y x) (g: A.C.hom z y), F.fcomp z y x g f, star)

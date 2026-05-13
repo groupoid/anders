@@ -15,48 +15,48 @@ import library/mathematics/categories/functor
 def isNaturalTransformation
     (C D: precategory)
     (F G: catfunctor C D)
-    (eta: Π (x: C.C.ob), D.C.hom (F.ob x) (G.ob x)) : U
- := Π (x y: C.C.ob)
-      (h: C.C.hom x y),
-      Path (D.C.hom (F.ob x) (G.ob y))
-           (D.P.∘ (F.ob x) (F.ob y) (G.ob y) (F.mor x y h) (eta y))
-           (D.P.∘ (F.ob x) (G.ob x) (G.ob y) (eta x) (G.mor x y h))
+    (eta: Π (x: C.1.1), D.1.2 (F.ob x) (G.ob x)) : U
+ := Π (x y: C.1.1)
+      (h: C.1.2 x y),
+      Path (D.1.2 (F.ob x) (G.ob y))
+           (D.2.∘ (F.ob x) (F.ob y) (G.ob y) (F.mor x y h) (eta y))
+           (D.2.∘ (F.ob x) (G.ob x) (G.ob y) (eta x) (G.mor x y h))
 
 -- Natural transformation
 def nattrans (C D: precategory) (F G: catfunctor C D): U
- := Σ (η: Π (x: C.C.ob), D.C.hom (F.ob x) (G.ob x))
-      (commute: isNaturalTransformation C D F G η), unit
+ := Σ (η: Π (x: C.1.1), D.1.2 (F.ob x) (G.ob x)),
+      isNaturalTransformation C D F G η
 
 -- Natural Transformation Isomorphism
 -- Natural Transformation Isomorphism
 def natiso (C D: precategory) (F G: catfunctor C D) : U
  := Σ (η: nattrans C D F G)
       (inv: nattrans C D G F)
-      (idL: Π (x: C.C.ob), Path (D.C.hom (F.ob x) (F.ob x)) (D.P.∘ (F.ob x) (G.ob x) (F.ob x) (η.1 x) (inv.1 x)) (D.P.id (F.ob x)))
-      (idR: Π (x: C.C.ob), Path (D.C.hom (G.ob x) (G.ob x)) (D.P.∘ (G.ob x) (F.ob x) (G.ob x) (inv.1 x) (η.1 x)) (D.P.id (G.ob x))), unit
+      (idL: Π (x: C.1.1), Path (D.1.2 (F.ob x) (F.ob x)) (D.2.∘ (F.ob x) (G.ob x) (F.ob x) (η.1 x) (inv.1 x)) (D.2.id (F.ob x))),
+      Π (x: C.1.1), Path (D.1.2 (G.ob x) (G.ob x)) (D.2.∘ (G.ob x) (F.ob x) (G.ob x) (inv.1 x) (η.1 x)) (D.2.id (G.ob x))
 
 def idNatTrans (C D: precategory) (F: catfunctor C D) : nattrans C D F F
- := (λ (x: C.C.ob), D.P.id (F.ob x),
-     λ (x y: C.C.ob) (h: C.C.hom x y),
-     pcomp (D.C.hom (F.ob x) (F.ob y))
-           (D.P.∘ (F.ob x) (F.ob y) (F.ob y) (F.mor x y h) (D.P.id (F.ob y)))
+ := (λ (x: C.1.1), D.2.id (F.ob x),
+     λ (x y: C.1.1) (h: C.1.2 x y),
+     pcomp (D.1.2 (F.ob x) (F.ob y))
+           (D.2.∘ (F.ob x) (F.ob y) (F.ob y) (F.mor x y h) (D.2.id (F.ob y)))
            (F.mor x y h)
-           (D.P.∘ (F.ob x) (F.ob x) (F.ob y) (D.P.id (F.ob x)) (F.mor x y h))
-           (D.P.∘-right (F.ob x) (F.ob y) (F.mor x y h))
-           (<i> D.P.∘-left (F.ob x) (F.ob y) (F.mor x y h) @ -i), star)
+           (D.2.∘ (F.ob x) (F.ob x) (F.ob y) (D.2.id (F.ob x)) (F.mor x y h))
+           (D.2.∘-right (F.ob x) (F.ob y) (F.mor x y h))
+           (<i> D.2.∘-left (F.ob x) (F.ob y) (F.mor x y h) @ -i))
 
 def idNatIso (C D: precategory) (F: catfunctor C D) : natiso C D F F
  := (idNatTrans C D F, idNatTrans C D F,
-     λ (x: C.C.ob), D.P.id-id (F.ob x),
-     λ (x: C.C.ob), D.P.id-id (F.ob x), star)
+     λ (x: C.1.1), D.2.2.2.2.2.2.2.2 (F.ob x),
+     λ (x: C.1.1), D.2.2.2.2.2.2.2.2 (F.ob x))
 
 def opNatTrans (C D: precategory) (F G: catfunctor C D) (α: nattrans C D F G)
   : nattrans (catᵒᵖ C) (catᵒᵖ D) (catᵒᵖF C D G) (catᵒᵖF C D F)
- := (α.1, λ (x y: C.C.ob) (h: C.C.hom y x), <i> α.2.1 y x h @ -i, star)
+ := (α.1, λ (x y: C.1.1) (h: C.1.2 y x), <i> α.2 y x h @ -i)
 
 def symNatIso (C D: precategory) (F G: catfunctor C D) (α: natiso C D F G) : natiso C D G F
- := (α.2.1, α.1, α.2.2.2.1, α.2.2.1, star)
+ := (α.2.1, α.1, α.2.2.2, α.2.2.1)
 
 def opNatIso (C D: precategory) (F G: catfunctor C D) (α: natiso C D F G)
   : natiso (catᵒᵖ C) (catᵒᵖ D) (catᵒᵖF C D G) (catᵒᵖF C D F)
- := (opNatTrans C D F G α.1, opNatTrans C D G F α.2.1, α.2.2.2.1, α.2.2.1, star)
+ := (opNatTrans C D F G α.1, opNatTrans C D G F α.2.1, α.2.2.2, α.2.2.1)

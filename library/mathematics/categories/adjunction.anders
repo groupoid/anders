@@ -15,15 +15,15 @@ import library/mathematics/categories/natural
 def isAdjoint (C D: precategory) (L: catfunctor C D) (R: catfunctor D C): U := Σ
     (u: nattrans C C (idFunctor C) (compFunctor C D C L R))
     (c: nattrans D D (compFunctor D C D R L) (idFunctor D))
-    (zig: Π (A: C.C.ob), Path (D.C.hom (L.ob A) (L.ob A))
-        (D.P.∘ (L.ob A) (L.ob (R.ob (L.ob A))) (L.ob A) (L.mor A (R.ob (L.ob A)) (u.1 A)) (c.1 (L.ob A))) (D.P.id (L.ob A)))
-    (zag: Π (B: D.C.ob), Path (C.C.hom (R.ob B) (R.ob B))
-        (C.P.∘ (R.ob B) (R.ob (L.ob (R.ob B))) (R.ob B) (u.1 (R.ob B)) (R.mor (L.ob (R.ob B)) B (c.1 B))) (C.P.id (R.ob B))), unit
+    (zig: Π (A: C.1.1), Path (D.1.2 (L.ob A) (L.ob A))
+        (D.2.∘ (L.ob A) (L.ob (R.ob (L.ob A))) (L.ob A) (L.mor A (R.ob (L.ob A)) (u.1 A)) (c.1 (L.ob A))) (D.2.id (L.ob A))),
+    Π (B: D.1.1), Path (C.1.2 (R.ob B) (R.ob B))
+        (C.2.∘ (R.ob B) (R.ob (L.ob (R.ob B))) (R.ob B) (u.1 (R.ob B)) (R.mor (L.ob (R.ob B)) B (c.1 B))) (C.2.id (R.ob B))
 
 def Ladjunct (C D: precategory) (L: catfunctor C D) (R: catfunctor D C) (adj: isAdjoint C D L R)
-             (A: C.C.ob) (B: D.C.ob) (f: D.C.hom (L.ob A) B) : C.C.hom A (R.ob B)
- := C.P.∘ A (R.ob (L.ob A)) (R.ob B) (adj.1.1 A) (R.mor (L.ob A) B f)
+             (A: C.1.1) (B: D.1.1) (f: D.1.2 (L.ob A) B) : C.1.2 A (R.ob B)
+ := C.2.∘ A (R.ob (L.ob A)) (R.ob B) (adj.1.1 A) (R.mor (L.ob A) B f)
 
 def Radjunct (C D: precategory) (L: catfunctor C D) (R: catfunctor D C) (adj: isAdjoint C D L R)
-             (A: C.C.ob) (B: D.C.ob) (f: C.C.hom A (R.ob B)) : D.C.hom (L.ob A) B
- := D.P.∘ (L.ob A) (L.ob (R.ob B)) B (L.mor A (R.ob B) f) (adj.2.1.1 B)
+             (A: C.1.1) (B: D.1.1) (f: C.1.2 A (R.ob B)) : D.1.2 (L.ob A) B
+ := D.2.∘ (L.ob A) (L.ob (R.ob B)) B (L.mor A (R.ob B) f) (adj.2.1.1 B)

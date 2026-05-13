@@ -9,82 +9,79 @@ import library/foundations/univalent/extensionality
 -- | Functors from a small category C into the large category of sets SET.
 --   Manual definition to handle large target category SET.
 def catfunSET (C: precategory) : U₁ :=
-  Σ (ob: Π (x: C.C.ob), SET)
-    (mor: Π (x y: C.C.ob) (f: C.C.hom x y), (ob x).1 -> (ob y).1)
-    (id: Π (x: C.C.ob), Path ((ob x).1 -> (ob x).1) (mor x x (C.P.id x)) (λ (a: (ob x).1), a))
-    (fcomp: Π (x y z: C.C.ob) (f: C.C.hom x y) (g: C.C.hom y z),
-       Path ((ob x).1 -> (ob z).1) (mor x z (C.P.∘ x y z f g)) (λ (a: (ob x).1), mor y z g (mor x y f a))), 𝟏
+  Σ (ob: Π (x: C.1.1), SET)
+    (mor: Π (x y: C.1.1) (f: C.1.2 x y), (ob x).1 -> (ob y).1)
+    (id: Π (x: C.1.1), Path ((ob x).1 -> (ob x).1) (mor x x (C.2.id x)) (λ (a: (ob x).1), a)),
+    Π (x y z: C.1.1) (f: C.1.2 x y) (g: C.1.2 y z),
+       Path ((ob x).1 -> (ob z).1) (mor x z (C.2.∘ x y z f g)) (λ (a: (ob x).1), mor y z g (mor x y f a))
 
 -- | Natural transformations between functors into SET.
 def nattransSET (C: precategory) (F G: catfunSET C) : U₁ :=
-  Σ (η: Π (x: C.C.ob), (F.ob x).1 -> (G.ob x).1)
-    (commute: Π (x y: C.C.ob) (h: C.C.hom x y) (a: (F.ob x).1),
-       Path (G.ob y).1 (η y (F.mor x y h a)) (G.mor x y h (η x a))), 𝟏
+  Σ (η: Π (x: C.1.1), (F.ob x).1 -> (G.ob x).1),
+    Π (x y: C.1.1) (h: C.1.2 x y) (a: (F.ob x).1),
+       Path (G.ob y).1 (η y (F.mor x y h a)) (G.mor x y h (η x a))
 
 -- | The covariant hom-functor H_A = Hom(A, -)
-def HomFunctor (C: precategory) (A: C.C.ob) : catfunSET C :=
-    ( (λ (X: C.C.ob), ((C.C).hom A X, (C.P).homSet A X)),
-      λ (X Y: C.C.ob) (f: (C.C).hom X Y) (g: (C.C).hom A X), (C.P).∘ A X Y g f,
-      λ (X: C.C.ob), <i> λ (g: (C.C).hom A X), (C.P).∘-right A X g @ i,
-      λ (X Y Z: C.C.ob) (f: (C.C).hom X Y) (g: (C.C).hom Y Z),
-        <i> λ (h: (C.C).hom A X), (C.P).∘-assoc A X Y Z h f g @ -i, ★ )
+def HomFunctor (C: precategory) (A: C.1.1) : catfunSET C :=
+    ( (λ (X: C.1.1), (C.1.2 A X, C.2.homSet A X)),
+      λ (X Y: C.1.1) (f: C.1.2 X Y) (g: C.1.2 A X), C.2.∘ A X Y g f,
+      λ (X: C.1.1), <i> λ (g: C.1.2 A X), C.2.∘-right A X g @ i,
+      λ (X Y Z: C.1.1) (f: C.1.2 X Y) (g: C.1.2 Y Z),
+        <i> λ (h: C.1.2 A X), C.2.∘-assoc A X Y Z h f g @ -i )
 
 -- | The Yoneda map: Nat(H_A, F) -> F(A)
-def YonedaMap (C: precategory) (A: C.C.ob) (F: catfunSET C)
+def YonedaMap (C: precategory) (A: C.1.1) (F: catfunSET C)
   (α: nattransSET C (HomFunctor C A) F) : (F.ob A).1 :=
-    α.1 A (C.P.id A)
+    α.1 A (C.2.id A)
 
 -- | The Yoneda inverse: F(A) -> Nat(H_A, F)
-def YonedaInv (C: precategory) (A: C.C.ob) (F: catfunSET C) (u: (F.ob A).1)
+def YonedaInv (C: precategory) (A: C.1.1) (F: catfunSET C) (u: (F.ob A).1)
   : nattransSET C (HomFunctor C A) F :=
-    ( (λ (X: C.C.ob) (f: C.C.hom A X), F.mor A X f u),
-      λ (X Y: C.C.ob) (h: C.C.hom X Y) (f: C.C.hom A X),
-          <i> (F.fcomp A X Y f h @ i) u, ★ )
+    ( (λ (X: C.1.1) (f: C.1.2 A X), F.mor A X f u),
+      λ (X Y: C.1.1) (h: C.1.2 X Y) (f: C.1.2 A X),
+          <i> (F.2.2.2 A X Y f h @ i) u )
 
 -- | Verification of Yoneda Lemma: Beta reduction.
-def Yoneda-β (C: precategory) (A: C.C.ob) (F: catfunSET C) (u: (F.ob A).1)
+def Yoneda-β (C: precategory) (A: C.1.1) (F: catfunSET C) (u: (F.ob A).1)
   : Path (F.ob A).1 (YonedaMap C A F (YonedaInv C A F u)) u
  := <i> (F.id A @ i) u
 
 -- | Auxiliary path for Yoneda-η.
 --   Goes from F(f)(α_A(id_A)) to α_X(f).
-def Yoneda-η-η (C: precategory) (A: C.C.ob) (F: catfunSET C) (α: nattransSET C (HomFunctor C A) F) (X: C.C.ob) (f: C.C.hom A X)
-  : Path (F.ob X).1 (F.mor A X f (α.1 A (C.P.id A))) (α.1 X f)
- := comp-Path (F.ob X).1 (F.mor A X f (α.1 A (C.P.id A))) (α.1 X (C.P.∘ A A X (C.P.id A) f)) (α.1 X f)
-          (<i> α.2.1 A X f (C.P.id A) @ -i)
-          (<i> α.1 X (C.P.∘-left A X f @ i))
+def Yoneda-η-η (C: precategory) (A: C.1.1) (F: catfunSET C) (α: nattransSET C (HomFunctor C A) F) (X: C.1.1) (f: C.1.2 A X)
+  : Path (F.ob X).1 (F.mor A X f (α.1 A (C.2.id A))) (α.1 X f)
+ := comp-Path (F.ob X).1 (F.mor A X f (α.1 A (C.2.id A))) (α.1 X (C.2.∘ A A X (C.2.id A) f)) (α.1 X f)
+          (<i> α.2 A X f (C.2.id A) @ -i)
+          (<i> α.1 X (C.2.∘-left A X f @ i))
 
 -- | Unit type is a mere proposition.
-def prop-unit : isProp 𝟏 := λ (x y: 𝟏), <i> ★
+def prop-unit : isProp 𝟏 := λ (x y: 𝟏), comp-Path 𝟏 x ★ y (𝟏-contr x) (<i> 𝟏-contr y @ -i)
 
 -- | Naturality condition is a property for functors into SET.
-def nattransSET-isProp (C: precategory) (A: C.C.ob) (F: catfunSET C) (η: Π (x: C.C.ob), C.C.hom A x -> (F.ob x).1)
-  : isProp (Σ (commute: Π (x y: C.C.ob) (h: C.C.hom x y) (f: C.C.hom A x), Path (F.ob y).1 (η y (C.P.∘ A x y f h)) (F.mor x y h (η x f))), 𝟏)
- := propSig (Π (x y: C.C.ob) (h: C.C.hom x y) (f: C.C.hom A x),
-       Path (F.ob y).1 (η y (C.P.∘ A x y f h)) (F.mor x y h (η x f))) (λ (_: Π (x y: C.C.ob) (h: C.C.hom x y) (f: C.C.hom A x), Path (F.ob y).1 (η y (C.P.∘ A x y f h)) (F.mor x y h (η x f))), 𝟏)
-    (propPi' (C.C.ob) (λ (x: C.C.ob), Π (y: C.C.ob) (h: C.C.hom x y) (f: C.C.hom A x), Path (F.ob y).1 (η y (C.P.∘ A x y f h)) (F.mor x y h (η x f)))
-      (λ (x: C.C.ob), propPi' (C.C.ob) (λ (y: C.C.ob), Π (h: C.C.hom x y) (f: C.C.hom A x), Path (F.ob y).1 (η y (C.P.∘ A x y f h)) (F.mor x y h (η x f)))
-        (λ (y: C.C.ob), propPi' (C.C.hom x y) (λ (h: C.C.hom x y), Π (f: C.C.hom A x), Path (F.ob y).1 (η y (C.P.∘ A x y f h)) (F.mor x y h (η x f)))
-          (λ (h: C.C.hom x y), propPi' (C.C.hom A x) (λ (f: C.C.hom A x), Path (F.ob y).1 (η y (C.P.∘ A x y f h)) (F.mor x y h (η x f)))
-            (λ (f: C.C.hom A x), (F.ob y).2 (η y (C.P.∘ A x y f h)) (F.mor x y h (η x f)))))))
-    (λ (_: Π (x y: C.C.ob) (h: C.C.hom x y) (f: C.C.hom A x), Path (F.ob y).1 (η y (C.P.∘ A x y f h)) (F.mor x y h (η x f))), prop-unit)
+def nattransSET-isProp (C: precategory) (A: C.1.1) (F: catfunSET C) (η: Π (x: C.1.1), C.1.2 A x -> (F.ob x).1)
+  : isProp (Π (x y: C.1.1) (h: C.1.2 x y) (f: C.1.2 A x), Path (F.ob y).1 (η y (C.2.∘ A x y f h)) (F.mor x y h (η x f)))
+ := propPi' (C.1.1) (λ (x: C.1.1), Π (y: C.1.1) (h: C.1.2 x y) (f: C.1.2 A x), Path (F.ob y).1 (η y (C.2.∘ A x y f h)) (F.mor x y h (η x f)))
+      (λ (x: C.1.1), propPi' (C.1.1) (λ (y: C.1.1), Π (h: C.1.2 x y) (f: C.1.2 A x), Path (F.ob y).1 (η y (C.2.∘ A x y f h)) (F.mor x y h (η x f)))
+        (λ (y: C.1.1), propPi' (C.1.2 x y) (λ (h: C.1.2 x y), Π (f: C.1.2 A x), Path (F.ob y).1 (η y (C.2.∘ A x y f h)) (F.mor x y h (η x f)))
+          (λ (h: C.1.2 x y), propPi' (C.1.2 A x) (λ (f: C.1.2 A x), Path (F.ob y).1 (η y (C.2.∘ A x y f h)) (F.mor x y h (η x f)))
+            (λ (f: C.1.2 A x), (F.ob y).2 (η y (C.2.∘ A x y f h)) (F.mor x y h (η x f))))))
 
 -- | Path between component maps for Yoneda-η.
-def Yoneda-η-p (C: precategory) (A: C.C.ob) (F: catfunSET C) (α: nattransSET C (HomFunctor C A) F)
-  : Path (Π (x: C.C.ob) (f: C.C.hom A x), (F.ob x).1) (YonedaInv C A F (YonedaMap C A F α)).1 α.1
- := piext (C.C.ob) (λ (x: C.C.ob), Π (f: C.C.hom A x), (F.ob x).1)
+def Yoneda-η-p (C: precategory) (A: C.1.1) (F: catfunSET C) (α: nattransSET C (HomFunctor C A) F)
+  : Path (Π (x: C.1.1) (f: C.1.2 A x), (F.ob x).1) (YonedaInv C A F (YonedaMap C A F α)).1 α.1
+ := piext (C.1.1) (λ (x: C.1.1), Π (f: C.1.2 A x), (F.ob x).1)
            (YonedaInv C A F (YonedaMap C A F α)).1 α.1
-           (λ (x: C.C.ob), funext (C.C.hom A x) ((F.ob x).1)
+           (λ (x: C.1.1), funext (C.1.2 A x) ((F.ob x).1)
                                   ((YonedaInv C A F (YonedaMap C A F α)).1 x) (α.1 x)
-                                  (λ (f: C.C.hom A x), Yoneda-η-η C A F α x f))
+                                  (λ (f: C.1.2 A x), Yoneda-η-η C A F α x f))
 
 -- | Verification of Yoneda Lemma: Inverse Property 2.
-def Yoneda-η (C: precategory) (A: C.C.ob) (F: catfunSET C) (α: nattransSET C (HomFunctor C A) F)
+def Yoneda-η (C: precategory) (A: C.1.1) (F: catfunSET C) (α: nattransSET C (HomFunctor C A) F)
   : Path (nattransSET C (HomFunctor C A) F) (YonedaInv C A F (YonedaMap C A F α)) α
- := lemSig' (Π (x: C.C.ob) (f: C.C.hom A x), (F.ob x).1)
-            (λ (η: Π (x: C.C.ob) (f: C.C.hom A x), (F.ob x).1),
-              Σ (commute: Π (x y: C.C.ob) (h: C.C.hom x y) (f: C.C.hom A x),
-                 Path (F.ob y).1 (η y (C.P.∘ A x y f h)) (F.mor x y h (η x f))), 𝟏)
+ := lemSig' (Π (x: C.1.1) (f: C.1.2 A x), (F.ob x).1)
+            (λ (η: Π (x: C.1.1) (f: C.1.2 A x), (F.ob x).1),
+               Π (x y: C.1.1) (h: C.1.2 x y) (f: C.1.2 A x),
+                  Path (F.ob y).1 (η y (C.2.∘ A x y f h)) (F.mor x y h (η x f)))
             (nattransSET-isProp C A F)
             (YonedaInv C A F (YonedaMap C A F α)) α
             (Yoneda-η-p C A F α)

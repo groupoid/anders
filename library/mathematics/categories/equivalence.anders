@@ -15,8 +15,8 @@ import library/mathematics/categories/natural
 def StrongEquivalence (C D: precategory) : U := Σ
     (F: catfunctor C D)
     (G: catfunctor D C)
-    (η: natiso C C (idFunctor C) (compFunctor C D C F G))
-    (ε: natiso D D (compFunctor D C D G F) (idFunctor D)), unit
+    (η: natiso C C (idFunctor C) (compFunctor C D C F G)),
+    natiso D D (compFunctor D C D G F) (idFunctor D)
 
 def opEquivalence (C D: precategory) (e: StrongEquivalence C D)
   : StrongEquivalence (catᵒᵖ C) (catᵒᵖ D)
@@ -24,8 +24,8 @@ def opEquivalence (C D: precategory) (e: StrongEquivalence C D)
      symNatIso (catᵒᵖ C) (catᵒᵖ C) (compFunctor (catᵒᵖ C) (catᵒᵖ D) (catᵒᵖ C) (catᵒᵖF C D e.1) (catᵒᵖF D C e.2.1)) (idFunctor (catᵒᵖ C))
                (opNatIso C C (idFunctor C) (compFunctor C D C e.1 e.2.1) e.2.2.1),
      symNatIso (catᵒᵖ D) (catᵒᵖ D) (idFunctor (catᵒᵖ D)) (compFunctor (catᵒᵖ D) (catᵒᵖ C) (catᵒᵖ D) (catᵒᵖF D C e.2.1) (catᵒᵖF C D e.1))
-               (opNatIso D D (compFunctor D C D e.2.1 e.1) (idFunctor D) e.2.2.2.1), star)
+               (opNatIso D D (compFunctor D C D e.2.1 e.1) (idFunctor D) e.2.2.2))
 
 def reflEquivalence (C: precategory) : StrongEquivalence C C :=
-    (idFunctor C, idFunctor C, idNatIso C C (idFunctor C), idNatIso C C (idFunctor C), star)
+    (idFunctor C, idFunctor C, idNatIso C C (idFunctor C), idNatIso C C (idFunctor C))
 -- Wait, I need nattransRefl or similar natural isomorphism for identity.

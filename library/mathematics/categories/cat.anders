@@ -12,4 +12,4 @@ import library/mathematics/categories/topos
 -- | The Large Category of Small Precategoreis.
 --   Note: CAT is naturally a 2-category. Here we define its 1-categorical data.
 
-def CAT : cat1 := (precategory, λ (A B: precategory), catfunctor A B, star)
+def CAT : cat1 := (precategory, λ (A B: precategory), catfunctor A B)

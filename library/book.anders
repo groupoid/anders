@@ -40,6 +40,7 @@ import library/mathematics/categories/groupoid
 import library/mathematics/categories/topos
 import library/mathematics/categories/adjunction
 import library/mathematics/categories/equivalence
+import library/mathematics/categories/yoneda
 import library/mathematics/categories/meta/favonia
 import library/mathematics/categories/meta/kraus
 import library/mathematics/categories/meta/awodey

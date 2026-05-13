@@ -87,6 +87,21 @@ We have implemented \texttt{opEquivalence}, which shows that an equivalence $e :
 
 The category of small precategories, denoted $\mathcal{CAT}$, is formalized as a large category (of type $U_2$). The objects are precategories of type $U_1$, and morphisms are functors of type $U$. While $\mathcal{CAT}$ is naturally a $2$-category, we provide its $1$-categorical structure by specifying identity functors and functor composition. The operation of taking the opposite category is currently provided as a definitional involution on the objects of $\mathcal{CAT}$.
 
+\section{The Yoneda Lemma}
+
+The Yoneda Lemma is a fundamental result in category theory that relates natural transformations between a hom-functor and an arbitrary functor to the values of that functor. For a small precategory $\catC$, an object $A \in \catC$, and a functor $F : \catC \to \mathcal{SET}$, the lemma states:
+\begin{equation}
+    \text{Nat}(\catC(A, -), F) \cong F(A)
+\end{equation}
+
+Our implementation addresses several technical challenges inherent in formalizing the Yoneda Lemma:
+\begin{itemize}
+    \item \textbf{Large Target Category}: Standard functors in our library are restricted to small precategories. Since $\mathcal{SET}$ is a large category, we manually define \texttt{catfunSET} and \texttt{nattransSET} using Sigma types that accommodate objects from higher universes.
+    \item \textbf{Manual Sigma Triple}: Natural transformations are represented as triples $(\eta, \text{commute}, \star)$, where $\star$ is the unique element of the unit type $\mathbf{1}$. This structure ensures compatibility with the compiler's positional projection matching.
+    \item \textbf{Cubical Isomorphism}: The isomorphism is established via the \texttt{YonedaMap} and its inverse \texttt{YonedaInv}. The property $\texttt{Yoneda-β}$ (beta reduction) holds definitionally, while $\texttt{Yoneda-η}$ (isomorphism inverse) is proved by establishing a path between natural transformations.
+    \item \textbf{Identification of Transformations}: To prove that two natural transformations are equal, we utilize \texttt{nattransSET-isProp}, which shows that the naturality condition for functors into $\mathcal{SET}$ is a mere proposition. This allows us to use \texttt{lemSig'} from the foundation library to establish the equality by only checking the component map $\eta$.
+\end{itemize}
+
 \section{Conclusion}
 
 The Anders categorical library continues to expand by incorporating higher-level structures while maintaining strict adherence to definitional duality and cubical principles. The use of symmetric laws and explicit path-based proofs allows for a clean and performant formalization that avoids the overhead of traditional setoid-based approaches.

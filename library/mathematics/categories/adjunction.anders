@@ -1,0 +1,28 @@
+{- Category Theory: https://anders.groupoid.space/mathematics/categories/adjunction/
+   - Adjunctions.
+
+   HoTT 9.3 Adjunctions
+
+   Copyright (c) Groupoid Infinity, 2016-2026. -}
+
+module adjunction where
+import library/mathematics/categories/category
+import library/mathematics/categories/functor
+import library/mathematics/categories/natural
+
+-- Adjunction L ⊣ R
+def isAdjoint (C D: precategory) (L: catfunctor C D) (R: catfunctor D C): U := Σ
+    (u: nattrans C C (idFunctor C) (compFunctor C D C L R))
+    (c: nattrans D D (compFunctor D C D R L) (idFunctor D))
+    (zig: Π (A: C.C.ob), Path (D.C.hom (L.ob A) (L.ob A))
+        (D.P.∘ (L.ob A) (L.ob (R.ob (L.ob A))) (L.ob A) (L.mor A (R.ob (L.ob A)) (u.1 A)) (c.1 (L.ob A))) (D.P.id (L.ob A)))
+    (zag: Π (B: D.C.ob), Path (C.C.hom (R.ob B) (R.ob B))
+        (C.P.∘ (R.ob B) (R.ob (L.ob (R.ob B))) (R.ob B) (u.1 (R.ob B)) (R.mor (L.ob (R.ob B)) B (c.1 B))) (C.P.id (R.ob B))), unit
+
+def Ladjunct (C D: precategory) (L: catfunctor C D) (R: catfunctor D C) (adj: isAdjoint C D L R)
+             (A: C.C.ob) (B: D.C.ob) (f: D.C.hom (L.ob A) B) : C.C.hom A (R.ob B)
+ := C.P.∘ A (R.ob (L.ob A)) (R.ob B) (adj.1.1 A) (R.mor (L.ob A) B f)
+
+def Radjunct (C D: precategory) (L: catfunctor C D) (R: catfunctor D C) (adj: isAdjoint C D L R)
+             (A: C.C.ob) (B: D.C.ob) (f: C.C.hom A (R.ob B)) : D.C.hom (L.ob A) B
+ := D.P.∘ (L.ob A) (L.ob (R.ob B)) B (L.mor A (R.ob B) f) (adj.2.1.1 B)

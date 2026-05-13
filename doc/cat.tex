@@ -27,26 +27,45 @@ specifically regarding definitional duality and the use of cubical foundations f
 
 \section{Introduction}
 
-The Anders categorical library is designed to be a minimal yet powerful implementation of category theory
-in a pure Martin-Löf Type Theory (MLTT) with cubical extensions. The library \footnote{\url{https://github.com/groupoid/anders/tree/main/library/mathematics/categories}}prioritizes
-proof-relevance (even for units), univalence, and duality-friendliness.
+The Anders \footnote{\url{https://github.com/groupoid/anders}} categorical library is designed to be a minimal yet powerful
+implementation of category theory in a pure Martin-Löf Type Theory (MLTT)
+with cubical extensions. The library \footnote{\url{./library/mathematics/categories}}
+prioritizes proof-relevance (even for units), univalence, and duality-friendliness.
 
 \section{Definitional Duality}
 
-A key design choice, following \cite{carette2021}, is the use of symmetric laws for associativity and identity.
-By including both \texttt{assoc} and \texttt{assoc-inv}, as well as \texttt{id-id} (the neutral identity law),
-we ensure that the opposite category operation $(\cdot)\op$ is a definitional involution:
+In Anders, leveraging its native cubical foundations (such as CCHM), the opposite category operation $(\cdot)\op$ is a definitional involution:
 \begin{equation}
     (\catC\op)\op \equiv \catC
 \end{equation}
-This allows for "duality for free," where any theorem proved for a category $\catC$ can be immediately applied
-to its dual without explicit transport along an isomorphism.
+This property provides "duality for free," where any result established for a category $\catC$ is immediately applicable to its dual without the need for explicit transport along an isomorphism.
 
+We have retained the precategory signature with additional properties ---
+specifically symmetric laws like \texttt{assoc-inv} and \texttt{id-id} ---
+primarily to ensure compatibility for proof extraction to Coq/HoTT and other
+formalizations that lack a multidimensional interval. While the Agda
+formalization \cite{carette2021} introduces these properties to achieve
+definitional duality in systems where it is not native, in Anders they
+are not strictly required for duality purposes. Instead, their inclusion
+is a deliberate design choice to facilitate interoperability and extraction
+to systems without native cubical support.
+
+\newpage
 \section{Cubical Foundations}
 
 Unlike the Agda formalization which often relies on setoids to maintain compatibility with different Agda modes,
 Anders is natively cubical. This allows us to use Path types for equality between morphisms, which are
-proof-relevant by default. A univalent category in Anders is a precategory where the map from paths between
+proof-relevant by default.
+
+Working with $hSet$ in HoTT offers several significant advantages over a setoid-based approach:
+\begin{itemize}
+    \item \textbf{Definitional Simplification}: By using $hSets$, we avoid the overhead of manually managing equivalence relations and congruence proofs.
+    \item \textbf{Path-Based Equality}: Native Path types allow us to leverage cubical primitives for transport and composition, which is more direct than setoid-based rewriting.
+    \item \textbf{Univalence Integration}: Univalent categories require an equivalence between paths and isomorphisms; this is a natural statement in HoTT/Cubical but becomes highly complex when using setoids to represent the underlying "sets".
+    \item \textbf{Higher Structures}: HoTT allows for a more uniform treatment of higher categories, where the 0-type (hSet) restriction on morphisms can be naturally generalized to higher groupoids.
+\end{itemize}
+
+A univalent category in Anders is a precategory where the map from paths between
 objects to isomorphisms is an equivalence.
 
 \section{Core Library Structure}
@@ -58,6 +77,7 @@ The core library consists of the following modules:
     \item \texttt{natural.anders}: Natural transformations and isomorphisms.
     \item \texttt{adjunction.anders}: Adjunctions between categories.
     \item \texttt{yoneda.anders}: Yoneda lemma.
+    \item \texttt{universal.anders}: Universal Mapping Property.
 \end{itemize}
 
 \section{Natural Transformations and Isomorphisms}
@@ -66,7 +86,7 @@ Natural transformations are implemented as Sigma types consisting of the compone
 We have formalized the definitional duality for natural transformations: if $\alpha : F \Rightarrow G$ is a natural
 transformation between functors $F, G : \catC \to \catD$, then $\alpha$ also defines a natural transformation
 $\alpha\op : G\op \Rightarrow F\op$ between the dual functors. In Anders, this duality is definitional,
-meaning $(\alpha\op)\op \equiv \alpha$.
+meaning $(\alpha\op)\op \equiv \alpha$ (after normalization process).
 
 \section{Adjunctions}
 
@@ -109,7 +129,10 @@ Our implementation addresses several technical challenges inherent in formalizin
 \newpage
 \section{Conclusion}
 
-The Anders categorical library continues to expand by incorporating higher-level structures while maintaining strict adherence to definitional duality and cubical principles. The use of symmetric laws and explicit path-based proofs allows for a clean and performant formalization that avoids the overhead of traditional setoid-based approaches.
+The Anders categorical library continues to expand by incorporating higher-level structures while
+maintaining strict adherence to definitional duality and cubical principles. The use of symmetric
+laws and explicit path-based proofs allows for a clean and performant formalization that avoids
+the overhead of traditional setoid-based approaches preserving their compatibility with this categorical base library.
 
 \begin{thebibliography}{9}
 \bibitem{carette2021}

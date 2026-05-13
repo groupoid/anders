@@ -45,6 +45,7 @@ import library/mathematics/categories/adjunction
 import library/mathematics/categories/equivalence
 import library/mathematics/categories/yoneda
 import library/mathematics/categories/symmetric
+import library/mathematics/categories/universal
 import library/mathematics/homotopy/coequalizer
 import library/mathematics/homotopy/hs
 import library/mathematics/homotopy/constcubes

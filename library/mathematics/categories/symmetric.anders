@@ -1,3 +1,5 @@
+{- Category Theory: https://anders.groupoid.space/mathematics/categories/symmetric/
+   Copyright (c) Groupoid Infinity, 2016-2026. -}
 
 module symmetric where
 import library/mathematics/categories/category
@@ -43,17 +45,13 @@ def isMonoidal (C: precategory): U
         Path (C.1.2 (tensor.ob (tensor.ob (tensor.ob (x, y), z), w)) (tensor.ob (x, tensor.ob (y, tensor.ob (z, w)))))
              (C.2.∘ (tensor.ob (tensor.ob (tensor.ob (x, y), z), w)) (tensor.ob (x, tensor.ob (tensor.ob (y, z), w))) (tensor.ob (x, tensor.ob (y, tensor.ob (z, w))))
                 (C.2.∘ (tensor.ob (tensor.ob (tensor.ob (x, y), z), w)) (tensor.ob (tensor.ob (x, tensor.ob (y, z)), w)) (tensor.ob (x, tensor.ob (tensor.ob (y, z), w)))
-                   (tensor.mor (tensor.ob (tensor.ob (x, y), z), w) (tensor.ob (x, tensor.ob (y, z)), w) ((α x y z).1, C.2.id w))
-                   ((α x (tensor.ob (y, z)) w).1))
+                   (tensor.mor (tensor.ob (tensor.ob (x, y), z), w) (tensor.ob (x, tensor.ob (y, z)), w) ((α x y z).1, C.2.id w)) ((α x (tensor.ob (y, z)) w).1))
                 (tensor.mor (x, tensor.ob (tensor.ob (y, z), w)) (x, tensor.ob (y, tensor.ob (z, w))) (C.2.id x, (α y z w).1)))
              (C.2.∘ (tensor.ob (tensor.ob (tensor.ob (x, y), z), w)) (tensor.ob (tensor.ob (x, y), tensor.ob (z, w))) (tensor.ob (x, tensor.ob (y, tensor.ob (z, w))))
-                 ((α (tensor.ob (x, y)) z w).1)
-                 ((α x y (tensor.ob (z, w))).1))),
+                 ((α (tensor.ob (x, y)) z w).1) ((α x y (tensor.ob (z, w))).1))),
       Π (x y: (C.1.1)),
         Path (C.1.2 (tensor.ob (tensor.ob (x, e), y)) (tensor.ob (x, y)))
-             (C.2.∘ (tensor.ob (tensor.ob (x, e), y)) (tensor.ob (x, tensor.ob (e, y))) (tensor.ob (x, y))
-                ((α x e y).1)
-                (tensor.mor (x, tensor.ob (e, y)) (x, y) (C.2.id x, (λ₁ y).1)))
+             (C.2.∘ (tensor.ob (tensor.ob (x, e), y)) (tensor.ob (x, tensor.ob (e, y))) (tensor.ob (x, y)) ((α x e y).1) (tensor.mor (x, tensor.ob (e, y)) (x, y) (C.2.id x, (λ₁ y).1)))
              (tensor.mor (tensor.ob (x, e), y) (x, y) ((ρ₁ x).1, C.2.id y))
 
 -- | Braided Monoidal Category
@@ -97,3 +95,4 @@ def isSymmetric (C: precategory) (m: isMonoidal C) (b: isBraided C m) : U
              (C.2.∘ (m.tensor.ob (x, m.e)) x (m.tensor.ob (m.e, x))
                 ((m.ρ₁ x).1)
                 ((m.λ₁ x).2.1))
+

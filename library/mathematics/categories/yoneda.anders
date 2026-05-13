@@ -1,3 +1,12 @@
+{- Category Theory: https://anders.groupoid.space/mathematics/categories/yoneda/
+
+   - Yoneda Map.
+   - Yoneda Inverse.
+   - Yoneda Computation.
+   - Yoneda Uniqueness.
+
+   Copyright (c) Groupoid Infinity, 2016-2026. -}
+
 module yoneda where
 
 import library/mathematics/categories/functor

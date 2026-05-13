@@ -1,3 +1,6 @@
+{- Category Theory: https://anders.groupoid.space/mathematics/categories/topos/
+   Copyright (c) Groupoid Infinity, 2016-2026. -}
+
 module topos where
 import library/mathematics/categories/category
 import library/mathematics/categories/functor
@@ -39,21 +42,21 @@ def Set : precategory1 :=
 
 -- | Limits in Large Categories.
 
-def terminal1 (C: precategory1) : U₁ := Σ (top: C.1.1), Π (x: C.1.1), isContr (C.1.2 x top)
-def cospanLarge (C: precategory1) : U₁ := Σ (X: C.1.1) (f: Σ (Y: C.1.1), C.1.2 Y X), (Σ (Y: C.1.1), C.1.2 Y X)
-def hasCospanConeLarge (C: precategory1) (D: cospanLarge C) (w: C.1.1) : U₁ := Σ (f: C.1.2 w D.2.1.1) (g: C.1.2 w D.2.2.1),
-    Path (C.1.2 w D.1) (C.2.∘ w D.2.1.1 D.1 f D.2.1.2) (C.2.∘ w D.2.2.1 D.1 g D.2.2.2)
+def terminal1            (C: precategory1) : U₁ := Σ (top: C.1.1), Π (x: C.1.1), isContr (C.1.2 x top)
+def cospanLarge          (C: precategory1) : U₁ := Σ (X: C.1.1) (f: Σ (Y: C.1.1), C.1.2 Y X), (Σ (Y: C.1.1), C.1.2 Y X)
+def hasCospanConeLarge   (C: precategory1) (D: cospanLarge C) (w: C.1.1) : U₁ := Σ (f: C.1.2 w D.2.1.1) (g: C.1.2 w D.2.2.1),
+    Path (C.1.2 w D.1)   (C.2.∘ w D.2.1.1 D.1 f D.2.1.2) (C.2.∘ w D.2.2.1 D.1 g D.2.2.2)
 
-def cospanConeLarge (C: precategory1) (D: cospanLarge C) : U₁ := Σ (w: C.1.1), hasCospanConeLarge C D w
+def cospanConeLarge      (C: precategory1) (D: cospanLarge C) : U₁ := Σ (w: C.1.1), hasCospanConeLarge C D w
 def isCospanConeHomLarge (C: precategory1) (D: cospanLarge C) (E1 E2: cospanConeLarge C D) (h: C.1.2 E1.1 E2.1) : U₁ := Σ
     (_ : Path (C.1.2 E1.1 D.2.1.1) (C.2.∘ E1.1 E2.1 D.2.1.1 h E2.2.1) E1.2.1),
     Path (C.1.2 E1.1 D.2.2.1) (C.2.∘ E1.1 E2.1 D.2.2.1 h E2.2.2.1) E1.2.2.1
 
-def cospanConeHomLarge (C: precategory1) (D: cospanLarge C) (E1 E2: cospanConeLarge C D) : U₁ := Σ (h: C.1.2 E1.1 E2.1), isCospanConeHomLarge C D E1 E2 h
-def isPullbackLarge (C: precategory1) (D: cospanLarge C) (E: cospanConeLarge C D) : U₁ := Π (h: cospanConeLarge C D), isContr (cospanConeHomLarge C D h E)
-def hasPullbackLarge (C: precategory1) (D: cospanLarge C) : U₁ := Σ (E: cospanConeLarge C D), isPullbackLarge C D E
-def mono1 (C: precategory1) (Y Z: C.1.1) (f: C.1.2 Y Z): U₁ := Π (X: C.1.1) (g1 g2: C.1.2 X Y),
-    Path (C.1.2 X Z) (C.2.∘ X Y Z g1 f) (C.2.∘ X Y Z g2 f) -> Path (C.1.2 X Y) g1 g2
+def cospanConeHomLarge   (C: precategory1) (D: cospanLarge C) (E1 E2: cospanConeLarge C D) : U₁ := Σ (h: C.1.2 E1.1 E2.1), isCospanConeHomLarge C D E1 E2 h
+def isPullbackLarge      (C: precategory1) (D: cospanLarge C) (E:     cospanConeLarge C D) : U₁ := Π (h: cospanConeLarge C D), isContr (cospanConeHomLarge C D h E)
+def hasPullbackLarge     (C: precategory1) (D: cospanLarge C) : U₁ := Σ (E: cospanConeLarge C D), isPullbackLarge C D E
+def mono1                (C: precategory1) (Y Z: C.1.1) (f: C.1.2 Y Z): U₁ := Π (X: C.1.1) (g1 g2: C.1.2 X Y),
+    Path (C.1.2 X Z)     (C.2.∘ X Y Z g1 f) (C.2.∘ X Y Z g2 f) -> Path (C.1.2 X Y) g1 g2
 
 -- | Topos structure.
 

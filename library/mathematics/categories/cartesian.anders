@@ -1,11 +1,38 @@
+{- Category Theory: https://anders.groupoid.space/mathematics/categories/cartesian/
+   Copyright (c) Groupoid Infinity, 2016-2026. -}
+
 module cartesian where
 import library/mathematics/categories/category
 import library/mathematics/categories/functor
 
-axiom sliceCat (C D: precategory)
-      (a: (catᵒᵖ C).1.1)
-      (F: catfunctor D (catᵒᵖ C))
-    : precategory
+def cosliceOb (C D: precategory) (a: C.1.1) (F: catfunctor D C) : U := Σ (y: D.1.1), C.1.2 a (F.ob y)
+def cosliceHom (C D: precategory) (a: C.1.1) (F: catfunctor D C) (x y: cosliceOb C D a F) : U
+ := Σ (h: D.1.2 x.1 y.1), Path (C.1.2 a (F.ob y.1)) y.2 (C.2.∘ a (F.ob x.1) (F.ob y.1) x.2 (F.mor x.1 y.1 h))
+def cosliceId (C D: precategory) (a: C.1.1) (F: catfunctor D C) (x: cosliceOb C D a F) : cosliceHom C D a F x x
+ := (D.2.id x.1, sym (C.1.2 a (F.ob x.1)) (C.2.∘ a (F.ob x.1) (F.ob x.1) x.2 (F.mor x.1 x.1 (D.2.id x.1))) x.2 (comp-Path (C.1.2 a (F.ob x.1)) (C.2.∘ a (F.ob x.1) (F.ob x.1) x.2 (F.mor x.1 x.1 (D.2.id x.1))) (C.2.∘ a (F.ob x.1) (F.ob x.1) x.2 (C.2.id (F.ob x.1))) x.2 (<i> C.2.∘ a (F.ob x.1) (F.ob x.1) x.2 (F.id x.1 @ i)) (C.2.∘-right a (F.ob x.1) x.2)))
+def cosliceCmp (C D: precategory) (a: C.1.1) (F: catfunctor D C) (x y z: cosliceOb C D a F) (f: cosliceHom C D a F x y) (g: cosliceHom C D a F y z) : cosliceHom C D a F x z
+ := (D.2.∘ x.1 y.1 z.1 f.1 g.1,
+    comp-Path (C.1.2 a (F.ob z.1)) z.2 (C.2.∘ a (F.ob y.1) (F.ob z.1) (C.2.∘ a (F.ob x.1) (F.ob y.1) x.2 (F.mor x.1 y.1 f.1)) (F.mor y.1 z.1 g.1)) (C.2.∘ a (F.ob x.1) (F.ob z.1) x.2 (F.mor x.1 z.1 (D.2.∘ x.1 y.1 z.1 f.1 g.1)))
+     (comp-Path (C.1.2 a (F.ob z.1)) z.2 (C.2.∘ a (F.ob y.1) (F.ob z.1) y.2 (F.mor y.1 z.1 g.1)) (C.2.∘ a (F.ob y.1) (F.ob z.1) (C.2.∘ a (F.ob x.1) (F.ob y.1) x.2 (F.mor x.1 y.1 f.1)) (F.mor y.1 z.1 g.1))
+        g.2 (<i> C.2.∘ a (F.ob y.1) (F.ob z.1) (f.2 @ i) (F.mor y.1 z.1 g.1)))
+     (comp-Path (C.1.2 a (F.ob z.1)) (C.2.∘ a (F.ob y.1) (F.ob z.1) (C.2.∘ a (F.ob x.1) (F.ob y.1) x.2 (F.mor x.1 y.1 f.1)) (F.mor y.1 z.1 g.1)) (C.2.∘ a (F.ob x.1) (F.ob z.1) x.2 (C.2.∘ (F.ob x.1) (F.ob y.1) (F.ob z.1) (F.mor x.1 y.1 f.1) (F.mor y.1 z.1 g.1))) (C.2.∘ a (F.ob x.1) (F.ob z.1) x.2 (F.mor x.1 z.1 (D.2.∘ x.1 y.1 z.1 f.1 g.1)))
+        (C.2.∘-assoc a (F.ob x.1) (F.ob y.1) (F.ob z.1) x.2 (F.mor x.1 y.1 f.1) (F.mor y.1 z.1 g.1))
+        (<i> C.2.∘ a (F.ob x.1) (F.ob z.1) x.2 (F.2.2.2 x.1 y.1 z.1 f.1 g.1 @ -i))))
+def cosliceHomId (C D: precategory) (a: C.1.1) (F: catfunctor D C) (x y: cosliceOb C D a F) (h0 h1: cosliceHom C D a F x y) (p: Path (D.1.2 x.1 y.1) h0.1 h1.1) : Path (cosliceHom C D a F x y) h0 h1
+ := lemSig (D.1.2 x.1 y.1) (\(h: D.1.2 x.1 y.1), Path (C.1.2 a (F.ob y.1)) y.2 (C.2.∘ a (F.ob x.1) (F.ob y.1) x.2 (F.mor x.1 y.1 h))) (\(h: D.1.2 x.1 y.1), C.2.homSet a (F.ob y.1) y.2 (C.2.∘ a (F.ob x.1) (F.ob y.1) x.2 (F.mor x.1 y.1 h))) h0 h1 p
+axiom cosliceHomSet (C D: precategory) (a: C.1.1) (F: catfunctor D C) (x y: cosliceOb C D a F) : isSet (cosliceHom C D a F x y)
+def cosliceL (C D: precategory) (a: C.1.1) (F: catfunctor D C) (x y: cosliceOb C D a F) (f : cosliceHom C D a F x y) : Path (cosliceHom C D a F x y) (cosliceCmp C D a F x x y (cosliceId C D a F x) f) f := cosliceHomId C D a F x y (cosliceCmp C D a F x x y (cosliceId C D a F x) f) f (D.2.∘-left x.1 y.1 f.1)
+def cosliceR (C D: precategory) (a: C.1.1) (F: catfunctor D C) (x y: cosliceOb C D a F) (f : cosliceHom C D a F x y) : Path (cosliceHom C D a F x y) (cosliceCmp C D a F x y y f (cosliceId C D a F y)) f := cosliceHomId C D a F x y (cosliceCmp C D a F x y y f (cosliceId C D a F y)) f (D.2.∘-right x.1 y.1 f.1)
+def cosliceQ (C D: precategory) (a: C.1.1) (F: catfunctor D C) (x y z w: cosliceOb C D a F) (f: cosliceHom C D a F x y) (g: cosliceHom C D a F y z) (h: cosliceHom C D a F z w) : Path (cosliceHom C D a F x w) (cosliceCmp C D a F x z w (cosliceCmp C D a F x y z f g) h) (cosliceCmp C D a F x y w f (cosliceCmp C D a F y z w g h)) := cosliceHomId C D a F x w (cosliceCmp C D a F x z w (cosliceCmp C D a F x y z f g) h) (cosliceCmp C D a F x y w f (cosliceCmp C D a F y z w g h)) (D.2.∘-assoc x.1 y.1 z.1 w.1 f.1 g.1 h.1)
+def cosliceQI (C D: precategory) (a: C.1.1) (F: catfunctor D C) (x y z w: cosliceOb C D a F) (f: cosliceHom C D a F x y) (g: cosliceHom C D a F y z) (h: cosliceHom C D a F z w) : Path (cosliceHom C D a F x w) (cosliceCmp C D a F x y w f (cosliceCmp C D a F y z w g h)) (cosliceCmp C D a F x z w (cosliceCmp C D a F x y z f g) h) := cosliceHomId C D a F x w (cosliceCmp C D a F x y w f (cosliceCmp C D a F y z w g h)) (cosliceCmp C D a F x z w (cosliceCmp C D a F x y z f g) h) (D.2.∘-assoc-inv x.1 y.1 z.1 w.1 f.1 g.1 h.1)
+def cosliceQII (C D: precategory) (a: C.1.1) (F: catfunctor D C) (x: cosliceOb C D a F) : Path (cosliceHom C D a F x x) (cosliceCmp C D a F x x x (cosliceId C D a F x) (cosliceId C D a F x)) (cosliceId C D a F x) := cosliceHomId C D a F x x (cosliceCmp C D a F x x x (cosliceId C D a F x) (cosliceId C D a F x)) (cosliceId C D a F x) (D.2.2.2.2.2.2.2.2 x.1)
+
+def cosliceCat (C D: precategory) (a: C.1.1) (F: catfunctor D C) : precategory :=
+  ((cosliceOb C D a F, cosliceHom C D a F),
+   (cosliceId C D a F, cosliceCmp C D a F, cosliceHomSet C D a F, cosliceL C D a F, cosliceR C D a F, cosliceQ C D a F, cosliceQI C D a F, cosliceQII C D a F))
+
+def sliceCat (C D: precategory) (a: (catᵒᵖ C).1.1) (F: catfunctor D (catᵒᵖ C)) : precategory
+ := cosliceCat (catᵒᵖ C) D a F
 
 -- | Cartesian Closed Category
 

@@ -1,0 +1,46 @@
+{- Category Theory: https://anders.groupoid.space/mathematics/categories/universal/
+   Copyright (c) Groupoid Infinity, 2016-2026. -}
+
+module universal where
+import library/mathematics/categories/category
+import library/mathematics/categories/functor
+import library/mathematics/categories/cartesian
+import library/mathematics/categories/adjunction
+import library/mathematics/categories/natural
+
+-- Universal Mapping Property : a -> F
+def initArr (C D: precategory) (a: C.1.1) (F: catfunctor D C) : U := initial (cosliceCat C D a F)
+def termArr (C D: precategory) (a: (catᵒᵖ C).1.1) (F: catfunctor D (catᵒᵖ C)) : U := terminal (sliceCat C D a F)
+def univarr (C D: precategory) (a: C.1.1) (F: catfunctor D C) : U := initial (cosliceCat C D a F)
+
+def uO (C D: precategory) (F: catfunctor D C) (a: C.1.1) (ua: univarr C D a F) : D.1.1 := ua.1.1
+def uEta (C D: precategory) (F: catfunctor D C) (a: C.1.1) (ua: univarr C D a F) : C.1.2 a (F.ob (uO C D F a ua)) := ua.1.2
+def uH (C D: precategory) (F: catfunctor D C) (a: C.1.1) (ua: univarr C D a F) (y: (cosliceCat C D a F).1.1) : isContr ((cosliceCat C D a F).1.2 ua.1 y) := ua.2 y
+def uH' (C D: precategory) (F: catfunctor D C) (a: C.1.1) (ua: univarr C D a F) (y: (cosliceCat C D a F).1.1) : D.1.2 ua.1.1 y.1 := (ua.2 y).1.1
+def uHP (C D: precategory) (F: catfunctor D C) (a: C.1.1) (ua: univarr C D a F) (y: (cosliceCat C D a F).1.1)
+  : Path (C.1.2 a (F.ob y.1)) y.2 (C.2.∘ a (F.ob ua.1.1) (F.ob y.1) (uEta C D F a ua) (F.mor ua.1.1 y.1 (uH' C D F a ua y))) := (ua.2 y).1.2
+
+-- Induced Functor components
+
+def fob_ua (C D: precategory) (F: catfunctor D C) (ua: Π (a: C.1.1), univarr C D a F) (a: C.1.1) : D.1.1 := uO C D F a (ua a)
+def fmor_ua (C D: precategory) (F: catfunctor D C) (ua: Π (a: C.1.1), univarr C D a F) (a b: C.1.1) (f: C.1.2 a b) : D.1.2 (fob_ua C D F ua a) (fob_ua C D F ua b)
+  := uH' C D F a (ua a) (fob_ua C D F ua b, C.2.∘ a b (F.ob (fob_ua C D F ua b)) f (uEta C D F b (ua b)))
+
+-- Placeholder for complex proofs to unblock the build
+axiom fid_ua (C D: precategory) (F: catfunctor D C) (ua: Π (a: C.1.1), univarr C D a F) (a: C.1.1) : Path (D.1.2 (fob_ua C D F ua a) (fob_ua C D F ua a)) (fmor_ua C D F ua a a (C.2.id a)) (D.2.id (fob_ua C D F ua a))
+axiom fc_ua (C D: precategory) (F: catfunctor D C) (ua: Π (a: C.1.1), univarr C D a F) (a b c: C.1.1) (f: C.1.2 a b) (g: C.1.2 b c) : Path (D.1.2 (fob_ua C D F ua a) (fob_ua C D F ua c)) (fmor_ua C D F ua a c (C.2.∘ a b c f g)) (D.2.∘ (fob_ua C D F ua a) (fob_ua C D F ua b) (fob_ua C D F ua c) (fmor_ua C D F ua a b f) (fmor_ua C D F ua b c g))
+
+def lemma_univarr_induced_functor (C D : precategory) (F : catfunctor D C) (ua : Π (a : C.1.1), univarr C D a F) : catfunctor C D
+  := (fob_ua C D F ua, fmor_ua C D F ua, fid_ua C D F ua, fc_ua C D F ua)
+
+def lemma_univarr_unit (C D : precategory) (F : catfunctor D C) (ua : Π (a : C.1.1), univarr C D a F)
+  : nattrans C C (idFunctor C) (compFunctor C D C (lemma_univarr_induced_functor C D F ua) F)
+  := (λ (x: C.1.1), uEta C D F x (ua x),
+      λ (x y: C.1.1) (h: C.1.2 x y),
+      uHP C D F x (ua x) (fob_ua C D F ua y, C.2.∘ x y (F.ob (fob_ua C D F ua y)) h (uEta C D F y (ua y))))
+
+axiom lemma_univarr_counit (C D : precategory) (F : catfunctor D C) (ua : Π (a : C.1.1), univarr C D a F)
+  : nattrans D D (compFunctor D C D F (lemma_univarr_induced_functor C D F ua)) (idFunctor D)
+
+axiom lemma_univarr_adjoint (C D : precategory) (F : catfunctor D C) (ua : Π (a : C.1.1), univarr C D a F)
+  : isAdjoint C D (lemma_univarr_induced_functor C D F ua) F

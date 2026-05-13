@@ -1348,7 +1348,7 @@ and convProofIrrel v1 v2 =
     (* Id A a b is proof-irrelevant *)
     | VApp (VApp (VId t1, a1), b1), VApp (VApp (VId t2, a2), b2) -> conv t1 t2 && conv a1 a2 && conv b1 b2
     | VEmpty, VEmpty -> !Options.irrelevance
-    | VUnit, VUnit -> !Options.irrelevance
+    | VUnit, VUnit -> !Options.irrelevance 
     | t1, t2 when is_isContr_type t1 && conv t1 t2 -> true
     | _, _ -> false
   with _ -> false

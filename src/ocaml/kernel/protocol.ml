@@ -119,7 +119,7 @@ let rec proto : req -> resp = function
     | "trace"           -> promote (fun () -> Options.trace           := getBoolVal p x; OK)
     | "preeval"         -> promote (fun () -> Options.preeval         := getBoolVal p x; OK)
     | "girard"          -> promote (fun () -> Options.girard          := getUnitVal p x; OK)
-    | "irrelevance"     -> promote (fun () -> Options.irrelevance     := getUnitVal p x; OK)
+    | "irrelevance"     -> promote (fun () -> Options.irrelevance     := getBoolVal p x; OK)
     | "impredicativity" -> promote (fun () -> Options.impredicativity := getUnitVal p x; OK)
     | "gidx"            -> promote (fun () -> Sequence.gidx := max !Sequence.gidx (Int64.of_string x); OK)
     | _                 -> Error (InvalidOpt p)

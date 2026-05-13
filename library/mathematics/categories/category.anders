@@ -11,9 +11,13 @@
 module category where
 import library/foundations/mltt/sigma
 import library/foundations/univalent/path
+
+-- this library is written for absolute relevance, even unit is relevant!
+
 option irrelevance false
 
--- disable irrelevance for Unit types
+-- option irrelevance true
+-- def test-irrel (x : 𝟏) : Path 𝟏 x ★ := <i> ★
 
 def cat : U₁ := Σ (ob: U), ob -> ob -> U
 

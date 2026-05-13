@@ -80,9 +80,9 @@ let get_bundle ctx targets =
   let sorted = List.sort (fun x y -> compare (pos x) (pos y)) res in
   let config = [
     Set ("girard", if !Options.girard then "tt" else "ff");
-    Set ("preeval", if !Options.preeval then "true" else "false");
-    Set ("irrelevance", if !Options.irrelevance then "tt" else "ff");
     Set ("impredicativity", if !Options.impredicativity then "tt" else "ff");
+    Set ("preeval", if !Options.preeval then "true" else "false");
+    Set ("irrelevance", if !Options.irrelevance then "true" else "false");
     Set ("gidx", Int64.to_string !Sequence.gidx)
   ] in
   config @ sorted

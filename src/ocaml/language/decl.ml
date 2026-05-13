@@ -43,10 +43,10 @@ let rec checkLine fs : line -> Files.t = function
     end; fs
   | Option (opt, value) ->
     begin match opt with
-      | "girard"   | "irrelevance"
-      | "preeval"  | "impredicativity" -> set opt value
+      | "girard" | "preeval"  | "impredicativity" -> set opt value
+      | "irrelevance" -> Prefs.irrelevance := getBoolVal opt value
       | "verbose" -> Prefs.verbose := getBoolVal opt value
-      | _         -> raise (UnknownOption opt)
+      | _ -> raise (UnknownOption opt)
     end; fs
   | Import xs -> List.fold_left (fun fs x -> let path = ext x in
     if Files.mem path fs then fs else checkFile fs path) fs xs

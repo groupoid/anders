@@ -28,4 +28,3 @@ def opEquivalence (C D: precategory) (e: StrongEquivalence C D)
 
 def reflEquivalence (C: precategory) : StrongEquivalence C C :=
     (idFunctor C, idFunctor C, idNatIso C C (idFunctor C), idNatIso C C (idFunctor C))
--- Wait, I need nattransRefl or similar natural isomorphism for identity.

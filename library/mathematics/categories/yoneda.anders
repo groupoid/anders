@@ -15,8 +15,7 @@ import library/mathematics/categories/topos
 import library/foundations/univalent/prop
 import library/foundations/univalent/extensionality
 
--- | Functors from a small category C into the large category of sets SET.
---   Manual definition to handle large target category SET.
+-- | Functors from a small category C into the large category of sets SET. Manual definition to handle large target category SET.
 def catfunSET (C: precategory) : U₁ :=
   Σ (ob: Π (x: C.1.1), SET)
     (mor: Π (x y: C.1.1) (f: C.1.2 x y), (ob x).1 -> (ob y).1)
@@ -55,8 +54,7 @@ def Yoneda-β (C: precategory) (A: C.1.1) (F: catfunSET C) (u: (F.ob A).1)
   : Path (F.ob A).1 (YonedaMap C A F (YonedaInv C A F u)) u
  := <i> (F.id A @ i) u
 
--- | Auxiliary path for Yoneda-η.
---   Goes from F(f)(α_A(id_A)) to α_X(f).
+-- | Auxiliary path for Yoneda-η. Goes from F(f)(α_A(id_A)) to α_X(f).
 def Yoneda-η-η (C: precategory) (A: C.1.1) (F: catfunSET C) (α: nattransSET C (HomFunctor C A) F) (X: C.1.1) (f: C.1.2 A X)
   : Path (F.ob X).1 (F.mor A X f (α.1 A (C.2.id A))) (α.1 X f)
  := comp-Path (F.ob X).1 (F.mor A X f (α.1 A (C.2.id A))) (α.1 X (C.2.∘ A A X (C.2.id A) f)) (α.1 X f)

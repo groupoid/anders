@@ -12,9 +12,9 @@ import library/mathematics/categories/functor
 import library/mathematics/categories/natural
 
 -- Adjunction L ⊣ R
+
 def isAdjoint (C D: precategory) (L: catfunctor C D) (R: catfunctor D C): U := Σ
-    (u: nattrans C C (idFunctor C) (compFunctor C D C L R))
-    (c: nattrans D D (compFunctor D C D R L) (idFunctor D))
+    (u: nattrans C C (idFunctor C) (compFunctor C D C L R)) (c: nattrans D D (compFunctor D C D R L) (idFunctor D))
     (zig: Π (A: C.1.1), Path (D.1.2 (L.ob A) (L.ob A)) (D.2.∘ (L.ob A) (L.ob (R.ob (L.ob A))) (L.ob A) (L.mor A (R.ob (L.ob A)) (u.1 A)) (c.1 (L.ob A))) (D.2.id (L.ob A))),
     Π (B: D.1.1), Path (C.1.2 (R.ob B) (R.ob B)) (C.2.∘ (R.ob B) (R.ob (L.ob (R.ob B))) (R.ob B) (u.1 (R.ob B)) (R.mor (L.ob (R.ob B)) B (c.1 B))) (C.2.id (R.ob B))
 

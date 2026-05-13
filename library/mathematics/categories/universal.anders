@@ -21,7 +21,6 @@ def uHP (C D: precategory) (F: catfunctor D C) (a: C.1.1) (ua: univarr C D a F) 
   : Path (C.1.2 a (F.ob y.1)) y.2 (C.2.∘ a (F.ob ua.1.1) (F.ob y.1) (uEta C D F a ua) (F.mor ua.1.1 y.1 (uH' C D F a ua y))) := (ua.2 y).1.2
 
 -- Induced Functor components
-
 def fob_ua (C D: precategory) (F: catfunctor D C) (ua: Π (a: C.1.1), univarr C D a F) (a: C.1.1) : D.1.1 := uO C D F a (ua a)
 def fmor_ua (C D: precategory) (F: catfunctor D C) (ua: Π (a: C.1.1), univarr C D a F) (a b: C.1.1) (f: C.1.2 a b) : D.1.2 (fob_ua C D F ua a) (fob_ua C D F ua b)
   := uH' C D F a (ua a) (fob_ua C D F ua b, C.2.∘ a b (F.ob (fob_ua C D F ua b)) f (uEta C D F b (ua b)))

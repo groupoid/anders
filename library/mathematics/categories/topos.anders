@@ -10,7 +10,6 @@ import library/foundations/univalent/prop
 import library/foundations/univalent/iso
 
 -- | Large Categories (Locally Small)
-
 def cat1 : U₂ := Σ (ob: U₁), ob -> ob -> U
 
 def isPrecategory1 (C: cat1) : U₁ := Σ
@@ -28,7 +27,6 @@ def isPrecategory1 (C: cat1) : U₁ := Σ
 def precategory1 : U₂ := Σ (C: cat1), isPrecategory1 C
 
 -- | Definition of the Category of Sets.
-
 def Set : precategory1 :=
   ((SET, λ (A B: SET), A.1 -> B.1),
     ((λ (A: SET), idfun A.1),
@@ -172,9 +170,7 @@ def mono-to-prop (Y X: SET) (j: Y.1 -> X.1) (m: mono1 Set Y X j) (x: X.1) : isPr
 axiom SetSquare (Y X: SET) (j: Y.1 -> X.1) (m: mono1 Set Y X j) : hasPullbackLarge Set (SetOmega, (SetTerminal.1, λ (x: 𝟏), SetTrue x), (X, SetXi Y X j))
 axiom SetUniq (Y X: SET) (j: Y.1 -> X.1) (k: X.1 -> SetOmega.1) (m: mono1 Set Y X j) (p: hasPullbackLarge Set (SetOmega, (SetTerminal.1, λ (x: 𝟏), SetTrue x), (X, k))) : Path (X.1 -> SetOmega.1) (SetXi Y X j) k
 
-def SetSubobject : subobjectClassifier1 Set :=
-  (SetOmega, SetTerminal, (λ (x: 𝟏), SetTrue x), SetXi, SetSquare, SetUniq)
-
+def SetSubobject : subobjectClassifier1 Set := (SetOmega, SetTerminal, (λ (x: 𝟏), SetTrue x), SetXi, SetSquare, SetUniq)
 def Topos1 (cat: precategory1) : U₁ := Σ (ccc: isCCC1 cat), subobjectClassifier1 cat
 def internal : Topos1 Set := (SetCCC, SetSubobject)
 

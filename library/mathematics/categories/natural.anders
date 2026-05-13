@@ -28,7 +28,6 @@ def nattrans (C D: precategory) (F G: catfunctor C D): U
       isNaturalTransformation C D F G η
 
 -- Natural Transformation Isomorphism
--- Natural Transformation Isomorphism
 def natiso (C D: precategory) (F G: catfunctor C D) : U
  := Σ (η: nattrans C D F G)
       (inv: nattrans C D G F)

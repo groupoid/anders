@@ -1,9 +1,15 @@
 {- Category Theory: https://anders.groupoid.space/mathematics/categories/cartesian/
+
+   - Slice Category
+   - Cartesian Category
+
    Copyright (c) Groupoid Infinity, 2016-2026. -}
 
 module cartesian where
 import library/mathematics/categories/category
 import library/mathematics/categories/functor
+
+-- | Slice Category
 
 def cosliceOb (C D: precategory) (a: C.1.1) (F: catfunctor D C) : U := Σ (y: D.1.1), C.1.2 a (F.ob y)
 def cosliceHom (C D: precategory) (a: C.1.1) (F: catfunctor D C) (x y: cosliceOb C D a F) : U

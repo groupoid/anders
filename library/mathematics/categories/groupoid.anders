@@ -9,15 +9,6 @@
 module groupoid where
 import library/foundations/univalent/path
 import library/mathematics/categories/category
-option irrelevance true
-
-def comp-Path-assoc-inv (A : U) (a b c d : A) (f : Path A a b) (g : Path A b c) (h : Path A c d)
-  : Path (Path A a d) (comp-Path A a b d f (comp-Path A b c d g h)) (comp-Path A a c d (comp-Path A a b c f g) h)
- := sym (Path A a d) (comp-Path A a c d (comp-Path A a b c f g) h) (comp-Path A a b d f (comp-Path A b c d g h)) (comp-Path-assoc A a b c d f g h)
-
-def comp-Path-id-id (A : U) (x : A)
-  : Path (Path A x x) (comp-Path A x x x (idp A x) (idp A x)) (idp A x)
- := sym (Path A x x) (idp A x) (comp-Path A x x x (idp A x) (idp A x)) (comp-Path-left A x x (idp A x))
 
 def PathCat (X: U): cat := (X, \ (x y : X), PathP (<_>X) x y, star)
 
@@ -47,7 +38,7 @@ def CatGroupoid (X : U) (G : isGroupoid X)
       comp-Path-left X,
       comp-Path-right X,
       comp-Path-assoc X,
-      (\ (x y z w: X) (f: Path X x y) (g: Path X y z) (h: Path X z w), sym (Path X x w) (comp-Path X x z w (comp-Path X x y z f g) h) (comp-Path X x y w f (comp-Path X y z w g h)) (comp-Path-assoc X x y z w f g h)),
-      (\ (x: X), sym (Path X x x) (idp X x) (comp-Path X x x x (idp X x) (idp X x)) (comp-Path-left X x x (idp X x))),
+      comp-Path-assoc-inv X,
+      comp-Path-id-id X,
       star
     )

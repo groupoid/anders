@@ -246,13 +246,15 @@ def comp-Path-assoc (A : U) (a b c d : A) (f : Path A a b) (g : Path A b c) (h :
   : Path (Path A a d) (comp-Path A a c d (comp-Path A a b c f g) h) (comp-Path A a b d f (comp-Path A b c d g h))
  := J A a (λ (a : A) (b : A) (f : Path A a b), Π (c d : A) (g : Path A b c) (h : Path A c d),
     Path (Path A a d) (comp-Path A a c d (comp-Path A a b c f g) h) (comp-Path A a b d f (comp-Path A b c d g h)))
-    (λ (c d : A) (g : Path A a c) (h : Path A c d),
-      comp-Path (Path A a d)
-         (comp-Path A a c d (comp-Path A a a c (<_> a) g) h)
-         (comp-Path A a c d g h)
-         (comp-Path A a a d (<_> a) (comp-Path A a c d g h))
-         (<i> comp-Path A a c d (comp-Path-left A a c g @ -i) h)
-         (comp-Path-left A a d (comp-Path A a c d g h))) b f c d g h
+    (λ (c d : A) (g : Path A a c) (h : Path A c d), comp-Path (Path A a d) (comp-Path A a c d (comp-Path A a a c (<_> a) g) h)
+    (comp-Path A a c d g h) (comp-Path A a a d (<_> a) (comp-Path A a c d g h))
+    (<i> comp-Path A a c d (comp-Path-left A a c g @ -i) h) (comp-Path-left A a d (comp-Path A a c d g h))) b f c d g h
+def comp-Path-assoc-inv (A : U) (a b c d : A) (f : Path A a b) (g : Path A b c) (h : Path A c d)
+  : Path (Path A a d) (comp-Path A a b d f (comp-Path A b c d g h)) (comp-Path A a c d (comp-Path A a b c f g) h)
+ := sym (Path A a d) (comp-Path A a c d (comp-Path A a b c f g) h) (comp-Path A a b d f (comp-Path A b c d g h)) (comp-Path-assoc A a b c d f g h)
+def comp-Path-id-id (A : U) (x : A)
+  : Path (Path A x x) (comp-Path A x x x (idp A x) (idp A x)) (idp A x)
+ := sym (Path A x x) (idp A x) (comp-Path A x x x (idp A x) (idp A x)) (comp-Path-left A x x (idp A x))
 
 --- Reviewers of prover consistency should revise following
 --- rules of Reality Checking (Internalizing of transp and hcomp)

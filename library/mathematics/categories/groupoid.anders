@@ -21,10 +21,8 @@ def isCatGroupoid (C: cat): U := Σ
     (inv-right: Π (x y: C.1) (p: C.2 x y), Path (C.2 y y) (c y x y (inv x y p) p) (id y))
     (left: Π (x y: C.1) (f: C.2 x y), Path (C.2 x y) f (c x x y (id x) f))
     (right: Π (x y: C.1) (f: C.2 x y), Path (C.2 x y) f (c x y y f (id y)))
-    (assoc: Π (x y z w: C.1) (f: C.2 x y) (g: C.2 y z) (h: C.2 z w),
-      Path (C.2 x w) (c x z w (c x y z f g) h) (c x y w f (c y z w g h)))
-    (assoc-inv: Π (x y z w: C.1) (f: C.2 x y) (g: C.2 y z) (h: C.2 z w),
-      Path (C.2 x w) (c x y w f (c y z w g h)) (c x z w (c x y z f g) h)),
+    (assoc: Π (x y z w: C.1) (f: C.2 x y) (g: C.2 y z) (h: C.2 z w), Path (C.2 x w) (c x z w (c x y z f g) h) (c x y w f (c y z w g h)))
+    (assoc-inv: Π (x y z w: C.1) (f: C.2 x y) (g: C.2 y z) (h: C.2 z w), Path (C.2 x w) (c x y w f (c y z w g h)) (c x z w (c x y z f g) h)),
     Π (x: C.1), Path (C.2 x x) (c x x x (id x) (id x)) (id x)
 
 def CatGroupoid (X : U) (G : isGroupoid X)

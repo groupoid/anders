@@ -12,10 +12,7 @@ import library/mathematics/categories/category
 import library/mathematics/categories/functor
 
 -- Definitive Property
-def isNaturalTransformation
-    (C D: precategory)
-    (F G: catfunctor C D)
-    (eta: Π (x: C.1.1), D.1.2 (F.ob x) (G.ob x)) : U
+def isNaturalTransformation (C D: precategory) (F G: catfunctor C D) (eta: Π (x: C.1.1), D.1.2 (F.ob x) (G.ob x)) : U
  := Π (x y: C.1.1)
       (h: C.1.2 x y),
       Path (D.1.2 (F.ob x) (G.ob y))
@@ -24,8 +21,7 @@ def isNaturalTransformation
 
 -- Natural transformation
 def nattrans (C D: precategory) (F G: catfunctor C D): U
- := Σ (η: Π (x: C.1.1), D.1.2 (F.ob x) (G.ob x)),
-      isNaturalTransformation C D F G η
+ := Σ (η: Π (x: C.1.1), D.1.2 (F.ob x) (G.ob x)), isNaturalTransformation C D F G η
 
 -- Natural Transformation Isomorphism
 def natiso (C D: precategory) (F G: catfunctor C D) : U
@@ -45,9 +41,7 @@ def idNatTrans (C D: precategory) (F: catfunctor C D) : nattrans C D F F
            (<i> D.2.∘-left (F.ob x) (F.ob y) (F.mor x y h) @ -i))
 
 def idNatIso (C D: precategory) (F: catfunctor C D) : natiso C D F F
- := (idNatTrans C D F, idNatTrans C D F,
-     λ (x: C.1.1), D.2.2.2.2.2.2.2.2 (F.ob x),
-     λ (x: C.1.1), D.2.2.2.2.2.2.2.2 (F.ob x))
+ := (idNatTrans C D F, idNatTrans C D F, λ (x: C.1.1), D.2.2.2.2.2.2.2.2 (F.ob x), λ (x: C.1.1), D.2.2.2.2.2.2.2.2 (F.ob x))
 
 def opNatTrans (C D: precategory) (F G: catfunctor C D) (α: nattrans C D F G)
   : nattrans (catᵒᵖ C) (catᵒᵖ D) (catᵒᵖF C D G) (catᵒᵖF C D F)

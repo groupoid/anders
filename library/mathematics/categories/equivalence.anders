@@ -11,12 +11,8 @@ import library/mathematics/categories/category
 import library/mathematics/categories/functor
 import library/mathematics/categories/natural
 
--- Strong Equivalence
-def StrongEquivalence (C D: precategory) : U := Σ
-    (F: catfunctor C D)
-    (G: catfunctor D C)
-    (η: natiso C C (idFunctor C) (compFunctor C D C F G)),
-    natiso D D (compFunctor D C D G F) (idFunctor D)
+def StrongEquivalence (C D: precategory) : U
+ := Σ (F: catfunctor C D) (G: catfunctor D C) (η: natiso C C (idFunctor C) (compFunctor C D C F G)), natiso D D (compFunctor D C D G F) (idFunctor D)
 
 def opEquivalence (C D: precategory) (e: StrongEquivalence C D)
   : StrongEquivalence (catᵒᵖ C) (catᵒᵖ D)
@@ -26,5 +22,6 @@ def opEquivalence (C D: precategory) (e: StrongEquivalence C D)
      symNatIso (catᵒᵖ D) (catᵒᵖ D) (idFunctor (catᵒᵖ D)) (compFunctor (catᵒᵖ D) (catᵒᵖ C) (catᵒᵖ D) (catᵒᵖF D C e.2.1) (catᵒᵖF C D e.1))
                (opNatIso D D (compFunctor D C D e.2.1 e.1) (idFunctor D) e.2.2.2))
 
-def reflEquivalence (C: precategory) : StrongEquivalence C C :=
-    (idFunctor C, idFunctor C, idNatIso C C (idFunctor C), idNatIso C C (idFunctor C))
+def reflEquivalence (C: precategory) : StrongEquivalence C C
+ := (idFunctor C, idFunctor C, idNatIso C C (idFunctor C), idNatIso C C (idFunctor C))
+

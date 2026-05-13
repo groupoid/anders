@@ -1,0 +1,101 @@
+\documentclass[11pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{hyperref}
+\usepackage{listings}
+
+\title{Categorical Library in Anders}
+\author{Groupoid Infinity}
+\date{May 2026}
+
+\newcommand{\catC}{\mathcal{C}}
+\newcommand{\catD}{\mathcal{D}}
+\newcommand{\op}{^\text{op}}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+This article describes the design and implementation of the categorical library in the Anders proof assistant.
+We focus on incorporating the design principles from Jacques Carette et al. (2021) formalization in Agda, specifically regarding definitional duality and the use of cubical foundations for univalent categories.
+\end{abstract}
+
+\section{Introduction}
+
+The Anders categorical library is designed to be a minimal yet powerful implementation of category theory
+in a pure Martin-Löf Type Theory (MLTT) with cubical extensions. The library prioritizes
+proof-relevance, univalence, and duality-friendliness.
+
+\section{Definitional Duality}
+
+A key design choice, following \cite{carette2021}, is the use of symmetric laws for associativity and identity.
+By including both \texttt{assoc} and \texttt{assoc-inv}, as well as \texttt{id-id} (the neutral identity law),
+we ensure that the opposite category operation $(\cdot)\op$ is a definitional involution:
+\begin{equation}
+    (\catC\op)\op \equiv \catC
+\end{equation}
+This allows for "duality for free," where any theorem proved for a category $\catC$ can be immediately applied
+to its dual without explicit transport along an isomorphism.
+
+\section{Cubical Foundations}
+
+Unlike the Agda formalization which often relies on setoids to maintain compatibility with different Agda modes,
+Anders is natively cubical. This allows us to use Path types for equality between morphisms, which are
+proof-relevant by default. A univalent category in Anders is a precategory where the map from paths between
+objects to isomorphisms is an equivalence.
+
+\section{Core Library Structure}
+
+The core library consists of the following modules:
+\begin{itemize}
+    \item \texttt{category.anders}: Basic definitions of precategories and categories.
+    \item \texttt{functor.anders}: Functors and their compositions.
+    \item \texttt{natural.anders}: Natural transformations and isomorphisms.
+    \item \texttt{adjunction.anders}: Adjunctions between categories.
+\end{itemize}
+
+\section{Natural Transformations and Isomorphisms}
+
+Natural transformations are implemented as Sigma types consisting of the component map $\eta$ and a naturality condition.
+We have formalized the definitional duality for natural transformations: if $\alpha : F \Rightarrow G$ is a natural
+transformation between functors $F, G : \catC \to \catD$, then $\alpha$ also defines a natural transformation
+$\alpha\op : G\op \Rightarrow F\op$ between the dual functors. In Anders, this duality is definitional,
+meaning $(\alpha\op)\op \equiv \alpha$.
+
+\section{Adjunctions}
+
+Adjunctions $L \dashv R$ between categories $\catC$ and $\catD$ are defined via the unit-counit formulation:
+\begin{itemize}
+    \item A unit natural transformation $\eta : \text{id}_\catC \Rightarrow R \circ L$.
+    \item A counit natural transformation $\varepsilon : L \circ R \Rightarrow \text{id}_\catD$.
+    \item Two triangle identities (zig and zag).
+\end{itemize}
+Due to the current limitations of the Anders compiler regarding named projections within nested Sigma types, the implementation uses numeric indices (e.g., \texttt{u.1} for $\eta$) to ensure stable typechecking.
+
+\section{Equivalences of Categories}
+
+A strong equivalence between two categories $\catC$ and $\catD$ is a pair of functors $F : \catC \to \catD$ and $G : \catD \to \catC$ equipped with natural isomorphisms:
+\begin{itemize}
+    \item $\eta : \text{id}_\catC \cong G \circ F$
+    \item $\varepsilon : F \circ G \cong \text{id}_\catD$
+\end{itemize}
+We have implemented \texttt{opEquivalence}, which shows that an equivalence $e : \catC \cong \catD$ induces an equivalence $e\op : \catC\op \cong \catD\op$. To ensure definitional duality, we utilize \texttt{symNatIso} to adjust the directions of the unit and counit in the dualized structure.
+
+\section{The Category of Categories}
+
+The category of small precategories, denoted $\mathcal{CAT}$, is formalized as a large category (of type $U_2$). The objects are precategories of type $U_1$, and morphisms are functors of type $U$. While $\mathcal{CAT}$ is naturally a $2$-category, we provide its $1$-categorical structure by specifying identity functors and functor composition. The operation of taking the opposite category is currently provided as a definitional involution on the objects of $\mathcal{CAT}$.
+
+\section{Conclusion}
+
+The Anders categorical library continues to expand by incorporating higher-level structures while maintaining strict adherence to definitional duality and cubical principles. The use of symmetric laws and explicit path-based proofs allows for a clean and performant formalization that avoids the overhead of traditional setoid-based approaches.
+
+\begin{thebibliography}{9}
+\bibitem{carette2021}
+Jason Z. S. Hu and Jacques Carette.
+\textit{Formalizing Category Theory in Agda}.
+CPP 2021.
+\end{thebibliography}
+
+\end{document}

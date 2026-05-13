@@ -33,11 +33,13 @@ import library/mathematics/geometry/formalDisc
 import library/mathematics/categories/category
 import library/mathematics/categories/cartesian
 import library/mathematics/categories/functor
+import library/mathematics/categories/cat
 import library/mathematics/categories/natural
 import library/mathematics/categories/abelian
 import library/mathematics/categories/groupoid
 import library/mathematics/categories/topos
 import library/mathematics/categories/adjunction
+import library/mathematics/categories/equivalence
 import library/mathematics/categories/meta/favonia
 import library/mathematics/categories/meta/kraus
 import library/mathematics/categories/meta/awodey

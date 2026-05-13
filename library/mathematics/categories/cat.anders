@@ -1,0 +1,14 @@
+{- Category Theory: https://anders.groupoid.space/mathematics/categories/cat/
+   - The Category of Categories.
+
+   Copyright (c) Groupoid Infinity, 2016-2026. -}
+
+module cat where
+import library/mathematics/categories/category
+import library/mathematics/categories/functor
+import library/mathematics/categories/topos
+
+-- | The Large Category of Small Precategoreis.
+--   Note: CAT is naturally a 2-category. Here we define its 1-categorical data.
+
+def CAT : cat1 := (precategory, λ (A B: precategory), catfunctor A B, star)

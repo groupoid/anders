@@ -16,7 +16,10 @@ def catproduct (A B: precategory): precategory
       (\ (x y: prod A.C.ob B.C.ob) (f: prod (A.C.hom x.1 y.1) (B.C.hom x.2 y.2)), <i> (A.P.∘-left x.1 y.1 f.1 @ i, B.P.∘-left x.2 y.2 f.2 @ i)),
       (\ (x y: prod A.C.ob B.C.ob) (f: prod (A.C.hom x.1 y.1) (B.C.hom x.2 y.2)), <i> (A.P.∘-right x.1 y.1 f.1 @ i, B.P.∘-right x.2 y.2 f.2 @ i)),
       (\ (x y z w: prod A.C.ob B.C.ob) (f: prod (A.C.hom x.1 y.1) (B.C.hom x.2 y.2)) (g: prod (A.C.hom y.1 z.1) (B.C.hom y.2 z.2)) (h: prod (A.C.hom z.1 w.1) (B.C.hom z.2 w.2)),
-       <i> (A.P.∘-assoc x.1 y.1 z.1 w.1 f.1 g.1 h.1 @ i, B.P.∘-assoc x.2 y.2 z.2 w.2 f.2 g.2 h.2 @ i)), star), star)
+       <i> (A.P.∘-assoc x.1 y.1 z.1 w.1 f.1 g.1 h.1 @ i, B.P.∘-assoc x.2 y.2 z.2 w.2 f.2 g.2 h.2 @ i)),
+      (\ (x y z w: prod A.C.ob B.C.ob) (f: prod (A.C.hom x.1 y.1) (B.C.hom x.2 y.2)) (g: prod (A.C.hom y.1 z.1) (B.C.hom y.2 z.2)) (h: prod (A.C.hom z.1 w.1) (B.C.hom z.2 w.2)),
+       <i> (A.P.∘-assoc-inv x.1 y.1 z.1 w.1 f.1 g.1 h.1 @ i, B.P.∘-assoc-inv x.2 y.2 z.2 w.2 f.2 g.2 h.2 @ i)),
+      (\ (x: prod A.C.ob B.C.ob), <i> (A.P.id-id x.1 @ i, B.P.id-id x.2 @ i)), star), star)
 
 -- | Flip Bifunctor
 

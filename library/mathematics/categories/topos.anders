@@ -17,7 +17,10 @@ def isPrecategory1 (C: cat1) : U₁ := Σ
     (∘-left: Π (x y: C.ob) (f: C.hom x y), Path (C.hom x y) (∘ x x y (id x) f) f)
     (∘-right: Π (x y: C.ob) (f: C.hom x y), Path (C.hom x y) (∘ x y y f (id y)) f)
     (∘-assoc: Π (x y z w: C.ob) (f: C.hom x y) (g: C.hom y z) (h: C.hom z w),
-       Path (C.hom x w) (∘ x z w (∘ x y z f g) h) (∘ x y w f (∘ y z w g h))), unit
+       Path (C.hom x w) (∘ x z w (∘ x y z f g) h) (∘ x y w f (∘ y z w g h)))
+    (∘-assoc-inv: Π (x y z w: C.ob) (f: C.hom x y) (g: C.hom y z) (h: C.hom z w),
+       Path (C.hom x w) (∘ x y w f (∘ y z w g h)) (∘ x z w (∘ x y z f g) h))
+    (id-id: Π (x: C.ob), Path (C.hom x x) (∘ x x x (id x) (id x)) (id x)), unit
 
 def precategory1 : U₂ := Σ (C: cat1) (P: isPrecategory1 C), unit
 
@@ -31,6 +34,8 @@ def Set : precategory1 :=
      (λ (A B: SET) (f: A.1 -> B.1), (<i> f)),
      (λ (A B: SET) (f: A.1 -> B.1), (<i> f)),
      (λ (A B C D: SET) (f: A.1 -> B.1) (g: B.1 -> C.1) (h: C.1 -> D.1), (<i> (λ (a: A.1), h (g (f a))))),
+     (λ (A B C D: SET) (f: A.1 -> B.1) (g: B.1 -> C.1) (h: C.1 -> D.1), (<i> (λ (a: A.1), h (g (f a))))),
+     (λ (A: SET), <i> idfun A.1),
      star),
     star))
 

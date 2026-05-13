@@ -46,9 +46,7 @@ def isCCC (C: precategory): U
  := Σ (prod: Π (A B: C.1.1), C.1.1)
       (p1: Π (A B: C.1.1), C.1.2 (prod A B) A)
       (p2: Π (A B: C.1.1), C.1.2 (prod A B) B)
-      (univ: Π (A B X: C.1.1) (f: C.1.2 X A) (g: C.1.2 X B),
-           isContr (Σ (h: C.1.2 X (prod A B)), (Path (C.1.2 X A) (C.2.∘ X (prod A B) A h (p1 A B)) f) ×
-                   (Path (C.1.2 X B) (C.2.∘ X (prod A B) B h (p2 A B)) g)))
+      (univ: Π (A B X: C.1.1) (f: C.1.2 X A) (g: C.1.2 X B), isContr (Σ (h: C.1.2 X (prod A B)), (Path (C.1.2 X A) (C.2.∘ X (prod A B) A h (p1 A B)) f) × (Path (C.1.2 X B) (C.2.∘ X (prod A B) B h (p2 A B)) g)))
       (exp: Π (A B: C.1.1), C.1.1)
       (apply: Π (A B: C.1.1), C.1.2 (prod (exp A B) A) B)
       (curry: Π (A B X: C.1.1) (f: C.1.2 (prod X A) B), isContr (Σ (g: C.1.2 X (exp A B)), Path (C.1.2 (prod X A) B)

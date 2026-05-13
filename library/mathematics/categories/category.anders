@@ -19,7 +19,8 @@ option irrelevance false
 -- option irrelevance true
 -- def test-irrel (x : 𝟏) : Path 𝟏 x ★ := <i> ★
 
-def cat : U₁ := Σ (ob: U), ob -> ob -> U
+def cat  : U₁ := Σ (ob: U),  ob -> ob -> U
+def cat₁ : U₂ := Σ (ob: U₁), ob -> ob -> U
 
 def isPrecategory (C: cat) : U := Σ
     (id: Π (x: C.1), C.2 x x)

@@ -59,8 +59,7 @@ def prop-unit : isProp 𝟏 := λ (x y: 𝟏), <i> ★
 
 -- | Naturality condition is a property for functors into SET.
 def nattransSET-isProp (C: precategory) (A: C.C.ob) (F: catfunSET C) (η: Π (x: C.C.ob), C.C.hom A x -> (F.ob x).1)
-  : isProp (Σ (commute: Π (x y: C.C.ob) (h: C.C.hom x y) (f: C.C.hom A x),
-       Path (F.ob y).1 (η y (C.P.∘ A x y f h)) (F.mor x y h (η x f))), 𝟏)
+  : isProp (Σ (commute: Π (x y: C.C.ob) (h: C.C.hom x y) (f: C.C.hom A x), Path (F.ob y).1 (η y (C.P.∘ A x y f h)) (F.mor x y h (η x f))), 𝟏)
  := propSig (Π (x y: C.C.ob) (h: C.C.hom x y) (f: C.C.hom A x),
        Path (F.ob y).1 (η y (C.P.∘ A x y f h)) (F.mor x y h (η x f))) (λ (_: Π (x y: C.C.ob) (h: C.C.hom x y) (f: C.C.hom A x), Path (F.ob y).1 (η y (C.P.∘ A x y f h)) (F.mor x y h (η x f))), 𝟏)
     (propPi' (C.C.ob) (λ (x: C.C.ob), Π (y: C.C.ob) (h: C.C.hom x y) (f: C.C.hom A x), Path (F.ob y).1 (η y (C.P.∘ A x y f h)) (F.mor x y h (η x f)))

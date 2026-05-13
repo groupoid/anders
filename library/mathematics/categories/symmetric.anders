@@ -1,3 +1,4 @@
+
 module symmetric where
 import library/mathematics/categories/category
 import library/mathematics/categories/functor

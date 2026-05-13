@@ -1,4 +1,5 @@
-{- Category Theory.
+{- Category Theory: https://anders.groupoid.space/mathematics/categories/groupoid/
+
    - Categorical Groupoid.
 
    HoTT 9.9 The Rezk completion
@@ -17,7 +18,6 @@ def comp-Path-assoc-inv (A : U) (a b c d : A) (f : Path A a b) (g : Path A b c) 
 def comp-Path-id-id (A : U) (x : A)
   : Path (Path A x x) (comp-Path A x x x (idp A x) (idp A x)) (idp A x)
  := sym (Path A x x) (idp A x) (comp-Path A x x x (idp A x) (idp A x)) (comp-Path-left A x x (idp A x))
-
 
 def PathCat (X: U): cat := (X, \ (x y : X), PathP (<_>X) x y, star)
 

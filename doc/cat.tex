@@ -29,7 +29,7 @@ specifically regarding definitional duality and the use of cubical foundations f
 
 The Anders categorical library is designed to be a minimal yet powerful implementation of category theory
 in a pure Martin-Löf Type Theory (MLTT) with cubical extensions. The library \footnote{\url{https://github.com/groupoid/anders/tree/main/library/mathematics/categories}}prioritizes
-proof-relevance, univalence, and duality-friendliness.
+proof-relevance (even for units), univalence, and duality-friendliness.
 
 \section{Definitional Duality}
 
@@ -102,6 +102,7 @@ Our implementation addresses several technical challenges inherent in formalizin
 \begin{itemize}
     \item \textbf{Large Target Category}: Standard functors in our library are restricted to small precategories. Since $\mathcal{SET}$ is a large category, we manually define \texttt{catfunSET} and \texttt{nattransSET} using Sigma types that accommodate objects from higher universes.
     \item \textbf{Cubical Isomorphism}: The isomorphism is established via the projection of \texttt{YonedaMap} and its inverse \texttt{YonedaInv}. The computability property of beta reduction $\texttt{Yoneda-$\beta$}$ holds definitionally, while uniqueness property of isomorphism inverse $\texttt{Yoneda-$\eta$}$ is proved by establishing a path between natural transformations.
+    \item \textbf{Proof Relevance}: Proof Irrelevance is disabled even for Units, Path proofs are relevant by design.
     \item \textbf{Identification of Transformations}: To prove that two natural transformations are equal, we utilize \texttt{nattransSET-isProp}, which shows that the naturality condition for functors into $\mathcal{SET}$ is a mere proposition. This allows us to use \texttt{lemSig'} from the foundation library to establish the equality by only checking the component map $\eta$.
 \end{itemize}
 

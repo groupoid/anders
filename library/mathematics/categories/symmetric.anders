@@ -7,29 +7,29 @@ import library/mathematics/categories/natural
 -- | Product Category
 
 def catproduct (A B: precategory): precategory
- := ((prod A.1 B.1, λ (x y: prod A.1 B.1), prod (A.2 x.1 y.1) (B.2 x.2 y.2)),
-     ((λ (x: prod A.1 B.1), (A.2.id x.1, B.2.id x.2)),
-      (λ (x y z: prod A.1 B.1) (f: prod (A.2 x.1 y.1) (B.2 x.2 y.2)) (g: prod (A.2 y.1 z.1) (B.2 y.2 z.2)),
+ := ((prod A.1.1 B.1.1, λ (x y: prod A.1.1 B.1.1), prod (A.1.2 x.1 y.1) (B.1.2 x.2 y.2)),
+     ((λ (x: prod A.1.1 B.1.1), (A.2.id x.1, B.2.id x.2)),
+      (λ (x y z: prod A.1.1 B.1.1) (f: prod (A.1.2 x.1 y.1) (B.1.2 x.2 y.2)) (g: prod (A.1.2 y.1 z.1) (B.1.2 y.2 z.2)),
        (A.2.∘ x.1 y.1 z.1 f.1 g.1, B.2.∘ x.2 y.2 z.2 f.2 g.2)),
-      (λ (x y: prod A.1 B.1) (f g: prod (A.2 x.1 y.1) (B.2 x.2 y.2)) (p q: Path (prod (A.2 x.1 y.1) (B.2 x.2 y.2)) f g),
+      (λ (x y: prod A.1.1 B.1.1) (f g: prod (A.1.2 x.1 y.1) (B.1.2 x.2 y.2)) (p q: Path (prod (A.1.2 x.1 y.1) (B.1.2 x.2 y.2)) f g),
        <i j> (A.2.homSet x.1 y.1 f.1 g.1 (<k> (p @ k).1) (<k> (q @ k).1) @ i @ j,
               B.2.homSet x.2 y.2 f.2 g.2 (<k> (p @ k).2) (<k> (q @ k).2) @ i @ j)),
-      (λ (x y: prod A.1 B.1) (f: prod (A.2 x.1 y.1) (B.2 x.2 y.2)), <i> (A.2.∘-left x.1 y.1 f.1 @ i, B.2.∘-left x.2 y.2 f.2 @ i)),
-      (λ (x y: prod A.1 B.1) (f: prod (A.2 x.1 y.1) (B.2 x.2 y.2)), <i> (A.2.∘-right x.1 y.1 f.1 @ i, B.2.∘-right x.2 y.2 f.2 @ i)),
-      (λ (x y z w: prod A.1 B.1) (f: prod (A.2 x.1 y.1) (B.2 x.2 y.2)) (g: prod (A.2 y.1 z.1) (B.2 y.2 z.2)) (h: prod (A.2 z.1 w.1) (B.2 z.2 w.2)),
+      (λ (x y: prod A.1.1 B.1.1) (f: prod (A.1.2 x.1 y.1) (B.1.2 x.2 y.2)), <i> (A.2.∘-left x.1 y.1 f.1 @ i, B.2.∘-left x.2 y.2 f.2 @ i)),
+      (λ (x y: prod A.1.1 B.1.1) (f: prod (A.1.2 x.1 y.1) (B.1.2 x.2 y.2)), <i> (A.2.∘-right x.1 y.1 f.1 @ i, B.2.∘-right x.2 y.2 f.2 @ i)),
+      (λ (x y z w: prod A.1.1 B.1.1) (f: prod (A.1.2 x.1 y.1) (B.1.2 x.2 y.2)) (g: prod (A.1.2 y.1 z.1) (B.1.2 y.2 z.2)) (h: prod (A.1.2 z.1 w.1) (B.1.2 z.2 w.2)),
        <i> (A.2.∘-assoc x.1 y.1 z.1 w.1 f.1 g.1 h.1 @ i, B.2.∘-assoc x.2 y.2 z.2 w.2 f.2 g.2 h.2 @ i)),
-      (λ (x y z w: prod A.1 B.1) (f: prod (A.2 x.1 y.1) (B.2 x.2 y.2)) (g: prod (A.2 y.1 z.1) (B.2 y.2 z.2)) (h: prod (A.2 z.1 w.1) (B.2 z.2 w.2)),
+      (λ (x y z w: prod A.1.1 B.1.1) (f: prod (A.1.2 x.1 y.1) (B.1.2 x.2 y.2)) (g: prod (A.1.2 y.1 z.1) (B.1.2 y.2 z.2)) (h: prod (A.1.2 z.1 w.1) (B.1.2 z.2 w.2)),
        <i> (A.2.∘-assoc-inv x.1 y.1 z.1 w.1 f.1 g.1 h.1 @ i, B.2.∘-assoc-inv x.2 y.2 z.2 w.2 f.2 g.2 h.2 @ i)),
-      (λ (x: prod A.1 B.1), <i> (A.2.id-id x.1 @ i, B.2.id-id x.2 @ i))))
+      (λ (x: prod A.1.1 B.1.1), <i> (A.2.2.2.2.2.2.2.2 x.1 @ i, B.2.2.2.2.2.2.2.2 x.2 @ i))))
 
 -- | Flip Bifunctor
 
 def flipBifunctor (X Y Z: precategory) (F: catfunctor (catproduct X Y) Z) : catfunctor (catproduct Y X) Z :=
-  ((\(x: prod Y.1 X.1), F.ob (x.2, x.1)),
-   (\(x y: prod Y.1 X.1) (f: prod (Y.2 x.1 y.1) (X.2 x.2 y.2)), F.mor (x.2, x.1) (y.2, y.1) (f.2, f.1)),
-   (\(x: prod Y.1 X.1), F.id (x.2, x.1)),
-   \(x y z: prod Y.1 X.1) (f: prod (Y.2 x.1 y.1) (X.2 x.2 y.2)) (g: prod (Y.2 y.1 z.1) (X.2 y.2 z.2)),
-    F.fcomp (x.2, x.1) (y.2, y.1) (z.2, z.1) (f.2, f.1) (g.2, g.1))
+  ((\(x: prod Y.1.1 X.1.1), F.1 (x.2, x.1)),
+   (\(x y: prod Y.1.1 X.1.1) (f: prod (Y.1.2 x.1 y.1) (X.1.2 x.2 y.2)), F.2.1 (x.2, x.1) (y.2, y.1) (f.2, f.1)),
+   (\(x: prod Y.1.1 X.1.1), F.2.2.1 (x.2, x.1)),
+   \(x y z: prod Y.1.1 X.1.1) (f: prod (Y.1.2 x.1 y.1) (X.1.2 x.2 y.2)) (g: prod (Y.1.2 y.1 z.1) (X.1.2 y.2 z.2)),
+    F.2.2.2 (x.2, x.1) (y.2, y.1) (z.2, z.1) (f.2, f.1) (g.2, g.1))
 
 -- | Monoidal Category structure
 
@@ -48,13 +48,13 @@ def isMonoidal (C: precategory): U
                 (tensor.mor (x, tensor.ob (tensor.ob (y, z), w)) (x, tensor.ob (y, tensor.ob (z, w))) (C.2.id x, (α y z w).1)))
              (C.2.∘ (tensor.ob (tensor.ob (tensor.ob (x, y), z), w)) (tensor.ob (tensor.ob (x, y), tensor.ob (z, w))) (tensor.ob (x, tensor.ob (y, tensor.ob (z, w))))
                  ((α (tensor.ob (x, y)) z w).1)
-                 ((α x y (tensor.ob (z, w))).1)))
-      (triangle: Π (x y: C.1.1),
+                 ((α x y (tensor.ob (z, w))).1))),
+      Π (x y: (C.1.1)),
         Path (C.1.2 (tensor.ob (tensor.ob (x, e), y)) (tensor.ob (x, y)))
              (C.2.∘ (tensor.ob (tensor.ob (x, e), y)) (tensor.ob (x, tensor.ob (e, y))) (tensor.ob (x, y))
                 ((α x e y).1)
                 (tensor.mor (x, tensor.ob (e, y)) (x, y) (C.2.id x, (λ₁ y).1)))
-             (tensor.mor (tensor.ob (x, e), y) (x, y) ((ρ₁ x).1, C.2.id y)))
+             (tensor.mor (tensor.ob (x, e), y) (x, y) ((ρ₁ x).1, C.2.id y))
 
 -- | Braided Monoidal Category
 
@@ -71,8 +71,8 @@ def isBraided (C: precategory) (m: isMonoidal C) : U
                    ((m.α y x z).1))
                 (C.2.∘ (m.tensor.ob (y, m.tensor.ob (x, z))) (m.tensor.ob (y, m.tensor.ob (z, x))) (m.tensor.ob (m.tensor.ob (y, z), x))
                    (m.tensor.mor (y, m.tensor.ob (x, z)) (y, m.tensor.ob (z, x)) (C.2.id y, braiding.η.η (x, z)))
-                   ((m.α z x y).1))))
-      (hexagon₂: Π (x y z: C.1.1),
+                   ((m.α y z x).2.1)))),
+       Π (x y z: C.1.1),
         Path (C.1.2 (m.tensor.ob (m.tensor.ob (x, y), z)) (m.tensor.ob (z, m.tensor.ob (x, y))))
              (braiding.η.η (m.tensor.ob (x, y), z))
              (C.2.∘ (m.tensor.ob (m.tensor.ob (x, y), z)) (m.tensor.ob (x, m.tensor.ob (z, y))) (m.tensor.ob (z, m.tensor.ob (x, y)))
@@ -83,17 +83,17 @@ def isBraided (C: precategory) (m: isMonoidal C) : U
                    ((m.α x z y).2.1)
                    (C.2.∘ (m.tensor.ob (m.tensor.ob (x, z), y)) (m.tensor.ob (m.tensor.ob (z, x), y)) (m.tensor.ob (z, m.tensor.ob (x, y)))
                       (m.tensor.mor (m.tensor.ob (x, z), y) (m.tensor.ob (z, x), y) (braiding.η.η (x, z), C.2.id y))
-                      ((m.α z x y).1)))))
+                      ((m.α z x y).1))))
 
 -- | Symmetric Monoidal Category
 
 def isSymmetric (C: precategory) (m: isMonoidal C) (b: isBraided C m) : U
  := Σ (symmetry: Π (x y: C.1.1), Path (C.1.2 (m.tensor.ob (x,y)) (m.tensor.ob (x,y)))
           (C.2.∘ (m.tensor.ob (x,y)) (m.tensor.ob (y,x)) (m.tensor.ob (x,y)) (b.braiding.η.η (x,y)) (b.braiding.η.η (y,x)))
-          (C.2.id (m.tensor.ob (x,y))))
-      (braidingCondition: Π (x: C.1.1),
+          (C.2.id (m.tensor.ob (x,y)))),
+      Π (x: (C.1.1)),
         Path (C.1.2 (m.tensor.ob (x, m.e)) (m.tensor.ob (m.e, x)))
              (b.braiding.η.η (x, m.e))
              (C.2.∘ (m.tensor.ob (x, m.e)) x (m.tensor.ob (m.e, x))
                 ((m.ρ₁ x).1)
-                ((m.λ₁ x).2.1)))
+                ((m.λ₁ x).2.1))

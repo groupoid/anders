@@ -19,8 +19,11 @@
 
 \begin{abstract}
 This article describes the design and implementation of the categorical library in the Anders proof assistant.
-We focus on incorporating the design principles from Jacques Carette et al. (2021) formalization in Agda, specifically regarding definitional duality and the use of cubical foundations for univalent categories.
+We focus on incorporating the design principles from Jacques Carette et al (2021) formalization in Agda,
+specifically regarding definitional duality and the use of cubical foundations for univalent categories.
 \end{abstract}
+
+\tableofcontents
 
 \section{Introduction}
 
@@ -54,6 +57,7 @@ The core library consists of the following modules:
     \item \texttt{functor.anders}: Functors and their compositions.
     \item \texttt{natural.anders}: Natural transformations and isomorphisms.
     \item \texttt{adjunction.anders}: Adjunctions between categories.
+    \item \texttt{yoneda.anders}: Yoneda lemma.
 \end{itemize}
 
 \section{Natural Transformations and Isomorphisms}
@@ -97,11 +101,11 @@ The Yoneda Lemma is a fundamental result in category theory that relates natural
 Our implementation addresses several technical challenges inherent in formalizing the Yoneda Lemma:
 \begin{itemize}
     \item \textbf{Large Target Category}: Standard functors in our library are restricted to small precategories. Since $\mathcal{SET}$ is a large category, we manually define \texttt{catfunSET} and \texttt{nattransSET} using Sigma types that accommodate objects from higher universes.
-    \item \textbf{Manual Sigma Triple}: Natural transformations are represented as triples $(\eta, \text{commute}, \star)$, where $\star$ is the unique element of the unit type $\mathbf{1}$. This structure ensures compatibility with the compiler's positional projection matching.
-    \item \textbf{Cubical Isomorphism}: The isomorphism is established via the \texttt{YonedaMap} and its inverse \texttt{YonedaInv}. The property $\texttt{Yoneda-β}$ (beta reduction) holds definitionally, while $\texttt{Yoneda-η}$ (isomorphism inverse) is proved by establishing a path between natural transformations.
+    \item \textbf{Cubical Isomorphism}: The isomorphism is established via the projection of \texttt{YonedaMap} and its inverse \texttt{YonedaInv}. The computability property of beta reduction $\texttt{Yoneda-$\beta$}$ holds definitionally, while uniqueness property of isomorphism inverse $\texttt{Yoneda-$\eta$}$ is proved by establishing a path between natural transformations.
     \item \textbf{Identification of Transformations}: To prove that two natural transformations are equal, we utilize \texttt{nattransSET-isProp}, which shows that the naturality condition for functors into $\mathcal{SET}$ is a mere proposition. This allows us to use \texttt{lemSig'} from the foundation library to establish the equality by only checking the component map $\eta$.
 \end{itemize}
 
+\newpage
 \section{Conclusion}
 
 The Anders categorical library continues to expand by incorporating higher-level structures while maintaining strict adherence to definitional duality and cubical principles. The use of symmetric laws and explicit path-based proofs allows for a clean and performant formalization that avoids the overhead of traditional setoid-based approaches.

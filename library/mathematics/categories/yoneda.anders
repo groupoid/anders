@@ -4,6 +4,7 @@ import library/mathematics/categories/functor
 import library/mathematics/categories/natural
 import library/mathematics/categories/topos
 import library/foundations/univalent/prop
+import library/foundations/univalent/extensionality
 
 -- | Functors from a small category C into the large category of sets SET.
 --   Manual definition to handle large target category SET.
@@ -46,9 +47,10 @@ def Yoneda-β (C: precategory) (A: C.C.ob) (F: catfunSET C) (u: (F.ob A).1)
  := <i> (F.id A @ i) u
 
 -- | Auxiliary path for Yoneda-η.
+--   Goes from F(f)(α_A(id_A)) to α_X(f).
 def Yoneda-η-η (C: precategory) (A: C.C.ob) (F: catfunSET C) (α: nattransSET C (HomFunctor C A) F) (X: C.C.ob) (f: C.C.hom A X)
   : Path (F.ob X).1 (F.mor A X f (α.1 A (C.P.id A))) (α.1 X f)
- := pcomp (F.ob X).1 (F.mor A X f (α.1 A (C.P.id A))) (α.1 X (C.P.∘ A A X (C.P.id A) f)) (α.1 X f)
+ := comp-Path (F.ob X).1 (F.mor A X f (α.1 A (C.P.id A))) (α.1 X (C.P.∘ A A X (C.P.id A) f)) (α.1 X f)
           (<i> α.2.1 A X f (C.P.id A) @ -i)
           (<i> α.1 X (C.P.∘-left A X f @ i))
 
@@ -71,7 +73,11 @@ def nattransSET-isProp (C: precategory) (A: C.C.ob) (F: catfunSET C) (η: Π (x:
 -- | Path between component maps for Yoneda-η.
 def Yoneda-η-p (C: precategory) (A: C.C.ob) (F: catfunSET C) (α: nattransSET C (HomFunctor C A) F)
   : Path (Π (x: C.C.ob) (f: C.C.hom A x), (F.ob x).1) (YonedaInv C A F (YonedaMap C A F α)).1 α.1
- := ?
+ := piext (C.C.ob) (λ (x: C.C.ob), Π (f: C.C.hom A x), (F.ob x).1)
+           (YonedaInv C A F (YonedaMap C A F α)).1 α.1
+           (λ (x: C.C.ob), funext (C.C.hom A x) ((F.ob x).1)
+                                  ((YonedaInv C A F (YonedaMap C A F α)).1 x) (α.1 x)
+                                  (λ (f: C.C.hom A x), Yoneda-η-η C A F α x f))
 
 -- | Verification of Yoneda Lemma: Inverse Property 2.
 def Yoneda-η (C: precategory) (A: C.C.ob) (F: catfunSET C) (α: nattransSET C (HomFunctor C A) F)

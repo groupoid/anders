@@ -101,6 +101,7 @@ corresponds to the type defined in OCaml module:
     kan :=&$\textbf{transp}\ E\ E\ |\ \textbf{hcomp}\ E$ \\
    glue :=&$\textbf{Glue}\ E\ |\ \textbf{glue}\ E\ |\ \textbf{unglue}\ E\ E$ \\
      Im :=&$\textbf{Im}\ \mathrm{E}\ |\ \textbf{Inf}\ \mathrm{E}\ |\ \textbf{Join}\ \mathrm{E}\ |\ \textbf{ind$_{Im}$}\ \mathrm{E}\ \mathrm{E}$ \\
+     Flat :=&$\flat\ \mathrm{E}\ |\ \flat-\textrm{unit}\ \mathrm{E}\ |\ \flat-\textrm{counit}\ \mathrm{E}\ |\ \textbf{ind}_{\flat}\ \mathrm{E}\ \mathrm{E}$ \\
 \end{tabular}
 \end{table}
 
@@ -109,7 +110,7 @@ Further Menhir BNF notation will be used to describe the top-level language E pa
 \begin{table}[ht!]
 \centering
 \begin{tabular}{rl}
-      E :=&$\textrm{cosmos}\ |\ \textrm{var}\ |\ \textrm{MLTT}\ |\ \textrm{CCHM}\ |\ \textrm{Im}$ \\
+      E :=&$\textrm{cosmos}\ |\ \textrm{var}\ |\ \textrm{MLTT}\ |\ \textrm{CCHM}\ |\ \textrm{Im}\ |\ \textrm{Flat}$ \\
    CCHM :=&$\textrm{path}\ |\ \textrm{I}\ |\ \textrm{part}\ |\ \textrm{sub}\ |\ \textrm{kan}\ |\ \textrm{glue}$ \\
    MLTT :=&$\textrm{pi}\ |\ \textrm{sigma}\ |\ \textrm{id}$ \\
 \end{tabular}
@@ -122,7 +123,8 @@ The keywords are following: \texttt{module}, \texttt{where}, \texttt{import}, \t
 \texttt{V}, \texttt{$\bigvee$}, \texttt{$\bigwedge$}, \texttt{-}, \texttt{+}, \texttt{@}, \texttt{PathP},
 \texttt{transp}, \texttt{hcomp}, \texttt{zero}, \texttt{one}, \texttt{Partial}, \texttt{inc},
 \texttt{$\times$}, \texttt{$\rightarrow$}, \texttt{:}, \texttt{:=}, \texttt{$\mapsto$}, \texttt{U},
-\texttt{ouc}, \texttt{interval}, \texttt{inductive}, \texttt{Glue}, \texttt{glue}, \texttt{unglue}.
+\texttt{ouc}, \texttt{interval}, \texttt{inductive}, \texttt{Glue}, \texttt{glue}, \texttt{unglue},
+\texttt{$\flat$}, \texttt{$\flat$-unit}, \texttt{$\flat$-counit}, \texttt{ind-$\flat$}.
 
 \textbf{Indentifiers}. Identifiers support UTF-8. Indentifiers couldn't
 start with $\texttt{:}$, $\texttt{-}$, $\rightarrow$. Sample identifiers:
@@ -651,6 +653,44 @@ Geometric Modal HoTT Framework: Infinitesimal Proximity, Formal Disk, Formal Dis
 \textbf{def} T$^\infty$-map (X Y : U) (f : X → Y) ($\tau$ : T$^\infty$ X) : T$^\infty$ Y := (f $\tau$.1, d X Y f $\tau$.1 $\tau$.2) \\
 \end{tabular}
 \end{table}
+\newpage
+\subsection{Flat Modality}
+
+The Flat modality $\flat$ (also known as the discrete modality) is a core primitive of Anders,
+providing a way to talk about discrete types. In a cohesive type theory, $\flat A$
+is the type $A$ equipped with the discrete topology. The Anders prover implements
+computational semantics for the Flat modality including its interaction with cubical primitives.
+
+\begin{table}[ht!]
+\tabstyle
+\begin{tabular}{l}
+\textbf{def} Flat (A : U) := $\flat$ A \\
+\textbf{def} FlatUnit (A : U) (a : A) := $\flat$-unit a \\
+\textbf{def} FlatCounit (A : U) (x : $\flat$ A) := $\flat$-counit x \\
+\\
+\textbf{def} isDiscrete (A : U) : U := isEquiv A ($\flat$ A) (FlatUnit A) \\
+\textbf{def} ♭-$\eta$ (A : U) (x : $\flat$ A) : Path ($\flat$ A) x ($\flat$-unit ($\flat$-counit x)) := <p> x \\
+\textbf{def} FlatInd (A : U) (B : $\flat$ A $\rightarrow$ U) := ind-$\flat$ A B \\
+\end{tabular}
+\end{table}
+
+The Flat modality satisfies several computational reduction rules for transport and
+homogeneous composition, which ensure that $\flat$ behaves correctly with respect to the
+cubical structure of the type theory.
+
+\begin{table}[ht!]
+\tabstyle
+\begin{tabular}{l}
+transp$^{i}$ ($\flat$ A) $\varphi$ ($\flat$-unit a) = $\flat$-unit (transp$^i$ A $\varphi$ a) \\
+hcomp$^{i}$ ($\flat$ A) [$\phi$ $\mapsto$ $\flat$-unit u] ($\flat$-unit u$_0$) = $\flat$-unit (hcomp$^i$ A [$\phi$ $\mapsto$ u] u$_0$) \\
+\end{tabular}
+\end{table}
+
+\begin{definition}[Discreteness]
+A type $A$ is called discrete if the unit map $\flat$-unit : $A \rightarrow \flat A$ is an equivalence.
+This corresponds to the intuition that a type is discrete if its points have no non-trivial paths between them
+that aren't captured by the discrete topology.
+\end{definition}
 
 \newpage
 \subsection{Inductive Types}

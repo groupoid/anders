@@ -1321,6 +1321,7 @@ and conv_internal v1 v2 =
     | VJoin u, VJoin v -> u == v || conv u v
     | VIndIm (a1, b1), VIndIm (a2, b2) -> (a1 == a2 || conv a1 a2) && (b1 == b2 || conv b1 b2)
     | VFla u, VFla v -> u == v || conv u v
+    | VFlaUnit u, VFlaUnit v -> u == v || conv u v
     | VFlaCounit u, VFlaCounit v -> u == v || conv u v
     | VIndFla (a1, b1), VIndFla (a2, b2) -> (a1 == a2 || conv a1 a2) && (b1 == b2 || conv b1 b2)
     | VCoequ (a1, b1, f1, g1), VCoequ (a2, b2, f2, g2) -> (a1 == a2 || conv a1 a2) && (b1 == b2 || conv b1 b2) && (f1 == f2 || conv f1 f2) && (g1 == g2 || conv g1 g2)

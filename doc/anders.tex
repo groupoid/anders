@@ -60,7 +60,7 @@ sources: groupoid/anders\footnote{\url{https://github.com/groupoid/anders/}} or 
 through OPAM package manager. Main commands are \textbf{check} (to check a program)
 and \textbf{repl} (to enter the proof shell).
 
-\begin{table}[ht]
+\begin{table}[ht!]
 \centering
 \begin{tabular}{l}
 \$ opam install anders
@@ -82,7 +82,7 @@ Here is given the mathematical pseudo-code notation of the language
 expressions that come immediately after parsing. The core syntax definition of HTS language
 corresponds to the type defined in OCaml module:
 
-\begin{table}[ht]
+\begin{table}[ht!]
 \centering
 \begin{tabular}{rl}
  cosmos :=&$\textbf{U}_j \ |\ \textbf{V}_k$ \\
@@ -106,7 +106,7 @@ corresponds to the type defined in OCaml module:
 
 Further Menhir BNF notation will be used to describe the top-level language E parser.
 
-\begin{table}[ht]
+\begin{table}[ht!]
 \centering
 \begin{tabular}{rl}
       E :=&$\textrm{cosmos}\ |\ \textrm{var}\ |\ \textrm{MLTT}\ |\ \textrm{CCHM}\ |\ \textrm{Im}$ \\
@@ -130,7 +130,7 @@ $\neg\texttt{-of-}\vee$, $\texttt{1}$$\rightarrow$$\texttt{1}$, $\texttt{is-?}$,
 $\texttt{=}$, $\texttt{\$$\sim$]!}$$\texttt{005x}$, $\infty$, $\texttt{x}$$\rightarrow$$\texttt{Nat}$.
 
 \textbf{Modules}. Modules represent files with declarations. More accurate, BNF notation of module consists of imports, options and declarations.
-\begin{table}[ht]
+\begin{table}[ht!]
 \tabstyle
 \begin{tabular}{l}
 \textbf{menhir} \\
@@ -160,7 +160,7 @@ tune inner variables of the type checker.
 4) lemma (helper in big game);
 5) theorem (something valuable or complex enough).
 
-\begin{table}[ht!]
+\begin{table}[ht!][ht!]
 \tabstyle
 \begin{tabular}{l}
 \textbf{axiom} isProp (A : U) : U \\
@@ -176,7 +176,7 @@ Each telescope consists of a series of lenses or empty. Each lense provides a
 set of variables of the same type. Telescope defines parameters of a declaration.
 Types in a telescope, type of a declaration and a proof-terms are a language expressions exp1.
 
-\begin{table}[ht]
+\begin{table}[ht!]
 \tabstyle
 \begin{tabular}{l}
 \textbf{menhir} \\
@@ -195,7 +195,7 @@ Types in a telescope, type of a declaration and a proof-terms are a language exp
 exp0 (pair constructions), exp1 (non neutral constructions), exp2 (path and pi applcations),
 exp3 (neutral constructions).
 
-\begin{table}[ht!]
+\begin{table}[ht!][ht!]
 \tabstyle
 \begin{tabular}{ll}
 \textbf{menhir} \\
@@ -215,7 +215,7 @@ as a right part of left-associative application for both Path and Pi lambdas.
 Universe indicies $U_j$ (inner fibrant), $V_k$ (outer pretypes) and S (outer strict omega)
 are using unicode subscript letters that are already processed in lexer.
 
-\begin{table}[ht!]
+\begin{table}[ht!][ht!]
 \tabstyle
 \begin{tabular}{llll}
 \textbf{menhir} \\
@@ -238,7 +238,7 @@ assign types to universes and enable/disable hierachies. This will be done by pr
 pluggable presheaf modules. We selected 5 levels of type checker awareness from universes and pure type
 systems up to synthetic language of homotopy type theory. Each layer corresponds to its presheaves with
 separate configuration for universe hierarchies.
-\begin{table}[ht]
+\begin{table}[ht!]
 \tabstyle
 \begin{tabular}{rl}
      \textbf{def} & lang :\textbf{U} := \textbf{inductive} \\
@@ -271,7 +271,7 @@ j < k.
 \end{equation}
 Large elimination to upper universes is prohibited. This is extendable to Agda model:
 
-\begin{table}[ht]
+\begin{table}[ht!]
 \tabstyle
 \begin{tabular}{rl}
      \textbf{def} & cosmos : \textbf{U} := \textbf{inductive} \\
@@ -305,7 +305,7 @@ implication in a Kripke model.
 An element $w:[\Pi(x:A)B(x)](I)$ is a family of functions $w_f : \Pi(u:A(J))B(J,u)$
 for $f : J \rightarrow I$ such that $(w_f u)g=w_{f\ g}(u\ g)$ when $u:A(J)$ and $g:K\rightarrow J$.
 \end{definition}
-\begin{table}[ht]
+\begin{table}[ht!]
 \tabstyle
 \begin{tabular}{rl}
   \textbf{def} & pure (lang : U) : \textbf{U} := \textbf{inductive} \\
@@ -319,7 +319,7 @@ for $f : J \rightarrow I$ such that $(w_f u)g=w_{f\ g}(u\ g)$ when $u:A(J)$ and 
 \begin{definition}[Sigma]
 The set $\Sigma(x:A)B(x)$ is the set of pairs $(u,v)$ when $u:A(I),v:B(I,u)$ and restriction map $(u,v)\ f=(u\ f,v\ f)$.
 \end{definition}
-\begin{table}[ht]
+\begin{table}[ht!]
 \tabstyle
 \begin{tabular}{rl}
   \textbf{def} & total (lang : U) : \textbf{U} := \textbf{inductive} \\
@@ -333,7 +333,7 @@ The set $\Sigma(x:A)B(x)$ is the set of pairs $(u,v)$ when $u:A(I),v:B(I,u)$ and
 
 The presheaf with only Pi and Sigma is called \textbf{MLTT-72} \cite{MLTT72}. Its internalization in \textbf{anders} is as follows:
 
-\begin{table}[ht!]
+\begin{table}[ht!][ht!]
 \tabstyle
 \begin{tabular}{rl}
 \textbf{def} & MLTT-72 (A : U) (B : A $\rightarrow$ U) : U := $\Sigma$ \\
@@ -359,7 +359,7 @@ The fundamental development of equality inside MLTT provers led us to the
 notion of $\infty$-groupoid as spaces. In this way Path identity type appeared
 in the core of type checker along with De Morgan algebra on built-in interval type.
 
-\begin{table}[ht]
+\begin{table}[ht!]
 \tabstyle
 \begin{tabular}{rl}
      \textbf{def} & homotopy (lang : U) : \textbf{U} := \textbf{inductive} \\
@@ -406,7 +406,7 @@ extensionality; it is not enough for proving $\beta$ rule for Path type or path 
 \indent $\textbf{Generalized\ Transport}$. Generalized transport transp adresses
 first problem of deriving the computational $\beta$ rule for Path types:
 
-\begin{table}[ht]
+\begin{table}[ht!]
 \tabstyle
 \begin{tabular}{rl}
 \textbf{theorem} & Path$_\beta$ (A : U) (a : A) (C : D A) (d: C a a (refl A a)) \\
@@ -421,7 +421,7 @@ Transport is defined on fibrant types (only) and type checker should cover all t
 Note that transp$^i$ (Path$^j$ A v w) $\varphi$ u$_0$ case is relying on comp
 operation which depends on hcomp primitive. Here is given the first part of Simon Huber equations \cite{Huber} for \textbf{transp}:
 
-\begin{table}[ht]
+\begin{table}[ht!]
 \tabstyle
 \begin{tabular}{l}
 transp$^{i}$ N $\varphi$ u$_0$ = u$_0$ \\
@@ -443,7 +443,7 @@ extensional equality: two of its elements are considered judgmentally equal if
 they represent the same subcube of A. They are equal whenever they reduce to
 equal terms for all the possible assignment of variables that make r equal to 1.
 
-\begin{table}[ht]
+\begin{table}[ht!]
 \tabstyle
 \begin{tabular}{l}
 \textbf{def} Partial' (A : U) (i : I) := Partial A i \\
@@ -458,7 +458,7 @@ subtype A [ i $\mapsto$ u ]. A term of this type is a term of type A that is
 definitionally equal to u when (IsOne i) is satisfied. We have forth and back
 fusion rules ouc (inc v) = v and inc (outc v) = v. Moreover, ouc v will reduce to u 1=1 when i=1.
 
-\begin{table}[ht]
+\begin{table}[ht!]
 \tabstyle
 \begin{tabular}{l}
 \textbf{def} sub' (A : U) (i : I) (u : Partial A i) : V := A [i $\mapsto$ u ] \\
@@ -473,7 +473,7 @@ internalization in type theory). One of the main roles of homogeneous compositio
 carrier in [higher] inductive type constructors for calculating of homotopy colimits and direct
 encoding of CW-complexes. Here is given the second part of Simon Huber equations \cite{Huber} for $\textbf{hcomp}$:
 
-\begin{table}[ht]
+\begin{table}[ht!]
 \tabstyle
 \begin{tabular}{l}
 hcomp$^i$ N [$\phi$ $\mapsto$ 0] 0 = 0 \\
@@ -491,7 +491,7 @@ hcomp$^i$ (Glue [$\phi$ $\mapsto$ (T,w)] A) [$\psi$ $\mapsto$ u] u$_0$ = glue [$
 To avoid conflicts with path equalities which live in fibrant universes strict
 equalities live in pretypes universes.
 
-\begin{table}[ht!]
+\begin{table}[ht!][ht!]
 \tabstyle
 \begin{tabular}{rl}
      \textbf{def} & strict (lang : U) : \textbf{U} := \textbf{inductive} \\\
@@ -516,7 +516,7 @@ types you can compose with equivalences instead of paths. This implies the
 univalence principle and it is what lets us transport along paths built
 out of equivalences.
 
-\begin{table}[ht]
+\begin{table}[ht!]
 \tabstyle
 \begin{tabular}{rl}
      \textbf{def} & glue (lang : U) : \textbf{U} := \textbf{inductive} \\
@@ -529,7 +529,7 @@ out of equivalences.
 
 Basic Fibrational HoTT core by Pelayo, Warren, and Voevodsky (2012).
 
-\begin{table}[ht]
+\begin{table}[ht!]
 \tabstyle
 \begin{tabular}{l}
 \textbf{def} fiber (A B : U) (f: A → B) (y : B): U := $\Sigma$ (x : A), Path B (f x) y\\
@@ -550,7 +550,7 @@ heterogeneous path equality. The Equiv → Path type is called Univalence type,
 where univalence intro is obtained by Glue type and elim (Path → Equiv) is
 obtained by sigma transport from constant map.
 
-\begin{table}[ht]
+\begin{table}[ht!]
 \tabstyle
 \begin{tabular}{l}
 \textbf{def} univ-formation (A B : U) := equiv A B → PathP (<i> U) A B \\
@@ -570,7 +570,7 @@ Similar to Fibrational Equivalence the notion of Retract/Section based Isomorphi
 as forth-back transport between isomorphism and path equality. This notion is somehow cannonical to all
 cubical systems and is called Unimorphism here.
 
-\begin{table}[ht!]
+\begin{table}[ht!][ht!]
 \tabstyle
 \begin{tabular}{l}
 \textbf{def} iso-Form (A B: U) : U$_1$ := iso A B -> PathP (<i>U) A B \\
@@ -585,7 +585,7 @@ cubical systems and is called Unimorphism here.
 
 Orton-Pitts basis for univalence computability (2017):
 
-\begin{table}[ht!]
+\begin{table}[ht!][ht!]
 \tabstyle
 \begin{tabular}{l}
 \textbf{def} ua (A B : U) (p : equiv A B) : PathP (<i> U) A B := univ-intro A B p \\
@@ -603,7 +603,7 @@ from synthetic differential geometry. This type-theoretical framework was develo
 for the first time by Felix Cherubini under the guidance of Urs Schreiber. The Anders
 prover implements the computational semantics of the de Rham stack.
 
-\begin{table}[ht]
+\begin{table}[ht!]
 \tabstyle
 \begin{tabular}{l}
 \textbf{def} $\iota$ (A : U) (a : A) : $\Im$ A := $\Im-$unit a \\
@@ -621,7 +621,7 @@ prover implements the computational semantics of the de Rham stack.
 
 Coreduced induction and its $\beta-$quation.
 
-\begin{table}[ht]
+\begin{table}[ht!]
 \tabstyle
 \begin{tabular}{l}
 \textbf{def} $\Im-$ind (A : U) (B : $\Im$ A → U) (c : $\Pi$ (a : $\Im$ A), \\
@@ -636,7 +636,7 @@ Coreduced induction and its $\beta-$quation.
 
 Geometric Modal HoTT Framework: Infinitesimal Proximity, Formal Disk, Formal Disk Bundle, Differential.
 
-\begin{table}[ht]
+\begin{table}[ht!]
 \tabstyle
 \begin{tabular}{l}
 \textbf{def} $\sim$ (X : U) (a x' : X) : U := Path ($\Im$ X) ($\iota$ X a) ($\iota$ X x') \\
@@ -683,7 +683,7 @@ Also there are other foundations to consider motivated by typical tasks in homot
 Modification of Anders with Simplicial types and Hopf Fibrations built intro the core of type checker
 is called \textbf{Dan} with following recursive syntax (having $f$ as Simplecies and $coh$ as Path-coherence functions):
 
-\begin{table}[ht]
+\begin{table}[ht!]
 \tabstyle
 \begin{tabular}{l}
    \textbf{simplex} n [v$_0$ .. v$_n$] \{ f$_0$, f$_1$, ..., f$_n$ | coh i$_1$ i$_2$ ... i$_n$ \} : Simplex
@@ -692,7 +692,7 @@ is called \textbf{Dan} with following recursive syntax (having $f$ as Simplecies
 
 and instantiation example:
 
-\begin{table}[ht]
+\begin{table}[ht!]
 \tabstyle
 \begin{tabular}{l}
 
@@ -743,8 +743,8 @@ As a practical refinement of cubicaltt, Anders serves as an accessible
 tool for homotopy type theory, with potential for incremental
 enhancements like a tactic language.
 
-\newpage
 \appendix
+\newpage
 \section{Application A. HoTT Mathematics}
 \label{sec:hott-applications}
 

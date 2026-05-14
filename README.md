@@ -302,6 +302,9 @@ anders.groupoid.space/mathematics/
 Mentions
 --------
 
+* Максим Сохацький. <a href="https://groupoid.github.io/anders/doc/homotopy.pdf">Homotopy Theory for Anders</a>. 2022-05-13
+* Максим Сохацький. <a href="https://groupoid.github.io/anders/doc/cat.pdf">Category Theory for Anders</a>. 2022-05-13
+* Максим Сохацький. <a href="https://tonpa.guru/stream/2026/2026-05-12%20Андерс%205.5.htm">Anders 5.5</a>. 2026-05-12
 * Максим Сохацький. <a href="https://www.youtube.com/watch?v=KHDgytozLv4">Презентація кубічного CCHM прувера Anders 0.7.2</a>. 2021-07-18
 * Максим Сохацький. <a href="https://tonpa.guru/stream/2022/2022-01-17%20Anders.htm">Anders: верификатор математики</a>. 2022-01-17
 * Максим Сохацький. <a href="https://groupoid.github.io/anders/doc/anders.pdf">Anders: Modal Homotopy Type System</a>. 2022-01-17

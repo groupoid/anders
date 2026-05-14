@@ -272,10 +272,18 @@ anders.groupoid.space/mathematics/
 │   └── topology/
 ├── categories/
 │   ├── abelian/
+│   ├── adjunction/
+│   ├── cartesian/
+│   ├── cat/
 │   ├── category/
+│   ├── equivalence/
 │   ├── functor/
+│   ├── groupoid/
+│   ├── natural/
+│   ├── symmetric/
 │   ├── topos/
-│   └── groupoid/
+│   ├── universal/
+│   └── yoneda/
 ├── geometry/
 │   ├── bundle/
 │   ├── etale/

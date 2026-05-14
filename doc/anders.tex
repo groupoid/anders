@@ -26,6 +26,32 @@
 
 \newcommand{\tabstyle}[0]{\scriptsize\ttfamily\fontseries{l}\selectfont}
 
+\newcommand{\anders}[0]{\textbf{Anders}}
+
+\usepackage[utf8]{inputenc}
+\DeclareUnicodeCharacter{2071}{\textsuperscript{i}}
+\DeclareUnicodeCharacter{2080}{\ensuremath{_0}}
+\DeclareUnicodeCharacter{2081}{\ensuremath{_1}}
+\DeclareUnicodeCharacter{2082}{\ensuremath{_2}}
+\DeclareUnicodeCharacter{207B}{\ensuremath{^{-}}}
+\DeclareUnicodeCharacter{02B2}{\textsuperscript{j}}
+\DeclareUnicodeCharacter{03C6}{\ensuremath{\varphi}}
+\DeclareUnicodeCharacter{21A6}{\ensuremath{\mapsto}}
+\DeclareUnicodeCharacter{3008}{\ensuremath{\langle}}
+\DeclareUnicodeCharacter{3009}{\ensuremath{\rangle}}
+\DeclareUnicodeCharacter{266D}{\ensuremath{\flat}}
+\DeclareUnicodeCharacter{2111}{\ensuremath{\Im}}
+\DeclareUnicodeCharacter{03B9}{\ensuremath{\iota}}
+\DeclareUnicodeCharacter{2227}{\ensuremath{\wedge}}
+\DeclareUnicodeCharacter{2228}{\ensuremath{\vee}}
+\DeclareUnicodeCharacter{03A0}{\ensuremath{\Pi}}
+\DeclareUnicodeCharacter{03A3}{\ensuremath{\Sigma}}
+\DeclareUnicodeCharacter{2032}{\ensuremath{\prime}}
+\DeclareUnicodeCharacter{2212}{\ensuremath{-}}
+\DeclareUnicodeCharacter{03BB}{\ensuremath{\lambda}}
+\DeclareUnicodeCharacter{03C8}{\ensuremath{\psi}}
+\DeclareUnicodeCharacter{2605}{\ensuremath{\star}}
+
 \begin{document}
 
 \maketitle
@@ -101,7 +127,8 @@ corresponds to the type defined in OCaml module:
     kan :=&$\textbf{transp}\ E\ E\ |\ \textbf{hcomp}\ E$ \\
    glue :=&$\textbf{Glue}\ E\ |\ \textbf{glue}\ E\ |\ \textbf{unglue}\ E\ E$ \\
      Im :=&$\textbf{Im}\ \mathrm{E}\ |\ \textbf{Inf}\ \mathrm{E}\ |\ \textbf{Join}\ \mathrm{E}\ |\ \textbf{ind$_{Im}$}\ \mathrm{E}\ \mathrm{E}$ \\
-     Flat :=&$\flat\ \mathrm{E}\ |\ \flat-\textrm{unit}\ \mathrm{E}\ |\ \flat-\textrm{counit}\ \mathrm{E}\ |\ \textbf{ind}_{\flat}\ \mathrm{E}\ \mathrm{E}$ \\
+   Flat :=&$\flat\ \mathrm{E}\ |\ \flat-\textrm{unit}\ \mathrm{E}\ |\ \flat-\textrm{counit}\ \mathrm{E}\ |\ \textbf{ind}_{\flat}\ \mathrm{E}\ \mathrm{E}$ \\
+    HIT :=&$\textbf{coequ}\ \mathrm{E}\ |\ \iota_2\ |\ \textbf{resp}\ |\ \textbf{ind}_{coequ}\ |\ \textbf{disc}\ \mathrm{E}\ |\ \textbf{base}\ |\ \textbf{hub}\ |\ \textbf{spoke}\ |\ \textbf{ind}_{disc}$ \\
 \end{tabular}
 \end{table}
 
@@ -110,9 +137,10 @@ Further Menhir BNF notation will be used to describe the top-level language E pa
 \begin{table}[ht!]
 \centering
 \begin{tabular}{rl}
-      E :=&$\textrm{cosmos}\ |\ \textrm{var}\ |\ \textrm{MLTT}\ |\ \textrm{CCHM}\ |\ \textrm{Im}\ |\ \textrm{Flat}$ \\
+      E :=&$\textrm{cosmos}\ |\ \textrm{var}\ |\ \textrm{MLTT}\ |\ \textrm{CCHM}\ |\ \textrm{Im}\ |\ \textrm{Flat}\ |\ \textrm{HIT}$ \\
    CCHM :=&$\textrm{path}\ |\ \textrm{I}\ |\ \textrm{part}\ |\ \textrm{sub}\ |\ \textrm{kan}\ |\ \textrm{glue}$ \\
    MLTT :=&$\textrm{pi}\ |\ \textrm{sigma}\ |\ \textrm{id}$ \\
+    HIT :=&$\textrm{coequ}\ |\ \textrm{disc}$ \\
 \end{tabular}
 \end{table}
 
@@ -124,7 +152,7 @@ The keywords are following: \texttt{module}, \texttt{where}, \texttt{import}, \t
 \texttt{transp}, \texttt{hcomp}, \texttt{zero}, \texttt{one}, \texttt{Partial}, \texttt{inc},
 \texttt{$\times$}, \texttt{$\rightarrow$}, \texttt{:}, \texttt{:=}, \texttt{$\mapsto$}, \texttt{U},
 \texttt{ouc}, \texttt{interval}, \texttt{inductive}, \texttt{Glue}, \texttt{glue}, \texttt{unglue},
-\texttt{$\flat$}, \texttt{$\flat$-unit}, \texttt{$\flat$-counit}, \texttt{ind-$\flat$}.
+\texttt{$\flat$}, \texttt{$\flat$-unit}, \texttt{$\flat$-counit}, \texttt{ind-$\flat$}, \texttt{coequ}, \texttt{$\iota_2$}, \texttt{resp}, \texttt{coequ-ind}, \texttt{disc}, \texttt{base}, \texttt{hub}, \texttt{spoke}, \texttt{disc-ind}.
 
 \textbf{Indentifiers}. Identifiers support UTF-8. Indentifiers couldn't
 start with $\texttt{:}$, $\texttt{-}$, $\rightarrow$. Sample identifiers:
@@ -653,7 +681,7 @@ Geometric Modal HoTT Framework: Infinitesimal Proximity, Formal Disk, Formal Dis
 \textbf{def} T$^\infty$-map (X Y : U) (f : X → Y) ($\tau$ : T$^\infty$ X) : T$^\infty$ Y := (f $\tau$.1, d X Y f $\tau$.1 $\tau$.2) \\
 \end{tabular}
 \end{table}
-\newpage
+
 \subsection{Flat Modality}
 
 The Flat modality $\flat$ (also known as the discrete modality) is a core primitive of Anders,
@@ -669,7 +697,7 @@ computational semantics for the Flat modality including its interaction with cub
 \textbf{def} FlatCounit (A : U) (x : $\flat$ A) := $\flat$-counit x \\
 \\
 \textbf{def} isDiscrete (A : U) : U := isEquiv A ($\flat$ A) (FlatUnit A) \\
-\textbf{def} ♭-$\eta$ (A : U) (x : $\flat$ A) : Path ($\flat$ A) x ($\flat$-unit ($\flat$-counit x)) := <p> x \\
+\textbf{def} $\flat$-$\eta$ (A : U) (x : $\flat$ A) : Path ($\flat$ A) x ($\flat$-unit ($\flat$-counit x)) := <p> x \\
 \textbf{def} FlatInd (A : U) (B : $\flat$ A $\rightarrow$ U) := ind-$\flat$ A B \\
 \end{tabular}
 \end{table}
@@ -692,57 +720,161 @@ This corresponds to the intuition that a type is discrete if its points have no 
 that aren't captured by the discrete topology.
 \end{definition}
 
-\newpage
 \subsection{Inductive Types}
 
-Anders currently don’t support Lean-compatible generic inductive schemes
-definition. So instead of generic inductive schemes Anders supports well-founded trees (W-types).
-Basic data types like List, Nat, Fin, Vec are implemented as W-types in base library.
+The foundational inductive types in \anders\ are based on Martin-L\"{o}f's intuitionistic type theory \cite{ML84}. Instead of a generic inductive definition scheme, \anders\ provides well-founded trees (W-types) as a primitive construction from which other data types can be derived. Basic data types like List, Fin, and Vec are implemented as W-types in the core library.
 
-\begin{itemize}
-\item W, 0, 1, 2 basis of MLTT-80 (Martin-L\"{o}f)
-\item General Schemes of Inductive Types (Paulin-Mohring)
-\end{itemize}
+\subsubsection*{Empty Type}
 
+The empty type $\mathbf{0}$ (also written as \texttt{empty}) is the inductive type with no constructors. It represents logical falsehood. Its induction principle is the principle of explosion (\textit{ex falso quodlibet}).
+
+\begin{table}[ht!]
+\tabstyle
+\begin{tabular}{l}
+\textbf{def} Empty : U := \textbf{0} \\
+\textbf{def} Empty-elim (C : Empty $\rightarrow$ U) (z : Empty) : C z := \textbf{ind-empty} C z
+\end{tabular}
+\end{table}
+
+\subsubsection*{Unit Type}
+
+The unit type $\mathbf{1}$ (also written as \texttt{unit}) is the inductive type with a single constructor ★. It represents logical truth.
+
+\begin{table}[ht!]
+\tabstyle
+\begin{tabular}{l}
+\textbf{def} Unit : U := \textbf{1} \\
+\textbf{def} star : Unit := ★ \\
+\\
+\textbf{def} Unit-ind (C : Unit $\rightarrow$ U) (u : C star) (z : Unit) : C z := \textbf{ind-unit} C u z
+\end{tabular}
+\end{table}
+
+\subsubsection*{Boolean Type}
+
+The boolean type $\mathbf{2}$ (also written as \texttt{bool}) is the inductive type with two constructors $0_2$ and $1_2$ (or \texttt{false} and \texttt{true}). It is used for case analysis and decision procedures.
+
+\begin{table}[ht!]
+\tabstyle
+\begin{tabular}{l}
+\textbf{def} Bool : U := \textbf{2} \\
+\textbf{def} false : Bool := $0_2$ \\
+\textbf{def} true : Bool := $1_2$ \\
+\\
+\textbf{def} Bool-ind (C : Bool $\rightarrow$ U) (f : C false) (t : C true) (z : Bool) \\
+\ \ : C z := \textbf{ind-bool} C f t z
+\end{tabular}
+\end{table}
+
+\newpage
+\subsubsection*{Natural Numbers}
+
+The type of natural numbers $\mathbb{N}$ is a primitive type in \anders, providing efficient normalization for arithmetic operations. Its elimination rule is provided by the \texttt{ind-Nat} primitive.
+
+\begin{table}[ht!]
+\tabstyle
+\begin{tabular}{l}
+\textbf{def} Nat : U := \textbf{Nat} \\
+\textbf{def} Zero : Nat := \textbf{0} \\
+\textbf{def} Succ (n : Nat) : Nat := \textbf{S} n \\
+\\
+\textbf{def} Nat-ind (C : Nat $\rightarrow$ U) (z : C Zero) (s : $\Pi$ (n : Nat), C n $\rightarrow$ C (Succ n)) \\
+\ \ (n : Nat) : C n := \textbf{ind-Nat} C z s n
+\end{tabular}
+\end{table}
+
+\subsubsection*{W-Types}
+
+Well-founded trees (W-types) are the building blocks for all other inductive types in \anders. A W-type $\mathsf{W}(x : A), B(x)$ is specified by a type $A$ of shapes and a family $B : A \to U$ of positions for each shape.
+
+\begin{table}[ht!]
+\tabstyle
+\begin{tabular}{l}
+\textbf{def} W (A : U) (B : A $\rightarrow$ U) : U := \textbf{W} A B \\
+\textbf{def} sup (A : U) (B : A $\rightarrow$ U) (a : A) (f : B a $\rightarrow$ W A B) \\
+\ \ : W A B := \textbf{sup} a f \\
+\\
+\textbf{def} W-ind (A : U) (B : A $\rightarrow$ U) (C : W A B $\rightarrow$ U) \\
+\ \ (g : $\Pi$ (a : A) (f : B a $\rightarrow$ W A B), ($\Pi$ (b : B a), C (f b)) $\rightarrow$ C (sup A B a f)) \\
+\ \ (w : W A B) : C w := \textbf{ind-W} A B C g w
+\end{tabular}
+\end{table}
+
+\newpage
 \subsection{Higher Inductive Types}
 
-As for higher inductive types Anders is inspired by Three-HIT foundation (Coequalizer, Path Coequalizer and Colimit)
-but contains only modal extensions Flat and Infinitesimal, Hub Spoke Disc for direct truncations encoding, and
-Coequalizer for computable $S^1$, $S^n$, $K(G,n)$, Colimits.
+Higher inductive types (HITs) generalize inductive types by allowing constructors that target path types, enabling the representation of cell complexes and other quotient-like structures. \anders\ provides two primitive HIT constructions: coequalizers and hub-and-spoke discs. These primitives, combined with W-types, are sufficient to represent a wide range of HITs, including spheres $S^n$, suspensions, and truncations, following the Three-HIT theorem approach \cite{BauerWeide}.
 
-Also there are other foundations to consider motivated by typical tasks in homotopy (type) theory:
+\subsubsection*{Coequalizers}
 
-\begin{itemize}
-\item Coequalizer, Path Coequalizer and Colimit (van der Weide)
-\item Coequalizer, Hub Spoke Disc, and W, 0, 1, 2 types (Groupoid Infinity)
-\item General Schemes of Higher Inductive Types (Cubical Agda, cubicaltt)
-\end{itemize}
-
-\subsection{Simplicial Types}
-
-Modification of Anders with Simplicial types and Hopf Fibrations built intro the core of type checker
-is called \textbf{Dan} with following recursive syntax (having $f$ as Simplecies and $coh$ as Path-coherence functions):
+The coequalizer $\mathsf{coequ}(f, g)$ of two parallel maps $f, g : A \to B$ is a higher inductive type that identifies the images of $f$ and $g$ in $B$. That is, for every $a : A$, we have a path $f(a) = g(a)$ in $\mathsf{coequ}(f, g)$. This allows for computable representations of the circle $S^1$, the torus, and general colimits.
 
 \begin{table}[ht!]
 \tabstyle
 \begin{tabular}{l}
-   \textbf{simplex} n [v$_0$ .. v$_n$] \{ f$_0$, f$_1$, ..., f$_n$ | coh i$_1$ i$_2$ ... i$_n$ \} : Simplex
+\textbf{def} coeq (A B : U) (f g : A $\rightarrow$ B) : U := \textbf{coequ} A B f g \\
+\textbf{def} iota (A B : U) (f g : A $\rightarrow$ B) (x : B) : \textbf{coequ} A B f g := $\iota_2$ A B f g x \\
+\textbf{def} resp (A B : U) (f g : A $\rightarrow$ B) (x : A) \\
+\ \ : Path (\textbf{coequ} A B f g) ($\iota_2$ A B f g (f x)) ($\iota_2$ A B f g (g x)) \\
+\ := <i> \textbf{resp} A B f g x @ i \\
+\\
+\textbf{def} coequ-ind' (A B : U) (f g : A $\rightarrow$ B) (X : \textbf{coequ} A B f g $\rightarrow$ U) \\
+\ \ (i : $\Pi$ (b : B), X (iota A B f g b)) \\
+\ \ ($\rho$ : $\Pi$ (x : A), PathP (<i> X (resp A B f g x @ i)) (i (f x)) (i (g x))) \\
+\ \ (z : \textbf{coequ} A B f g) : X z \\
+\ := coequ-ind A B f g X i $\rho$ z
+
 \end{tabular}
 \end{table}
 
-and instantiation example:
+\subsubsection*{Hub-and-Spoke Discs}
+
+The hub-and-spoke construction $\mathsf{disc}(S, A)$ attaches a "disc" to a type $A$ for every map $f : S \to \mathsf{disc}(S, A)$. This is achieved by adding a "hub" point for each such $f$ and a "spoke" path connecting the hub to $f(s)$ for every $s : S$. This construction is particularly useful for defining $n$-truncations and other cell complexes where a point must be connected to an entire family of points.
 
 \begin{table}[ht!]
 \tabstyle
 \begin{tabular}{l}
-
-\textbf{def} s$_\infty$ : Simplicial \\
-\ := $\Pi$ (v e : Simplex), \\
-\ \ \ \ $\delta_{10}$ = v, $\delta_{11}$ = v, s$_0$ < v, \\
-\ \ \ \ $\delta_{20}$ = e $\circ$ e, s$_{10}$ < $\delta_{20}$ \\
-\ \ \ \ $\vdash$ $\infty$ (v, e, $\delta_{20}$ | $\delta_{10}$ $\delta_{11}$, s$_0$, $\delta_{20}$, s$_{10}$)
+\textbf{def} hs (S A : U) : U := \textbf{disc} S A \\
+\textbf{def} center (S A : U) (a : A) : hs S A := \textbf{base} S A a \\
+\textbf{def} hub' (S A : U) (f : S $\rightarrow$ hs S A) : hs S A := \textbf{hub} S A f \\
+\textbf{def} spoke' (S A : U) (f : S $\rightarrow$ hs S A) (s : S) \\
+\ \ : PathP (<i> hs S A) (hub' S A f) (f s) := \textbf{spoke} S A f s \\
+\\
+\textbf{def} hs-ind (S A : U) (X : hs S A $\rightarrow$ U) \\
+\ \ (nCenter : $\Pi$ (a : A), X (center S A a)) \\
+\ \ (nHub : $\Pi$ (f : S $\rightarrow$ hs S A) (nF : $\Pi$ (s : S), X (f s)), X (hub' S A f)) \\
+\ \ (nSpoke : $\Pi$ (f : S $\rightarrow$ hs S A) (nF : $\Pi$ (s : S), X (f s)) (s : S), \\
+\ \ \ \ PathP (<i> X (spoke' S A f s @ i)) (nHub f nF) (nF s)) \\
+\ \ (z : hs S A) : X z := \textbf{disc-ind} S A X nCenter nHub nSpoke z
 \end{tabular}
 \end{table}
+
+
+% \subsection{Simplicial Types}
+
+% Modification of Anders with Simplicial types and Hopf Fibrations built intro the core of type checker
+% is called \textbf{Dan} with following recursive syntax (having $f$ as Simplecies and $coh$ as Path-coherence functions):
+
+% \begin{table}[ht!]
+% \tabstyle
+% \begin{tabular}{l}
+%    \textbf{simplex} n [v$_0$ .. v$_n$] \{ f$_0$, f$_1$, ..., f$_n$ | coh i$_1$ i$_2$ ... i$_n$ \} : Simplex
+% \end{tabular}
+% \end{table}
+% 
+% and instantiation example:
+
+% \begin{table}[ht!]
+% \tabstyle
+% \begin{tabular}{l}
+% 
+% \textbf{def} s$_\infty$ : Simplicial \\
+% \ := $\Pi$ (v e : Simplex), \\
+% \ \ \ \ $\delta_{10}$ = v, $\delta_{11}$ = v, s$_0$ < v, \\
+% \ \ \ \ $\delta_{20}$ = e $\circ$ e, s$_{10}$ < $\delta_{20}$ \\
+% \ \ \ \ $\vdash$ $\infty$ (v, e, $\delta_{20}$ | $\delta_{10}$ $\delta_{11}$, s$_0$, $\delta_{20}$, s$_{10}$)
+% \end{tabular}
+% \end{table}
 
 \newpage
 \section{Properties}
@@ -785,7 +917,58 @@ enhancements like a tactic language.
 
 \appendix
 \newpage
-\section{Application A. HoTT Mathematics}
+\section{Annex A. Simon Huber Canonical Equations}
+\label{sec:appendix-b}
+
+\begin{table}[ht!]
+\tabstyle
+\begin{tabular}{l}
+transpⁱ N φ u₀ = u₀ \\
+transpⁱ U φ A = A \\
+transpⁱ (Π (x : A), B) φ u₀ v = transpⁱ B(x/w) φ (u₀ w(i/0)), w = tFill⁻ⁱ A φ v, v : A(i/1) \\
+transpⁱ (Σ (x : A), B) φ u₀ = (transpⁱ A φ (u₀.1), transpⁱ B(x/v) φ(u₀.2)), v = tFillⁱ A φ u₀.1 \\
+transpⁱ (Pathʲ A v w) φ u₀ = 〈j〉\\
+\ compⁱ A [φ ↦ u₀ j, (j=0) ↦ v, (j=1) ↦ w] (u₀ j) \\
+transpⁱ G ψ u₀ = glue [φ(i/1) ↦ t′₁] a′₁ : G(i/1), \\
+\ G = Glue [φ ↦ (T,w)] A \\
+transpⁱ (W (x : A), B) φ (sup a f) = \\
+\ sup (transpⁱ A φ a) (transpⁱ (B(v) → W) φ f), v = tFillⁱ A φ a \\
+transpⁱ (Coequ A B f g) φ (ι₂ b) = ι₂ (transpⁱ B φ b) \\
+transpⁱ (Coequ A B f g) φ (resp a j) = resp (transpⁱ A φ a) j \\
+transpⁱ (Disc S A) φ (base a) = base (transpⁱ A φ a) \\
+transpⁱ (Disc S A) φ (hub f) = hub (transpⁱ (S → Disc S A) φ f) \\
+transpⁱ (Disc S A) φ (spoke f y j) = spoke (transpⁱ (S → Disc S A) φ f) (transpⁱ S φ y) j \\
+transpⁱ (ℑ A) φ (ℑ-unit a) = ℑ-unit (transpⁱ A φ a) \\
+transpⁱ (♭ A) φ (♭-unit a) = ♭-unit (transpⁱ A φ a) \\
+transp⁻ⁱ A φ u = (transpⁱ A(i/1−i) φ u)(i/1−i) : A(i/0) \\
+tFillⁱ A φ u₀ = transpʲ A(i/i∧j) (φ∨(i=0)) u₀ : A \\
+\\
+hcompⁱ N [φ ↦ 0] 0 = 0 \\
+hcompⁱ N [φ ↦ S u] (S u₀) = S (hcompⁱ N [φ ↦ u] u₀) \\
+hcompⁱ U [φ ↦ E] A = Glue [φ ↦ (E(i/1), equivⁱ E(i/1−i))] A \\
+hcompⁱ (Π (x : A), B) [φ ↦ u] u₀ v = hcompⁱ B(x/v) [φ ↦ u v] (u₀ v) \\
+hcompⁱ (Σ (x : A), B) [φ ↦ u] u₀ = (v(i/1), compⁱ B(x/v) [φ ↦ u.2] u₀.2), \\
+\ v = hFillⁱ A [φ ↦ u.1] u₀.1 \\
+hcompⁱ (Pathʲ A v w) [φ ↦ u] u₀ = 〈j〉\\
+\ hcompⁱ A [ φ ↦ u j, (j = 0) ↦ v, (j = 1) ↦ w ] (u₀ j) \\
+hcompⁱ G [ψ ↦ u] u₀ = glue [φ ↦ t₁] a₁ : G, G = Glue [φ ↦ (T,w)] A, \\
+t₁ = u(i/1) : T, a₁ = unglue u(i/1) : A, glue [φ ↦ t₁] a1 = t₁ : T \\
+hcompⁱ (W (x : A), B) [φ ↦ sup a f] (sup a₀ f₀) \\
+\ = sup (hcompⁱ A [φ ↦ a] a₀) (hcompⁱ (B(v) → W) [φ ↦ f] f₀), v = hFillⁱ A [φ ↦ a] a₀ \\
+hcompⁱ (Coequ A B f g) [φ ↦ ι₂ u] (ι₂ u₀) = ι₂ (hcompⁱ B [φ ↦ u] u₀) \\
+hcompⁱ (Coequ A B f g) [φ ↦ resp a j] (resp a₀ j) = resp (hcompⁱ A [φ ↦ a] a₀) j \\
+hcompⁱ (Disc S A) [φ ↦ base a] (base a₀) = base (hcompⁱ A [φ ↦ a] a₀) \\
+hcompⁱ (Disc S A) [φ ↦ hub f] (hub f₀) = hub (hcompⁱ (S → Disc S A) [φ ↦ f] f₀) \\
+hcompⁱ (Disc S A) [φ ↦ spoke f y j] (spoke f₀ y₀ j) \\
+\ = spoke (hcompⁱ (S → Disc S A) [φ ↦ f] f₀) (hcompⁱ S [φ ↦ y] y₀) j \\
+hcompⁱ (ℑ A) [φ ↦ ℑ-unit u] (ℑ-unit u₀) = ℑ-unit (hcompⁱ A [φ ↦ u] u₀) \\
+hcompⁱ (♭ A) [φ ↦ ♭-unit u] (♭-unit u₀) = ♭-unit (hcompⁱ A [φ ↦ u] u₀) \\
+hFillⁱ A [φ ↦ u] u₀ = hcompʲ A [φ ↦ u(i/i∧j), (i=0) ↦ u₀] u₀ : A \\
+\end{tabular}
+\end{table}
+
+\newpage
+\section{Annex B. HoTT Mathematics}
 \label{sec:hott-applications}
 
 Mathematics in Homotopy Type Theory has seen substantial formalization efforts across multiple proof assistants (including Anders, Cubical Agda, Lean, Coq, etc.). Below is a (non-exhaustive) list of notable results that have been mechanized.

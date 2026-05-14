@@ -6,7 +6,7 @@
 
 <img src="https://tonpa.guru/stream/2019/img/Anders%20M%C3%B6rtberg.jpeg" width=600>
 
-Here is presented a reincarnation of **cubicaltt** called **anders**.
+Here is presented a derivative work of **cubicaltt** with **cohesivett** features called **anders**.
 
 Setup
 -----

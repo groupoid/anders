@@ -20,7 +20,8 @@
 \begin{abstract}
 This article describes the design and implementation of the categorical library in the Anders proof assistant.
 We focus on incorporating the design principles from Jacques Carette et al (2021) formalization in Agda,
-specifically regarding definitional duality and the use of cubical foundations for univalent categories.
+specifically regarding definitional duality and the use of redundant properties for free op-theorems
+in non-cubical foundations, with native cubical Rezk competion for univalent categories.
 \end{abstract}
 
 \tableofcontents
@@ -29,21 +30,25 @@ specifically regarding definitional duality and the use of cubical foundations f
 
 The Anders \footnote{\url{https://github.com/groupoid/anders}} categorical library is designed to be a minimal yet powerful
 implementation of category theory in a pure Martin-Löf Type Theory (MLTT)
-with cubical extensions. The library \footnote{\url{./library/mathematics/categories}}
+with cubical CCHM extensions. The library \footnote{\url{./library/mathematics/categories}}
 prioritizes proof-relevance (even for units), univalence, and duality-friendliness.
 
 \section{Definitional Duality}
 
-In Anders, leveraging its native cubical foundations (such as CCHM), the opposite category operation $(\cdot)\op$ is a definitional involution:
+In Anders, leveraging its native cubical foundations (such as CCHM),
+the opposite category operation $(\cdot)\op$ is a definitional involution:
+
 \begin{equation}
     (\catC\op)\op \equiv \catC
 \end{equation}
-This property provides "duality for free," where any result established for a category $\catC$ is immediately applicable to its dual without the need for explicit transport along an isomorphism.
 
-We have retained the precategory signature with additional properties ---
-specifically symmetric laws like \texttt{assoc-inv} and \texttt{id-id} ---
+This property provides "duality for free," where any result established for a category $\catC$
+is immediately applicable to its dual without the need for explicit transport along an isomorphism.
+
+We have retained the precategory signature with additional (redundant in cubical setting)
+properties --- specifically symmetric laws like \texttt{assoc-inv} and \texttt{id-id} ---
 primarily to ensure compatibility for proof extraction to Coq/HoTT and other
-formalizations that lack a multidimensional interval. While the Agda
+formalizations \footnote{\url{https://christine.groupoid.space}} that lack a multidimensional interval. While the Agda
 formalization \cite{carette2021} introduces these properties to achieve
 definitional duality in systems where it is not native, in Anders they
 are not strictly required for duality purposes. Instead, their inclusion
@@ -58,6 +63,7 @@ Anders is natively cubical. This allows us to use Path types for equality betwee
 proof-relevant by default.
 
 Working with $hSet$ in HoTT offers several significant advantages over a setoid-based approach:
+
 \begin{itemize}
     \item \textbf{Definitional Simplification}: By using $hSets$, we avoid the overhead of manually managing equivalence relations and congruence proofs.
     \item \textbf{Path-Based Equality}: Native Path types allow us to leverage cubical primitives for transport and composition, which is more direct than setoid-based rewriting.
@@ -91,34 +97,49 @@ meaning $(\alpha\op)\op \equiv \alpha$ (after normalization process).
 \section{Adjunctions}
 
 Adjunctions $L \dashv R$ between categories $\catC$ and $\catD$ are defined via the unit-counit formulation:
+
 \begin{itemize}
     \item A unit natural transformation $\eta : \text{id}_\catC \Rightarrow R \circ L$.
     \item A counit natural transformation $\varepsilon : L \circ R \Rightarrow \text{id}_\catD$.
     \item Two triangle identities (zig and zag).
 \end{itemize}
-Due to the current limitations of the Anders compiler regarding named projections within nested Sigma types, the implementation uses numeric indices (e.g., \texttt{u.1} for $\eta$) to ensure stable typechecking.
+
+Due to the current limitations of the Anders compiler regarding named projections within nested Sigma types,
+the implementation uses numeric indices (e.g., \texttt{u.1} for $\eta$) to ensure stable typechecking.
 
 \section{Equivalences of Categories}
 
 A strong equivalence between two categories $\catC$ and $\catD$ is a pair of functors $F : \catC \to \catD$ and $G : \catD \to \catC$ equipped with natural isomorphisms:
+
 \begin{itemize}
     \item $\eta : \text{id}_\catC \cong G \circ F$
     \item $\varepsilon : F \circ G \cong \text{id}_\catD$
 \end{itemize}
-We have implemented \texttt{opEquivalence}, which shows that an equivalence $e : \catC \cong \catD$ induces an equivalence $e\op : \catC\op \cong \catD\op$. To ensure definitional duality, we utilize \texttt{symNatIso} to adjust the directions of the unit and counit in the dualized structure.
+
+We have implemented \texttt{opEquivalence}, which shows that an equivalence $e : \catC \cong \catD$ induces
+an equivalence $e\op : \catC\op \cong \catD\op$. To ensure definitional duality, we utilize \texttt{symNatIso}
+to adjust the directions of the unit and counit in the dualized structure.
 
 \section{The Category of Categories}
 
-The category of small precategories, denoted $\mathcal{CAT}$, is formalized as a large category (of type $U_2$). The objects are precategories of type $U_1$, and morphisms are functors of type $U$. While $\mathcal{CAT}$ is naturally a $2$-category, we provide its $1$-categorical structure by specifying identity functors and functor composition. The operation of taking the opposite category is currently provided as a definitional involution on the objects of $\mathcal{CAT}$.
+The category of small precategories, denoted $\mathcal{CAT}$, is formalized as a large category (of type $U_2$).
+The objects are precategories of type $U_1$, and morphisms are functors of type $U$. While $\mathcal{CAT}$ is
+naturally a $2$-category, we provide its $1$-categorical structure by specifying identity functors and functor
+composition. The operation of taking the opposite category is currently provided as a definitional involution
+on the objects of $\mathcal{CAT}$.
 
 \section{The Yoneda Lemma}
 
-The Yoneda Lemma is a fundamental result in category theory that relates natural transformations between a hom-functor and an arbitrary functor to the values of that functor. For a small precategory $\catC$, an object $A \in \catC$, and a functor $F : \catC \to \mathcal{SET}$, the lemma states:
+The Yoneda Lemma is a fundamental result in category theory that relates natural transformations between a
+hom-functor and an arbitrary functor to the values of that functor. For a small precategory $\catC$, an
+object $A \in \catC$, and a functor $F : \catC \to \mathcal{SET}$, the lemma states:
+
 \begin{equation}
     \text{Nat}(\catC(A, -), F) \cong F(A)
 \end{equation}
 
 Our implementation addresses several technical challenges inherent in formalizing the Yoneda Lemma:
+
 \begin{itemize}
     \item \textbf{Large Target Category}: Standard functors in our library are restricted to small precategories. Since $\mathcal{SET}$ is a large category, we manually define \texttt{catfunSET} and \texttt{nattransSET} using Sigma types that accommodate objects from higher universes.
     \item \textbf{Cubical Isomorphism}: The isomorphism is established via the projection of \texttt{YonedaMap} and its inverse \texttt{YonedaInv}. The computability property of beta reduction $\texttt{Yoneda-$\beta$}$ holds definitionally, while uniqueness property of isomorphism inverse $\texttt{Yoneda-$\eta$}$ is proved by establishing a path between natural transformations.

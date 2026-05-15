@@ -161,6 +161,12 @@ hcompⁱ (♭ A) [φ ↦ ♭-unit u] (♭-unit u₀) = ♭-unit (hcompⁱ A [φ 
 hсomp-Fillⁱ A [φ ↦ u] u₀ = hcompʲ A [φ ↦ u(i/i∧j), (i=0) ↦ u₀] u₀ : A
 ```
 
+Next Versions
+-------------
+
+* Simplicial Type Theory (Modal Pi and Twisted primitives)
+* Simplicial version of Yoneda Embedding
+
 MLTT
 ----
 

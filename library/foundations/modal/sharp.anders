@@ -8,19 +8,49 @@ import library/foundations/univalent/equiv
 
 def ♯ (A : U) := ♭ 𝟏 → A
 
--- Introduction Rule
-def ♯-unit (A : U) := λ (a : A), λ (_ : ♭ 𝟏), a
+-- Introduction Rule (Unit)
+def ♯-unit (A : U) (a : A) : ♯ A := λ (_ : ♭ 𝟏), a
 
 -- Elimination Rule (Counit)
-def ♯-counit (A : U) := λ (s : ♯ A), s (♭-unit ★)
+def ♯-counit (A : U) (s : ♯ A) : A := s (♭-unit ★)
+
+-- Path in ♭ 𝟏 from ♭-unit ★ to any x
+-- This holds because ♭ 𝟏 is a proposition.
+-- We use ind-♭ with a flat motive and then extract with ♭-counit.
+def ♭-unit-𝟏-prop (x : ♭ 𝟏) : Path (♭ 𝟏) (♭-unit ★) x
+  := ♭-counit (ind-♭ 𝟏 (λ (z : ♭ 𝟏), Path (♭ 𝟏) (♭-unit ★) z)
+                 (λ (a : 𝟏), ind-unit (λ (z : 𝟏), ♭ (Path (♭ 𝟏) (♭-unit ★) (♭-unit z)))
+                                      (♭-unit (<_> ♭-unit ★)) a) x)
+
+-- Uniqueness Rule (η)
+-- s ≡ λ x, s (♭-unit ★)
+def ♯-η (A : U) (s : ♯ A) : Path (♯ A) (♯-unit A (♯-counit A s)) s
+  := <p> λ (x : ♭ 𝟏), s (♭-unit-𝟏-prop x @ p)
+
+-- Induction Rule (Derived)
+def ind-♯ (A : U) (C : ♯ A → U) (f : Π (x : A), C (♯-unit A x)) (z : ♯ A) : C z
+  := transp (<i> C (♯-η A z @ i)) 0 (f (♯-counit A z))
 
 -- Modal types: A type is codiscrete (♯-modal) if the unit is an equivalence.
 def is-♯-modal (A : U) := isEquiv A (♯ A) (♯-unit A)
 
--- Uniqueness Rule (η)
--- s ≡ λ x, s (♭-unit ★)
-def ♯-η (A : U) := λ (s : ♯ A), <p> λ (x : ♭ 𝟏), s (♭-η 𝟏 x @ p)
-
 -- Monad structure
-def ♯-join (A : U) := λ (ss : ♯ (♯ A)), λ (x : ♭ 𝟏), ss x x
-def ♯-map (A B : U) := λ (f : A → B), λ (s : ♯ A), λ (x : ♭ 𝟏), f (s x)
+def ♯-join (A : U) (ss : ♯ (♯ A)) : ♯ A := λ (x : ♭ 𝟏), ss x x
+def ♯-map (A B : U) (f : A → B) (s : ♯ A) : ♯ B := λ (x : ♭ 𝟏), f (s x)
+
+--- Uniqueness (η-rule)
+def ♯-η-eq (A : U) (x : ♯ A) : Path (♯ A) x (♯-unit A (ind-♯ A (λ (z : ♯ A), A) (λ (a : A), a) x))
+  := sym (♯ A) (♯-unit A (♯-counit A x)) x (♯-η A x)
+
+--- Reality Check: Huber Equations (Transport)
+--- transpⁱ (♯ A) φ (♯-unit a) = ♯-unit (transpⁱ A φ a)
+def trans-♯-is-correct (A : I → U) (u0 : A 0) :
+  Path (♯ (A 1)) (transp (<i> ♯ (A i)) 0 (♯-unit (A 0) u0)) (♯-unit (A 1) (transp (<i> A i) 0 u0))
+  := idp (♯ (A 1)) (♯-unit (A 1) (transp (<i> A i) 0 u0))
+
+--- Reality Check: Huber Equations (Composition)
+--- hcompⁱ (♯ A) [φ ↦ ♯-unit u] (♯-unit u₀) = ♯-unit (hcompⁱ A [φ ↦ u] u₀)
+def hcomp-♯-is-correct (A : U) (phi : I) (u : I → A) :
+  Path (♯ A) (hcomp (♯ A) phi (λ (j : I), [ (phi = 1) → ♯-unit A (u j) ]) (♯-unit A (u 0)))
+             (♯-unit A (hcomp A phi (λ (j : I), [ (phi = 1) → u j ]) (u 0)))
+  := idp (♯ A) (♯-unit A (hcomp A phi (λ (j : I), [ (phi = 1) → u j ]) (u 0)))

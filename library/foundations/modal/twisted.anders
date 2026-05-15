@@ -1,21 +1,25 @@
--- Twisted Modality (tw) for Simplicial Type Theory
+--- Twisted Modality (tw) for Simplicial Type Theory
 
--- Definitions
+--- Definitions
 def Twisted (A : U) : U := tw A
 def TwistedUnit (A : U) (a : A) : tw A := tw-unit a
-def TwistedInd (A : U) (C : tw A -> U) (f : (x : A) -> C (tw-unit x)) (z : tw A) : C z := ind-tw A C f z
+def TwistedInd (A : U) (C : tw A -> U) (f : (x : A) -> C (tw-unit x)) (z : tw A) : C z
+ := ind-tw A C f z
 
--- Uniqueness (η-rule)
-def TwistedEta (A : U) (x : tw A) : Path (tw A) x (tw-unit (ind-tw A (\_ -> A) (\a -> a) x)) := <p> x
+--- Uniqueness (η-rule)
+def TwistedEta (A : U) (x : tw A) : Path (tw A) x (tw-unit (ind-tw A (\_ -> A) (\a -> a) x))
+ := <p> x
 
--- Reality Check: Huber Equations (Transport)
--- transpⁱ (tw A) φ (tw-unit a) = tw-unit (transpⁱ A φ a)
+--- Reality Check: Huber Equations (Transport)
+--- transpⁱ (tw A) φ (tw-unit a) = tw-unit (transpⁱ A φ a)
 def trans-tw-is-correct (A : I -> U) (phi : I) (u0 : A 0) :
-  Path (tw (A 1)) (transp (<i> tw (A i)) phi (tw-unit u0)) (tw-unit (transp (<i> A i) phi u0))
-  := refl (tw (A 1)) (tw-unit (transp (<i> A i) phi u0))
+    Path (tw (A 1)) (transp (<i> tw (A i)) phi (tw-unit u0)) (tw-unit (transp (<i> A i) phi u0))
+ := refl (tw (A 1)) (tw-unit (transp (<i> A i) phi u0))
 
--- Reality Check: Huber Equations (Composition)
--- hcompⁱ (tw A) [φ ↦ tw-unit u] (tw-unit u₀) = tw-unit (hcompⁱ A [φ ↦ u] u₀)
+--- Reality Check: Huber Equations (Composition)
+--- hcompⁱ (tw A) [φ ↦ tw-unit u] (tw-unit u₀) = tw-unit (hcompⁱ A [φ ↦ u] u₀)
 def hcomp-tw-is-correct (A : U) (phi : I) (u : I -> A) (u0 : A) :
-  Path (tw A) (hcomp (<i> tw A) [ (phi=1) -> <i> tw-unit (u i) ] (tw-unit u0)) (tw-unit (hcomp (<i> A) [ (phi=1) -> <i> u i ] u0))
-  := refl (tw A) (tw-unit (hcomp (<i> A) [ (phi=1) -> <i> u i ] u0))
+    Path (tw A) (hcomp (<i> tw A) [ (phi=1) -> <i> tw-unit (u i) ] (tw-unit u0))
+                (tw-unit (hcomp (<i> A) [ (phi=1) -> <i> u i ] u0))
+ := refl (tw A) (tw-unit (hcomp (<i> A) [ (phi=1) -> <i> u i ] u0))
+

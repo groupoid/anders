@@ -1,27 +1,30 @@
--- Simplicial Type Theory (STT) Core Verification
+--- Simplicial Type Theory (STT) Core Verification
 
 import library/foundations/modal/flat
 import library/foundations/modal/sharp
 import library/foundations/modal/twisted
 
--- Modal Pi Types (Π (x :_μ A), B)
--- tracked via modal annotations μ ∈ {id, ♭, ♯, tw, ...}
+--- Modal Pi Types (Π (x :_μ A), B)
+--- tracked via modal annotations μ ∈ {id, ♭, ♯, tw, ...}
 
--- Reality Check: Huber Equations (Transport) for Modal Pi
--- transpⁱ (Π (x :_μ A), B) φ u₀ v = transpⁱ B[x/w] φ (u₀ w(i/0))
-def trans-ModalPi-is-correct (A : I -> U) (B : (i : I) -> A i -> U) (phi : I) (u0 : (x :_♭ A 0) -> B 0 x) :
-  Path ((x :_♭ A 1) -> B 1 x) (transp (<i> (x :_♭ A i) -> B i x) phi u0)
-       (\(v : A 1) -> transp (<i> B i (tFill A phi v i)) phi (u0 (tFill A phi v 0)))
+--- Reality Check: Huber Equations (Transport) for Modal Pi
+--- transpⁱ (Π (x :_μ A), B) φ u₀ v = transpⁱ B[x/w] φ (u₀ w(i/0))
+def trans-ModalPi-is-correct (A : I -> U) (B : (i : I) -> A i -> U)
+    (phi : I) (u0 : (x :_♭ A 0) -> B 0 x)
+  : Path ((x :_♭ A 1) -> B 1 x) (transp (<i> (x :_♭ A i) -> B i x) phi u0)
+          (\(v : A 1) -> transp (<i> B i (tFill A phi v i)) phi (u0 (tFill A phi v 0)))
   := refl ((x :_♭ A 1) -> B 1 x) (\(v : A 1) -> transp (<i> B i (tFill A phi v i)) phi (u0 (tFill A phi v 0)))
 
--- Reality Check: Huber Equations (Composition) for Modal Pi
--- hcompⁱ (Π (x :_μ A), B) [φ ↦ u] u₀ v = hcompⁱ B[x/v] [φ ↦ u v] (u₀ v)
-def hcomp-ModalPi-is-correct (A : U) (B : A -> U) (phi : I) (u : I -> (x :_♭ A) -> B x) (u0 : (x :_♭ A) -> B x) :
-  Path ((x :_♭ A) -> B x) (hcomp (<i> (x :_♭ A) -> B x) [ (phi=1) -> <i> u i ] u0)
-       (\(v : A) -> hcomp (<i> B v) [ (phi=1) -> <i> u i v ] (u0 v))
-  := refl ((x :_♭ A) -> B x) (\(v : A) -> hcomp (<i> B v) [ (phi=1) -> <i> u i v ] (u0 v))
+--- Reality Check: Huber Equations (Composition) for Modal Pi
+--- hcompⁱ (Π (x :_μ A), B) [φ ↦ u] u₀ v = hcompⁱ B[x/v] [φ ↦ u v] (u₀ v)
+def hcomp-ModalPi-is-correct (A : U) (B : A -> U) (phi : I)
+    (u : I -> (x :_♭ A) -> B x) (u0 : (x :_♭ A) -> B x)
+  : Path ((x :_♭ A) -> B x) (hcomp (<i> (x :_♭ A) -> B x) [ (phi=1) -> <i> u i ] u0)
+         (\(v : A) -> hcomp (<i> B v) [ (phi=1) -> <i> u i v ] (u0 v))
+ := refl ((x :_♭ A) -> B x) (\(v : A) -> hcomp (<i> B v) [ (phi=1) -> <i> u i v ] (u0 v))
 
--- Uniqueness (η-rule) for Modal Pi
-def ModalPi-Eta (A : U) (B : A -> U) (f : (x :_♭ A) -> B x) :
-  Path ((x :_♭ A) -> B x) f (\(x :_♭ A) -> f x)
-  := <p> f
+--- Uniqueness (η-rule) for Modal Pi
+def ModalPi-Eta (A : U) (B : A -> U) (f : (x :_♭ A) -> B x)
+  : Path ((x :_♭ A) -> B x) f (\(x :_♭ A) -> f x)
+ := <p> f
+

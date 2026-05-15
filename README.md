@@ -6,7 +6,7 @@
 
 <img src="https://tonpa.guru/stream/2019/img/Anders%20M%C3%B6rtberg.jpeg" width=600>
 
-Derivative work of **cubicaltt** with **cohesivett** and **stt** features.
+Derivative work of **cubicaltt** with **cohesivett** and **simplicialtt** features.
 
 Setup
 -----

@@ -6,7 +6,7 @@
 
 <img src="https://tonpa.guru/stream/2019/img/Anders%20M%C3%B6rtberg.jpeg" width=600>
 
-Here is presented a derivative work of **cubicaltt** with **cohesivett** features called **anders**.
+Derivative work of **cubicaltt** with **cohesivett** and **simplicialtt** features.
 
 Setup
 -----
@@ -160,6 +160,12 @@ hcompⁱ (ℑ A) [φ ↦ ℑ-unit u] (ℑ-unit u₀) = ℑ-unit (hcompⁱ A [φ 
 hcompⁱ (♭ A) [φ ↦ ♭-unit u] (♭-unit u₀) = ♭-unit (hcompⁱ A [φ ↦ u] u₀)
 hсomp-Fillⁱ A [φ ↦ u] u₀ = hcompʲ A [φ ↦ u(i/i∧j), (i=0) ↦ u₀] u₀ : A
 ```
+
+Next Versions
+-------------
+
+* Simplicial Type Theory (Modal Pi and Twisted primitives)
+* Simplicial version of Yoneda Embedding
 
 MLTT
 ----

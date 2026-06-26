@@ -96,7 +96,8 @@ in the style of HoTT/Coq homotopy library and Three-HIT theorem.
 Features
 --------
 
-* Homepage: https://anders.groupoid.space/
+* Academic Homepage: https://anders.groupoid.space/
+* Pantheon Homepage: https://homotopy.dev/
 * Fibrant MLTT-style N-0-1-2-Π-Σ-W primitives with Uₙ hierarchy in 500 LOC
 * Cofibrant CHM-style I (PathP) primitives with pretypes hierarchy Vₙ in 500 LOC
 * Generalized Transport and Homogeneous Composition core Kan operations

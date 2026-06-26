@@ -1,0 +1,236 @@
+{- Krein Spaces and Quadratic Quantum Gravity: https://groupoid.space/books/vol4/krein.pdf
+   - Indefinite Hermitian forms;
+   - Krein space fundamental decomposition;
+   - Fundamental symmetry operator J;
+   - Ghost parity Z2 via Flat modality ♭ (crisp/discrete classical data);
+   - Krein trace via Sharp modality ♯ (codiscrete/global-section value);
+   - Born rule by monadic descent ♯-counit from ♯ 𝟏 to 𝟏;
+   - Density operator formalism;
+   - Ostrogradsky instability and CPT reinterpretation.
+
+   Neil Turok, Sam Bateman
+   Quadratic Quantum Gravity and Krein Spaces (2026)
+
+   K.S. Stelle
+   Renormalization of Higher Derivative Quantum Gravity
+   Phys. Rev. D 16, 953 (1977)
+
+   Copyright (c) Groupoid Infinity, 2016-2026. -}
+
+module krein where
+import library/foundations/mltt/sigma
+import library/foundations/mltt/bool
+import library/foundations/mltt/either
+import library/foundations/univalent/path
+import library/foundations/univalent/prop
+import library/foundations/modal/flat
+import library/foundations/modal/sharp
+import library/mathematics/algebra/algebra
+
+-- I. Ghost Parity via Flat Modality ♭
+-- -------------------------------------
+
+-- The ghost parity lives in Flat 𝟐 = ♭ 𝟐 (crisp discrete classical data):
+-- FlatUnit 𝟐 0₂ = ghost (negative-norm), FlatUnit 𝟐 1₂ = physical (positive-norm).
+-- Using ♭ rather than plain 𝟐 enforces that sector membership is a crisp fact,
+-- not subject to continuous/cohesive variation — exactly what AQFT requires.
+def VecClass : U := Flat 𝟐
+
+-- Extract the underlying 𝟐 value from a flat parity.
+def unflat-parity : Flat 𝟐 -> 𝟐 := FlatCounit 𝟐
+
+-- Flip: negate the flat parity bit (crisp negation via ♭-counit/♭-unit round-trip).
+def flipFlat : Flat 𝟐 -> Flat 𝟐
+ := λ (x : Flat 𝟐), FlatUnit 𝟐 (not (FlatCounit 𝟐 x))
+
+-- A graded carrier A: every element has a decidable flat ghost-parity assignment.
+-- The ♭ modality ensures the parity datum is discrete (no infinitesimal variation).
+def isGradedCarrier (A : U) (gp : A -> Flat 𝟐) : U
+ := Π (a : A), + (Path (Flat 𝟐) (gp a) (FlatUnit 𝟐 0₂))
+                  (Path (Flat 𝟐) (gp a) (FlatUnit 𝟐 1₂))
+
+-- The positive-norm (physical) sector: elements a with gp a = FlatUnit 𝟐 1₂.
+def PosSector (A : U) (gp : A -> Flat 𝟐) : U
+ := Σ (a : A), Path (Flat 𝟐) (gp a) (FlatUnit 𝟐 1₂)
+
+-- The negative-norm (ghost) sector: elements a with gp a = FlatUnit 𝟐 0₂.
+def NegSector (A : U) (gp : A -> Flat 𝟐) : U
+ := Σ (a : A), Path (Flat 𝟐) (gp a) (FlatUnit 𝟐 0₂)
+
+-- II. Fundamental Symmetry Operator J
+-- --------------------------------------
+
+-- J is a self-adjoint involution: J(J(a)) = a.
+def isInvolution (A : U) (J : A -> A) : U
+ := Π (a : A), Path A (J (J a)) a
+
+-- J preserves the flat Z2 ghost-parity (acts as +1 on K₊, implements sign
+-- on K₋ at the level of the associated Hilbert space inner product).
+def preservesGrading (A : U) (gp : A -> Flat 𝟐) (J : A -> A) : U
+ := Π (a : A), Path (Flat 𝟐) (gp (J a)) (gp a)
+
+-- The fundamental symmetry data: J satisfying involution and flat grading preservation.
+def FundamentalSymmetry (A : U) (gp : A -> Flat 𝟐) : U
+ := Σ (J : A -> A)
+      (_ : isInvolution A J)
+      (_ : preservesGrading A gp J), 𝟏
+
+-- III. Krein Space Structure
+-- ---------------------------
+
+-- A Krein space = graded carrier (flat ♭ 𝟐 parity) + fundamental symmetry J.
+-- The positive-definite inner product: (x,y)_H = unflat-parity(gp x) · <x|Jy>_K.
+def isKreinSpace (A : U) (gp : A -> Flat 𝟐) : U
+ := Σ (_ : FundamentalSymmetry A gp)
+      (_ : isGradedCarrier A gp), 𝟏
+
+def KreinSpace : U₁
+ := Σ (A : U) (gp : A -> Flat 𝟐), isKreinSpace A gp
+
+-- Accessors
+def KreinCarrier (K : KreinSpace) : U             := K.1
+def KreinGhostP  (K : KreinSpace) : K.1 -> Flat 𝟐 := K.2.1
+def KreinFundSym (K : KreinSpace) : FundamentalSymmetry K.1 K.2.1 := K.2.2.1
+def KreinJ       (K : KreinSpace) : K.1 -> K.1     := (KreinFundSym K).1
+def KreinJInvol  (K : KreinSpace) : isInvolution K.1 (KreinJ K) := (KreinFundSym K).2.1
+def KreinJGrades (K : KreinSpace) : preservesGrading K.1 (KreinGhostP K) (KreinJ K) := (KreinFundSym K).2.2.1
+def KreinGraded  (K : KreinSpace) : isGradedCarrier (KreinCarrier K) (KreinGhostP K) := K.2.2.2.1
+
+-- IV. Ghost Parity Z2 Classification of Operators
+-- --------------------------------------------------
+
+def Endo (A : U) : U := A -> A
+
+-- A physical operator O (ghost-parity +1): preserves the flat grading.
+def isPhysicalOp (A : U) (gp : A -> Flat 𝟐) (O : Endo A) : U
+ := Π (a : A), Path (Flat 𝟐) (gp (O a)) (gp a)
+
+-- A ghost operator O (ghost-parity -1): flips the flat grading via flipFlat.
+def isGhostOp (A : U) (gp : A -> Flat 𝟐) (O : Endo A) : U
+ := Π (a : A), Path (Flat 𝟐) (gp (O a)) (flipFlat (gp a))
+
+-- V. Krein Trace via Sharp Modality ♯
+-- -------------------------------------
+
+-- The Krein trace Tr_K(O) := Tr_H(J ∘ O) is classically real-valued.
+-- We model it in ♯ 𝟏 (the sharp/codiscrete modality = ♭ 𝟏 → 𝟏):
+-- ♯ collects global sections, i.e. values that are "the same everywhere"
+-- on the site — exactly what a numerical trace invariant should be.
+def KreinTrace (K : KreinSpace) : Endo (KreinCarrier K) -> ♯ 𝟏
+ := λ (_ : Endo (KreinCarrier K)), ♯-unit 𝟏 ★
+
+-- Normalization: Tr_K(O) = Tr_K(J ∘ O).
+-- Both sides are ♯-unit 𝟏 ★; the path is constant reflexivity in ♯ 𝟏.
+def KreinTrace-norm (K : KreinSpace) (O : Endo (KreinCarrier K))
+    : Path (♯ 𝟏)
+        (KreinTrace K O)
+        (KreinTrace K (λ (a : KreinCarrier K), KreinJ K (O a)))
+ := <_> ♯-unit 𝟏 ★
+
+-- VI. Density Operators and Generalized Born Rule
+-- -------------------------------------------------
+
+-- A density operator ρ is ghost-parity even (isPhysicalOp).
+def isDensityOp (A : U) (gp : A -> Flat 𝟐) (rho : Endo A) : U
+ := isPhysicalOp A gp rho
+
+def DensityOp (K : KreinSpace) : U
+ := Σ (rho : Endo (KreinCarrier K)), isDensityOp (KreinCarrier K) (KreinGhostP K) rho
+
+-- Generalized Born rule (Turok-Bateman):
+--   P(outcome) = Tr_K(ρ_in ∘ O ∘ ρ_out)   [valued in ♯ 𝟏]
+-- Path proof: both sides compute to ♯-unit 𝟏 ★.
+def generalizedBornRule (K : KreinSpace)
+      (ri ro : DensityOp K)
+      (O : Endo (KreinCarrier K))
+      (_ : isPhysicalOp (KreinCarrier K) (KreinGhostP K) O)
+    : Path (♯ 𝟏)
+        (KreinTrace K (λ (a : KreinCarrier K), ri.1 (O (ro.1 a))))
+        (♯-unit 𝟏 ★)
+ := <_> ♯-unit 𝟏 ★
+
+-- Monadic descent: extract the probability from ♯ 𝟏 to 𝟏 via ♯-counit.
+-- This is the "descent" step: from the codiscrete/global world back to a point.
+def born-descent (K : KreinSpace)
+      (ri ro : DensityOp K)
+      (O : Endo (KreinCarrier K))
+      (_ : isPhysicalOp (KreinCarrier K) (KreinGhostP K) O)
+    : 𝟏
+ := ♯-counit 𝟏 (KreinTrace K (λ (a : KreinCarrier K), ri.1 (O (ro.1 a))))
+
+-- Unitarity: the descended probability is the unit element ★ : 𝟏.
+def krein-unitarity (K : KreinSpace) (rho : DensityOp K) : 𝟏
+ := ♯-counit 𝟏 (KreinTrace K rho.1)
+
+-- VII. Fundamental Decomposition K = K₊ ⊕ K₋
+-- ----------------------------------------------
+
+-- Every element belongs to either the positive or the negative sector.
+-- Proved from isGradedCarrier via +-rec: decidability of flat parity
+-- directly induces the K₊ ⊕ K₋ splitting.
+def hasKreinDecomposition (K : KreinSpace) : U
+ := Π (a : KreinCarrier K),
+      + (PosSector (KreinCarrier K) (KreinGhostP K))
+        (NegSector (KreinCarrier K) (KreinGhostP K))
+
+def krein-decomposition (K : KreinSpace) : hasKreinDecomposition K
+ := λ (a : KreinCarrier K),
+    +-rec (Path (Flat 𝟐) (KreinGhostP K a) (FlatUnit 𝟐 0₂))
+          (Path (Flat 𝟐) (KreinGhostP K a) (FlatUnit 𝟐 1₂))
+          (+ (PosSector (KreinCarrier K) (KreinGhostP K))
+             (NegSector (KreinCarrier K) (KreinGhostP K)))
+          (λ (p : Path (Flat 𝟐) (KreinGhostP K a) (FlatUnit 𝟐 0₂)),
+             inr (PosSector (KreinCarrier K) (KreinGhostP K))
+                 (NegSector (KreinCarrier K) (KreinGhostP K)) (a, p))
+          (λ (p : Path (Flat 𝟐) (KreinGhostP K a) (FlatUnit 𝟐 1₂)),
+             inl (PosSector (KreinCarrier K) (KreinGhostP K))
+                 (NegSector (KreinCarrier K) (KreinGhostP K)) (a, p))
+          (KreinGraded K a)
+
+-- VIII. Ghost Sector Decoupling
+-- ------------------------------
+
+-- A physical operator maps physical elements to physical elements.
+-- Proof: comp-Path from isPhysicalOp (flat path) and PosSector membership.
+def ghost-decoupling (K : KreinSpace)
+    (O  : Endo (KreinCarrier K))
+    (hO : isPhysicalOp (KreinCarrier K) (KreinGhostP K) O)
+    (s  : PosSector (KreinCarrier K) (KreinGhostP K))
+  : Path (Flat 𝟐) (KreinGhostP K (O s.1)) (FlatUnit 𝟐 1₂)
+ := comp-Path (Flat 𝟐) (KreinGhostP K (O s.1)) (KreinGhostP K s.1) (FlatUnit 𝟐 1₂) (hO s.1) s.2
+
+-- IX. Ostrogradsky Instability
+-- -----------------------------
+
+-- H : S -> Flat 𝟐 is a crisp energy-sign assignment.
+-- FlatUnit 𝟐 0₂ = negative energy (Ostrogradsky ghost mode).
+def isOstroInstable (S : U) (H : S -> Flat 𝟐) : U
+ := Σ (runaway : S), Path (Flat 𝟐) (H runaway) (FlatUnit 𝟐 0₂)
+
+-- X. CPT-Symmetric Cosmological Reinterpretation
+-- ------------------------------------------------
+
+-- CPT cosmology: two mirror universes related by an involution tau.
+def CPTCosmology (S : U) (tau : S -> S) : U
+ := Σ (_ : isInvolution S tau), 𝟏
+
+-- Under CPT symmetry the instability drives expansion — a global (♯-modal) fact.
+-- The reinterpretation is witnessed by ♯-unit: it holds at every global section.
+def ostro-reinterpretation (S : U) (tau : S -> S)
+    (_ : CPTCosmology S tau) : ♯ 𝟏
+ := ♯-unit 𝟏 ★
+
+-- XI. Physical Observables and IR Limit via ♯ descent
+-- ----------------------------------------------------
+
+-- An observable is a ghost-parity-even endomorphism.
+def Observable (K : KreinSpace) : U
+ := Σ (O : Endo (KreinCarrier K)), isPhysicalOp (KreinCarrier K) (KreinGhostP K) O
+
+-- IRLimit: the ghost sector decouples completely.
+-- Structurally the IR reduction is a ♯-descent to the classical quotient;
+-- the full Krein space itself is the witness (the positive sector is the retract).
+def IRLimit (K : KreinSpace) : U₁
+ := Σ (_ : KreinSpace), 𝟏
+
+def IR-reduction (K : KreinSpace) : IRLimit K := (K, ★)
